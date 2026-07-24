@@ -1,0 +1,6 @@
+{
+  "schema": "ariadne.interior_gate_baseline.v1",
+  "baseline_fraction": 0.985,
+  "source": "runs/e2e_1dwg_R4l_interior_20260709 refolded under the *D derived-cache measurement contract: 26779/27130 = 0.987062 (blockdef_diff exclude_derived_caches, 113+113 *D dim caches accounted in totals.derived_cache_excluded; dimensions verified by dim_semantic_gate 113/113)",
+  "note": "P8 ratchet floor (Paul approved 2026-07-09; raised from 0.948 with the *D measurement-contract adoption, deliberate commit 2026-07-09). Raising the floor is a deliberate commit after a verified better run - never automatic. A run whose interior_diff0_fraction falls below this blocks the capstone."
+}

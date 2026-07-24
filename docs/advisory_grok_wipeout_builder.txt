@@ -1,0 +1,45 @@
+```text
+[[-0.5,-0.5], [-0.5,h-0.5], [w-0.5,h-0.5], [w-0.5,-0.5], [-0.5,-0.5]]
+```
+
+**Wipeout `kPoly`:** IR의 `clip_boundary`를 **변환 없이** 다시 `setClipBoundary`에 넣으면 됨.  
+같은 footprint를 유지하려면:
+
+1. `setOrientation(origin, u, v)` — IR과 동일  
+2. `setClipBoundary(clip_boundary_type, clip_boundary)` — IR과 동일 (폐합 유지)  
+3. `image_size`는 보통 def/엔진이 채움; plain wipeout 인증값은 `[1,1]` (다른 크기 clip에 대한 유도 여부는 미검증)
+
+WCS 폴리곤만 있을 때: `AcDbWipeout::fitPointsToImage(pointArray, minPoint, scale, bFlipY)`로 이미지 공간으로 맞춘 뒤 `setClipBoundary`.
+
+IR 추출은 이미 이 공간을 그대로 씁니다 (`pWipe->clipBoundary()` → JSON).
+
+---
+
+## 4) Headless 함정 (심각도 순)
+
+1. **`acismobj26.dbx` 미로드** → `setAt`/`append`에서 `eNoClassId(409)`. demand-load에 맡기지 말 것.  
+2. **`createImageDefinition()`만 호출** → `eKeyNotFound(22)`. dict+placeholder def+`setImageDefId` 필수.  
+3. **`setImageDefId` 누락** → 이후 clip이 `eInvalidInput`.  
+4. **open clip polygon** → `setClipBoundary(kPoly)` = `eInvalidInput(3)`. 첫 점 반복 필수.  
+5. **`BTR::appendAcDbEntity`로 block def에 넣기** — 미증명. 인증 경로는 `AcDbWipeout::append()`뿐 (사실상 current/model space).  
+6. **`append()` out-id / handle self-report** — 엔티티는 살아 있는데 `handleOfId(id)=="0"` 가능. post-inspect로 확인.  
+7. **`engine_module_loaded=false` 진단** — 이미 로드된 경우 return-code 아티팩트일 수 있음. 실제 성공/실패와 혼동 금지.  
+8. **디스플레이 없음** — create 자체는 GS/뷰포트 불필요 (인증 create는 display 없이 성립). `subWorldDraw`는 나중에.  
+9. **`WIPEOUTVARIABLES`** — 성공 create에서 명시 생성 불필요. 필요한 건 **`ACAD_IMAGE_DICT` + ImageDef**.  
+10. **ISM reactor** — ImageDef를 dict에 `setAt`하면 됨. 별도 reactor 손코딩 불필요.  
+11. **orientation과 clip footprint 불일치** — 초기에 의심됐으나, 실제 결정적 실패 원인은 open polygon. 그래도 IR의 `origin/u/v`와 clip을 짝으로 유지할 것.  
+12. **`frame_on` 쓰기** — public setter 없음. 기본 true; 전역은 `WIPEOUTFRAME`.
+
+---
+
+### Block-def에 넣을 때 (아직 미증명, 시도 순서만)
+
+```text
+loadModule(acismobj26.dbx)
+→ mint ImageDef in ACAD_IMAGE_DICT
+→ new AcDbWipeout + setImageDefId + setOrientation + setClipBoundary(closed)
+→ try pBTR->appendAcDbEntity(id, pE)   // unproven
+→ if eInvalidInput/eNoClassId: fall back only to AcDbWipeout::append (MS), do not fake success
+```
+
+**한 줄 요약:** `acismobj26.dbx` 강제 로드 → placeholder `AcDbRasterImageDef` → `setImageDefId` → orientation → **닫힌** `setClipBoundary(kPoly)` → `AcDbWipeout::append()`. IR clip은 픽셀 공간 verbatim 재주입. Named BTR append는 아직 정직한 defer 대상입니다.

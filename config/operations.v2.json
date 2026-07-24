@@ -54,10 +54,10 @@
     }
   },
   "totals": {
-    "operations": 550,
+    "operations": 551,
     "by_status": {
       "blocked": 62,
-      "implemented": 488
+      "implemented": 489
     },
     "by_family": {
       "objectdbx_database": 21,
@@ -75,7 +75,7 @@
       "patch": 2,
       "diff": 1,
       "active_document_write_original": 8,
-      "blocks_xrefs_clone": 8,
+      "blocks_xrefs_clone": 9,
       "brep_solids": 54,
       "com_activex": 51,
       "constraints_associativity": 58,
@@ -92,11 +92,11 @@
     },
     "by_engine_tier": {
       "managed_also": 48,
-      "objectdbx_capable": 248,
+      "objectdbx_capable": 306,
       "accoreconsole_lisp_also": 20,
-      "native_arx_only": 234
+      "native_arx_only": 177
     },
-    "total": 550
+    "total": 551
   },
   "coverage": {
     "wired_ops": 29,
@@ -130,8 +130,8 @@
       "symbol_tables_dictionaries": 16,
       "ui_customization": 39
     },
-    "operation_records": 550,
-    "implemented": 488,
+    "operation_records": 551,
+    "implemented": 489,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
@@ -4310,6 +4310,78 @@
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
       "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "owner_ticket": "M08E-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "write.block.relink_hatch_assoc",
+      "operation": "write.block.relink_hatch_assoc",
+      "family": "blocks_xrefs_clone",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "hostless_dbx_in_accoreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "m08eDispatch",
+        "execution_host_class": "dbx",
+        "native_api": "AcDbHatch::insertLoopAt(int, Adesk::Int32, const AcDbObjectIdArray&) [id-derived loop replacement; ObjectARX 2027 has no per-loop assoc setter] + AcDbHatch::setAssociative + AcDbHatch::evaluateHatch + AcDbEntity::addPersistentReactor",
+        "composed_of": []
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tests/unit/test_relink_assoc.py",
+        "tests/unit/test_m08e_handlers.py"
+      ],
+      "summary": "Re-arm hatch associativity in the rebuilt drawing: open a hatch by",
+      "source_slice": "acdb-core.md",
+      "citation": "ref AcDbHatch__insertLoopAt@int@Adesk__Int32@AcDbObjectIdArray_.html",
+      "evidence_refs": [
+        "docs/ASSOC_RELINK_DESIGN.md",
+        "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eHandleRelinkHatchAssoc",
+        "tools/patch_ops/blocks.py:relink_hatch_assoc_ops",
+        "reports/interior100/R4u_remeasure_lwz.json"
+      ],
+      "notes": "P3 assoc-relink arc (R4v). Opens the (already appended, non-associative) hatch by its rebuilt handle, sets the associative flag, then per loop index REPLACES the geometric loop with an id-derived loop (removeLoopAt + insertLoopAt(int, type, AcDbObjectIdArray) -- ObjectARX 2027 exposes no per-loop assoc setter, the id-derived insert overload IS the write path), re-evaluates the hatch, and adds a persistent reactor on each source so the association is real (mirrors how genuinely associative hatches persist -- 1.dwg's own 66 prove the shape). Handles arrive PRE-TRANSLATED to rebuilt-drawing handles by patch_engine._translate_relink_records; the handler never sees census handles. Loop-count mismatch, missing hatch, non-hatch target, or unresolvable source ids are loud per-op errors (ASSOC_RELINK_* classes, docs/ASSOC_RELINK_DESIGN.md failure modes) -- never a silent skip.",
       "owner_ticket": "M08E-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -16121,9 +16193,9 @@
       "operation": "extend.customclass.declare",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -16181,7 +16253,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -16191,9 +16263,9 @@
       "operation": "extend.customclass.define",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -16251,7 +16323,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -16261,9 +16333,9 @@
       "operation": "extend.customclass.define_cons",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -16321,7 +16393,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -16331,9 +16403,9 @@
       "operation": "extend.customclass.define_dxf",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -16391,7 +16463,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -16401,9 +16473,9 @@
       "operation": "extend.customclass.define_nocons",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -16461,7 +16533,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -16471,9 +16543,9 @@
       "operation": "extend.customclass.rxinit",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -16531,7 +16603,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -16541,9 +16613,9 @@
       "operation": "extend.customclass.unregister",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -16601,7 +16673,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -16611,9 +16683,9 @@
       "operation": "extend.customentity.db_defaults",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -16671,7 +16743,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -16681,9 +16753,9 @@
       "operation": "extend.customentity.define",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -16745,7 +16817,7 @@
         "reports/tickets/WAVE3_PANE6_native_build.json",
         "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -16755,9 +16827,9 @@
       "operation": "extend.customentity.draw_viewport",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -16818,7 +16890,7 @@
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
         "reports/tickets/WAVE3_PANE6_native_build.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -16828,9 +16900,9 @@
       "operation": "extend.customentity.draw_world",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -16891,7 +16963,7 @@
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
         "reports/tickets/WAVE3_PANE6_native_build.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -16901,9 +16973,9 @@
       "operation": "extend.customentity.explode",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -16961,7 +17033,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -16971,9 +17043,9 @@
       "operation": "extend.customentity.geom_extents",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -17031,7 +17103,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -17041,9 +17113,9 @@
       "operation": "extend.customentity.grips",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -17104,7 +17176,7 @@
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
         "reports/tickets/WAVE3_PANE6_native_build.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -17114,9 +17186,9 @@
       "operation": "extend.customentity.intersect",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -17174,7 +17246,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -17184,9 +17256,9 @@
       "operation": "extend.customentity.list",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -17244,7 +17316,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -17254,9 +17326,9 @@
       "operation": "extend.customentity.osnap",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -17317,7 +17389,7 @@
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
         "reports/tickets/WAVE3_PANE6_native_build.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -17327,9 +17399,9 @@
       "operation": "extend.customentity.stretch",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -17390,7 +17462,7 @@
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
         "reports/tickets/WAVE3_PANE6_native_build.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -17400,9 +17472,9 @@
       "operation": "extend.customentity.subentpaths",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -17460,7 +17532,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -17470,9 +17542,9 @@
       "operation": "extend.customentity.transform",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -17530,7 +17602,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -17540,9 +17612,9 @@
       "operation": "extend.customobject.deepclone",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -17600,7 +17672,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -17610,9 +17682,9 @@
       "operation": "extend.customobject.define",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -17674,7 +17746,7 @@
         "reports/tickets/WAVE3_PANE6_native_build.json",
         "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -17684,9 +17756,9 @@
       "operation": "extend.customobject.embedded",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -17748,7 +17820,7 @@
         "reports/tickets/WAVE3_PANE6_native_build.json",
         "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -18060,9 +18132,9 @@
       "operation": "extend.customobject.partial_undo",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -18123,7 +18195,7 @@
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
         "reports/tickets/WAVE3_PANE6_native_build.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -18133,9 +18205,9 @@
       "operation": "extend.customobject.version",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -18194,7 +18266,7 @@
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
         "reports/lane_i_router_fix_resolution.json (2026-07-06 Lane I router-fix re-probe, CRASH->RUNNABLE headless)"
       ],
-      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I.",
+      "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re-probe measured this op as RUNNABLE, so the policy is now promoted to implemented. See reports/lane_i_router_fix_resolution.json and build_log.md Lane I. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -18204,9 +18276,9 @@
       "operation": "extend.customobject.wblockclone",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -18264,7 +18336,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -18274,9 +18346,9 @@
       "operation": "extend.module.entrypoint",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -18334,7 +18406,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -18501,9 +18573,9 @@
       "operation": "extend.object_enabler.register_classes",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -18561,7 +18633,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -18571,9 +18643,9 @@
       "operation": "extend.osnap.custom_mode",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -18634,7 +18706,7 @@
         "reports/tickets/WAVE3_PANE6_NATIVE_CUSTOM_OPS.json",
         "reports/tickets/WAVE3_PANE6_native_build.json"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -18644,9 +18716,9 @@
       "operation": "extend.protocol.attach",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -18704,7 +18776,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -18714,9 +18786,9 @@
       "operation": "extend.protocol.declare",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -18774,7 +18846,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -18784,9 +18856,9 @@
       "operation": "extend.protocol.detach",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -18844,7 +18916,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -18854,9 +18926,9 @@
       "operation": "extend.protocol.query",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -18914,7 +18986,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -18924,9 +18996,9 @@
       "operation": "extend.service.register",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -18984,7 +19056,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -19064,9 +19136,9 @@
       "operation": "inspect.runtime.cast",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -19124,7 +19196,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -19134,9 +19206,9 @@
       "operation": "inspect.runtime.desc",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -19194,7 +19266,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -19204,9 +19276,9 @@
       "operation": "inspect.runtime.isa",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -19264,7 +19336,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -19274,9 +19346,9 @@
       "operation": "inspect.runtime.iskindof",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -19334,7 +19406,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08K-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -19414,9 +19486,9 @@
       "operation": "overrule.dimstyle.install",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -19474,7 +19546,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08L-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -19974,9 +20046,9 @@
       "operation": "overrule.object.install",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -20034,7 +20106,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08L-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -20254,9 +20326,9 @@
       "operation": "overrule.queryx.install",
       "family": "custom_objects_protocols",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -20314,7 +20386,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08L-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -26876,9 +26948,9 @@
       "operation": "compute.geometry.circarc",
       "family": "geometry_kernel",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -26936,7 +27008,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08D-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -26946,9 +27018,9 @@
       "operation": "compute.geometry.compositecurve",
       "family": "geometry_kernel",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -27006,7 +27078,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08D-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -27016,9 +27088,9 @@
       "operation": "compute.geometry.curve.closest",
       "family": "geometry_kernel",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -27076,7 +27148,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08D-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -27086,9 +27158,9 @@
       "operation": "compute.geometry.curve.eval",
       "family": "geometry_kernel",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -27146,7 +27218,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08D-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -27156,9 +27228,9 @@
       "operation": "compute.geometry.curve.intersect",
       "family": "geometry_kernel",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -27216,7 +27288,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08D-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -27226,9 +27298,9 @@
       "operation": "compute.geometry.curve.sample",
       "family": "geometry_kernel",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -27286,7 +27358,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08D-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -27296,9 +27368,9 @@
       "operation": "compute.geometry.elliparc",
       "family": "geometry_kernel",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -27356,7 +27428,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08D-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -27366,9 +27438,9 @@
       "operation": "compute.geometry.lineseg",
       "family": "geometry_kernel",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -27426,7 +27498,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08D-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -27436,9 +27508,9 @@
       "operation": "compute.geometry.matrix.build",
       "family": "geometry_kernel",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -27496,7 +27568,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08D-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -27506,9 +27578,9 @@
       "operation": "compute.geometry.matrix.compose",
       "family": "geometry_kernel",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -27566,7 +27638,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08D-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -27576,9 +27648,9 @@
       "operation": "compute.geometry.nurbcurve",
       "family": "geometry_kernel",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -27636,7 +27708,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08D-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -27646,9 +27718,9 @@
       "operation": "compute.geometry.point.distance",
       "family": "geometry_kernel",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -27706,7 +27778,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08D-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -27716,9 +27788,9 @@
       "operation": "compute.geometry.point.transform",
       "family": "geometry_kernel",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -27776,7 +27848,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08D-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -27786,9 +27858,9 @@
       "operation": "compute.geometry.scale.build",
       "family": "geometry_kernel",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -27846,7 +27918,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08D-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -27856,9 +27928,9 @@
       "operation": "compute.geometry.surface.nurb",
       "family": "geometry_kernel",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -27916,7 +27988,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08D-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -27926,9 +27998,9 @@
       "operation": "compute.geometry.tolerance",
       "family": "geometry_kernel",
       "status": "implemented",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "engines": [
-        "native_arx_only"
+        "objectdbx_capable"
       ],
       "host_eligibility": [
         "arx_adapter",
@@ -27986,7 +28058,7 @@
         "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
         "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capability audit (reports/objectarx_sdk/P2A_DBX_CAPABILITY_AUDIT_20260716.json) found no editor/host-bound API in the declared native_api or the dispatch code slice -> objectdbx_capable. Static necessary-not-sufficient; dbx module import audit PASS (acdb/AcGe/CRT only).",
       "owner_ticket": "M08D-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -32685,11 +32757,13 @@
         "docs/FALLBACK_POLICY.md",
         "docs/M08_REMAINING_BATCH_PLAN.md#m08o-fallback-raw-command-hard-block"
       ],
-      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents.",
+      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is a HOST-OWNED module/loader lifecycle event or forbidden loader mutation, not a dispatchable job operation. Its occurrence is certified indirectly by the module lifecycle harness (tools/module_lifecycle_harness.py): every clean accoreconsole job run proves load->init->dispatch->unload completed.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings."
+      "blocked_reason": "SAFETY_FORBIDDEN: raw command dispatch is blocked in M08O fallback policy. Fallbacks are managed/.NET/LISP-only and do not expose direct command strings.",
+      "kind": "module_event",
+      "dispatchable": false
     },
     {
       "id": "module.command.register_auto",
@@ -32895,12 +32969,14 @@
         "config/autocad_native_arx_operation_catalog.json#module.command.remove_group",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.command.remove_group"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: arbitrary command group removal mutates the host command stack; implemented probes only clean up their bounded ARIADNE_M08N group.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: arbitrary command group removal mutates the host command stack; implemented probes only clean up their bounded ARIADNE_M08N group. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is a HOST-OWNED module/loader lifecycle event or forbidden loader mutation, not a dispatchable job operation. Its occurrence is certified indirectly by the module lifecycle harness (tools/module_lifecycle_harness.py): every clean accoreconsole job run proves load->init->dispatch->unload completed.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "SAFETY_FORBIDDEN: arbitrary command group removal mutates the host command stack; implemented probes only clean up their bounded ARIADNE_M08N group.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.command.remove_group"
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.command.remove_group",
+      "kind": "module_event",
+      "dispatchable": false
     },
     {
       "id": "module.command.stack_handle",
@@ -33036,12 +33112,14 @@
         "config/autocad_native_arx_operation_catalog.json#module.entrypoint.define",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.define"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. SDK_NOT_EXPOSED: entrypoint definition is a compile/link-time ARX macro/export contract, not a runtime SDK operation callable by the job dispatcher.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SDK_NOT_EXPOSED: entrypoint definition is a compile/link-time ARX macro/export contract, not a runtime SDK operation callable by the job dispatcher. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is a HOST-OWNED module/loader lifecycle event or forbidden loader mutation, not a dispatchable job operation. Its occurrence is certified indirectly by the module lifecycle harness (tools/module_lifecycle_harness.py): every clean accoreconsole job run proves load->init->dispatch->unload completed.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "SDK_NOT_EXPOSED: entrypoint definition is a compile/link-time ARX macro/export contract, not a runtime SDK operation callable by the job dispatcher.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.define"
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.define",
+      "kind": "module_event",
+      "dispatchable": false
     },
     {
       "id": "module.entrypoint.dispatch",
@@ -33107,12 +33185,14 @@
         "config/autocad_native_arx_operation_catalog.json#module.entrypoint.dispatch",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.dispatch"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: entrypoint dispatch is host-owned by the AutoCAD loader via acrxEntryPoint and cannot be synthesized safely by the integration job dispatcher.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: entrypoint dispatch is host-owned by the AutoCAD loader via acrxEntryPoint and cannot be synthesized safely by the integration job dispatcher. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is a HOST-OWNED module/loader lifecycle event or forbidden loader mutation, not a dispatchable job operation. Its occurrence is certified indirectly by the module lifecycle harness (tools/module_lifecycle_harness.py): every clean accoreconsole job run proves load->init->dispatch->unload completed.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "HOST_UNAVAILABLE: entrypoint dispatch is host-owned by the AutoCAD loader via acrxEntryPoint and cannot be synthesized safely by the integration job dispatcher.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.dispatch"
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.entrypoint.dispatch",
+      "kind": "module_event",
+      "dispatchable": false
     },
     {
       "id": "module.lifecycle.init",
@@ -33178,12 +33258,14 @@
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.init",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.init"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kInitAppMsg is delivered by the AutoCAD loader during module load; it is not a safe runtime job operation.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kInitAppMsg is delivered by the AutoCAD loader during module load; it is not a safe runtime job operation. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is a HOST-OWNED module/loader lifecycle event or forbidden loader mutation, not a dispatchable job operation. Its occurrence is certified indirectly by the module lifecycle harness (tools/module_lifecycle_harness.py): every clean accoreconsole job run proves load->init->dispatch->unload completed.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "HOST_UNAVAILABLE: On_kInitAppMsg is delivered by the AutoCAD loader during module load; it is not a safe runtime job operation.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.init"
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.init",
+      "kind": "module_event",
+      "dispatchable": false
     },
     {
       "id": "module.lifecycle.on_load_dwg",
@@ -33249,12 +33331,14 @@
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.on_load_dwg",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_load_dwg"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kLoadDwgMsg is delivered by the host during document lifecycle events; no controlled attended lifecycle route is available.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kLoadDwgMsg is delivered by the host during document lifecycle events; no controlled attended lifecycle route is available. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is a HOST-OWNED module/loader lifecycle event or forbidden loader mutation, not a dispatchable job operation. Its occurrence is certified indirectly by the module lifecycle harness (tools/module_lifecycle_harness.py): every clean accoreconsole job run proves load->init->dispatch->unload completed.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "HOST_UNAVAILABLE: On_kLoadDwgMsg is delivered by the host during document lifecycle events; no controlled attended lifecycle route is available.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_load_dwg"
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_load_dwg",
+      "kind": "module_event",
+      "dispatchable": false
     },
     {
       "id": "module.lifecycle.on_ole_unload",
@@ -33320,12 +33404,14 @@
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.on_ole_unload",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_ole_unload"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kOleUnloadAppMsg is a host lifecycle callback and cannot be triggered safely from the CAD OS job surface.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kOleUnloadAppMsg is a host lifecycle callback and cannot be triggered safely from the CAD OS job surface. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is a HOST-OWNED module/loader lifecycle event or forbidden loader mutation, not a dispatchable job operation. Its occurrence is certified indirectly by the module lifecycle harness (tools/module_lifecycle_harness.py): every clean accoreconsole job run proves load->init->dispatch->unload completed.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "HOST_UNAVAILABLE: On_kOleUnloadAppMsg is a host lifecycle callback and cannot be triggered safely from the CAD OS job surface.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_ole_unload"
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_ole_unload",
+      "kind": "module_event",
+      "dispatchable": false
     },
     {
       "id": "module.lifecycle.on_unload_dwg",
@@ -33391,12 +33477,14 @@
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.on_unload_dwg",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_unload_dwg"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kUnloadDwgMsg is host-owned document lifecycle dispatch and unavailable to the headless integration job route.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kUnloadDwgMsg is host-owned document lifecycle dispatch and unavailable to the headless integration job route. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is a HOST-OWNED module/loader lifecycle event or forbidden loader mutation, not a dispatchable job operation. Its occurrence is certified indirectly by the module lifecycle harness (tools/module_lifecycle_harness.py): every clean accoreconsole job run proves load->init->dispatch->unload completed.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "HOST_UNAVAILABLE: On_kUnloadDwgMsg is host-owned document lifecycle dispatch and unavailable to the headless integration job route.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_unload_dwg"
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.on_unload_dwg",
+      "kind": "module_event",
+      "dispatchable": false
     },
     {
       "id": "module.lifecycle.other",
@@ -33462,12 +33550,14 @@
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.other",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.other"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: arbitrary lifecycle message dispatch is host-owned and cannot be simulated safely by the agent job surface.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: arbitrary lifecycle message dispatch is host-owned and cannot be simulated safely by the agent job surface. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is a HOST-OWNED module/loader lifecycle event or forbidden loader mutation, not a dispatchable job operation. Its occurrence is certified indirectly by the module lifecycle harness (tools/module_lifecycle_harness.py): every clean accoreconsole job run proves load->init->dispatch->unload completed.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "HOST_UNAVAILABLE: arbitrary lifecycle message dispatch is host-owned and cannot be simulated safely by the agent job surface.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.other"
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.other",
+      "kind": "module_event",
+      "dispatchable": false
     },
     {
       "id": "module.lifecycle.unload",
@@ -33533,12 +33623,14 @@
         "config/autocad_native_arx_operation_catalog.json#module.lifecycle.unload",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.unload"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kUnloadAppMsg is delivered by the loader during module unload; the job dispatcher must not invoke it directly.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kUnloadAppMsg is delivered by the loader during module unload; the job dispatcher must not invoke it directly. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is a HOST-OWNED module/loader lifecycle event or forbidden loader mutation, not a dispatchable job operation. Its occurrence is certified indirectly by the module lifecycle harness (tools/module_lifecycle_harness.py): every clean accoreconsole job run proves load->init->dispatch->unload completed.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "HOST_UNAVAILABLE: On_kUnloadAppMsg is delivered by the loader during module unload; the job dispatcher must not invoke it directly.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.unload"
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.lifecycle.unload",
+      "kind": "module_event",
+      "dispatchable": false
     },
     {
       "id": "module.load",
@@ -33604,12 +33696,14 @@
         "config/autocad_native_arx_operation_catalog.json#module.load",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: acrxLoadModule loads external code into the AutoCAD host process and is not an agent-exposed operation.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: acrxLoadModule loads external code into the AutoCAD host process and is not an agent-exposed operation. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is a HOST-OWNED module/loader lifecycle event or forbidden loader mutation, not a dispatchable job operation. Its occurrence is certified indirectly by the module lifecycle harness (tools/module_lifecycle_harness.py): every clean accoreconsole job run proves load->init->dispatch->unload completed.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "SAFETY_FORBIDDEN: acrxLoadModule loads external code into the AutoCAD host process and is not an agent-exposed operation.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load"
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load",
+      "kind": "module_event",
+      "dispatchable": false
     },
     {
       "id": "module.load.acad_rx",
@@ -33679,12 +33773,14 @@
         "config/autocad_native_arx_operation_catalog.json#module.load.acad_rx",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.acad_rx"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: ARX demand/load mechanics execute host modules and mutate runtime loader state.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: ARX demand/load mechanics execute host modules and mutate runtime loader state. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is a HOST-OWNED module/loader lifecycle event or forbidden loader mutation, not a dispatchable job operation. Its occurrence is certified indirectly by the module lifecycle harness (tools/module_lifecycle_harness.py): every clean accoreconsole job run proves load->init->dispatch->unload completed.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "SAFETY_FORBIDDEN: ARX demand/load mechanics execute host modules and mutate runtime loader state.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.acad_rx"
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.acad_rx",
+      "kind": "module_event",
+      "dispatchable": false
     },
     {
       "id": "module.load.by_app",
@@ -33750,12 +33846,14 @@
         "config/autocad_native_arx_operation_catalog.json#module.load.by_app",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.by_app"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: application-driven module loading executes external code and mutates process loader state.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: application-driven module loading executes external code and mutates process loader state. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is a HOST-OWNED module/loader lifecycle event or forbidden loader mutation, not a dispatchable job operation. Its occurrence is certified indirectly by the module lifecycle harness (tools/module_lifecycle_harness.py): every clean accoreconsole job run proves load->init->dispatch->unload completed.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "SAFETY_FORBIDDEN: application-driven module loading executes external code and mutates process loader state.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.by_app"
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.by_app",
+      "kind": "module_event",
+      "dispatchable": false
     },
     {
       "id": "module.load.demand_register",
@@ -33822,11 +33920,13 @@
         "research/native_arx/editor-delta.md#Operation catalog (PART 1)",
         "research/native_arx/ui-customization.md#Operation catalog"
       ],
-      "notes": "M08N-A3 hard-blocked by safety: no raw command/menu/tool execution or AutoCAD demand-load registry mutation is exposed from the agent surface.",
+      "notes": "M08N-A3 hard-blocked by safety: no raw command/menu/tool execution or AutoCAD demand-load registry mutation is exposed from the agent surface. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is a HOST-OWNED module/loader lifecycle event or forbidden loader mutation, not a dispatchable job operation. Its occurrence is certified indirectly by the module lifecycle harness (tools/module_lifecycle_harness.py): every clean accoreconsole job run proves load->init->dispatch->unload completed.",
       "owner_ticket": "M08N-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
-      "blocked_reason": "SAFETY_FORBIDDEN: ObjectARX demand-load registration requires AutoCAD application registry/autoload mutation (LOADER/LOADCTRLS/MANAGED); ticket scope permits source/build artifacts only, not host autoload registry writes."
+      "blocked_reason": "SAFETY_FORBIDDEN: ObjectARX demand-load registration requires AutoCAD application registry/autoload mutation (LOADER/LOADCTRLS/MANAGED); ticket scope permits source/build artifacts only, not host autoload registry writes.",
+      "kind": "module_event",
+      "dispatchable": false
     },
     {
       "id": "module.load.lisp",
@@ -33896,12 +33996,14 @@
         "config/autocad_native_arx_operation_catalog.json#module.load.lisp",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.lisp"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: LISP loading executes script code in the AutoCAD host and is not exposed as a raw agent load surface.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: LISP loading executes script code in the AutoCAD host and is not exposed as a raw agent load surface. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is a HOST-OWNED module/loader lifecycle event or forbidden loader mutation, not a dispatchable job operation. Its occurrence is certified indirectly by the module lifecycle harness (tools/module_lifecycle_harness.py): every clean accoreconsole job run proves load->init->dispatch->unload completed.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "SAFETY_FORBIDDEN: LISP loading executes script code in the AutoCAD host and is not exposed as a raw agent load surface.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.lisp"
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.load.lisp",
+      "kind": "module_event",
+      "dispatchable": false
     },
     {
       "id": "module.register_mdi",
@@ -34107,12 +34209,14 @@
         "config/autocad_native_arx_operation_catalog.json#module.unload",
         "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.unload"
       ],
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: acrxUnloadModule can unload host modules and destabilize the running process; it remains non-agent-exposed.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: acrxUnloadModule can unload host modules and destabilize the running process; it remains non-agent-exposed. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is a HOST-OWNED module/loader lifecycle event or forbidden loader mutation, not a dispatchable job operation. Its occurrence is certified indirectly by the module lifecycle harness (tools/module_lifecycle_harness.py): every clean accoreconsole job run proves load->init->dispatch->unload completed.",
       "owner_ticket": "M08O-T02",
       "implementation_strategy": "hard_blocked",
       "evidence_required": "blocker_ref_and_evidence",
       "blocked_reason": "SAFETY_FORBIDDEN: acrxUnloadModule can unload host modules and destabilize the running process; it remains non-agent-exposed.",
-      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.unload"
+      "blocker_ref": "reports/WAVE3_REMAINING_HARDBLOCK_REAUDIT.md#module.unload",
+      "kind": "module_event",
+      "dispatchable": false
     },
     {
       "id": "acdb.database.create",

@@ -1,0 +1,1467 @@
+{
+  "schema": "ariadne.blockdef_diff.v1",
+  "per_def": [
+    {
+      "name": "C",
+      "a_total": 2,
+      "b_total": 3,
+      "diff0": 2,
+      "removed": 0,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "DIMDOT",
+      "a_total": 3,
+      "b_total": 0,
+      "diff0": 0,
+      "removed": 3,
+      "added": 0,
+      "modified": 0,
+      "missing_side": "b"
+    },
+    {
+      "name": "LV",
+      "a_total": 1,
+      "b_total": 1,
+      "diff0": 0,
+      "removed": 1,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "LV2",
+      "a_total": 2,
+      "b_total": 1,
+      "diff0": 0,
+      "removed": 2,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "SC",
+      "a_total": 2,
+      "b_total": 3,
+      "diff0": 2,
+      "removed": 0,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-FORM_청주",
+      "a_total": 196,
+      "b_total": 178,
+      "diff0": 105,
+      "removed": 19,
+      "added": 1,
+      "modified": 72,
+      "missing_side": null
+    },
+    {
+      "name": "X-FORM_청주$0$Block_5",
+      "a_total": 6,
+      "b_total": 1,
+      "diff0": 0,
+      "removed": 6,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-FORM_청주$0$dA로고",
+      "a_total": 30,
+      "b_total": 1,
+      "diff0": 0,
+      "removed": 30,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)",
+      "a_total": 4723,
+      "b_total": 2445,
+      "diff0": 2409,
+      "removed": 2279,
+      "added": 1,
+      "modified": 35,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$1000",
+      "a_total": 16,
+      "b_total": 5,
+      "diff0": 4,
+      "removed": 12,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$100012",
+      "a_total": 16,
+      "b_total": 5,
+      "diff0": 4,
+      "removed": 12,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$1000m",
+      "a_total": 14,
+      "b_total": 4,
+      "diff0": 3,
+      "removed": 11,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$101co1",
+      "a_total": 98,
+      "b_total": 86,
+      "diff0": 82,
+      "removed": 13,
+      "added": 1,
+      "modified": 3,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$101co1-RF",
+      "a_total": 86,
+      "b_total": 79,
+      "diff0": 78,
+      "removed": 8,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$101co1-RF2",
+      "a_total": 60,
+      "b_total": 51,
+      "diff0": 50,
+      "removed": 10,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$101co1-RF3",
+      "a_total": 14,
+      "b_total": 9,
+      "diff0": 8,
+      "removed": 6,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$101co2",
+      "a_total": 99,
+      "b_total": 84,
+      "diff0": 79,
+      "removed": 16,
+      "added": 1,
+      "modified": 4,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$103co1",
+      "a_total": 106,
+      "b_total": 91,
+      "diff0": 86,
+      "removed": 16,
+      "added": 1,
+      "modified": 4,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$104co1",
+      "a_total": 106,
+      "b_total": 92,
+      "diff0": 86,
+      "removed": 15,
+      "added": 1,
+      "modified": 5,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$104co2",
+      "a_total": 102,
+      "b_total": 90,
+      "diff0": 85,
+      "removed": 13,
+      "added": 1,
+      "modified": 4,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$105co2",
+      "a_total": 114,
+      "b_total": 96,
+      "diff0": 90,
+      "removed": 19,
+      "added": 1,
+      "modified": 5,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$111ARF",
+      "a_total": 21,
+      "b_total": 10,
+      "diff0": 8,
+      "removed": 12,
+      "added": 1,
+      "modified": 1,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$111ARF2",
+      "a_total": 11,
+      "b_total": 10,
+      "diff0": 8,
+      "removed": 2,
+      "added": 1,
+      "modified": 1,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$111BRF",
+      "a_total": 24,
+      "b_total": 13,
+      "diff0": 11,
+      "removed": 12,
+      "added": 1,
+      "modified": 1,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$111BRF2",
+      "a_total": 14,
+      "b_total": 13,
+      "diff0": 11,
+      "removed": 2,
+      "added": 1,
+      "modified": 1,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$111a",
+      "a_total": 639,
+      "b_total": 516,
+      "diff0": 514,
+      "removed": 124,
+      "added": 1,
+      "modified": 1,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$111b",
+      "a_total": 546,
+      "b_total": 440,
+      "diff0": 438,
+      "removed": 107,
+      "added": 1,
+      "modified": 1,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$130A-S1",
+      "a_total": 4,
+      "b_total": 4,
+      "diff0": 3,
+      "removed": 1,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$130a",
+      "a_total": 784,
+      "b_total": 633,
+      "diff0": 631,
+      "removed": 152,
+      "added": 1,
+      "modified": 1,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$130a1",
+      "a_total": 780,
+      "b_total": 631,
+      "diff0": 629,
+      "removed": 150,
+      "added": 1,
+      "modified": 1,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$130b",
+      "a_total": 776,
+      "b_total": 646,
+      "diff0": 644,
+      "removed": 131,
+      "added": 1,
+      "modified": 1,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$84a",
+      "a_total": 527,
+      "b_total": 419,
+      "diff0": 417,
+      "removed": 109,
+      "added": 1,
+      "modified": 1,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$84a1",
+      "a_total": 533,
+      "b_total": 426,
+      "diff0": 424,
+      "removed": 108,
+      "added": 1,
+      "modified": 1,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$84b",
+      "a_total": 525,
+      "b_total": 411,
+      "diff0": 409,
+      "removed": 115,
+      "added": 1,
+      "modified": 1,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$84b1",
+      "a_total": 527,
+      "b_total": 416,
+      "diff0": 413,
+      "removed": 112,
+      "added": 1,
+      "modified": 2,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$84c",
+      "a_total": 571,
+      "b_total": 453,
+      "diff0": 451,
+      "removed": 119,
+      "added": 1,
+      "modified": 1,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$84c1",
+      "a_total": 577,
+      "b_total": 458,
+      "diff0": 456,
+      "removed": 120,
+      "added": 1,
+      "modified": 1,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C019C01BD",
+      "a_total": 117,
+      "b_total": 111,
+      "diff0": 110,
+      "removed": 7,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C01A306AE",
+      "a_total": 22,
+      "b_total": 23,
+      "diff0": 22,
+      "removed": 0,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C04B05B29",
+      "a_total": 24,
+      "b_total": 17,
+      "diff0": 16,
+      "removed": 8,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C059766AB",
+      "a_total": 308,
+      "b_total": 306,
+      "diff0": 305,
+      "removed": 3,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C072C115F",
+      "a_total": 23,
+      "b_total": 15,
+      "diff0": 14,
+      "removed": 9,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C0A097A0C",
+      "a_total": 125,
+      "b_total": 126,
+      "diff0": 125,
+      "removed": 0,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C0C1F5443",
+      "a_total": 93,
+      "b_total": 85,
+      "diff0": 84,
+      "removed": 9,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C0E9D10F9",
+      "a_total": 46,
+      "b_total": 29,
+      "diff0": 28,
+      "removed": 18,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C0EF505D0",
+      "a_total": 32,
+      "b_total": 21,
+      "diff0": 20,
+      "removed": 12,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C12CA7994",
+      "a_total": 3,
+      "b_total": 1,
+      "diff0": 0,
+      "removed": 3,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C17C8346B",
+      "a_total": 188,
+      "b_total": 189,
+      "diff0": 188,
+      "removed": 0,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C200833B1",
+      "a_total": 24,
+      "b_total": 17,
+      "diff0": 16,
+      "removed": 8,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C24B0555E",
+      "a_total": 24,
+      "b_total": 17,
+      "diff0": 16,
+      "removed": 8,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C38AD67D4",
+      "a_total": 3,
+      "b_total": 1,
+      "diff0": 0,
+      "removed": 3,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C41D360DF",
+      "a_total": 107,
+      "b_total": 48,
+      "diff0": 47,
+      "removed": 60,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C48BA1CD6",
+      "a_total": 127,
+      "b_total": 119,
+      "diff0": 118,
+      "removed": 9,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C49112A41",
+      "a_total": 32,
+      "b_total": 21,
+      "diff0": 20,
+      "removed": 12,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C4B913E7C",
+      "a_total": 14,
+      "b_total": 4,
+      "diff0": 3,
+      "removed": 11,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C4D747D6B",
+      "a_total": 32,
+      "b_total": 21,
+      "diff0": 20,
+      "removed": 12,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C4cfca2ef",
+      "a_total": 3,
+      "b_total": 1,
+      "diff0": 0,
+      "removed": 3,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C57321CDF",
+      "a_total": 24,
+      "b_total": 17,
+      "diff0": 16,
+      "removed": 8,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C57620E0B",
+      "a_total": 3,
+      "b_total": 1,
+      "diff0": 0,
+      "removed": 3,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C590B6141",
+      "a_total": 3,
+      "b_total": 1,
+      "diff0": 0,
+      "removed": 3,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C5AA0109C",
+      "a_total": 9,
+      "b_total": 8,
+      "diff0": 7,
+      "removed": 2,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C5C3D4CBD",
+      "a_total": 3,
+      "b_total": 1,
+      "diff0": 0,
+      "removed": 3,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C5C7666B6",
+      "a_total": 865,
+      "b_total": 474,
+      "diff0": 473,
+      "removed": 392,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C5FEA68FE",
+      "a_total": 402,
+      "b_total": 214,
+      "diff0": 213,
+      "removed": 189,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C60D55377",
+      "a_total": 146,
+      "b_total": 147,
+      "diff0": 146,
+      "removed": 0,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C610442A9",
+      "a_total": 136,
+      "b_total": 137,
+      "diff0": 136,
+      "removed": 0,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C651D2038",
+      "a_total": 3,
+      "b_total": 1,
+      "diff0": 0,
+      "removed": 3,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C66AC16F3",
+      "a_total": 32,
+      "b_total": 33,
+      "diff0": 32,
+      "removed": 0,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C66e6687a",
+      "a_total": 122,
+      "b_total": 122,
+      "diff0": 121,
+      "removed": 1,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C6FEB5B01",
+      "a_total": 3,
+      "b_total": 1,
+      "diff0": 0,
+      "removed": 3,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C71B42895",
+      "a_total": 144,
+      "b_total": 75,
+      "diff0": 74,
+      "removed": 70,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C745B7F2C",
+      "a_total": 24,
+      "b_total": 17,
+      "diff0": 16,
+      "removed": 8,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C7CF27C93",
+      "a_total": 146,
+      "b_total": 147,
+      "diff0": 146,
+      "removed": 0,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$C7D8E4760",
+      "a_total": 345,
+      "b_total": 237,
+      "diff0": 236,
+      "removed": 109,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$A$Cc2871f03",
+      "a_total": 42,
+      "b_total": 27,
+      "diff0": 26,
+      "removed": 16,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$BA23502100",
+      "a_total": 28,
+      "b_total": 22,
+      "diff0": 21,
+      "removed": 7,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$BS-03 TOP",
+      "a_total": 33,
+      "b_total": 34,
+      "diff0": 33,
+      "removed": 0,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$CW900",
+      "a_total": 31,
+      "b_total": 28,
+      "diff0": 27,
+      "removed": 4,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$Ca2405caa",
+      "a_total": 31,
+      "b_total": 20,
+      "diff0": 19,
+      "removed": 12,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$DW1500",
+      "a_total": 53,
+      "b_total": 28,
+      "diff0": 27,
+      "removed": 26,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$DW2700v",
+      "a_total": 53,
+      "b_total": 28,
+      "diff0": 27,
+      "removed": 26,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$FSD1120",
+      "a_total": 7,
+      "b_total": 5,
+      "diff0": 4,
+      "removed": 3,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$FSD1500-2",
+      "a_total": 9,
+      "b_total": 6,
+      "diff0": 5,
+      "removed": 4,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$FSDFSDF321",
+      "a_total": 5,
+      "b_total": 4,
+      "diff0": 3,
+      "removed": 2,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$FU1",
+      "a_total": 115,
+      "b_total": 48,
+      "diff0": 47,
+      "removed": 68,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$HOBGAS19",
+      "a_total": 30,
+      "b_total": 15,
+      "diff0": 14,
+      "removed": 16,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$IC708",
+      "a_total": 100,
+      "b_total": 87,
+      "diff0": 86,
+      "removed": 14,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$IW990",
+      "a_total": 451,
+      "b_total": 303,
+      "diff0": 302,
+      "removed": 149,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$KH-530S-1 TOP",
+      "a_total": 132,
+      "b_total": 91,
+      "diff0": 90,
+      "removed": 42,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$L933 TOP",
+      "a_total": 191,
+      "b_total": 53,
+      "diff0": 52,
+      "removed": 139,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$PSD700_2",
+      "a_total": 5,
+      "b_total": 3,
+      "diff0": 2,
+      "removed": 3,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$SB1703 1500",
+      "a_total": 1312,
+      "b_total": 467,
+      "diff0": 466,
+      "removed": 846,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$T1",
+      "a_total": 33,
+      "b_total": 31,
+      "diff0": 30,
+      "removed": 3,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$WD200900",
+      "a_total": 16,
+      "b_total": 5,
+      "diff0": 4,
+      "removed": 12,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$WD850",
+      "a_total": 12,
+      "b_total": 4,
+      "diff0": 3,
+      "removed": 9,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$ba15001400",
+      "a_total": 28,
+      "b_total": 21,
+      "diff0": 20,
+      "removed": 8,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$ba15002200",
+      "a_total": 22,
+      "b_total": 15,
+      "diff0": 14,
+      "removed": 8,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$ba15002700",
+      "a_total": 144,
+      "b_total": 131,
+      "diff0": 130,
+      "removed": 14,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$ba17001400",
+      "a_total": 26,
+      "b_total": 20,
+      "diff0": 19,
+      "removed": 7,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$ba18601500",
+      "a_total": 14,
+      "b_total": 10,
+      "diff0": 9,
+      "removed": 5,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$cw1200",
+      "a_total": 31,
+      "b_total": 28,
+      "diff0": 27,
+      "removed": 4,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$dffm",
+      "a_total": 3,
+      "b_total": 1,
+      "diff0": 0,
+      "removed": 3,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$dw1200",
+      "a_total": 53,
+      "b_total": 28,
+      "diff0": 27,
+      "removed": 26,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$dw1400",
+      "a_total": 53,
+      "b_total": 28,
+      "diff0": 27,
+      "removed": 26,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$dw1600",
+      "a_total": 53,
+      "b_total": 28,
+      "diff0": 27,
+      "removed": 26,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$dw2100",
+      "a_total": 53,
+      "b_total": 28,
+      "diff0": 27,
+      "removed": 26,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$esp",
+      "a_total": 11,
+      "b_total": 7,
+      "diff0": 6,
+      "removed": 5,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$ev13k",
+      "a_total": 47,
+      "b_total": 36,
+      "diff0": 34,
+      "removed": 12,
+      "added": 1,
+      "modified": 1,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$ev16k",
+      "a_total": 47,
+      "b_total": 36,
+      "diff0": 34,
+      "removed": 12,
+      "added": 1,
+      "modified": 1,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$ev16x2k",
+      "a_total": 94,
+      "b_total": 72,
+      "diff0": 69,
+      "removed": 23,
+      "added": 1,
+      "modified": 2,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$evj",
+      "a_total": 2,
+      "b_total": 1,
+      "diff0": 0,
+      "removed": 2,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$hd1050",
+      "a_total": 244,
+      "b_total": 212,
+      "diff0": 211,
+      "removed": 33,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$ins-l",
+      "a_total": 1,
+      "b_total": 0,
+      "diff0": 0,
+      "removed": 1,
+      "added": 0,
+      "modified": 0,
+      "missing_side": "b"
+    },
+    {
+      "name": "X-평면도(기본형)$0$is",
+      "a_total": 2,
+      "b_total": 2,
+      "diff0": 1,
+      "removed": 1,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$is1",
+      "a_total": 4,
+      "b_total": 1,
+      "diff0": 0,
+      "removed": 4,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$is2",
+      "a_total": 4,
+      "b_total": 1,
+      "diff0": 0,
+      "removed": 4,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$is3",
+      "a_total": 4,
+      "b_total": 1,
+      "diff0": 0,
+      "removed": 4,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$jjbl",
+      "a_total": 37,
+      "b_total": 37,
+      "diff0": 36,
+      "removed": 1,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$ng",
+      "a_total": 23,
+      "b_total": 0,
+      "diff0": 0,
+      "removed": 23,
+      "added": 0,
+      "modified": 0,
+      "missing_side": "b"
+    },
+    {
+      "name": "X-평면도(기본형)$0$pd900",
+      "a_total": 19,
+      "b_total": 10,
+      "diff0": 9,
+      "removed": 10,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$phg1200",
+      "a_total": 22,
+      "b_total": 15,
+      "diff0": 14,
+      "removed": 8,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$pkdr750190",
+      "a_total": 25,
+      "b_total": 9,
+      "diff0": 8,
+      "removed": 17,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$pkdr750190-1",
+      "a_total": 25,
+      "b_total": 9,
+      "diff0": 8,
+      "removed": 17,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$sta-t",
+      "a_total": 60,
+      "b_total": 37,
+      "diff0": 36,
+      "removed": 24,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$sta-t-4",
+      "a_total": 66,
+      "b_total": 41,
+      "diff0": 40,
+      "removed": 26,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$sta-t-5",
+      "a_total": 65,
+      "b_total": 42,
+      "diff0": 41,
+      "removed": 24,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$wd120900",
+      "a_total": 16,
+      "b_total": 5,
+      "diff0": 4,
+      "removed": 12,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$wd160750",
+      "a_total": 15,
+      "b_total": 6,
+      "diff0": 5,
+      "removed": 10,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$wd170750",
+      "a_total": 15,
+      "b_total": 6,
+      "diff0": 5,
+      "removed": 10,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$wd250900",
+      "a_total": 16,
+      "b_total": 5,
+      "diff0": 4,
+      "removed": 12,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$국기계양대",
+      "a_total": 17,
+      "b_total": 0,
+      "diff0": 0,
+      "removed": 17,
+      "added": 0,
+      "modified": 0,
+      "missing_side": "b"
+    },
+    {
+      "name": "X-평면도(기본형)$0$무동력휀300",
+      "a_total": 8,
+      "b_total": 6,
+      "diff0": 5,
+      "removed": 3,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$세면대_공통",
+      "a_total": 191,
+      "b_total": 53,
+      "diff0": 52,
+      "removed": 139,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$수전",
+      "a_total": 33,
+      "b_total": 32,
+      "diff0": 31,
+      "removed": 2,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$수전-1",
+      "a_total": 15,
+      "b_total": 10,
+      "diff0": 9,
+      "removed": 6,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$씽크$0$59C$0$gasdfasdfs$0$COK3",
+      "a_total": 38,
+      "b_total": 2,
+      "diff0": 1,
+      "removed": 37,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$안전사다리",
+      "a_total": 50,
+      "b_total": 51,
+      "diff0": 50,
+      "removed": 0,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$우수관_100A",
+      "a_total": 6,
+      "b_total": 5,
+      "diff0": 2,
+      "removed": 2,
+      "added": 1,
+      "modified": 2,
+      "missing_side": null
+    },
+    {
+      "name": "X-평면도(기본형)$0$코너  선반",
+      "a_total": 47,
+      "b_total": 48,
+      "diff0": 47,
+      "removed": 0,
+      "added": 1,
+      "modified": 0,
+      "missing_side": null
+    },
+    {
+      "name": "_ArchTick",
+      "a_total": 1,
+      "b_total": 0,
+      "diff0": 0,
+      "removed": 1,
+      "added": 0,
+      "modified": 0,
+      "missing_side": "b"
+    }
+  ],
+  "totals": {
+    "a_def_count": 140,
+    "b_def_count": 135,
+    "a_entity_total": 20851,
+    "b_entity_total": 14074,
+    "diff0_total": 13785,
+    "interior_diff0_fraction": 0.661119370773584
+  },
+  "by_kind_gap": {
+    "arc": {
+      "a_count": 2198,
+      "b_count": 2198
+    },
+    "block_reference": {
+      "a_count": 944,
+      "b_count": 0
+    },
+    "circle": {
+      "a_count": 143,
+      "b_count": 142
+    },
+    "ellipse": {
+      "a_count": 201,
+      "b_count": 0
+    },
+    "face3d": {
+      "a_count": 34,
+      "b_count": 0
+    },
+    "hatch": {
+      "a_count": 265,
+      "b_count": 0
+    },
+    "line": {
+      "a_count": 11482,
+      "b_count": 11580
+    },
+    "lwpolyline": {
+      "a_count": 1447,
+      "b_count": 0
+    },
+    "point": {
+      "a_count": 2,
+      "b_count": 0
+    },
+    "polyline": {
+      "a_count": 1,
+      "b_count": 0
+    },
+    "spline": {
+      "a_count": 3973,
+      "b_count": 0
+    },
+    "text": {
+      "a_count": 154,
+      "b_count": 154
+    },
+    "wipeout": {
+      "a_count": 7,
+      "b_count": 0
+    }
+  }
+}

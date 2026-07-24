@@ -1,0 +1,58 @@
+[
+  {
+    "unit_id": "defannot-x-0-0-59c-0-gasdfasdfs-0-cok3-381",
+    "def": "X-평면도(기본형)$0$씽크$0$59C$0$gasdfasdfs$0$COK3",
+    "role": "가구",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Kitchen sink fixture block: 3DFACE-dominant solid on a KIT-tagged layer with a non-zero Z extent, no wall-like line pattern.",
+    "rationale": {
+      "evidence": "38 entities on a single layer named ...$KIT (kitchen) are dominated by 34 3DFACE entities forming a solid 3D volume, with bbox z-range 10 to 30 indicating an elevated fixture rather than a floor-level wall run; the definition name explicitly contains '씽크' (sink); the lone LINE (handle 1DA3) runs diagonally from (15.737,3.57) to (49.089,25.652), which is not axis-aligned and therefore inconsistent with a wall segment.",
+      "rule": "Layer names encoding fixture categories (e.g. KIT for kitchen) combined with 3DFACE-heavy geometry and non-zero, non-uniform Z extents indicate discrete 3D fixture/furniture blocks rather than 2D wall representations, which are normally near-planar, axis-aligned line/polyline runs on wall-specific layers.",
+      "counterfactual": "If the 3DFACEs were replaced by a small number of long, axis-aligned LINE or LWPOLYLINE pairs at a constant Z spanning the full bbox width, and the layer name referenced a wall/partition tag instead of KIT, the judgment would flip toward wall.",
+      "uncertainty": "Without the actual 3DFACE vertex coordinates (only counts are given) it cannot be confirmed whether the sink outline abuts or overlaps a structural wall face in the parent drawing, nor whether the single diagonal LINE is a construction/reference line rather than part of the fixture geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-382",
+    "def": "X-평면도(기본형)$0$안전사다리",
+    "role": "심볼",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Safety ladder equipment symbol: short clustered line/arc/circle groups on an equipment layer, not wall-like.",
+    "rationale": {
+      "evidence": "All 50 entities sit on a single non-wall-coded layer (...$8ELE), and the geometry is dominated by 46 short LINE segments plus 2 ARC and 2 CIRCLE entities clustered into small repeating groups (e.g. 7CE4-7CE7, 7CE8-7CEB) scattered at increasing radii from the origin rather than forming continuous runs; the definition name '안전사다리' (safety ladder) names it as fixed safety equipment, not a wall.",
+      "rule": "Safety/equipment symbols are typically built from many short, disconnected line clusters representing rungs, treads, or hardware rather than long continuous collinear runs, and they sit on equipment-tagged layers separate from wall layers — this combination (short segment clusters + equipment layer + descriptive equipment name) rules out a wall classification.",
+      "counterfactual": "If the 46 LINE segments instead formed two or more long parallel or perpendicular runs of consistent length spanning the full bbox extents (rather than short clustered rung-like segments), and the layer referenced a wall tag, the wall_likelihood would rise sharply.",
+      "uncertainty": "The projection gives only 30 of 50 sampled entities and no explicit topology, so it cannot be confirmed whether any remaining unsampled LINE entities form a longer continuous run; the exact visual shape (e.g. spiral vs. straight ladder) also cannot be verified from coordinates alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-100a-383",
+    "def": "X-평면도(기본형)$0$우수관_100A",
+    "role": "심볼",
+    "wall_likelihood": 0.01,
+    "wall_line_handles": [],
+    "notes": "Rainwater drain (RD) plumbing symbol: crosshair plus diameter callout 'ø100', clearly a point MEP symbol.",
+    "rationale": {
+      "evidence": "Only 6 entities total: a horizontal LINE (82.5,0)->(-82.5,0) and vertical LINE (0,-82.5)->(0,82.5) forming a symmetric crosshair, two 2-vertex LWPOLYLINEs (likely a small circle/target outline), and two TEXT entities reading 'RD' and 'ø100' on a DEFPOINTS-adjacent layer; the definition name '우수관_100A' (100A rainwater pipe) and the diameter callout confirm this is a plumbing/drain callout symbol, not a wall.",
+      "rule": "Small, symmetric crosshair-and-label assemblies with diameter/size text callouts (e.g. 'ø100') and very few total entities are characteristic of MEP point symbols (drains, pipe stubs, fixtures) rather than walls, which require many more entities or long line runs to represent a partition.",
+      "counterfactual": "If the crosshair lines were instead a long parallel pair of LINEs spanning many times the 165-unit bbox width with no diameter/size TEXT callout, and the layer referenced a structural/wall tag instead of DEFPOINTS/M_1, this would read as a wall rather than a point symbol.",
+      "uncertainty": "It cannot be determined from this projection whether the two 2-vertex LWPOLYLINEs form a closed circle (drain body) or an open arc, since only vertex counts and not coordinates are given for them."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-384",
+    "def": "X-평면도(기본형)$0$코너  선반",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Corner shelf furniture unit on a FUR-tagged layer: small closed rectangular outline with nested compartment lines and corner arcs.",
+    "rationale": {
+      "evidence": "47 entities (LINE=24, ARC=16, CIRCLE=7) all sit on a single furniture-coded layer (...$FUR), and the outer LINEs form a small closed rectangle roughly 300 units wide by 127 units deep (e.g. 59A9-59AC) with nested inner rectangles and arcs (59AF-59C1) suggesting shelf compartments and rounded corner details; the definition name '코너  선반' (corner shelf) names it explicitly as furniture.",
+      "rule": "An explicit furniture-category layer (FUR) combined with a small, self-contained closed outline at furniture scale (hundreds of units, not the tens-of-meters scale typical of room walls) and nested internal detail (compartment lines, corner arcs) indicates a furniture block, even when the outer boundary happens to be an axis-aligned rectangle that could superficially resemble a wall footprint.",
+      "counterfactual": "If the same rectangular outline lines were on a wall/partition-tagged layer instead of FUR, spanned a much larger extent consistent with a room perimeter, and lacked the nested compartment/arc detail, the wall_likelihood would increase substantially.",
+      "uncertainty": "The bbox coordinates are large absolute site coordinates (506869-507169, 180294-180421) rather than local block-space coordinates, so it cannot be fully confirmed from this projection alone that the block is inserted at furniture scale rather than being a scaled architectural fragment; the exact shelf shape also cannot be verified since ARC parameters are not given."
+    }
+  }
+]

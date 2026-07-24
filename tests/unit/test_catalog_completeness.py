@@ -149,11 +149,12 @@ class TestCatalogDenominatorLiveSmoke(unittest.TestCase):
         # sheet-set COM read records -- 525 -> 526 -> 527. See
         # tools/patch_ops/tables.py + entities.py + tools/sheetset_read.py.
         ops = cc.load_operations_catalog()
-        self.assertEqual(len(ops), 550,
+        self.assertEqual(len(ops), 551,
                          "the F0 task's own '517-op catalogue' anchor (+8 wave0-3, "
                          "+16 wave5/6: w5-anchor x4/w6-layerstate x4/w6-dynblk x3/"
                          "w6-section x3/w6-sheetset x2; +4 wave-7: identity_contract/"
-                         "semantic_anchor/corpus.batch/cross_engine python ops); "
+                         "semantic_anchor/corpus.batch/cross_engine python ops; "
+                         "+1 P3 assoc-relink: write.block.relink_hatch_assoc); "
                          "if this moves again, "
                          "the whole WAVE-0 accounting must be recomputed")
 

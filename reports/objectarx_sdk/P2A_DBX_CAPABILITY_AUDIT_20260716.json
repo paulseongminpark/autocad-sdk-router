@@ -1,0 +1,1487 @@
+{
+  "schema": "ariadne.p2a_dbx_capability_audit.v1",
+  "generated": "2026-07-16T09:09:07",
+  "method": "declared native_api tokens + op dispatch code slice + 1-level helper taint (see module docstring)",
+  "families": [
+    "custom_objects_protocols",
+    "geometry_kernel"
+  ],
+  "totals": {
+    "audited": 88,
+    "asm_boundary_review": 1,
+    "dbx_capable": 87
+  },
+  "mismatches_vs_engine_tier": [
+    "compute.geometry.circarc",
+    "compute.geometry.compositecurve",
+    "compute.geometry.curve.closest",
+    "compute.geometry.curve.eval",
+    "compute.geometry.curve.intersect",
+    "compute.geometry.curve.sample",
+    "compute.geometry.elliparc",
+    "compute.geometry.lineseg",
+    "compute.geometry.matrix.build",
+    "compute.geometry.matrix.compose",
+    "compute.geometry.nurbcurve",
+    "compute.geometry.point.distance",
+    "compute.geometry.point.transform",
+    "compute.geometry.scale.build",
+    "compute.geometry.surface.nurb",
+    "compute.geometry.tolerance",
+    "extend.customclass.declare",
+    "extend.customclass.define",
+    "extend.customclass.define_cons",
+    "extend.customclass.define_dxf",
+    "extend.customclass.define_nocons",
+    "extend.customclass.rxinit",
+    "extend.customclass.unregister",
+    "extend.customentity.db_defaults",
+    "extend.customentity.define",
+    "extend.customentity.draw_viewport",
+    "extend.customentity.draw_world",
+    "extend.customentity.explode",
+    "extend.customentity.geom_extents",
+    "extend.customentity.grips",
+    "extend.customentity.intersect",
+    "extend.customentity.list",
+    "extend.customentity.osnap",
+    "extend.customentity.stretch",
+    "extend.customentity.subentpaths",
+    "extend.customentity.transform",
+    "extend.customobject.deepclone",
+    "extend.customobject.define",
+    "extend.customobject.embedded",
+    "extend.customobject.partial_undo",
+    "extend.customobject.version",
+    "extend.customobject.wblockclone",
+    "extend.module.entrypoint",
+    "extend.object_enabler.register_classes",
+    "extend.osnap.custom_mode",
+    "extend.protocol.attach",
+    "extend.protocol.declare",
+    "extend.protocol.detach",
+    "extend.protocol.query",
+    "extend.service.register",
+    "inspect.runtime.cast",
+    "inspect.runtime.desc",
+    "inspect.runtime.isa",
+    "inspect.runtime.iskindof",
+    "overrule.dimstyle.install",
+    "overrule.object.install",
+    "overrule.queryx.install"
+  ],
+  "ops": [
+    {
+      "op_id": "compute.entity.intersect",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "execution_host_class": "dbx",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbEntity::intersectWith(pEnt, AcDb::Intersect, pts[, thisGsMarker, otherGsMarker])",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08d_handlers.inc",
+        "line": 239,
+        "chars": 139
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "compute.geometry.circarc",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcGeCircArc3d (gearc3d.h)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08d_handlers.inc",
+        "line": 229,
+        "chars": 89
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "compute.geometry.compositecurve",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcGeCompositeCurve3d (gecomp3d.h)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08d_handlers.inc",
+        "line": 237,
+        "chars": 100
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "compute.geometry.curve.closest",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcGeCurve3d::getClosestPointTo(pnt, AcGePointOnCurve3d&[, tol])",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08d_handlers.inc",
+        "line": 234,
+        "chars": 102
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "compute.geometry.curve.eval",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcGeCurve3d::evalPoint(param[, numDeriv, derivs]), getInterval, isClosed, isOn",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08d_handlers.inc",
+        "line": 232,
+        "chars": 96
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "compute.geometry.curve.intersect",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcGeCurve3d ↔ AcGeCurveCurveInt3d (gecint3d.h)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08d_handlers.inc",
+        "line": 235,
+        "chars": 98
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "compute.geometry.curve.sample",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcGeCurve3d::getSamplePoints(numSample / fromParam,toParam,eps, AcGePoint3dArray&)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08d_handlers.inc",
+        "line": 233,
+        "chars": 99
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "compute.geometry.elliparc",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcGeEllipArc3d (geell3d.h)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08d_handlers.inc",
+        "line": 230,
+        "chars": 91
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "compute.geometry.lineseg",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcGeLineSeg3d (gelnsg3d.h) / AcGeLine3d (geline3d.h)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08d_handlers.inc",
+        "line": 228,
+        "chars": 88
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "compute.geometry.matrix.build",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcGeMatrix3d::setToTranslation/setToRotation/setToMirroring/setToScaling/setToAlignCoordSys/setToWorldToPlane/setToPlaneToWorld",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08d_handlers.inc",
+        "line": 225,
+        "chars": 100
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "compute.geometry.matrix.compose",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcGeMatrix3d::preMultBy/postMultBy/invert/inverse/translation",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08d_handlers.inc",
+        "line": 226,
+        "chars": 99
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "compute.geometry.nurbcurve",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcGeNurbCurve3d (genurb3d.h) — fit/ctrl-pt construction, eval",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08d_handlers.inc",
+        "line": 236,
+        "chars": 97
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "compute.geometry.point.distance",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcGePoint3d::distanceTo(const AcGePoint3d&)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08d_handlers.inc",
+        "line": 223,
+        "chars": 103
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "compute.geometry.point.transform",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcGePoint3d::transformBy/rotateBy/mirror/scaleBy",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08d_handlers.inc",
+        "line": 224,
+        "chars": 101
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "compute.geometry.scale.build",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcGeScale3d(factor) / (sx,sy,sz) / isProportional",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08d_handlers.inc",
+        "line": 227,
+        "chars": 92
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "compute.geometry.surface.nurb",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcGeNurbSurface (genurbsf.h), AcGeExternalSurface (geextsf.h)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08d_handlers.inc",
+        "line": 238,
+        "chars": 93
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "compute.geometry.tolerance",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcGeTol (getol.h), AcGeInterval (geintrvl.h)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08d_handlers.inc",
+        "line": 231,
+        "chars": 93
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "compute.solid3d.interference",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "execution_host_class": "dbx",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDb3dSolid::checkInterference(other, createNew, solidsInterfere, commonVol)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08d_handlers.inc",
+        "line": 240,
+        "chars": 95
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "extend.customclass.declare",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "ACRX_DECLARE_MEMBERS(CLASS_NAME) (in class public: section)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 372,
+        "chars": 91
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customclass.define",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "ACRX_DEFINE_MEMBERS(CLASS_NAME)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 373,
+        "chars": 95
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customclass.define_cons",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "ACRX_CONS_DEFINE_MEMBERS(CLASS_NAME, PARENT_CLASS, VERNO)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 374,
+        "chars": 99
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customclass.define_dxf",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "ACRX_DXF_DEFINE_MEMBERS(CLASS_NAME, PARENT_CLASS, DWG_VERSION, MAINTENANCE_VERSION, PROXY_FLAGS, DXF_NAME, APP)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 375,
+        "chars": 101
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customclass.define_nocons",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "ACRX_NO_CONS_DEFINE_MEMBERS(CLASS_NAME, PARENT_CLASS)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 376,
+        "chars": 97
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customclass.rxinit",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "CLASS_NAME::rxInit() then acrxBuildClassHierarchy()",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 377,
+        "chars": 94
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customclass.unregister",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "deleteAcRxClass(CLASS::desc()) / DeleteClassAndDescendant",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 378,
+        "chars": 92
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customentity.db_defaults",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbEntity::subSetDatabaseDefaults(AcDbDatabase*)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 403,
+        "chars": 103
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customentity.define",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "subclass AcDbEntity + override subWorldDraw, subGetGeomExtents, subTransformBy, the 4 filing fns (+ others)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 397,
+        "chars": 96
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customentity.draw_viewport",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbEntity::subViewportDraw(AcGiViewportDraw*)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 399,
+        "chars": 98
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customentity.draw_world",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbEntity::subWorldDraw(AcGiWorldDraw*) → Adesk::Boolean",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 398,
+        "chars": 103
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customentity.explode",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbEntity::subExplode(AcDbVoidPtrArray&)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 405,
+        "chars": 96
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customentity.geom_extents",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbEntity::subGetGeomExtents(AcDbExtents&)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 404,
+        "chars": 99
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customentity.grips",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "subGetGripPoints(AcGePoint3dArray&,…) / subMoveGripPointsAt(const AcDbIntArray&, const AcGeVector3d&)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 400,
+        "chars": 90
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customentity.intersect",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbEntity::subIntersectWith(...) (2 overloads: direct + projected plane)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 407,
+        "chars": 93
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customentity.list",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbEntity::subList()",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 408,
+        "chars": 211
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customentity.osnap",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbEntity::subGetOsnapPoints(AcDb::OsnapMode,…) (2 overloads incl. block-insert matrix)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 401,
+        "chars": 92
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customentity.stretch",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "subGetStretchPoints(AcGePoint3dArray&) / subMoveStretchPointsAt(const AcDbIntArray&, const AcGeVector3d&)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 402,
+        "chars": 98
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customentity.subentpaths",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbEntity::subGetSubentPathsAtGsMarker(...)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 409,
+        "chars": 167
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customentity.transform",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbEntity::subTransformBy(const AcGeMatrix3d&)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 406,
+        "chars": 98
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customobject.deepclone",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbObject::subDeepClone(AcDbObject* owner, AcDbObject*& clone, AcDbIdMapping&, Adesk::Boolean isPrimary) const",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 393,
+        "chars": 100
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customobject.define",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "subclass AcDbObject + override dwgInFields/dwgOutFields/dxfInFields/dxfOutFields (+ subDeepClone/subWblockClone as needed)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 386,
+        "chars": 94
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customobject.embedded",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "encapsulate another AcDb* entity; forward worldDraw/grip/filing; DXF separator AcDb::kDxfEmbeddedObjectStart (101) via writeEmbeddedObjectStart() / atEmbeddedOb",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 387,
+        "chars": 100
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customobject.filer_dwgin",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "execution_host_class": "dbx",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbObject::dwgInFields(AcDbDwgFiler*)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 389,
+        "chars": 103
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "extend.customobject.filer_dwgout",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "execution_host_class": "dbx",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbObject::dwgOutFields(AcDbDwgFiler*) const",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 388,
+        "chars": 103
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "extend.customobject.filer_dxfin",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "execution_host_class": "dbx",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbObject::dxfInFields(AcDbDxfFiler*)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 391,
+        "chars": 103
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "extend.customobject.filer_dxfout",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "execution_host_class": "dbx",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbObject::dxfOutFields(AcDbDxfFiler*) const",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 390,
+        "chars": 103
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "extend.customobject.partial_undo",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbObject::applyPartialUndo(AcDbDwgFiler*, AcRxClass*)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 392,
+        "chars": 101
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customobject.version",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "data-member version Adesk::Int16 + eMakeMeProxy protocol; setHasSaveVersionOverride(true) + override AcDbObject::getObjectSaveVersion()",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 395,
+        "chars": 139
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.customobject.wblockclone",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbObject::subWblockClone(...) with AcDbWblockCloneFiler",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 394,
+        "chars": 190
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.module.entrypoint",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "extern \"C\" AcRx::AppRetCode acrxEntryPoint(AcRx::AppMsgCode, void*) handling kInitAppMsg/kUnloadAppMsg/kLoadDwgMsg/… ; acrxDynamicLinker->unlockApplication/regi",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 380,
+        "chars": 91
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.object_enabler.build",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "execution_host_class": "dbx",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "Build an **ObjectDBX (.dbx)** module containing the custom classes' rxInit + filing + draw (no editor/command/UI deps)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 381,
+        "chars": 105
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "extend.object_enabler.demand_register",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "accoreconsole_lisp_also",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "Registry keys under HKLM\\SOFTWARE\\Autodesk\\ObjectDBX\\R<ver>\\Applications\\<app> (DESCRIPTION, LOADCTRLS REG_DWORD, LOADER = path to .dbx); no Commands/Groups sub",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 383,
+        "chars": 244
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "extend.object_enabler.register_classes",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcRxDbxApp + ACDB_REGISTER_OBJECT_ENTRY_AUTO(classname) (linker-section auto-registration)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 382,
+        "chars": 302
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.osnap.custom_mode",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "PE class derived from AcDbCustomOsnapInfo (getOsnapInfo(...)) + addX per entity class",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 411,
+        "chars": 963
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.protocol.attach",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcRxClass::addX(AcRxClass* peClass, AcRxObject* peObj)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 368,
+        "chars": 84
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.protocol.declare",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "protocol base : public AcRxObject + ACRX_DECLARE_MEMBERS(PE) + pure-virtual API; ACRX_NO_CONS_DEFINE_MEMBERS(PE, AcRxObject)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 367,
+        "chars": 85
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.protocol.detach",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcRxClass::delX(AcRxClass* peClass)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 369,
+        "chars": 185
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.protocol.query",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcRxObject::queryX(const AcRxClass* peClass) (replaces deprecated x() / ACRX_X_CALL)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 370,
+        "chars": 143
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "extend.service.register",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "acrxRegisterService(\"Name\") / acrxServiceDictionary->remove(\"Name\") (AcRxService)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 379,
+        "chars": 87
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "inspect.proxy.detect",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbObject::isAProxy()",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 365,
+        "chars": 134
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "inspect.runtime.cast",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "CLASS::cast(const AcRxObject*)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 361,
+        "chars": 80
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "inspect.runtime.desc",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "CLASS::desc() → AcRxClass*; AcRxClass::create()",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 362,
+        "chars": 123
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "inspect.runtime.isa",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcRxObject::isA() → AcRxClass*",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 363,
+        "chars": 83
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "inspect.runtime.iskindof",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcRxObject::isKindOf(AcRxClass*)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08k_handlers.inc",
+        "line": 364,
+        "chars": 178
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "modify.entity.solid3d.boolean",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "execution_host_class": "dbx",
+      "verdict": "asm_boundary_review",
+      "reason": {
+        "asm_tokens": [
+          "AcDb3dSolid"
+        ]
+      },
+      "declared_api_excerpt": "AcDb3dSolid::booleanOper(AcDb::BoolOperType, other)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08g_handlers.inc",
+        "line": 484,
+        "chars": 88
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "modify.entity.transform",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "execution_host_class": "dbx",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbEntity::transformBy(const AcGeMatrix3d& xform) (sealed; override subTransformBy)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08g_handlers.inc",
+        "line": 479,
+        "chars": 93
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "overrule.applicable",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcRxOverrule::isApplicable(const AcRxObject* pOverruledSubject) const = 0",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08l_handlers.inc",
+        "line": 635,
+        "chars": 112
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "overrule.dimstyle.install",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbDimensionStyleOverrule (header present dbdim.h) — **signatures NOT read this session**",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08l_handlers.inc",
+        "line": 632,
+        "chars": 108
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "overrule.drawable.install",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcGiDrawableOverrule (header present drawable.h) — **signatures NOT read this session**",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08l_handlers.inc",
+        "line": 621,
+        "chars": 90
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "overrule.geometry.install",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbGeometryOverrule : intersectWith (2 overloads) / getGeomExtents",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08l_handlers.inc",
+        "line": 622,
+        "chars": 91
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "overrule.global.enable",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcRxOverrule::setIsOverruling(bool) / isOverruling()",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08l_handlers.inc",
+        "line": 634,
+        "chars": 81
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "overrule.grip.install",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbGripOverrule : getGripPoints (2 forms) / moveGripPointsAt (2 forms) / getStretchPoints / moveStretchPointsAt / gripStatus",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08l_handlers.inc",
+        "line": 630,
+        "chars": 84
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "overrule.highlight.install",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbHighlightOverrule : highlight / unhighlight",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08l_handlers.inc",
+        "line": 627,
+        "chars": 97
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "overrule.highlightstate.install",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbHighlightStateOverrule : pushHighlight / popHighlight / highlightState",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08l_handlers.inc",
+        "line": 628,
+        "chars": 98
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "overrule.install",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcRxOverrule::addOverrule(AcRxClass* pClass, AcRxOverrule* pOverrule, bool bAddAtLast=false)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08l_handlers.inc",
+        "line": 619,
+        "chars": 124
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "overrule.object.install",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbObjectOverrule : open / close / cancel / erase / deepClone / wblockClone",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08l_handlers.inc",
+        "line": 620,
+        "chars": 88
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "overrule.osnap.install",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbOsnapOverrule : getOsnapPoints (2 overloads) / isContentSnappable",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08l_handlers.inc",
+        "line": 624,
+        "chars": 88
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "overrule.properties.install",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbPropertiesOverrule : list / getClassID",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08l_handlers.inc",
+        "line": 626,
+        "chars": 93
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "overrule.query.has",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcRxOverrule::hasOverrule(const AcRxObject* pSubject, AcRxClass* pOverruleClass)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08l_handlers.inc",
+        "line": 636,
+        "chars": 1531
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "overrule.queryx.install",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "native_arx_only",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcRxQueryXOverrule::queryX(const AcRxObject*, const AcRxClass*)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08l_handlers.inc",
+        "line": 631,
+        "chars": 151
+      },
+      "mismatch_vs_engine_tier": true
+    },
+    {
+      "op_id": "overrule.remove",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcRxOverrule::removeOverrule(AcRxClass* pClass, AcRxOverrule* pOverrule)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08l_handlers.inc",
+        "line": 637,
+        "chars": 1493
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "overrule.subentity.install",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbSubentityOverrule : addSubentPaths / deleteSubentPaths / transformSubentPathsBy / getGripPointsAtSubentPath / moveGripPointsAtSubentPaths / getSubentPathsAt",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08l_handlers.inc",
+        "line": 625,
+        "chars": 93
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "overrule.transform.install",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbTransformOverrule : transformBy / getTransformedCopy / explode / cloneMeForDragging / hideMeForDragging",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08l_handlers.inc",
+        "line": 623,
+        "chars": 88
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "overrule.visibility.install",
+      "family": "custom_objects_protocols",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "execution_host_class": "arx_adapter",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbVisibilityOverrule : visibility / setVisibility",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08l_handlers.inc",
+        "line": 629,
+        "chars": 88
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "write.entity.circle",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "execution_host_class": "dbx",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbCircle(const AcGePoint3d& cntr, const AcGeVector3d& nrm, double radius) + setCenter/setRadius/setNormal",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\AriadneNativeJob.cpp",
+        "line": 6946,
+        "chars": 1122
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "write.entity.line",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "execution_host_class": "dbx",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbLine(const AcGePoint3d& start, const AcGePoint3d& end) + setStartPoint/setEndPoint/setNormal/setThickness",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\AriadneNativeJob.cpp",
+        "line": 6913,
+        "chars": 1325
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "write.entity.point",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "execution_host_class": "dbx",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbPoint(const AcGePoint3d&)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08g_handlers.inc",
+        "line": 445,
+        "chars": 112
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "write.entity.polyline",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "execution_host_class": "dbx",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbPolyline::addVertexAt(idx, AcGePoint2d, bulge, startW, endW), setClosed, setBulgeAt, setWidthsAt",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08g_handlers.inc",
+        "line": 452,
+        "chars": 84
+      },
+      "mismatch_vs_engine_tier": false
+    },
+    {
+      "op_id": "write.entity.tolerance",
+      "family": "geometry_kernel",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "execution_host_class": "dbx",
+      "verdict": "dbx_capable",
+      "reason": {},
+      "declared_api_excerpt": "AcDbFcf (feature control frame)",
+      "code_slice": {
+        "file": "src\\Ariadne.AcadNative\\families\\m08g_handlers.inc",
+        "line": 477,
+        "chars": 119
+      },
+      "mismatch_vs_engine_tier": false
+    }
+  ]
+}

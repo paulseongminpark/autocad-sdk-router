@@ -1,0 +1,309 @@
+[
+  {
+    "unit_id": "defannot-u130-141",
+    "def": "*U130",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "6 closed 5-vertex LWPOLYLINEs on floor-plan INSUL (insulation) layer; anonymous plan fragment tracing envelope insulation along exterior walls.",
+    "rationale": {
+      "evidence": "All 6 entities are LWPOLYLINE (dxf histogram LWPOLYLINE=6), each with vertices=5 (a closed quadrilateral), on the single xref layer X-평면도(기본형)$0$INSUL (handles 483F-4844). INSUL denotes 단열재/thermal insulation and the layer's parent 평면도(기본형) is a standard-type floor plan, so this anonymous block is insulation graphics of the plan. No LINE, INSERT, TEXT, HATCH, or dimension entities are present.",
+      "rule": "A block composed solely of closed LWPOLYLINEs on a floor-plan INSUL (insulation) layer is a plan-geometry fragment that traces the insulated building envelope (exterior/party walls); classify it as 평면 부분도 and treat insulation as a wall-location indicator, not a container of wall-line entities.",
+      "counterfactual": "If these polylines resolved to long parallel collinear edges at ~100-200mm wall spacing, or if the layer were 벽체/WALL instead of INSUL, wall_likelihood would rise and specific wall-face handles could be listed; if the layer named furniture, a symbol, or text, the role would shift to 가구/심볼/기타.",
+      "uncertainty": "The projection gives only vertices=5 with no vertex coordinates, so I cannot confirm whether each polygon is an insulation batt or a wall-poché fill, cannot extract any wall-face line, and cannot compute a bbox. The 0.4 wall_likelihood reflects wall-association (insulation co-locates with exterior walls), not verified wall-line content; wall_line_handles is [] because every entity is a closed insulation polygon, not a linear wall face."
+    }
+  },
+  {
+    "unit_id": "defannot-u131-142",
+    "def": "*U131",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "6 closed 5-vertex LWPOLYLINEs on floor-plan INSUL (insulation) layer; anonymous plan fragment tracing envelope insulation along exterior walls.",
+    "rationale": {
+      "evidence": "All 6 entities are LWPOLYLINE (dxf histogram LWPOLYLINE=6), each with vertices=5 (a closed quadrilateral), on the single xref layer X-평면도(기본형)$0$INSUL (handles 484A-484F). INSUL denotes 단열재/thermal insulation and the layer's parent 평면도(기본형) is a standard-type floor plan, so this anonymous block is insulation graphics of the plan. No LINE, INSERT, TEXT, HATCH, or dimension entities are present.",
+      "rule": "A block composed solely of closed LWPOLYLINEs on a floor-plan INSUL (insulation) layer is a plan-geometry fragment that traces the insulated building envelope (exterior/party walls); classify it as 평면 부분도 and treat insulation as a wall-location indicator, not a container of wall-line entities.",
+      "counterfactual": "If these polylines resolved to long parallel collinear edges at ~100-200mm wall spacing, or if the layer were 벽체/WALL instead of INSUL, wall_likelihood would rise and specific wall-face handles could be listed; if the layer named furniture, a symbol, or text, the role would shift to 가구/심볼/기타.",
+      "uncertainty": "The projection gives only vertices=5 with no vertex coordinates, so I cannot confirm whether each polygon is an insulation batt or a wall-poché fill, cannot extract any wall-face line, and cannot compute a bbox. The 0.4 wall_likelihood reflects wall-association (insulation co-locates with exterior walls), not verified wall-line content; wall_line_handles is [] because every entity is a closed insulation polygon, not a linear wall face."
+    }
+  },
+  {
+    "unit_id": "defannot-u132-143",
+    "def": "*U132",
+    "role": "심볼",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [
+      {
+        "handle": "4858",
+        "reason": "long horizontal edge; 50mm paired gap = bracket flange not wall"
+      },
+      {
+        "handle": "485A",
+        "reason": "parallel horizontal 50mm from 4858 — too thin for a wall"
+      }
+    ],
+    "notes": "Flagpole-holder (국기계양대) fixture symbol: 2 WIPEOUTs + nested fixture INSERT + 1120×126mm bracket of 20 LINEs on layer 0.",
+    "rationale": {
+      "evidence": "Mixed histogram INSERT=1, LINE=20, WIPEOUT=2. The INSERT places block X-평면도(기본형)$0$국기계양대 (국기계양대 = flagpole holder) on its own layer; the 20 LINEs and 2 WIPEOUTs sit on layer 0. bbox [-560,-103.5,0,560,22.5,0] ≈ 1120×126mm — fixture-scale, not room-scale. Lines 4858/485A form a 1076×50mm inner bar and the remaining LINEs a notched outer frame; the WIPEOUTs mask the background so the symbol reads cleanly.",
+      "rule": "A block combining WIPEOUT masks, a nested named-fixture INSERT, and a small (~1m) closed LINE frame on layer 0 is a plan fixture/symbol (심볼): it is inserted at a wall or parapet but does not itself contain structural wall geometry.",
+      "counterfactual": "If the LINEs spanned meters as long parallel pairs at ~100-200mm spacing with no nested fixture INSERT and no WIPEOUT, the block would read as wall geometry (평면 부분도) with high wall_likelihood; removing the 국기계양대 INSERT alone would drop the symbol reading.",
+      "uncertainty": "I cannot inspect the nested 국기계양대 block's contents, so wall lines embedded there cannot be ruled out; the 50mm parallel gap of the inner-bar lines could be misread as a thin wall, but at ~1m fixture scale it is a bracket flange, not a partition."
+    }
+  },
+  {
+    "unit_id": "defannot-u133-144",
+    "def": "*U133",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "14 closed 5-vertex LWPOLYLINEs on floor-plan INSUL (insulation) layer; anonymous plan fragment tracing envelope insulation along exterior walls.",
+    "rationale": {
+      "evidence": "All 14 entities are LWPOLYLINE (dxf histogram LWPOLYLINE=14), each with vertices=5 (a closed quadrilateral), on the single xref layer X-평면도(기본형)$0$INSUL (handles 4871-487E). INSUL denotes 단열재/thermal insulation and the layer's parent 평면도(기본형) is a standard-type floor plan, so this anonymous block is insulation graphics of the plan. No LINE, INSERT, TEXT, HATCH, or dimension entities are present.",
+      "rule": "A block composed solely of closed LWPOLYLINEs on a floor-plan INSUL (insulation) layer is a plan-geometry fragment that traces the insulated building envelope (exterior/party walls); classify it as 평면 부분도 and treat insulation as a wall-location indicator, not a container of wall-line entities.",
+      "counterfactual": "If these polylines resolved to long parallel collinear edges at ~100-200mm wall spacing, or if the layer were 벽체/WALL instead of INSUL, wall_likelihood would rise and specific wall-face handles could be listed; if the layer named furniture, a symbol, or text, the role would shift to 가구/심볼/기타.",
+      "uncertainty": "The projection gives only vertices=5 with no vertex coordinates, so I cannot confirm whether each polygon is an insulation batt or a wall-poché fill, cannot extract any wall-face line, and cannot compute a bbox. The 0.4 wall_likelihood reflects wall-association (insulation co-locates with exterior walls), not verified wall-line content; wall_line_handles is [] because every entity is a closed insulation polygon, not a linear wall face."
+    }
+  },
+  {
+    "unit_id": "defannot-u134-145",
+    "def": "*U134",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "7 closed 5-vertex LWPOLYLINEs on floor-plan INSUL (insulation) layer; anonymous plan fragment tracing envelope insulation along exterior walls.",
+    "rationale": {
+      "evidence": "All 7 entities are LWPOLYLINE (dxf histogram LWPOLYLINE=7), each with vertices=5 (a closed quadrilateral), on the single xref layer X-평면도(기본형)$0$INSUL (handles 4884-488A). INSUL denotes 단열재/thermal insulation and the layer's parent 평면도(기본형) is a standard-type floor plan, so this anonymous block is insulation graphics of the plan. No LINE, INSERT, TEXT, HATCH, or dimension entities are present.",
+      "rule": "A block composed solely of closed LWPOLYLINEs on a floor-plan INSUL (insulation) layer is a plan-geometry fragment that traces the insulated building envelope (exterior/party walls); classify it as 평면 부분도 and treat insulation as a wall-location indicator, not a container of wall-line entities.",
+      "counterfactual": "If these polylines resolved to long parallel collinear edges at ~100-200mm wall spacing, or if the layer were 벽체/WALL instead of INSUL, wall_likelihood would rise and specific wall-face handles could be listed; if the layer named furniture, a symbol, or text, the role would shift to 가구/심볼/기타.",
+      "uncertainty": "The projection gives only vertices=5 with no vertex coordinates, so I cannot confirm whether each polygon is an insulation batt or a wall-poché fill, cannot extract any wall-face line, and cannot compute a bbox. The 0.4 wall_likelihood reflects wall-association (insulation co-locates with exterior walls), not verified wall-line content; wall_line_handles is [] because every entity is a closed insulation polygon, not a linear wall face."
+    }
+  },
+  {
+    "unit_id": "defannot-u135-146",
+    "def": "*U135",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "20 closed 5-vertex LWPOLYLINEs on floor-plan INSUL (insulation) layer; anonymous plan fragment tracing envelope insulation along exterior walls.",
+    "rationale": {
+      "evidence": "All 20 entities are LWPOLYLINE (dxf histogram LWPOLYLINE=20), each with vertices=5 (a closed quadrilateral), on the single xref layer X-평면도(기본형)$0$INSUL (handles 4890-48A3). INSUL denotes 단열재/thermal insulation and the layer's parent 평면도(기본형) is a standard-type floor plan, so this anonymous block is insulation graphics of the plan. No LINE, INSERT, TEXT, HATCH, or dimension entities are present.",
+      "rule": "A block composed solely of closed LWPOLYLINEs on a floor-plan INSUL (insulation) layer is a plan-geometry fragment that traces the insulated building envelope (exterior/party walls); classify it as 평면 부분도 and treat insulation as a wall-location indicator, not a container of wall-line entities.",
+      "counterfactual": "If these polylines resolved to long parallel collinear edges at ~100-200mm wall spacing, or if the layer were 벽체/WALL instead of INSUL, wall_likelihood would rise and specific wall-face handles could be listed; if the layer named furniture, a symbol, or text, the role would shift to 가구/심볼/기타.",
+      "uncertainty": "The projection gives only vertices=5 with no vertex coordinates, so I cannot confirm whether each polygon is an insulation batt or a wall-poché fill, cannot extract any wall-face line, and cannot compute a bbox. The 0.4 wall_likelihood reflects wall-association (insulation co-locates with exterior walls), not verified wall-line content; wall_line_handles is [] because every entity is a closed insulation polygon, not a linear wall face."
+    }
+  },
+  {
+    "unit_id": "defannot-u136-147",
+    "def": "*U136",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "32 closed 5-vertex LWPOLYLINEs on floor-plan INSUL (insulation) layer; anonymous plan fragment tracing envelope insulation along exterior walls.",
+    "rationale": {
+      "evidence": "All 32 entities are LWPOLYLINE (dxf histogram LWPOLYLINE=32), each with vertices=5 (a closed quadrilateral), on the single xref layer X-평면도(기본형)$0$INSUL (handles 48A9-48C6). INSUL denotes 단열재/thermal insulation and the layer's parent 평면도(기본형) is a standard-type floor plan, so this anonymous block is insulation graphics of the plan. No LINE, INSERT, TEXT, HATCH, or dimension entities are present.",
+      "rule": "A block composed solely of closed LWPOLYLINEs on a floor-plan INSUL (insulation) layer is a plan-geometry fragment that traces the insulated building envelope (exterior/party walls); classify it as 평면 부분도 and treat insulation as a wall-location indicator, not a container of wall-line entities.",
+      "counterfactual": "If these polylines resolved to long parallel collinear edges at ~100-200mm wall spacing, or if the layer were 벽체/WALL instead of INSUL, wall_likelihood would rise and specific wall-face handles could be listed; if the layer named furniture, a symbol, or text, the role would shift to 가구/심볼/기타.",
+      "uncertainty": "The projection gives only vertices=5 with no vertex coordinates, so I cannot confirm whether each polygon is an insulation batt or a wall-poché fill, cannot extract any wall-face line, and cannot compute a bbox. The 0.4 wall_likelihood reflects wall-association (insulation co-locates with exterior walls), not verified wall-line content; wall_line_handles is [] because every entity is a closed insulation polygon, not a linear wall face."
+    }
+  },
+  {
+    "unit_id": "defannot-u137-148",
+    "def": "*U137",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "9 closed 5-vertex LWPOLYLINEs on floor-plan INSUL (insulation) layer; anonymous plan fragment tracing envelope insulation along exterior walls.",
+    "rationale": {
+      "evidence": "All 9 entities are LWPOLYLINE (dxf histogram LWPOLYLINE=9), each with vertices=5 (a closed quadrilateral), on the single xref layer X-평면도(기본형)$0$INSUL (handles 48CE-48D6). INSUL denotes 단열재/thermal insulation and the layer's parent 평면도(기본형) is a standard-type floor plan, so this anonymous block is insulation graphics of the plan. No LINE, INSERT, TEXT, HATCH, or dimension entities are present.",
+      "rule": "A block composed solely of closed LWPOLYLINEs on a floor-plan INSUL (insulation) layer is a plan-geometry fragment that traces the insulated building envelope (exterior/party walls); classify it as 평면 부분도 and treat insulation as a wall-location indicator, not a container of wall-line entities.",
+      "counterfactual": "If these polylines resolved to long parallel collinear edges at ~100-200mm wall spacing, or if the layer were 벽체/WALL instead of INSUL, wall_likelihood would rise and specific wall-face handles could be listed; if the layer named furniture, a symbol, or text, the role would shift to 가구/심볼/기타.",
+      "uncertainty": "The projection gives only vertices=5 with no vertex coordinates, so I cannot confirm whether each polygon is an insulation batt or a wall-poché fill, cannot extract any wall-face line, and cannot compute a bbox. The 0.4 wall_likelihood reflects wall-association (insulation co-locates with exterior walls), not verified wall-line content; wall_line_handles is [] because every entity is a closed insulation polygon, not a linear wall face."
+    }
+  },
+  {
+    "unit_id": "defannot-u138-149",
+    "def": "*U138",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "10 closed 5-vertex LWPOLYLINEs on floor-plan INSUL (insulation) layer; anonymous plan fragment tracing envelope insulation along exterior walls.",
+    "rationale": {
+      "evidence": "All 10 entities are LWPOLYLINE (dxf histogram LWPOLYLINE=10), each with vertices=5 (a closed quadrilateral), on the single xref layer X-평면도(기본형)$0$INSUL (handles 48DC-48E5). INSUL denotes 단열재/thermal insulation and the layer's parent 평면도(기본형) is a standard-type floor plan, so this anonymous block is insulation graphics of the plan. No LINE, INSERT, TEXT, HATCH, or dimension entities are present.",
+      "rule": "A block composed solely of closed LWPOLYLINEs on a floor-plan INSUL (insulation) layer is a plan-geometry fragment that traces the insulated building envelope (exterior/party walls); classify it as 평면 부분도 and treat insulation as a wall-location indicator, not a container of wall-line entities.",
+      "counterfactual": "If these polylines resolved to long parallel collinear edges at ~100-200mm wall spacing, or if the layer were 벽체/WALL instead of INSUL, wall_likelihood would rise and specific wall-face handles could be listed; if the layer named furniture, a symbol, or text, the role would shift to 가구/심볼/기타.",
+      "uncertainty": "The projection gives only vertices=5 with no vertex coordinates, so I cannot confirm whether each polygon is an insulation batt or a wall-poché fill, cannot extract any wall-face line, and cannot compute a bbox. The 0.4 wall_likelihood reflects wall-association (insulation co-locates with exterior walls), not verified wall-line content; wall_line_handles is [] because every entity is a closed insulation polygon, not a linear wall face."
+    }
+  },
+  {
+    "unit_id": "defannot-u139-150",
+    "def": "*U139",
+    "role": "심볼",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [
+      {
+        "handle": "48EE",
+        "reason": "long horizontal edge; 50mm paired gap = bracket flange not wall"
+      },
+      {
+        "handle": "48F0",
+        "reason": "parallel horizontal 50mm from 48EE — too thin for a wall"
+      }
+    ],
+    "notes": "Flagpole-holder (국기계양대) fixture symbol: 2 WIPEOUTs + nested fixture INSERT + 1120×126mm bracket of 20 LINEs on layer 0.",
+    "rationale": {
+      "evidence": "Mixed histogram INSERT=1, LINE=20, WIPEOUT=2. The INSERT places block X-평면도(기본형)$0$국기계양대 (국기계양대 = flagpole holder) on its own layer; the 20 LINEs and 2 WIPEOUTs sit on layer 0. bbox [-560,-103.5,0,560,22.5,0] ≈ 1120×126mm — fixture-scale, not room-scale. Lines 48EE/48F0 form a 1076×50mm inner bar and the remaining LINEs a notched outer frame; the WIPEOUTs mask the background so the symbol reads cleanly.",
+      "rule": "A block combining WIPEOUT masks, a nested named-fixture INSERT, and a small (~1m) closed LINE frame on layer 0 is a plan fixture/symbol (심볼): it is inserted at a wall or parapet but does not itself contain structural wall geometry.",
+      "counterfactual": "If the LINEs spanned meters as long parallel pairs at ~100-200mm spacing with no nested fixture INSERT and no WIPEOUT, the block would read as wall geometry (평면 부분도) with high wall_likelihood; removing the 국기계양대 INSERT alone would drop the symbol reading.",
+      "uncertainty": "I cannot inspect the nested 국기계양대 block's contents, so wall lines embedded there cannot be ruled out; the 50mm parallel gap of the inner-bar lines could be misread as a thin wall, but at ~1m fixture scale it is a bracket flange, not a partition."
+    }
+  },
+  {
+    "unit_id": "defannot-u140-151",
+    "def": "*U140",
+    "role": "심볼",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [
+      {
+        "handle": "490A",
+        "reason": "long horizontal edge; 50mm paired gap = bracket flange not wall"
+      },
+      {
+        "handle": "490C",
+        "reason": "parallel horizontal 50mm from 490A — too thin for a wall"
+      }
+    ],
+    "notes": "Flagpole-holder (국기계양대) fixture symbol: 2 WIPEOUTs + nested fixture INSERT + 1020×126mm bracket of 20 LINEs on layer 0.",
+    "rationale": {
+      "evidence": "Mixed histogram INSERT=1, LINE=20, WIPEOUT=2. The INSERT places block X-평면도(기본형)$0$국기계양대 (국기계양대 = flagpole holder) on its own layer; the 20 LINEs and 2 WIPEOUTs sit on layer 0. bbox [-510,-103.5,0,510,22.5,0] ≈ 1020×126mm — fixture-scale, not room-scale. Lines 490A/490C form a 1076×50mm inner bar and the remaining LINEs a notched outer frame; the WIPEOUTs mask the background so the symbol reads cleanly.",
+      "rule": "A block combining WIPEOUT masks, a nested named-fixture INSERT, and a small (~1m) closed LINE frame on layer 0 is a plan fixture/symbol (심볼): it is inserted at a wall or parapet but does not itself contain structural wall geometry.",
+      "counterfactual": "If the LINEs spanned meters as long parallel pairs at ~100-200mm spacing with no nested fixture INSERT and no WIPEOUT, the block would read as wall geometry (평면 부분도) with high wall_likelihood; removing the 국기계양대 INSERT alone would drop the symbol reading.",
+      "uncertainty": "I cannot inspect the nested 국기계양대 block's contents, so wall lines embedded there cannot be ruled out; the 50mm parallel gap of the inner-bar lines could be misread as a thin wall, but at ~1m fixture scale it is a bracket flange, not a partition."
+    }
+  },
+  {
+    "unit_id": "defannot-u141-152",
+    "def": "*U141",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "15 closed 5-vertex LWPOLYLINEs on floor-plan INSUL (insulation) layer; anonymous plan fragment tracing envelope insulation along exterior walls.",
+    "rationale": {
+      "evidence": "All 15 entities are LWPOLYLINE (dxf histogram LWPOLYLINE=15), each with vertices=5 (a closed quadrilateral), on the single xref layer X-평면도(기본형)$0$INSUL (handles 4923-4931). INSUL denotes 단열재/thermal insulation and the layer's parent 평면도(기본형) is a standard-type floor plan, so this anonymous block is insulation graphics of the plan. No LINE, INSERT, TEXT, HATCH, or dimension entities are present.",
+      "rule": "A block composed solely of closed LWPOLYLINEs on a floor-plan INSUL (insulation) layer is a plan-geometry fragment that traces the insulated building envelope (exterior/party walls); classify it as 평면 부분도 and treat insulation as a wall-location indicator, not a container of wall-line entities.",
+      "counterfactual": "If these polylines resolved to long parallel collinear edges at ~100-200mm wall spacing, or if the layer were 벽체/WALL instead of INSUL, wall_likelihood would rise and specific wall-face handles could be listed; if the layer named furniture, a symbol, or text, the role would shift to 가구/심볼/기타.",
+      "uncertainty": "The projection gives only vertices=5 with no vertex coordinates, so I cannot confirm whether each polygon is an insulation batt or a wall-poché fill, cannot extract any wall-face line, and cannot compute a bbox. The 0.4 wall_likelihood reflects wall-association (insulation co-locates with exterior walls), not verified wall-line content; wall_line_handles is [] because every entity is a closed insulation polygon, not a linear wall face."
+    }
+  },
+  {
+    "unit_id": "defannot-u142-153",
+    "def": "*U142",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "95 closed 5-vertex LWPOLYLINEs on floor-plan INSUL (insulation) layer; anonymous plan fragment tracing envelope insulation along exterior walls.",
+    "rationale": {
+      "evidence": "All 95 entities are LWPOLYLINE (dxf histogram LWPOLYLINE=95), each with vertices=5 (a closed quadrilateral), on the single xref layer X-평면도(기본형)$0$INSUL (handles 4937-4954 (95 total, first 30 sampled)). INSUL denotes 단열재/thermal insulation and the layer's parent 평면도(기본형) is a standard-type floor plan, so this anonymous block is insulation graphics of the plan. No LINE, INSERT, TEXT, HATCH, or dimension entities are present.",
+      "rule": "A block composed solely of closed LWPOLYLINEs on a floor-plan INSUL (insulation) layer is a plan-geometry fragment that traces the insulated building envelope (exterior/party walls); classify it as 평면 부분도 and treat insulation as a wall-location indicator, not a container of wall-line entities.",
+      "counterfactual": "If these polylines resolved to long parallel collinear edges at ~100-200mm wall spacing, or if the layer were 벽체/WALL instead of INSUL, wall_likelihood would rise and specific wall-face handles could be listed; if the layer named furniture, a symbol, or text, the role would shift to 가구/심볼/기타.",
+      "uncertainty": "The projection gives only vertices=5 with no vertex coordinates, so I cannot confirm whether each polygon is an insulation batt or a wall-poché fill, cannot extract any wall-face line, and cannot compute a bbox. The 0.4 wall_likelihood reflects wall-association (insulation co-locates with exterior walls), not verified wall-line content; wall_line_handles is [] because every entity is a closed insulation polygon, not a linear wall face."
+    }
+  },
+  {
+    "unit_id": "defannot-u144-154",
+    "def": "*U144",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "14 closed 5-vertex LWPOLYLINEs on floor-plan INSUL (insulation) layer; anonymous plan fragment tracing envelope insulation along exterior walls.",
+    "rationale": {
+      "evidence": "All 14 entities are LWPOLYLINE (dxf histogram LWPOLYLINE=14), each with vertices=5 (a closed quadrilateral), on the single xref layer X-평면도(기본형)$0$INSUL (handles 4D9F-4DAC). INSUL denotes 단열재/thermal insulation and the layer's parent 평면도(기본형) is a standard-type floor plan, so this anonymous block is insulation graphics of the plan. No LINE, INSERT, TEXT, HATCH, or dimension entities are present.",
+      "rule": "A block composed solely of closed LWPOLYLINEs on a floor-plan INSUL (insulation) layer is a plan-geometry fragment that traces the insulated building envelope (exterior/party walls); classify it as 평면 부분도 and treat insulation as a wall-location indicator, not a container of wall-line entities.",
+      "counterfactual": "If these polylines resolved to long parallel collinear edges at ~100-200mm wall spacing, or if the layer were 벽체/WALL instead of INSUL, wall_likelihood would rise and specific wall-face handles could be listed; if the layer named furniture, a symbol, or text, the role would shift to 가구/심볼/기타.",
+      "uncertainty": "The projection gives only vertices=5 with no vertex coordinates, so I cannot confirm whether each polygon is an insulation batt or a wall-poché fill, cannot extract any wall-face line, and cannot compute a bbox. The 0.4 wall_likelihood reflects wall-association (insulation co-locates with exterior walls), not verified wall-line content; wall_line_handles is [] because every entity is a closed insulation polygon, not a linear wall face."
+    }
+  },
+  {
+    "unit_id": "defannot-u145-155",
+    "def": "*U145",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "16 closed 5-vertex LWPOLYLINEs on floor-plan INSUL (insulation) layer; anonymous plan fragment tracing envelope insulation along exterior walls.",
+    "rationale": {
+      "evidence": "All 16 entities are LWPOLYLINE (dxf histogram LWPOLYLINE=16), each with vertices=5 (a closed quadrilateral), on the single xref layer X-평면도(기본형)$0$INSUL (handles 4DB2-4DC1). INSUL denotes 단열재/thermal insulation and the layer's parent 평면도(기본형) is a standard-type floor plan, so this anonymous block is insulation graphics of the plan. No LINE, INSERT, TEXT, HATCH, or dimension entities are present.",
+      "rule": "A block composed solely of closed LWPOLYLINEs on a floor-plan INSUL (insulation) layer is a plan-geometry fragment that traces the insulated building envelope (exterior/party walls); classify it as 평면 부분도 and treat insulation as a wall-location indicator, not a container of wall-line entities.",
+      "counterfactual": "If these polylines resolved to long parallel collinear edges at ~100-200mm wall spacing, or if the layer were 벽체/WALL instead of INSUL, wall_likelihood would rise and specific wall-face handles could be listed; if the layer named furniture, a symbol, or text, the role would shift to 가구/심볼/기타.",
+      "uncertainty": "The projection gives only vertices=5 with no vertex coordinates, so I cannot confirm whether each polygon is an insulation batt or a wall-poché fill, cannot extract any wall-face line, and cannot compute a bbox. The 0.4 wall_likelihood reflects wall-association (insulation co-locates with exterior walls), not verified wall-line content; wall_line_handles is [] because every entity is a closed insulation polygon, not a linear wall face."
+    }
+  },
+  {
+    "unit_id": "defannot-u146-156",
+    "def": "*U146",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "159 closed 5-vertex LWPOLYLINEs on floor-plan INSUL (insulation) layer; anonymous plan fragment tracing envelope insulation along exterior walls.",
+    "rationale": {
+      "evidence": "All 159 entities are LWPOLYLINE (dxf histogram LWPOLYLINE=159), each with vertices=5 (a closed quadrilateral), on the single xref layer X-평면도(기본형)$0$INSUL (handles 4DC7-4DE4 (159 total, first 30 sampled)). INSUL denotes 단열재/thermal insulation and the layer's parent 평면도(기본형) is a standard-type floor plan, so this anonymous block is insulation graphics of the plan. No LINE, INSERT, TEXT, HATCH, or dimension entities are present.",
+      "rule": "A block composed solely of closed LWPOLYLINEs on a floor-plan INSUL (insulation) layer is a plan-geometry fragment that traces the insulated building envelope (exterior/party walls); classify it as 평면 부분도 and treat insulation as a wall-location indicator, not a container of wall-line entities.",
+      "counterfactual": "If these polylines resolved to long parallel collinear edges at ~100-200mm wall spacing, or if the layer were 벽체/WALL instead of INSUL, wall_likelihood would rise and specific wall-face handles could be listed; if the layer named furniture, a symbol, or text, the role would shift to 가구/심볼/기타.",
+      "uncertainty": "The projection gives only vertices=5 with no vertex coordinates, so I cannot confirm whether each polygon is an insulation batt or a wall-poché fill, cannot extract any wall-face line, and cannot compute a bbox. The 0.4 wall_likelihood reflects wall-association (insulation co-locates with exterior walls), not verified wall-line content; wall_line_handles is [] because every entity is a closed insulation polygon, not a linear wall face."
+    }
+  },
+  {
+    "unit_id": "defannot-u147-157",
+    "def": "*U147",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "12 closed 5-vertex LWPOLYLINEs on floor-plan INSUL (insulation) layer; anonymous plan fragment tracing envelope insulation along exterior walls.",
+    "rationale": {
+      "evidence": "All 12 entities are LWPOLYLINE (dxf histogram LWPOLYLINE=12), each with vertices=5 (a closed quadrilateral), on the single xref layer X-평면도(기본형)$0$INSUL (handles 4E6B-4E76). INSUL denotes 단열재/thermal insulation and the layer's parent 평면도(기본형) is a standard-type floor plan, so this anonymous block is insulation graphics of the plan. No LINE, INSERT, TEXT, HATCH, or dimension entities are present.",
+      "rule": "A block composed solely of closed LWPOLYLINEs on a floor-plan INSUL (insulation) layer is a plan-geometry fragment that traces the insulated building envelope (exterior/party walls); classify it as 평면 부분도 and treat insulation as a wall-location indicator, not a container of wall-line entities.",
+      "counterfactual": "If these polylines resolved to long parallel collinear edges at ~100-200mm wall spacing, or if the layer were 벽체/WALL instead of INSUL, wall_likelihood would rise and specific wall-face handles could be listed; if the layer named furniture, a symbol, or text, the role would shift to 가구/심볼/기타.",
+      "uncertainty": "The projection gives only vertices=5 with no vertex coordinates, so I cannot confirm whether each polygon is an insulation batt or a wall-poché fill, cannot extract any wall-face line, and cannot compute a bbox. The 0.4 wall_likelihood reflects wall-association (insulation co-locates with exterior walls), not verified wall-line content; wall_line_handles is [] because every entity is a closed insulation polygon, not a linear wall face."
+    }
+  },
+  {
+    "unit_id": "defannot-u148-158",
+    "def": "*U148",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "28 closed 5-vertex LWPOLYLINEs on floor-plan INSUL (insulation) layer; anonymous plan fragment tracing envelope insulation along exterior walls.",
+    "rationale": {
+      "evidence": "All 28 entities are LWPOLYLINE (dxf histogram LWPOLYLINE=28), each with vertices=5 (a closed quadrilateral), on the single xref layer X-평면도(기본형)$0$INSUL (handles 4E7C-4E97). INSUL denotes 단열재/thermal insulation and the layer's parent 평면도(기본형) is a standard-type floor plan, so this anonymous block is insulation graphics of the plan. No LINE, INSERT, TEXT, HATCH, or dimension entities are present.",
+      "rule": "A block composed solely of closed LWPOLYLINEs on a floor-plan INSUL (insulation) layer is a plan-geometry fragment that traces the insulated building envelope (exterior/party walls); classify it as 평면 부분도 and treat insulation as a wall-location indicator, not a container of wall-line entities.",
+      "counterfactual": "If these polylines resolved to long parallel collinear edges at ~100-200mm wall spacing, or if the layer were 벽체/WALL instead of INSUL, wall_likelihood would rise and specific wall-face handles could be listed; if the layer named furniture, a symbol, or text, the role would shift to 가구/심볼/기타.",
+      "uncertainty": "The projection gives only vertices=5 with no vertex coordinates, so I cannot confirm whether each polygon is an insulation batt or a wall-poché fill, cannot extract any wall-face line, and cannot compute a bbox. The 0.4 wall_likelihood reflects wall-association (insulation co-locates with exterior walls), not verified wall-line content; wall_line_handles is [] because every entity is a closed insulation polygon, not a linear wall face."
+    }
+  },
+  {
+    "unit_id": "defannot-u149-159",
+    "def": "*U149",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "77 closed 5-vertex LWPOLYLINEs on floor-plan INSUL (insulation) layer; anonymous plan fragment tracing envelope insulation along exterior walls.",
+    "rationale": {
+      "evidence": "All 77 entities are LWPOLYLINE (dxf histogram LWPOLYLINE=77), each with vertices=5 (a closed quadrilateral), on the single xref layer X-평면도(기본형)$0$INSUL (handles 4E9D-4EBA (77 total, first 30 sampled)). INSUL denotes 단열재/thermal insulation and the layer's parent 평면도(기본형) is a standard-type floor plan, so this anonymous block is insulation graphics of the plan. No LINE, INSERT, TEXT, HATCH, or dimension entities are present.",
+      "rule": "A block composed solely of closed LWPOLYLINEs on a floor-plan INSUL (insulation) layer is a plan-geometry fragment that traces the insulated building envelope (exterior/party walls); classify it as 평면 부분도 and treat insulation as a wall-location indicator, not a container of wall-line entities.",
+      "counterfactual": "If these polylines resolved to long parallel collinear edges at ~100-200mm wall spacing, or if the layer were 벽체/WALL instead of INSUL, wall_likelihood would rise and specific wall-face handles could be listed; if the layer named furniture, a symbol, or text, the role would shift to 가구/심볼/기타.",
+      "uncertainty": "The projection gives only vertices=5 with no vertex coordinates, so I cannot confirm whether each polygon is an insulation batt or a wall-poché fill, cannot extract any wall-face line, and cannot compute a bbox. The 0.4 wall_likelihood reflects wall-association (insulation co-locates with exterior walls), not verified wall-line content; wall_line_handles is [] because every entity is a closed insulation polygon, not a linear wall face."
+    }
+  },
+  {
+    "unit_id": "defannot-u150-160",
+    "def": "*U150",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "25 closed 5-vertex LWPOLYLINEs on floor-plan INSUL (insulation) layer; anonymous plan fragment tracing envelope insulation along exterior walls.",
+    "rationale": {
+      "evidence": "All 25 entities are LWPOLYLINE (dxf histogram LWPOLYLINE=25), each with vertices=5 (a closed quadrilateral), on the single xref layer X-평면도(기본형)$0$INSUL (handles 4EEF-4F07). INSUL denotes 단열재/thermal insulation and the layer's parent 평면도(기본형) is a standard-type floor plan, so this anonymous block is insulation graphics of the plan. No LINE, INSERT, TEXT, HATCH, or dimension entities are present.",
+      "rule": "A block composed solely of closed LWPOLYLINEs on a floor-plan INSUL (insulation) layer is a plan-geometry fragment that traces the insulated building envelope (exterior/party walls); classify it as 평면 부분도 and treat insulation as a wall-location indicator, not a container of wall-line entities.",
+      "counterfactual": "If these polylines resolved to long parallel collinear edges at ~100-200mm wall spacing, or if the layer were 벽체/WALL instead of INSUL, wall_likelihood would rise and specific wall-face handles could be listed; if the layer named furniture, a symbol, or text, the role would shift to 가구/심볼/기타.",
+      "uncertainty": "The projection gives only vertices=5 with no vertex coordinates, so I cannot confirm whether each polygon is an insulation batt or a wall-poché fill, cannot extract any wall-face line, and cannot compute a bbox. The 0.4 wall_likelihood reflects wall-association (insulation co-locates with exterior walls), not verified wall-line content; wall_line_handles is [] because every entity is a closed insulation polygon, not a linear wall face."
+    }
+  }
+]

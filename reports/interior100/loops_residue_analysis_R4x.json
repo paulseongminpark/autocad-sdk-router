@@ -1,0 +1,312 @@
+{
+  "schema": "ariadne.loops_residue_analysis.v1",
+  "inputs": {
+    "census_ir": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4x_ccw_20260711\\census\\dwg_graph_ir.json",
+    "post_ir": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4x_ccw_20260711\\regen\\post\\dwg_graph_ir.json",
+    "interior_diff": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\interior100\\R4x_remeasure_ccw.json"
+  },
+  "baseline": {
+    "totals": {
+      "a_def_count": 294,
+      "b_def_count": 294,
+      "a_entity_total": 27130,
+      "b_entity_total": 27130,
+      "diff0_total": 27128,
+      "interior_diff0_fraction": 0.9999262808698858,
+      "spline_fit_authored_a": 432,
+      "spline_fit_authored_b": 0,
+      "derived_cache_excluded": {
+        "name_pattern": "^\\*D\\d+$",
+        "a_def_count": 113,
+        "b_def_count": 113,
+        "a_entity_total": 1053,
+        "b_entity_total": 1130,
+        "reason": "*D anonymous blocks are per-dimension rendered caches; a rebuild's dimensions mint fresh *D names, so a name-matched def compare is a category error. The dimension entities themselves are verified by the L5 dim_semantic_gate."
+      }
+    },
+    "reproduce_errors": [],
+    "captured_modified_pairs": 2
+  },
+  "classification": {
+    "loops_only": 2,
+    "loops_plus_other_keys": 0,
+    "non_loops": 0
+  },
+  "loops_only_verdict": {
+    "pointcloud_geometry_equal": 2,
+    "pointcloud_geometry_diff": 0,
+    "geometry_eq_tolerance": 0.001,
+    "canon_folds": 0,
+    "canon_resistant": 2,
+    "max_pointcloud_dist_among_folded": 0.0,
+    "folded_but_geometry_diff": []
+  },
+  "arc_angle_range_seen": null,
+  "collision_test": {
+    "census_hatch_loops": 310,
+    "distinct_canonical_forms": 212,
+    "notation_variants_merged": 16,
+    "geometry_collisions": []
+  },
+  "pairs_loops_only": [
+    {
+      "def": "X-FORM_청주$0$dA로고",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "1BDF",
+      "b_handle": "762B",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 0.000915805,
+      "pointcloud_notes": [
+        "spline-control-proxy"
+      ],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 5,
+          "closed": true,
+          "n_edges": 3,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 3
+          }
+        },
+        {
+          "loop_type": 20,
+          "closed": true,
+          "n_edges": 1,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 1
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 5,
+          "closed": true,
+          "n_edges": 9,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 9
+          }
+        },
+        {
+          "loop_type": 20,
+          "closed": true,
+          "n_edges": 3,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 3
+          }
+        }
+      ]
+    },
+    {
+      "def": "X-FORM_청주$0$dA로고",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "1BE6",
+      "b_handle": "7632",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 0.000915805,
+      "pointcloud_notes": [
+        "spline-control-proxy"
+      ],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 5,
+          "closed": true,
+          "n_edges": 3,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 3
+          }
+        },
+        {
+          "loop_type": 20,
+          "closed": true,
+          "n_edges": 1,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 1
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 5,
+          "closed": true,
+          "n_edges": 9,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 9
+          }
+        },
+        {
+          "loop_type": 20,
+          "closed": true,
+          "n_edges": 3,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 3
+          }
+        }
+      ]
+    }
+  ],
+  "pairs_loops_plus": [],
+  "pairs_non_loops": [],
+  "resistant_pairs": [
+    {
+      "def": "X-FORM_청주$0$dA로고",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "1BDF",
+      "b_handle": "762B",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 0.000915805,
+      "pointcloud_notes": [
+        "spline-control-proxy"
+      ],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 5,
+          "closed": true,
+          "n_edges": 3,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 3
+          }
+        },
+        {
+          "loop_type": 20,
+          "closed": true,
+          "n_edges": 1,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 1
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 5,
+          "closed": true,
+          "n_edges": 9,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 9
+          }
+        },
+        {
+          "loop_type": 20,
+          "closed": true,
+          "n_edges": 3,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 3
+          }
+        }
+      ]
+    },
+    {
+      "def": "X-FORM_청주$0$dA로고",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "1BE6",
+      "b_handle": "7632",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 0.000915805,
+      "pointcloud_notes": [
+        "spline-control-proxy"
+      ],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 5,
+          "closed": true,
+          "n_edges": 3,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 3
+          }
+        },
+        {
+          "loop_type": 20,
+          "closed": true,
+          "n_edges": 1,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 1
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 5,
+          "closed": true,
+          "n_edges": 9,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 9
+          }
+        },
+        {
+          "loop_type": 20,
+          "closed": true,
+          "n_edges": 3,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 3
+          }
+        }
+      ]
+    }
+  ],
+  "dryrun": {
+    "totals": {
+      "a_def_count": 294,
+      "b_def_count": 294,
+      "a_entity_total": 27130,
+      "b_entity_total": 27130,
+      "diff0_total": 27128,
+      "interior_diff0_fraction": 0.9999262808698858,
+      "spline_fit_authored_a": 432,
+      "spline_fit_authored_b": 0,
+      "derived_cache_excluded": {
+        "name_pattern": "^\\*D\\d+$",
+        "a_def_count": 113,
+        "b_def_count": 113,
+        "a_entity_total": 1053,
+        "b_entity_total": 1130,
+        "reason": "*D anonymous blocks are per-dimension rendered caches; a rebuild's dimensions mint fresh *D names, so a name-matched def compare is a category error. The dimension entities themselves are verified by the L5 dim_semantic_gate."
+      }
+    },
+    "per_def_regressions": [],
+    "dirty_defs_after": [
+      {
+        "name": "X-FORM_청주$0$dA로고",
+        "a_total": 30,
+        "diff0": 28,
+        "modified": 2,
+        "removed": 0,
+        "added": 0
+      }
+    ]
+  }
+}

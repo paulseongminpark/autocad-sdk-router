@@ -1,0 +1,282 @@
+[
+ {
+  "unit_id": "defannot-u63-241",
+  "def": "*U63",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "151 closed 5-vertex LWPOLYLINEs on plan INSUL layer; anonymous insulation hatch fragment of the floor plan.",
+  "rationale": {
+   "evidence": "All 151 entities are LWPOLYLINE with vertices=5 on the single xref layer X-평면도(기본형)$0$INSUL (sampled handles 3C70–3C8D). The layer token INSUL under 평면도(기본형) marks thermal-insulation graphics in a standard floor plan; histograms are 100% LWPOLYLINE/INSUL with no LINE, INSERT, TEXT, or dimension entities.",
+   "rule": "An anonymous *U block made only of uniform closed LWPOLYLINEs on a floor-plan INSUL material layer is a plan-geometry fill fragment (평면 부분도); insulation co-locates with the envelope but those polylines are not wall-face lines.",
+   "counterfactual": "If the layer were 벽체/WALL or the entities were long parallel LINE pairs at ~100–200 mm spacing, wall_likelihood would rise and wall_line_handles could be populated; a fixture-name INSERT or furniture layer would flip the role to 심볼 or 가구.",
+   "uncertainty": "No vertex coordinates or LINE-derived bbox are given, so each 5-vertex polyline cannot be measured as hatch batt versus thin cavity outline, nor can exterior versus party-wall placement be verified."
+  }
+ },
+ {
+  "unit_id": "defannot-u64-242",
+  "def": "*U64",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "25 closed 5-vertex LWPOLYLINEs on plan INSUL layer; anonymous insulation hatch fragment of the floor plan.",
+  "rationale": {
+   "evidence": "All 25 entities are LWPOLYLINE with vertices=5 on X-평면도(기본형)$0$INSUL (handles 3D0C–3D24). dxf_name and layer histograms are single-valued; no LINE/INSERT/TEXT/HATCH appear, so this is a compact insulation-fill anonymous block from the bound floor-plan xref.",
+   "rule": "Uniform closed polylines confined to a 평면도…$INSUL layer classify as 평면 부분도 material fill, with wall_line_handles empty because insulation polygons are not linear wall faces.",
+   "counterfactual": "Wall-layer naming or long parallel collinear edges at wall thickness would raise wall_likelihood and allow listing face handles; DEFPOINTS/*D dimension content would flip the role to 치수캐시.",
+   "uncertainty": "Without coordinates it is unclear whether the 25 quads form a short exterior-envelope run or an interior insulated partition strip."
+  }
+ },
+ {
+  "unit_id": "defannot-u67-243",
+  "def": "*U67",
+  "role": "심볼",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "국기계양대 flagpole-holder symbol: WIPEOUT pair + nested fixture INSERT + ~3320×126 mm LINE frame on layer 0.",
+  "rationale": {
+   "evidence": "Histogram INSERT=1, LINE=20, WIPEOUT=2. INSERT handle 3D7E places block X-평면도(기본형)$0$국기계양대 (flagpole holder); WIPEOUTs 3D7C/3D7D and twenty LINEs on layer 0 form a notched frame. LINE bbox [-1660,-103.5,0,1660,22.5,0] is fixture-scale (~3.3 m × 0.13 m), not room-partition scale; inner bars (e.g. 3D7F/3D81) show a ~50 mm flange gap.",
+   "rule": "WIPEOUT masks plus a nested named-fixture INSERT plus a thin closed LINE bracket on layer 0 indicate a plan fixture symbol (심볼), not structural wall geometry.",
+   "counterfactual": "Removing the 국기계양대 INSERT and stretching the LINEs into multi-meter parallel pairs at ~100–200 mm spacing without WIPEOUT would reclassify as 평면 부분도 with high wall_likelihood.",
+   "uncertainty": "Nested 국기계양대 contents are not expanded here, so any wall geometry inside that child block cannot be inspected; the 50 mm parallel gap could be mistaken for a thin wall without the fixture name and scale."
+  }
+ },
+ {
+  "unit_id": "defannot-u68-244",
+  "def": "*U68",
+  "role": "심볼",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "국기계양대 flagpole-holder symbol: WIPEOUT pair + nested fixture INSERT + ~920×126 mm LINE frame on layer 0.",
+  "rationale": {
+   "evidence": "Same composition as sibling flagpole wrappers: INSERT 3D9A of 국기계양대, WIPEOUTs 3D98/3D99, and 20 LINEs on layer 0. bbox [-460,-103.5,0,460,22.5,0] ≈ 920×126 mm — a shorter variant of the same fixture bracket (inner span ~876 mm via 3D9B/3D9D).",
+   "rule": "Named fixture INSERT + WIPEOUT + small-scale layer-0 LINE frame → 심볼 regardless of horizontal span length among variants.",
+   "counterfactual": "If LINEs spanned room lengths as wall-thickness parallel pairs with no fixture INSERT, role would flip to 평면 부분도; furniture-layer geometry would flip to 가구.",
+   "uncertainty": "Child block geometry is opaque; whether this shorter span marks a different wall bay or a scaled instance cannot be told from the projection alone."
+  }
+ },
+ {
+  "unit_id": "defannot-u70-245",
+  "def": "*U70",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "53 closed 5-vertex LWPOLYLINEs on plan INSUL layer; anonymous insulation hatch fragment of the floor plan.",
+  "rationale": {
+   "evidence": "53/53 entities are LWPOLYLINE vertices=5 on X-평면도(기본형)$0$INSUL (sampled 3DBC–3DD9). No other dxf types or layers appear; this is a mid-size anonymous insulation fill pack from the floor-plan xref.",
+   "rule": "Solely INSUL-layer closed LWPOLYLINEs in a *U block are plan insulation fragments (평면 부분도), not wall-line containers.",
+   "counterfactual": "WALL/벽체 layer or long parallel LINE faces would raise wall_likelihood and populate wall_line_handles; symbol INSERT+WIPEOUT would flip to 심볼.",
+   "uncertainty": "Missing vertex coordinates prevent confirming hatch-cell size versus wall-cavity outlines and prevent bbox-based envelope placement."
+  }
+ },
+ {
+  "unit_id": "defannot-u71-246",
+  "def": "*U71",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "41 closed 5-vertex LWPOLYLINEs on plan INSUL layer; anonymous insulation hatch fragment of the floor plan.",
+  "rationale": {
+   "evidence": "All 41 entities are 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL (handles 3DF6–3E13 sampled). Homogeneous histograms and absence of LINE/INSERT/TEXT support a single-material plan fill reading.",
+   "rule": "Material-token plan layers (INSUL under 평면도) with uniform closed polylines classify as 평면 부분도 fill, keeping wall_line_handles empty.",
+   "counterfactual": "Parallel wall-face LINEs at wall thickness or a wall layer rename would increase wall_likelihood; *D/DEFPOINTS dimension pattern would yield 치수캐시.",
+   "uncertainty": "Cannot measure polyline extents or confirm exterior-envelope versus interior insulated-wall context without coordinates."
+  }
+ },
+ {
+  "unit_id": "defannot-u72-247",
+  "def": "*U72",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "15 closed 5-vertex LWPOLYLINEs on plan INSUL layer; anonymous insulation hatch fragment of the floor plan.",
+  "rationale": {
+   "evidence": "15 LWPOLYLINE entities, each vertices=5, all on X-평면도(기본형)$0$INSUL (handles 3E24–3E32). Compact anonymous block matching the recurring insulation-fill pattern in this drawing set.",
+   "rule": "Count of insulation quads may vary; role stays 평면 부분도 whenever the sole content is plan INSUL closed polylines.",
+   "counterfactual": "Furniture-layer tokens or fixture INSERT/WIPEOUT would flip role; wall-layer long faces would keep 평면 부분도 but raise wall_likelihood and list handles.",
+   "uncertainty": "No bbox or vertices mean the 15-cell run’s path along the building shell cannot be reconstructed."
+  }
+ },
+ {
+  "unit_id": "defannot-u73-248",
+  "def": "*U73",
+  "role": "심볼",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "국기계양대 flagpole-holder symbol: WIPEOUT pair + nested fixture INSERT + ~1820×126 mm LINE frame on layer 0.",
+  "rationale": {
+   "evidence": "INSERT 3E3A of 국기계양대, WIPEOUTs 3E38/3E39, LINE=20 on layer 0. bbox [-910,-103.5,0,910,22.5,0] ≈ 1820×126 mm; frame LINEs (e.g. 3E3B–3E4E) form the same notched bracket idiom as other flagpole wrappers.",
+   "rule": "Fixture-named nested INSERT with WIPEOUT and thin layer-0 bracket LINEs at fixture scale → 심볼 with low wall_likelihood.",
+   "counterfactual": "Multi-meter parallel wall-thickness LINE pairs without the fixture INSERT would reclassify as wall-bearing 평면 부분도.",
+   "uncertainty": "Nested block internals and exact host-wall attachment are not visible; only the wrapper frame and fixture name are evidenced."
+  }
+ },
+ {
+  "unit_id": "defannot-u74-249",
+  "def": "*U74",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "8 closed 5-vertex LWPOLYLINEs on plan INSUL layer; anonymous insulation hatch fragment of the floor plan.",
+  "rationale": {
+   "evidence": "Exactly 8 LWPOLYLINEs with vertices=5 on X-평면도(기본형)$0$INSUL (handles 3E54–3E5B). Smallest INSUL pack in this shard but identical entity/layer signature to larger siblings.",
+   "rule": "Even a short run of plan-INSUL closed polylines remains 평면 부분도 insulation fill, not a reusable named 심볼.",
+   "counterfactual": "A named INSERT of a fixture or furniture geometry would flip the role; WALL-layer faces would raise wall_likelihood.",
+   "uncertainty": "Without coordinates, whether these eight quads are a short exterior segment or a local patch cannot be determined."
+  }
+ },
+ {
+  "unit_id": "defannot-u75-250",
+  "def": "*U75",
+  "role": "심볼",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "국기계양대 flagpole-holder symbol: WIPEOUT pair + nested fixture INSERT + ~3920×126 mm LINE frame on layer 0.",
+  "rationale": {
+   "evidence": "INSERT 3E63 of 국기계양대, WIPEOUTs 3E61/3E62, 20 LINEs on layer 0. bbox [-1960,-103.5,0,1960,22.5,0] ≈ 3920×126 mm — longest horizontal variant here, still only ~126 mm tall with ~50 mm inner flange (3E64/3E66), consistent with a fixture plate not a partition.",
+   "rule": "Horizontal span among flagpole wrappers can grow; classification remains 심볼 while height stays fixture-thin and a 국기계양대 INSERT is present.",
+   "counterfactual": "Absent the fixture INSERT and with parallel faces at wall thickness spanning rooms, judgment would flip to 평면 부분도 walls.",
+   "uncertainty": "Why this instance is longer than siblings (different facade length vs. scaled callout) cannot be decided from the projection alone."
+  }
+ },
+ {
+  "unit_id": "defannot-u76-251",
+  "def": "*U76",
+  "role": "심볼",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "국기계양대 flagpole-holder symbol: WIPEOUT pair + nested fixture INSERT + ~2420×126 mm LINE frame on layer 0.",
+  "rationale": {
+   "evidence": "INSERT 3E7F of 국기계양대, WIPEOUTs 3E7D/3E7E, LINE=20 on layer 0. bbox [-1210,-103.5,0,1210,22.5,0] ≈ 2420×126 mm; same notched outer frame and inner bar pattern (3E80–3E93) as other 국기계양대 wrappers.",
+   "rule": "WIPEOUT + named fixture INSERT + layer-0 thin bracket LINEs → 심볼; do not treat bracket flanges as wall_line_handles.",
+   "counterfactual": "Replacing the fixture INSERT with wall-layer geometry or thickening the parallel gap to ~100–200 mm over room lengths would flip toward wall-bearing 평면 부분도.",
+   "uncertainty": "Child 국기계양대 graphics are unexpanded; host wall adjacency is implied by plan use but not geometrically proven here."
+  }
+ },
+ {
+  "unit_id": "defannot-u77-252",
+  "def": "*U77",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "42 closed 5-vertex LWPOLYLINEs on plan INSUL layer; anonymous insulation hatch fragment of the floor plan.",
+  "rationale": {
+   "evidence": "42 LWPOLYLINE entities, all vertices=5, all on X-평면도(기본형)$0$INSUL (sampled 3E99–3EB6). Homogeneous dxf/layer histograms with no LINE-derived bbox indicate insulation fill graphics only.",
+   "rule": "Plan INSUL closed-polyline packs in anonymous blocks are 평면 부분도; wall association is indirect, so wall_line_handles stay [].",
+   "counterfactual": "Wall-layer long faces would raise wall_likelihood and list handles; fixture INSERT/WIPEOUT would flip to 심볼.",
+   "uncertainty": "Vertex geometry absent, so hatch versus cavity-outline ambiguity and exterior/party placement remain unresolved."
+  }
+ },
+ {
+  "unit_id": "defannot-u79-253",
+  "def": "*U79",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "33 closed 5-vertex LWPOLYLINEs on plan INSUL layer; anonymous insulation hatch fragment of the floor plan.",
+  "rationale": {
+   "evidence": "33/33 entities are 5-vertex LWPOLYLINEs on X-평면도(기본형)$0$INSUL (handles 3F00–3F1D sampled). No mixed entity types; anonymous *U79 matches the insulation-fragment pattern.",
+   "rule": "Classify sole INSUL-layer closed LWPOLYLINE anonymous blocks as 평면 부분도 material fill of the floor plan.",
+   "counterfactual": "WALL naming or measurable parallel wall faces would change wall scoring; furniture/symbol cues would change role.",
+   "uncertainty": "Cannot verify polyline size or continuous envelope path without coordinates or bbox."
+  }
+ },
+ {
+  "unit_id": "defannot-u81-254",
+  "def": "*U81",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "39 closed 5-vertex LWPOLYLINEs on plan INSUL layer; anonymous insulation hatch fragment of the floor plan.",
+  "rationale": {
+   "evidence": "39 LWPOLYLINEs with vertices=5 on X-평면도(기본형)$0$INSUL (sampled 3F5E–3F7B). Single-layer, single-type histogram; insulation semantics come from the $INSUL suffix under 평면도(기본형).",
+   "rule": "Material sub-layer under a floor-plan xref plus uniform closed polylines → 평면 부분도, not 심볼/치수캐시/가구.",
+   "counterfactual": "If entities were DIMENSION/SOLID/*D patterns, role would become 치수캐시; wall faces on WALL layers would raise wall_likelihood.",
+   "uncertainty": "No coordinates leave hatch-cell vs wall-cavity and exterior vs interior insulation ambiguous."
+  }
+ },
+ {
+  "unit_id": "defannot-u82-255",
+  "def": "*U82",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "19 closed 5-vertex LWPOLYLINEs on plan INSUL layer; anonymous insulation hatch fragment of the floor plan.",
+  "rationale": {
+   "evidence": "19 LWPOLYLINE entities, vertices=5 each, layer X-평면도(기본형)$0$INSUL exclusively (handles 3F8A–3F9C). Pattern matches other insulation anonymous packs in this shard.",
+   "rule": "Anonymous plan-INSUL closed polylines are 평면 부분도 fill; do not list them as wall_line_handles.",
+   "counterfactual": "Fixture INSERT+WIPEOUT would flip to 심볼; wall-thickness parallel LINEs on a wall layer would raise wall_likelihood.",
+   "uncertainty": "Spatial extent and which wall the 19-cell run follows cannot be recovered from this projection."
+  }
+ },
+ {
+  "unit_id": "defannot-u83-256",
+  "def": "*U83",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "9 closed 5-vertex LWPOLYLINEs on plan INSUL layer; anonymous insulation hatch fragment of the floor plan.",
+  "rationale": {
+   "evidence": "9 LWPOLYLINEs, vertices=5, all on X-평면도(기본형)$0$INSUL (handles 3FA2–3FAA). Small homogeneous insulation pack with no other entity kinds.",
+   "rule": "Short INSUL polyline runs still classify as 평면 부분도 when they are the sole content of a *U block on a plan insulation layer.",
+   "counterfactual": "Renaming to a furniture/fixture layer or adding a named INSERT would flip role; WALL-layer faces would change wall scoring.",
+   "uncertainty": "Without vertices/bbox, local patch versus short envelope segment cannot be distinguished."
+  }
+ },
+ {
+  "unit_id": "defannot-u84-257",
+  "def": "*U84",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "71 closed 5-vertex LWPOLYLINEs on plan INSUL layer; large anonymous insulation hatch fragment of the floor plan.",
+  "rationale": {
+   "evidence": "71 LWPOLYLINE entities with vertices=5 on X-평면도(기본형)$0$INSUL (sampled 3FB0–3FCD). Largest INSUL pack in this shard; still purely insulation fill with no LINE/INSERT/TEXT mix.",
+   "rule": "Entity count scales the fill extent but not the role: sole plan-INSUL closed polylines remain 평면 부분도 with empty wall_line_handles.",
+   "counterfactual": "Long parallel wall faces or WALL-layer content would raise wall_likelihood; dimension-cache cues would flip to 치수캐시.",
+   "uncertainty": "Cannot confirm whether the 71 quads form one continuous exterior run or aggregated patches without coordinates."
+  }
+ },
+ {
+  "unit_id": "defannot-u85-258",
+  "def": "*U85",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "18 closed 5-vertex LWPOLYLINEs on plan INSUL layer; anonymous insulation hatch fragment of the floor plan.",
+  "rationale": {
+   "evidence": "18 LWPOLYLINEs, vertices=5, layer X-평면도(기본형)$0$INSUL only (handles 3FFC–400D). Homogeneous histograms support insulation fill reading under the floor-plan xref.",
+   "rule": "Plan material-layer closed LWPOLYLINE anonymous blocks → 평면 부분도; insulation indicates wall vicinity but is not itself wall-line geometry.",
+   "counterfactual": "Wall-layer parallel LINEs would populate wall_line_handles; 국기계양대-style INSERT+WIPEOUT would flip to 심볼.",
+   "uncertainty": "Vertex coordinates and placement along the building envelope are unavailable in this projection."
+  }
+ },
+ {
+  "unit_id": "defannot-u86-259",
+  "def": "*U86",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "16 closed 5-vertex LWPOLYLINEs on plan INSUL layer; anonymous insulation hatch fragment of the floor plan.",
+  "rationale": {
+   "evidence": "16 entities, all LWPOLYLINE vertices=5 on X-평면도(기본형)$0$INSUL (handles 4013–4022). No secondary layers or entity types; matches the insulation-fragment anonymous-block pattern.",
+   "rule": "Uniform INSUL closed polylines under a 평면도 parent layer classify as 평면 부분도 fill fragments.",
+   "counterfactual": "If content included wall faces on WALL layers, wall_likelihood would rise; furniture or fixture naming would change role.",
+   "uncertainty": "Cannot measure cell size or confirm exterior versus party-wall insulation without geometry coordinates."
+  }
+ },
+ {
+  "unit_id": "defannot-u87-260",
+  "def": "*U87",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [],
+  "notes": "68 closed 5-vertex LWPOLYLINEs on plan INSUL layer; large anonymous insulation hatch fragment of the floor plan.",
+  "rationale": {
+   "evidence": "68 LWPOLYLINE entities with vertices=5 on X-평면도(기본형)$0$INSUL (sampled 4028–4045). Large homogeneous insulation pack; dxf and layer histograms are single-valued with no LINE-derived bbox.",
+   "rule": "Large or small, sole plan-INSUL closed LWPOLYLINE *U blocks are 평면 부분도; keep wall_line_handles empty because entities are insulation polygons, not wall faces.",
+   "counterfactual": "WALL-layer long parallel faces would raise wall_likelihood and allow handle listing; fixture INSERT+WIPEOUT would flip to 심볼.",
+   "uncertainty": "Absent vertex coordinates, continuous envelope tracing versus multi-patch aggregation and exterior versus interior context remain unknown."
+  }
+ }
+]

@@ -73,6 +73,22 @@ RE_CONST = re.compile(r'\b([A-Za-z_]\w*)\s*=\s*"([^"]+)"\s*;')
 RE_OPEQ = re.compile(r'op\s*==\s*(?:"([^"]+)"|([A-Za-z_]\w*))')
 RE_FAMFILE = re.compile(r'^m08([a-z]+)_handlers\.inc$')   # unit token may be multi-char (e.g. m08kc)
 
+# Family modules whose gate fn / filename do NOT fit the m08{letter}HasOp /
+# m08{letter}_handlers.inc shape RE_FAMFILE discovers, yet familyHasOp() in
+# AriadneNativeJob.cpp admits all the same (w6-layerstate/dynblk/section +
+# w7-materials/annoscale). Omitting them under-counts all_coded_ops() by their
+# op-ids and makes check_vocab_lockstep falsely report no_live_hasop for any
+# patch surface that points at one. Kept in lockstep with familyHasOp() by
+# tests/unit/test_reconcile_family_gate_parity.py.
+# (key, filename, hasop_fn, display_label)
+_NON_M08_FAMILIES = [
+    ("w6_layerstate", "w6_layerstate_handlers.inc", "w6LayerStateHasOp",  "w6-layerstate"),
+    ("w6_dynblk",     "w6_dynblk_handlers.inc",     "w6dynblkHasOp",      "w6-dynblk"),
+    ("w6_section",    "w6_section_handlers.inc",     "w6sectionHasOp",     "w6-section"),
+    ("w7_materials",  "materials_read.inc",          "materialsReadHasOp", "w7-materials"),
+    ("w7_annoscale",  "annoscale_read.inc",          "annoscaleReadHasOp", "w7-annoscale"),
+]
+
 
 def _load_reg():
     with open(REG, "r", encoding="utf-8-sig") as f:
@@ -85,12 +101,12 @@ def _dump_reg(obj):
         json.dump(obj, f, indent=2, ensure_ascii=False)
 
 
-def _hasop_body(text, letter):
-    """Extract the brace-balanced body of m08{letter}HasOp(...).
+def _hasop_body(text, hasop_fn):
+    """Extract the brace-balanced body of ``<hasop_fn>(...)``.
 
-    Anchor on the DEFINITION (`bool m08XHasOp(...)`) not the doc-comment mention
-    (`//   - m08XHasOp(op): ...`), which has no `bool` before the name."""
-    m = re.search(r'bool\s+m08' + letter + r'HasOp\s*\([^)]*\)', text)
+    Anchor on the DEFINITION (`bool <hasop_fn>(...)`) not the doc-comment mention
+    (`//   - <hasop_fn>(op): ...`), which has no `bool` before the name."""
+    m = re.search(r'bool\s+' + re.escape(hasop_fn) + r'\s*\([^)]*\)', text)
     if not m:
         return ""
     i = text.find("{", m.end())
@@ -109,10 +125,10 @@ def _hasop_body(text, letter):
     return text[i + 1:]
 
 
-def parse_family(path, letter):
+def parse_family(path, hasop_fn):
     text = open(path, "r", encoding="utf-8").read()
     consts = {name: val for name, val in RE_CONST.findall(text)}
-    body = _hasop_body(text, letter)
+    body = _hasop_body(text, hasop_fn)
     ops, unresolved = set(), []
     for lit, ident in RE_OPEQ.findall(body):
         if lit:
@@ -134,8 +150,21 @@ def discover_families(restrict):
         letter = m.group(1)
         if restrict and letter not in restrict:
             continue
-        ops, unresolved = parse_family(os.path.join(FAMILIES_DIR, fn), letter)
-        out[letter] = {"file": fn, "ops": ops, "unresolved": unresolved}
+        ops, unresolved = parse_family(os.path.join(FAMILIES_DIR, fn), "m08" + letter + "HasOp")
+        out[letter] = {"file": fn, "ops": ops, "unresolved": unresolved, "label": "m08" + letter}
+    # non-m08 families (w6/w7): familyHasOp() admits these too, but RE_FAMFILE
+    # can't see them (different filename + gate-fn shape). Their ops are all
+    # status=implemented today, so they never produce a flip (evidence_for() is
+    # never reached for a non-m08 key) -- they classify as overlap, which is
+    # exactly right, and they now count toward all_coded_ops().
+    for key, fn, hasop_fn, label in _NON_M08_FAMILIES:
+        if restrict and key not in restrict:
+            continue
+        path = os.path.join(FAMILIES_DIR, fn)
+        if not os.path.exists(path):
+            continue
+        ops, unresolved = parse_family(path, hasop_fn)
+        out[key] = {"file": fn, "ops": ops, "unresolved": unresolved, "label": label}
     return out
 
 
@@ -354,7 +383,7 @@ def main():
                 f_overlap.append(oid); overlaps.append(oid)
             else:  # blocked / deprecated / other
                 f_conflict.append(oid); conflicts.append((oid, st))
-        print("\n[m08{0}] {1}".format(letter, info["file"]))
+        print("\n[{0}] {1}".format(info["label"], info["file"]))
         print("  coded HasOp ops : {0}".format(len(coded)))
         print("  -> flip (catalogued/stub -> implemented): {0}".format(len(f_in)))
         print("  -> already implemented (skip)           : {0}".format(len(f_overlap)))

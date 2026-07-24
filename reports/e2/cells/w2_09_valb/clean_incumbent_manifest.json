@@ -1,0 +1,90 @@
+{
+  "schema": "e2.w2_09.clean_incumbent_manifest.v1",
+  "created_at": "2026-07-19T03:02:26+09:00",
+  "frozen": {
+    "schema": "e2.w2_09.clean_incumbent_manifest.v1",
+    "model_artifact": {
+      "path": "D:\\runs\\e2_program\\cells\\w2_09_valb\\clean_incumbent.joblib",
+      "sha256": "a0f37c1ab89d64773a7adbea871425a7f1bcc945e0b83ccea969e15d54ea1dcc",
+      "type": "three_seed_sklearn_bundle"
+    },
+    "arm": "hist_gbdt_context12_clean_valA",
+    "fit_universe": "train + val-A",
+    "training_rows": 4029873,
+    "selection_data": "val-A only",
+    "selected_context_radius_px": 20.0,
+    "selection_rule": "three-seed mean primary AUPRC",
+    "selection_tie_breakers": [
+      "three-seed mean F1",
+      "smaller radius_px"
+    ],
+    "features": [
+      "parallel",
+      "thickness",
+      "junction",
+      "log10_len",
+      "sin2t",
+      "cos2t",
+      "parallel_band_neighbor_count",
+      "nearest_parallel_gap_px",
+      "junction_degree",
+      "drawing_length_percentile",
+      "radius_density_r20_per_px2",
+      "neighbor_angle_entropy_r20"
+    ],
+    "model_seeds": [
+      17,
+      29,
+      43
+    ],
+    "estimator_parameters_except_seed": {
+      "categorical_features": "from_dtype",
+      "class_weight": null,
+      "early_stopping": "auto",
+      "interaction_cst": null,
+      "l2_regularization": 0.0,
+      "learning_rate": 0.1,
+      "loss": "log_loss",
+      "max_bins": 255,
+      "max_depth": null,
+      "max_features": 1.0,
+      "max_iter": 100,
+      "max_leaf_nodes": 31,
+      "min_samples_leaf": 20,
+      "monotonic_cst": null,
+      "n_iter_no_change": 10,
+      "scoring": "loss",
+      "tol": 1e-07,
+      "validation_fraction": 0.1,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "threshold": 0.5,
+    "threshold_selection_data": "fixed ex ante at 0.5; no val-B use",
+    "split_manifest_content_hash": "5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b",
+    "inference_rule": "report each seed; bundle probability is arithmetic mean",
+    "input_hashes": {
+      "w2_09_valb_py": "85481aa49f6cf62307588e73ea502160079f1172de8f5f927a1a7c23bb5ef1de",
+      "packet_w2_09": "34f2a15e8564ac5aa8f1fc8713d6471e44f7d37788153a60a1b7f7b69b9c1602",
+      "prereg_r2_v1": "fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2",
+      "wave2_joint_design": "a41d4442438b99215af6f38ec362e929499c1e3962dad082c3ce35482dbb82e9",
+      "revised_fable": "6b6489347390bdb1b4cee0b664a48b3f7dc0825f8dfac65d9ca0f7eb29883d6d",
+      "baseline_results": "7a696ff08c0a78c8b9db5f85ef5b5ece4dcc5ded40a664efe6564af36d65eab7",
+      "bstar_results_v2": "e6f8d17cfa94346ca0443649f1b327bd6982893522fc3f5b50e95bbad8f38643",
+      "cubicasa_ml": "e9baf9f361ca9cfc1a113e084bf5c34be33cf9b6c14615c2ed080f771cd3b466",
+      "cml_ctx": "ac0ef389ca971a87645763bd4153cf4f564731d17f8689331bc9de04a67e1b98",
+      "baseline_freeze_py": "631abe6ab2ebf9f805882e269eb139dd15788fb5e6ea6cdca949377479db9f3c",
+      "baseline_extraction_meta": "1198d41cc98c8424fdf8a2dc3b09548a836ffcbf8a39ec2f47ce0932419e97f0",
+      "legacy_model": "04c0515f0253b1d1979b5a5ca4a1f6ad6801c8e6b17a74734978f14717749f21",
+      "train_npz": "8f72d8931c6e08927bf027ee87f1bc5362ab1a85217862e09a0cddd6b0b0d5aa",
+      "val_npz": "5f15eefada2103a55f602473b7a467b72aa0390d84a2ed204a03f65b4a3dacef"
+    },
+    "versions": {
+      "python": "3.12.10",
+      "numpy": "1.26.4",
+      "scikit_learn": "1.9.0",
+      "joblib": "1.5.3"
+    }
+  },
+  "content_hash": "fbe7ed716f81165d1017ae695f2b142a0e89412494df5db846c0431395eddc84"
+}

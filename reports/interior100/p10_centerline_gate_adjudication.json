@@ -1,0 +1,55 @@
+{
+  "schema": "ariadne.interior100.p10_centerline_gate_adjudication.v1",
+  "arc": "p10-centerline-gate: octoloop v1 was REJECTED (vacuous+non-idempotent on real data). v2 (codex xhigh) rewrote it; this artifact is the orchestrator adversarial verification that cleared v2 for commit, plus the orchestrator-added name_map plumbing (my packet signature omitted it; block_topology.py establishes the convention).",
+  "unit_tests": "tests/unit/test_centerline_topology.py 8/8 PASS (incl. name_map pairing test)",
+  "real_data": "runs/e2e_1dwg_R4x_ccw_20260711 (census 1.dwg vs R4x rebuild)",
+  "census_line_entities": 12138,
+  "four_v1_defects_fixed": {
+    "vacuity": {
+      "census_segments": 1536,
+      "verdict": "FIXED",
+      "note": "v1 found ZERO centerlines (scanned only top-level entities); v2 scans block_definitions[].def_entities."
+    },
+    "half_grid_non_idempotence": {
+      "self_verdict": "PASS",
+      "self_missing": 0,
+      "verdict": "FIXED (tolerance match, not hard-snap+exact-compare)"
+    },
+    "vertical_bucket": "FIXED (undirected angle atan2(dy,dx) mod pi; unit test test_vertical_wall_pair_is_covered_and_translation_fails)",
+    "phantom_pairs": "FIXED (adjacent-offset pairing only; unit tests three_collinear + room_width_gap assert 2 not C(n,2))"
+  },
+  "adversarial_probes": {
+    "Q1_non_vacuous_segments": 1536,
+    "Q2_self_fixpoint": {
+      "verdict": "PASS",
+      "missing": 0,
+      "added": 0
+    },
+    "Q3_sensitivity": {
+      "block": "X-평면도(기본형)$0$84c",
+      "wall_lines_dropped": 225,
+      "verdict": "FAIL",
+      "missing": 81,
+      "added": 29,
+      "pass": true
+    },
+    "S1_order_invariance": {
+      "missing": 0,
+      "added": 0,
+      "stable": true
+    }
+  },
+  "rebuild_fidelity_with_name_map": {
+    "verdict": "FAIL",
+    "missing_total": 34,
+    "added_total": 34,
+    "wall_blocks_mismatch": 0,
+    "residue_by_block_class": {
+      "*D/ANON_D": [
+        34,
+        34
+      ]
+    },
+    "interpretation": "WALL (평면도) blocks are PERFECT (0 mismatch, 1536 non-vacuous centerlines). Residual FAIL is isolated to *D associative-dimension blocks, where the gate extracts spurious 'centerlines' from parallel dimension/extension lines in the 10-400 band. This is a CALLER-SCOPING concern (aim the gate at wall-bearing block definitions), not a gate-logic bug -- the gate correctly reports that dimension geometry differs. Harness integration should scope to wall blocks or accept dimension-block deltas."
+  }
+}

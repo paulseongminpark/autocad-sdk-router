@@ -224,6 +224,14 @@ block-definition geometry, when not inlined under `block_definitions`). This arr
 Required per entity: `handle`, `class`, `dxf_name`, `owner_handle`, `space`, `layer`,
 `bbox`, `geometry`, `source`.
 
+**Paper space.** The native `inspect.database.graph` op walks model space first, then
+appends every non-Model layout's paper-space entities (each carrying `space == "paper"`)
+using the same per-entity walker. The native result reports both counts —
+`modelspace_entities` and `paperspace_entities` — and `entities[].length ==
+modelspace_entities + paperspace_entities` when paper entities are present. A drawing
+with no paper-space geometry (or a native collector that predates this) simply reports
+`paperspace_entities: 0`.
+
 | field | meaning |
 |---|---|
 | `handle` | DWG handle (uppercase hex). Portable join key. |
@@ -235,7 +243,13 @@ Required per entity: `handle`, `class`, `dxf_name`, `owner_handle`, `space`, `la
 | `owner_handle` | Handle of the owning BTR (model space, paper space, or a block definition). Empty string allowed when the owner is unresolved. |
 | `space` | `model \| paper \| block`. |
 | `layout` | Layout/tab name when `space == "paper"`. |
-| `layer`, `linetype`, `color_index`, `lineweight`, `visible` | Common entity properties. |
+| `layer`, `visible` | Common entity properties. |
+| `linetype` | Entity linetype NAME as stored (`ByLayer` / `ByBlock` / `Continuous` or a named ltype like `HID`); the dash pattern itself lives in `symbol_tables.linetypes`. Display attribute — excluded from `stable_id`. |
+| `color_index` | Raw ACI color index from `AcDbEntity::colorIndex()`, emitted verbatim: `0` = ByBlock, `256` = ByLayer, `1-255` = explicit ACI. Sentinels are not resolved. Display attribute — excluded from `stable_id`. |
+| `color_method` | How the color is stored (`bylayer` / `byblock` / `bycolor` / `byaci`); `bycolor` ⇒ `true_color` present. |
+| `true_color` | Optional `{r,g,b}` (each `0-255`) explicit RGB color, present only when `color_method == "bycolor"`; omitted (not null) otherwise. Excluded from `stable_id`. |
+| `lineweight` | Lineweight in 1/100 mm, or the sentinels `-1` = ByLayer / `-2` = ByBlock / `-3` = Default. Display attribute — excluded from `stable_id`. |
+| `xclip{}` | XCLIP spatial-filter clip on a clipped `AcDbBlockReference` (`ACAD_FILTER`/`SPATIAL` on the reference's own extension dictionary): `enabled`, `inverted`, `elevation`, `front_clip`, `back_clip`, `normal`, `boundary` (verbatim CLIP-SPACE 2D vertices; 2 points = rectangular window), `boundary_block` (block-local — what e.g. ezdxf `set_block_clipping_path` needs; 2-point windows expanded to 4 corners before transform), `boundary_wcs` (WCS, 3D), `inv_block_xform` (row-major 4×4, clip→block). Display attribute — excluded from `stable_id`. |
 | `bbox` | Axis-aligned box `[minX,minY,minZ,maxX,maxY,maxZ]` (`$defs.bbox`); `[]` = no bbox computed. |
 | `geometry` | Coordinate payload (`$defs.geometry`, below). |
 | `xdata[]` | XDATA blocks per registered app (`$defs.xdata_block`: `app` + `items[]` of resbuf). |
@@ -321,6 +335,12 @@ The IR's single hardest invariant.
 `diagnostics.count_scope`
 (`modelspace \| modelspace_and_paperspace \| all_including_block_definitions \| total`).
 `diagnostics.realized_entity_count` is the **actual** length of `entities[]` as emitted.
+
+`count_scope` is **derived** by `ir_builder`, never hardcoded: it inspects the actual
+`space` values realized across `entities[]` and reports `modelspace_and_paperspace` when
+any entity carries `space == "paper"`, else `modelspace`. This keeps the declared scope
+truthful for both `build_ir_from_extract` (geometry-only extracts, model-space only today)
+and `build_ir_from_database_graph` (native graph results, which may include paper space).
 
 **Gate**: for the matching scope,
 

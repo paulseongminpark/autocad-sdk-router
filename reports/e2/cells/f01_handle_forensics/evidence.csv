@@ -1,0 +1,15 @@
+﻿section,metric,value,status,source
+PREREG,sha256,9ae565948e03787216f8744d7d5ba3e938a1c7302c0cadcf0bb73440724e02b2,SEALED,D:\runs\e2_program\cells\f01_handle_forensics\PREREG_local.json
+INPUT,input_hashes,110,MATCH,D:\runs\e2_program\cells\f01_handle_forensics\input_manifest_verified.csv
+C0,selectors_exact_order,TRUE,MATCH,D:\runs\e2_program\cells\f01_handle_forensics\selector_reproduction.csv
+C0,a_original_graph_reachable,19/20,MEASURED,D:\runs\e2_program\cells\f01_handle_forensics\selection_lineage.csv
+C1,oa_positive_defs,20,MEASURED,D:\runs\e2_program\cells\f01_handle_forensics\oa_per_def.csv
+C2,ob_positive_defs,131,MEASURED,D:\runs\e2_program\cells\f01_handle_forensics\ob_per_def.csv
+C2,positive_pairs,12173,MEASURED,D:\runs\e2_program\cells\f01_handle_forensics\geometric_pairs.csv
+C3,r_pair_handle,0.748898678414097,RESOLVED,D:\runs\e2_program\cells\f01_handle_forensics\oa_handle_citations.csv
+C3,r_pair_definition,0.8372093023255814,RESOLVED,D:\runs\e2_program\cells\f01_handle_forensics\ob_per_def.csv
+C4,unit_factor,1.0,RESOLVED,D:\runs\e2_program\cells\f01_handle_forensics\unit_anchors.csv
+C4,physical_unit_name,UNKNOWN,UNKNOWN,D:\dev\99_tools\autocad-sdk-router\reports\e2\s1\bbox_units.json
+C5,numeric_token_pair_risk_ratio,0.9088029809035864,MEASURED,D:\runs\e2_program\cells\f01_handle_forensics\token_contingency.csv
+C6,n_h_ornith,2045,CONSISTENT,D:\dev\99_tools\autocad-sdk-router\reports\e2\s1\handle_audit.json
+OUTPUT,evidence.xlsx,not_created,CSV_FALLBACK,D:\dev\99_tools\autocad-sdk-router\reports\e2\cells\f01_handle_forensics\EVIDENCE_XLSX_UNAVAILABLE.txt

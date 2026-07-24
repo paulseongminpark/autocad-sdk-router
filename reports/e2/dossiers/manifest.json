@@ -1,0 +1,184 @@
+[
+ {
+  "seat_id": "platt_P0",
+  "account": "aclaude",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\platt_P0.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\platt_P0.md",
+  "chars": 10843
+ },
+ {
+  "seat_id": "platt_P2",
+  "account": "aclaude",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\platt_P2.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\platt_P2.md",
+  "chars": 10916
+ },
+ {
+  "seat_id": "doe_P1",
+  "account": "aclaude",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\doe_P1.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\doe_P1.md",
+  "chars": 13724
+ },
+ {
+  "seat_id": "calibration_P3",
+  "account": "aclaude",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\calibration_P3.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\calibration_P3.md",
+  "chars": 11724
+ },
+ {
+  "seat_id": "feyerabend_P1",
+  "account": "aclaude",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\feyerabend_P1.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\feyerabend_P1.md",
+  "chars": 11281
+ },
+ {
+  "seat_id": "feyerabend_P5",
+  "account": "aclaude",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\feyerabend_P5.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\feyerabend_P5.md",
+  "chars": 11068
+ },
+ {
+  "seat_id": "platt_P1",
+  "account": "aclaude-e",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\platt_P1.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\platt_P1.md",
+  "chars": 10847
+ },
+ {
+  "seat_id": "platt_P5",
+  "account": "aclaude-e",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\platt_P5.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\platt_P5.md",
+  "chars": 11028
+ },
+ {
+  "seat_id": "doe_P3",
+  "account": "aclaude-e",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\doe_P3.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\doe_P3.md",
+  "chars": 12340
+ },
+ {
+  "seat_id": "calibration_P4",
+  "account": "aclaude-e",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\calibration_P4.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\calibration_P4.md",
+  "chars": 11793
+ },
+ {
+  "seat_id": "feyerabend_P2",
+  "account": "aclaude-e",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\feyerabend_P2.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\feyerabend_P2.md",
+  "chars": 11011
+ },
+ {
+  "seat_id": "feyerabend_P6",
+  "account": "aclaude-e",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\feyerabend_P6.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\feyerabend_P6.md",
+  "chars": 10521
+ },
+ {
+  "seat_id": "platt_P3",
+  "account": "acodex",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\platt_P3.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\platt_P3.md",
+  "chars": 10672
+ },
+ {
+  "seat_id": "doe_P2",
+  "account": "acodex",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\doe_P2.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\doe_P2.md",
+  "chars": 12548
+ },
+ {
+  "seat_id": "calibration_P1",
+  "account": "acodex",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\calibration_P1.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\calibration_P1.md",
+  "chars": 11721
+ },
+ {
+  "seat_id": "feyerabend_P3",
+  "account": "acodex",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\feyerabend_P3.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\feyerabend_P3.md",
+  "chars": 10914
+ },
+ {
+  "seat_id": "platt_P4",
+  "account": "acodex-b",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\platt_P4.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\platt_P4.md",
+  "chars": 11186
+ },
+ {
+  "seat_id": "doe_P5",
+  "account": "acodex-b",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\doe_P5.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\doe_P5.md",
+  "chars": 12598
+ },
+ {
+  "seat_id": "calibration_P2",
+  "account": "acodex-b",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\calibration_P2.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\calibration_P2.md",
+  "chars": 11578
+ },
+ {
+  "seat_id": "feyerabend_P7",
+  "account": "acodex-b",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\feyerabend_P7.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\feyerabend_P7.md",
+  "chars": 11288
+ },
+ {
+  "seat_id": "platt_P6",
+  "account": "grok",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\platt_P6.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\platt_P6.md",
+  "chars": 10768
+ },
+ {
+  "seat_id": "doe_P4",
+  "account": "grok",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\doe_P4.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\doe_P4.md",
+  "chars": 13286
+ },
+ {
+  "seat_id": "doe_P6",
+  "account": "grok",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\doe_P6.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\doe_P6.md",
+  "chars": 13419
+ },
+ {
+  "seat_id": "calibration_P5",
+  "account": "grok",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\calibration_P5.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\calibration_P5.md",
+  "chars": 11761
+ },
+ {
+  "seat_id": "calibration_P6",
+  "account": "grok",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\calibration_P6.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\calibration_P6.md",
+  "chars": 12254
+ },
+ {
+  "seat_id": "feyerabend_P4",
+  "account": "grok",
+  "prompt": "D:\\runs\\e2_dossier_wave\\20260718\\prompts\\feyerabend_P4.md",
+  "output": "D:\\runs\\e2_dossier_wave\\20260718\\dossiers\\feyerabend_P4.md",
+  "chars": 11079
+ }
+]

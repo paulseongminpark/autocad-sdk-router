@@ -1,0 +1,49 @@
+{
+  "family": "constraints_associativity_2",
+  "fixtures": {
+    "define.parameter.variable": {
+      "args": {
+        "name": "ARIADNE_PROBE_VAR",
+        "expression": "42.5"
+      },
+      "evidence": "m08kc_handlers.inc (define.parameter.variable: jsonFindString job 'name' [required, non-empty], jsonFindString job 'expression' [optional; falls back to jsonFindNumber 'value' then literal \"0\"])"
+    },
+    "define.parameter.merge": {
+      "args": {
+        "name": "ARIADNE_PROBE_MERGE_VAR",
+        "expression": "17.25"
+      },
+      "evidence": "m08kc_handlers.inc (define.parameter.merge: jsonFindString job 'name' [required, non-empty], jsonFindString job 'expression' [optional; falls back to literal \"0\"])"
+    }
+  },
+  "needs_state": [
+    {
+      "op": "define.constraint.dimensional.distance",
+      "reason": "handler requires target_handle (m08kcFindHandle 'target_handle'/'handle', optional 'target_handle2') naming an already-resident AcDbEntity to add to a 2D constraint group; a stateless fixture has no real object handle to supply (m08kc_handlers.inc line 367-402)."
+    },
+    {
+      "op": "define.constraint.dimensional.radiusDiameter",
+      "reason": "same handler block as define.constraint.dimensional.distance; requires target_handle for a pre-existing circular/arc entity handle already in the drawing database (m08kc_handlers.inc line 367-402)."
+    },
+    {
+      "op": "define.constraint.geometric",
+      "reason": "handler requires target_handle (m08kcFindHandle 'target_handle'/'handle', optional 'target_handle2') naming pre-existing entity handle(s) with an edge subentity to constrain; no construction-from-args path exists (m08kc_handlers.inc line 331-366)."
+    },
+    {
+      "op": "define.dimassoc.geometryDriven",
+      "reason": "handler requires dimension_handle (m08kcFindHandle 'dimension_handle'/'handle') naming an already-resident AcDbDimension entity to attach the AcDbDimAssoc to (m08kc_handlers.inc line 403-417)."
+    },
+    {
+      "op": "define.georef.subent",
+      "reason": "handler requires BOTH action_handle (existing AcDbAssocAction) and target_handle (existing entity) already resident in the drawing database; no args-only construction path (m08kc_handlers.inc line 774-824)."
+    },
+    {
+      "op": "define.perssubentid.resolve",
+      "reason": "handler requires target_handle (m08kcFindHandle 'target_handle'/'handle') naming a pre-existing entity whose real subentities (edges/faces/vertices) are enumerated via subentPtr; no entity to probe without prior state (m08kc_handlers.inc line 864-905)."
+    },
+    {
+      "op": "edit.assocnetwork.removeAction",
+      "reason": "handler requires action_handle (m08kcFindHandle 'action_handle'/'handle') naming an action already present in the top-level assoc network (e.g. created by a prior define.parameter.variable/merge call); a fresh stateless fixture has no action to remove (m08kc_handlers.inc line 534-556)."
+    }
+  ]
+}

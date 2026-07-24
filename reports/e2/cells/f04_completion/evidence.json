@@ -1,0 +1,1573 @@
+{
+  "all_legacy_observations": [
+    {
+      "admissibility": "INADMISSIBLE",
+      "admissibility_checks": {
+        "artifact_manifest_present": false,
+        "family_identified": false,
+        "lid_bijection_certificate_present": false,
+        "method_id_identified": false,
+        "relation_registered": true,
+        "repeat_checksum_present_and_matching": false,
+        "sentinel_qualified": false,
+        "transform_certificate_present": false
+      },
+      "admissibility_reasons": [
+        "family_id_absent",
+        "method_id_absent",
+        "artifact_manifest_absent",
+        "transform_certificate_absent",
+        "lid_bijection_certificate_absent",
+        "repeat_checksum_unproven",
+        "sentinel_qualification_unproven_or_failed"
+      ],
+      "canonical_cell_promoted": false,
+      "derived_r_meta": 0.0,
+      "derived_r_meta_exact": "0",
+      "derived_r_meta_formula": "1 - 1 = 0",
+      "diagnostic_band_from_r_meta": "PASS",
+      "mean_invariance": 1.0,
+      "mean_invariance_exact": "1",
+      "observation_id": "w2_independence_audit_v1:rotate",
+      "observed_family": null,
+      "observed_method_id": null,
+      "registry_relation": "rotate",
+      "source_id": "w2_independence_audit_v1",
+      "source_path": "reports/e2/w2_independence_audit_v1.json",
+      "source_pointer": "/surrogates/D_detector_vs_metamorphic/per_transform/rotate",
+      "source_precedence": 1,
+      "source_sha256": "9000f4e36246e7d450e358251cad9aa44f788536cdc6bec8669f5aac2f4996ad",
+      "source_transform": "rotate",
+      "source_values": {
+        "mean_invariance": 1.0,
+        "verdict": "PASS"
+      },
+      "source_verdict": "PASS"
+    },
+    {
+      "admissibility": "INADMISSIBLE",
+      "admissibility_checks": {
+        "artifact_manifest_present": false,
+        "family_identified": false,
+        "lid_bijection_certificate_present": false,
+        "method_id_identified": false,
+        "relation_registered": true,
+        "repeat_checksum_present_and_matching": false,
+        "sentinel_qualified": false,
+        "transform_certificate_present": false
+      },
+      "admissibility_reasons": [
+        "family_id_absent",
+        "method_id_absent",
+        "artifact_manifest_absent",
+        "transform_certificate_absent",
+        "lid_bijection_certificate_absent",
+        "repeat_checksum_unproven",
+        "sentinel_qualification_unproven_or_failed"
+      ],
+      "canonical_cell_promoted": false,
+      "derived_r_meta": 0.0,
+      "derived_r_meta_exact": "0",
+      "derived_r_meta_formula": "1 - 1 = 0",
+      "diagnostic_band_from_r_meta": "PASS",
+      "mean_invariance": 1.0,
+      "mean_invariance_exact": "1",
+      "observation_id": "w2_independence_audit_v1:translate",
+      "observed_family": null,
+      "observed_method_id": null,
+      "registry_relation": "translate",
+      "source_id": "w2_independence_audit_v1",
+      "source_path": "reports/e2/w2_independence_audit_v1.json",
+      "source_pointer": "/surrogates/D_detector_vs_metamorphic/per_transform/translate",
+      "source_precedence": 1,
+      "source_sha256": "9000f4e36246e7d450e358251cad9aa44f788536cdc6bec8669f5aac2f4996ad",
+      "source_transform": "translate",
+      "source_values": {
+        "mean_invariance": 1.0,
+        "verdict": "PASS"
+      },
+      "source_verdict": "PASS"
+    },
+    {
+      "admissibility": "OUT_OF_CATALOG",
+      "admissibility_checks": {
+        "artifact_manifest_present": false,
+        "family_identified": false,
+        "lid_bijection_certificate_present": false,
+        "method_id_identified": false,
+        "relation_registered": false,
+        "repeat_checksum_present_and_matching": false,
+        "sentinel_qualified": false,
+        "transform_certificate_present": false
+      },
+      "admissibility_reasons": [
+        "relation_not_registered",
+        "family_id_absent",
+        "method_id_absent",
+        "artifact_manifest_absent",
+        "transform_certificate_absent",
+        "lid_bijection_certificate_absent",
+        "repeat_checksum_unproven",
+        "sentinel_qualification_unproven_or_failed"
+      ],
+      "canonical_cell_promoted": false,
+      "derived_r_meta": 0.0,
+      "derived_r_meta_exact": "0",
+      "derived_r_meta_formula": "1 - 1 = 0",
+      "diagnostic_band_from_r_meta": "PASS",
+      "mean_invariance": 1.0,
+      "mean_invariance_exact": "1",
+      "observation_id": "w2_independence_audit_v1:mirror",
+      "observed_family": null,
+      "observed_method_id": null,
+      "registry_relation": null,
+      "source_id": "w2_independence_audit_v1",
+      "source_path": "reports/e2/w2_independence_audit_v1.json",
+      "source_pointer": "/surrogates/D_detector_vs_metamorphic/per_transform/mirror",
+      "source_precedence": 1,
+      "source_sha256": "9000f4e36246e7d450e358251cad9aa44f788536cdc6bec8669f5aac2f4996ad",
+      "source_transform": "mirror",
+      "source_values": {
+        "mean_invariance": 1.0,
+        "verdict": "PASS"
+      },
+      "source_verdict": "PASS"
+    },
+    {
+      "admissibility": "INADMISSIBLE",
+      "admissibility_checks": {
+        "artifact_manifest_present": false,
+        "family_identified": false,
+        "lid_bijection_certificate_present": false,
+        "method_id_identified": false,
+        "relation_registered": true,
+        "repeat_checksum_present_and_matching": false,
+        "sentinel_qualified": false,
+        "transform_certificate_present": false
+      },
+      "admissibility_reasons": [
+        "family_id_absent",
+        "method_id_absent",
+        "artifact_manifest_absent",
+        "transform_certificate_absent",
+        "lid_bijection_certificate_absent",
+        "repeat_checksum_unproven",
+        "sentinel_qualification_unproven_or_failed"
+      ],
+      "canonical_cell_promoted": false,
+      "derived_r_meta": 0.1205,
+      "derived_r_meta_exact": "0.1205",
+      "derived_r_meta_formula": "1 - 0.8795 = 0.1205",
+      "diagnostic_band_from_r_meta": "FAIL",
+      "mean_invariance": 0.8795,
+      "mean_invariance_exact": "0.8795",
+      "observation_id": "w2_independence_audit_v1:scale",
+      "observed_family": null,
+      "observed_method_id": null,
+      "registry_relation": "uniform-scale",
+      "source_id": "w2_independence_audit_v1",
+      "source_path": "reports/e2/w2_independence_audit_v1.json",
+      "source_pointer": "/surrogates/D_detector_vs_metamorphic/per_transform/scale",
+      "source_precedence": 1,
+      "source_sha256": "9000f4e36246e7d450e358251cad9aa44f788536cdc6bec8669f5aac2f4996ad",
+      "source_transform": "scale",
+      "source_values": {
+        "mean_invariance": 0.8795,
+        "verdict": "FAIL"
+      },
+      "source_verdict": "FAIL"
+    },
+    {
+      "admissibility": "INADMISSIBLE",
+      "admissibility_checks": {
+        "artifact_manifest_present": false,
+        "family_identified": false,
+        "lid_bijection_certificate_present": false,
+        "method_id_identified": false,
+        "relation_registered": true,
+        "repeat_checksum_present_and_matching": false,
+        "sentinel_qualified": false,
+        "transform_certificate_present": false
+      },
+      "admissibility_reasons": [
+        "family_id_absent",
+        "method_id_absent",
+        "artifact_manifest_absent",
+        "transform_certificate_absent",
+        "lid_bijection_certificate_absent",
+        "repeat_checksum_unproven",
+        "sentinel_qualification_unproven_or_failed"
+      ],
+      "canonical_cell_promoted": false,
+      "derived_r_meta": 0.0,
+      "derived_r_meta_exact": "0",
+      "derived_r_meta_formula": "1 - 1 = 0",
+      "diagnostic_band_from_r_meta": "PASS",
+      "mean_invariance": 1.0,
+      "mean_invariance_exact": "1",
+      "observation_id": "w2_independence_audit_v1:units",
+      "observed_family": null,
+      "observed_method_id": null,
+      "registry_relation": "unit-change",
+      "source_id": "w2_independence_audit_v1",
+      "source_path": "reports/e2/w2_independence_audit_v1.json",
+      "source_pointer": "/surrogates/D_detector_vs_metamorphic/per_transform/units",
+      "source_precedence": 1,
+      "source_sha256": "9000f4e36246e7d450e358251cad9aa44f788536cdc6bec8669f5aac2f4996ad",
+      "source_transform": "units",
+      "source_values": {
+        "mean_invariance": 1.0,
+        "verdict": "REPORT_ONLY"
+      },
+      "source_verdict": "REPORT_ONLY"
+    },
+    {
+      "admissibility": "INADMISSIBLE",
+      "admissibility_checks": {
+        "artifact_manifest_present": false,
+        "family_identified": false,
+        "lid_bijection_certificate_present": false,
+        "method_id_identified": false,
+        "relation_registered": true,
+        "repeat_checksum_present_and_matching": false,
+        "sentinel_qualified": false,
+        "transform_certificate_present": false
+      },
+      "admissibility_reasons": [
+        "family_id_absent",
+        "method_id_absent",
+        "artifact_manifest_absent",
+        "transform_certificate_absent",
+        "lid_bijection_certificate_absent",
+        "repeat_checksum_unproven",
+        "sentinel_qualification_unproven_or_failed",
+        "sentinel_all_trips=20"
+      ],
+      "canonical_cell_promoted": false,
+      "derived_r_meta": 0.0,
+      "derived_r_meta_exact": "0",
+      "derived_r_meta_formula": "1 - 1 = 0",
+      "diagnostic_band_from_r_meta": "PASS",
+      "mean_invariance": 1.0,
+      "mean_invariance_exact": "1",
+      "observation_id": "b4_fold_v2:rotate",
+      "observed_family": null,
+      "observed_method_id": null,
+      "registry_relation": "rotate",
+      "source_id": "b4_fold_v2",
+      "source_path": "reports/e2/s5/b4_fold_v2.json",
+      "source_pointer": "/transforms/rotate",
+      "source_precedence": 2,
+      "source_sha256": "866fadf11fa93fa5f8bd6c185c63124f3b7ef40cac0d7b7e12cbace4be6472dc",
+      "source_transform": "rotate",
+      "source_values": {
+        "banded": true,
+        "mean_invariance": 1.0,
+        "mean_recall_after": 1.0,
+        "min_invariance": 1,
+        "n": 20,
+        "n_recall_below_floor": 0,
+        "n_sentinel_all": 20,
+        "n_sentinel_zero": 0,
+        "strict_reason": "sentinel_all trips on 20/20 rows; sealed rule: any sentinel trip = automatic FAIL",
+        "verdict_strict": "FAIL"
+      },
+      "source_verdict": "FAIL"
+    },
+    {
+      "admissibility": "INADMISSIBLE",
+      "admissibility_checks": {
+        "artifact_manifest_present": false,
+        "family_identified": false,
+        "lid_bijection_certificate_present": false,
+        "method_id_identified": false,
+        "relation_registered": true,
+        "repeat_checksum_present_and_matching": false,
+        "sentinel_qualified": false,
+        "transform_certificate_present": false
+      },
+      "admissibility_reasons": [
+        "family_id_absent",
+        "method_id_absent",
+        "artifact_manifest_absent",
+        "transform_certificate_absent",
+        "lid_bijection_certificate_absent",
+        "repeat_checksum_unproven",
+        "sentinel_qualification_unproven_or_failed",
+        "sentinel_all_trips=20"
+      ],
+      "canonical_cell_promoted": false,
+      "derived_r_meta": 0.0,
+      "derived_r_meta_exact": "0",
+      "derived_r_meta_formula": "1 - 1 = 0",
+      "diagnostic_band_from_r_meta": "PASS",
+      "mean_invariance": 1.0,
+      "mean_invariance_exact": "1",
+      "observation_id": "b4_fold_v2:translate",
+      "observed_family": null,
+      "observed_method_id": null,
+      "registry_relation": "translate",
+      "source_id": "b4_fold_v2",
+      "source_path": "reports/e2/s5/b4_fold_v2.json",
+      "source_pointer": "/transforms/translate",
+      "source_precedence": 2,
+      "source_sha256": "866fadf11fa93fa5f8bd6c185c63124f3b7ef40cac0d7b7e12cbace4be6472dc",
+      "source_transform": "translate",
+      "source_values": {
+        "banded": true,
+        "mean_invariance": 1.0,
+        "mean_recall_after": 1.0,
+        "min_invariance": 1,
+        "n": 20,
+        "n_recall_below_floor": 0,
+        "n_sentinel_all": 20,
+        "n_sentinel_zero": 0,
+        "strict_reason": "sentinel_all trips on 20/20 rows; sealed rule: any sentinel trip = automatic FAIL",
+        "verdict_strict": "FAIL"
+      },
+      "source_verdict": "FAIL"
+    },
+    {
+      "admissibility": "OUT_OF_CATALOG",
+      "admissibility_checks": {
+        "artifact_manifest_present": false,
+        "family_identified": false,
+        "lid_bijection_certificate_present": false,
+        "method_id_identified": false,
+        "relation_registered": false,
+        "repeat_checksum_present_and_matching": false,
+        "sentinel_qualified": false,
+        "transform_certificate_present": false
+      },
+      "admissibility_reasons": [
+        "relation_not_registered",
+        "family_id_absent",
+        "method_id_absent",
+        "artifact_manifest_absent",
+        "transform_certificate_absent",
+        "lid_bijection_certificate_absent",
+        "repeat_checksum_unproven",
+        "sentinel_qualification_unproven_or_failed",
+        "sentinel_all_trips=20"
+      ],
+      "canonical_cell_promoted": false,
+      "derived_r_meta": 0.0,
+      "derived_r_meta_exact": "0",
+      "derived_r_meta_formula": "1 - 1 = 0",
+      "diagnostic_band_from_r_meta": "PASS",
+      "mean_invariance": 1.0,
+      "mean_invariance_exact": "1",
+      "observation_id": "b4_fold_v2:mirror",
+      "observed_family": null,
+      "observed_method_id": null,
+      "registry_relation": null,
+      "source_id": "b4_fold_v2",
+      "source_path": "reports/e2/s5/b4_fold_v2.json",
+      "source_pointer": "/transforms/mirror",
+      "source_precedence": 2,
+      "source_sha256": "866fadf11fa93fa5f8bd6c185c63124f3b7ef40cac0d7b7e12cbace4be6472dc",
+      "source_transform": "mirror",
+      "source_values": {
+        "banded": true,
+        "mean_invariance": 1.0,
+        "mean_recall_after": 1.0,
+        "min_invariance": 1,
+        "n": 20,
+        "n_recall_below_floor": 0,
+        "n_sentinel_all": 20,
+        "n_sentinel_zero": 0,
+        "strict_reason": "sentinel_all trips on 20/20 rows; sealed rule: any sentinel trip = automatic FAIL",
+        "verdict_strict": "FAIL"
+      },
+      "source_verdict": "FAIL"
+    },
+    {
+      "admissibility": "INADMISSIBLE",
+      "admissibility_checks": {
+        "artifact_manifest_present": false,
+        "family_identified": false,
+        "lid_bijection_certificate_present": false,
+        "method_id_identified": false,
+        "relation_registered": true,
+        "repeat_checksum_present_and_matching": false,
+        "sentinel_qualified": false,
+        "transform_certificate_present": false
+      },
+      "admissibility_reasons": [
+        "family_id_absent",
+        "method_id_absent",
+        "artifact_manifest_absent",
+        "transform_certificate_absent",
+        "lid_bijection_certificate_absent",
+        "repeat_checksum_unproven",
+        "sentinel_qualification_unproven_or_failed",
+        "sentinel_all_trips=20"
+      ],
+      "canonical_cell_promoted": false,
+      "derived_r_meta": 0.2376,
+      "derived_r_meta_exact": "0.2376",
+      "derived_r_meta_formula": "1 - 0.7624 = 0.2376",
+      "diagnostic_band_from_r_meta": "FAIL",
+      "mean_invariance": 0.7624,
+      "mean_invariance_exact": "0.7624",
+      "observation_id": "b4_fold_v2:scale",
+      "observed_family": null,
+      "observed_method_id": null,
+      "registry_relation": "uniform-scale",
+      "source_id": "b4_fold_v2",
+      "source_path": "reports/e2/s5/b4_fold_v2.json",
+      "source_pointer": "/transforms/scale",
+      "source_precedence": 2,
+      "source_sha256": "866fadf11fa93fa5f8bd6c185c63124f3b7ef40cac0d7b7e12cbace4be6472dc",
+      "source_transform": "scale",
+      "source_values": {
+        "banded": true,
+        "mean_invariance": 0.7624,
+        "mean_recall_after": 0.7624,
+        "min_invariance": 0.5,
+        "n": 20,
+        "n_recall_below_floor": 0,
+        "n_sentinel_all": 20,
+        "n_sentinel_zero": 0,
+        "strict_reason": "sentinel_all trips on 20/20 rows; sealed rule: any sentinel trip = automatic FAIL; invariance 0.7624 also below 0.90",
+        "verdict_strict": "FAIL"
+      },
+      "source_verdict": "FAIL"
+    },
+    {
+      "admissibility": "INADMISSIBLE",
+      "admissibility_checks": {
+        "artifact_manifest_present": false,
+        "family_identified": false,
+        "lid_bijection_certificate_present": false,
+        "method_id_identified": false,
+        "relation_registered": true,
+        "repeat_checksum_present_and_matching": false,
+        "sentinel_qualified": false,
+        "transform_certificate_present": false
+      },
+      "admissibility_reasons": [
+        "family_id_absent",
+        "method_id_absent",
+        "artifact_manifest_absent",
+        "transform_certificate_absent",
+        "lid_bijection_certificate_absent",
+        "repeat_checksum_unproven",
+        "sentinel_qualification_unproven_or_failed",
+        "sentinel_all_trips=20"
+      ],
+      "canonical_cell_promoted": false,
+      "derived_r_meta": 0.0,
+      "derived_r_meta_exact": "0",
+      "derived_r_meta_formula": "1 - 1 = 0",
+      "diagnostic_band_from_r_meta": "PASS",
+      "mean_invariance": 1.0,
+      "mean_invariance_exact": "1",
+      "observation_id": "b4_fold_v2:units",
+      "observed_family": null,
+      "observed_method_id": null,
+      "registry_relation": "unit-change",
+      "source_id": "b4_fold_v2",
+      "source_path": "reports/e2/s5/b4_fold_v2.json",
+      "source_pointer": "/transforms/units",
+      "source_precedence": 2,
+      "source_sha256": "866fadf11fa93fa5f8bd6c185c63124f3b7ef40cac0d7b7e12cbace4be6472dc",
+      "source_transform": "units",
+      "source_values": {
+        "banded": false,
+        "mean_invariance": 1.0,
+        "mean_recall_after": 1.0,
+        "min_invariance": 1,
+        "n": 20,
+        "n_recall_below_floor": 0,
+        "n_sentinel_all": 20,
+        "n_sentinel_zero": 0,
+        "strict_reason": "sentinel_all trips on 20/20 rows; sealed rule: any sentinel trip = automatic FAIL",
+        "verdict_strict": "REPORT_ONLY"
+      },
+      "source_verdict": "REPORT_ONLY"
+    }
+  ],
+  "axis_measurement_status": "AXIS_MEASUREMENT_COMPLETE",
+  "canonical_transform_by_family": [
+    {
+      "cell_id": "F01",
+      "family": "deterministic_v0",
+      "legacy_unassigned_observation_refs": [
+        "b4_fold_v2:translate",
+        "w2_independence_audit_v1:translate"
+      ],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04",
+      "r_meta": null,
+      "reason": "No admissible family-tagged measurement exists in the sealed packet inputs.",
+      "scope_status": "IN_SCOPE_F04_CPU",
+      "transform": "translate",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F02",
+      "family": "deterministic_v0",
+      "legacy_unassigned_observation_refs": [
+        "b4_fold_v2:rotate",
+        "w2_independence_audit_v1:rotate"
+      ],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04",
+      "r_meta": null,
+      "reason": "No admissible family-tagged measurement exists in the sealed packet inputs.",
+      "scope_status": "IN_SCOPE_F04_CPU",
+      "transform": "rotate",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F03",
+      "family": "deterministic_v0",
+      "legacy_unassigned_observation_refs": [
+        "b4_fold_v2:scale",
+        "w2_independence_audit_v1:scale"
+      ],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04",
+      "r_meta": null,
+      "reason": "No admissible family-tagged measurement exists in the sealed packet inputs.",
+      "scope_status": "IN_SCOPE_F04_CPU",
+      "transform": "uniform-scale",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F04",
+      "family": "deterministic_v0",
+      "legacy_unassigned_observation_refs": [
+        "b4_fold_v2:units",
+        "w2_independence_audit_v1:units"
+      ],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04",
+      "r_meta": null,
+      "reason": "No admissible family-tagged measurement exists in the sealed packet inputs.",
+      "scope_status": "IN_SCOPE_F04_CPU",
+      "transform": "unit-change",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F05",
+      "family": "deterministic_v0",
+      "legacy_unassigned_observation_refs": [],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04",
+      "r_meta": null,
+      "reason": "No admissible family-tagged measurement exists in the sealed packet inputs.",
+      "scope_status": "IN_SCOPE_F04_CPU",
+      "transform": "block-explode",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F06",
+      "family": "deterministic_v0",
+      "legacy_unassigned_observation_refs": [],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04",
+      "r_meta": null,
+      "reason": "No admissible family-tagged measurement exists in the sealed packet inputs.",
+      "scope_status": "IN_SCOPE_F04_CPU",
+      "transform": "layer-rename",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F07",
+      "family": "deterministic_v0",
+      "legacy_unassigned_observation_refs": [],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04",
+      "r_meta": null,
+      "reason": "No admissible family-tagged measurement exists in the sealed packet inputs.",
+      "scope_status": "IN_SCOPE_F04_CPU",
+      "transform": "coord-jitter",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F08",
+      "family": "classical_ml",
+      "legacy_unassigned_observation_refs": [
+        "b4_fold_v2:translate",
+        "w2_independence_audit_v1:translate"
+      ],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04",
+      "r_meta": null,
+      "reason": "No admissible family-tagged measurement exists in the sealed packet inputs.",
+      "scope_status": "IN_SCOPE_F04_CPU",
+      "transform": "translate",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F09",
+      "family": "classical_ml",
+      "legacy_unassigned_observation_refs": [
+        "b4_fold_v2:rotate",
+        "w2_independence_audit_v1:rotate"
+      ],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04",
+      "r_meta": null,
+      "reason": "No admissible family-tagged measurement exists in the sealed packet inputs.",
+      "scope_status": "IN_SCOPE_F04_CPU",
+      "transform": "rotate",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F10",
+      "family": "classical_ml",
+      "legacy_unassigned_observation_refs": [
+        "b4_fold_v2:scale",
+        "w2_independence_audit_v1:scale"
+      ],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04",
+      "r_meta": null,
+      "reason": "No admissible family-tagged measurement exists in the sealed packet inputs.",
+      "scope_status": "IN_SCOPE_F04_CPU",
+      "transform": "uniform-scale",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F11",
+      "family": "classical_ml",
+      "legacy_unassigned_observation_refs": [
+        "b4_fold_v2:units",
+        "w2_independence_audit_v1:units"
+      ],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04",
+      "r_meta": null,
+      "reason": "No admissible family-tagged measurement exists in the sealed packet inputs.",
+      "scope_status": "IN_SCOPE_F04_CPU",
+      "transform": "unit-change",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F12",
+      "family": "classical_ml",
+      "legacy_unassigned_observation_refs": [],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04",
+      "r_meta": null,
+      "reason": "No admissible family-tagged measurement exists in the sealed packet inputs.",
+      "scope_status": "IN_SCOPE_F04_CPU",
+      "transform": "block-explode",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F13",
+      "family": "classical_ml",
+      "legacy_unassigned_observation_refs": [],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04",
+      "r_meta": null,
+      "reason": "No admissible family-tagged measurement exists in the sealed packet inputs.",
+      "scope_status": "IN_SCOPE_F04_CPU",
+      "transform": "layer-rename",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F14",
+      "family": "classical_ml",
+      "legacy_unassigned_observation_refs": [],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04",
+      "r_meta": null,
+      "reason": "No admissible family-tagged measurement exists in the sealed packet inputs.",
+      "scope_status": "IN_SCOPE_F04_CPU",
+      "transform": "coord-jitter",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F15",
+      "family": "gnn",
+      "legacy_unassigned_observation_refs": [
+        "b4_fold_v2:translate",
+        "w2_independence_audit_v1:translate"
+      ],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04G",
+      "r_meta": null,
+      "reason": "Owned by F04G; this CPU packet records UNKNOWN without substitution.",
+      "scope_status": "DEFERRED_SCOPE",
+      "transform": "translate",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F16",
+      "family": "gnn",
+      "legacy_unassigned_observation_refs": [
+        "b4_fold_v2:rotate",
+        "w2_independence_audit_v1:rotate"
+      ],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04G",
+      "r_meta": null,
+      "reason": "Owned by F04G; this CPU packet records UNKNOWN without substitution.",
+      "scope_status": "DEFERRED_SCOPE",
+      "transform": "rotate",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F17",
+      "family": "gnn",
+      "legacy_unassigned_observation_refs": [
+        "b4_fold_v2:scale",
+        "w2_independence_audit_v1:scale"
+      ],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04G",
+      "r_meta": null,
+      "reason": "Owned by F04G; this CPU packet records UNKNOWN without substitution.",
+      "scope_status": "DEFERRED_SCOPE",
+      "transform": "uniform-scale",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F18",
+      "family": "gnn",
+      "legacy_unassigned_observation_refs": [
+        "b4_fold_v2:units",
+        "w2_independence_audit_v1:units"
+      ],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04G",
+      "r_meta": null,
+      "reason": "Owned by F04G; this CPU packet records UNKNOWN without substitution.",
+      "scope_status": "DEFERRED_SCOPE",
+      "transform": "unit-change",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F19",
+      "family": "gnn",
+      "legacy_unassigned_observation_refs": [],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04G",
+      "r_meta": null,
+      "reason": "Owned by F04G; this CPU packet records UNKNOWN without substitution.",
+      "scope_status": "DEFERRED_SCOPE",
+      "transform": "block-explode",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F20",
+      "family": "gnn",
+      "legacy_unassigned_observation_refs": [],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04G",
+      "r_meta": null,
+      "reason": "Owned by F04G; this CPU packet records UNKNOWN without substitution.",
+      "scope_status": "DEFERRED_SCOPE",
+      "transform": "layer-rename",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F21",
+      "family": "gnn",
+      "legacy_unassigned_observation_refs": [],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04G",
+      "r_meta": null,
+      "reason": "Owned by F04G; this CPU packet records UNKNOWN without substitution.",
+      "scope_status": "DEFERRED_SCOPE",
+      "transform": "coord-jitter",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F22",
+      "family": "vlm",
+      "legacy_unassigned_observation_refs": [
+        "b4_fold_v2:translate",
+        "w2_independence_audit_v1:translate"
+      ],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04V",
+      "r_meta": null,
+      "reason": "Owned by F04V; this CPU packet records UNKNOWN without substitution.",
+      "scope_status": "DEFERRED_SCOPE",
+      "transform": "translate",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F23",
+      "family": "vlm",
+      "legacy_unassigned_observation_refs": [
+        "b4_fold_v2:rotate",
+        "w2_independence_audit_v1:rotate"
+      ],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04V",
+      "r_meta": null,
+      "reason": "Owned by F04V; this CPU packet records UNKNOWN without substitution.",
+      "scope_status": "DEFERRED_SCOPE",
+      "transform": "rotate",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F24",
+      "family": "vlm",
+      "legacy_unassigned_observation_refs": [
+        "b4_fold_v2:scale",
+        "w2_independence_audit_v1:scale"
+      ],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04V",
+      "r_meta": null,
+      "reason": "Owned by F04V; this CPU packet records UNKNOWN without substitution.",
+      "scope_status": "DEFERRED_SCOPE",
+      "transform": "uniform-scale",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F25",
+      "family": "vlm",
+      "legacy_unassigned_observation_refs": [
+        "b4_fold_v2:units",
+        "w2_independence_audit_v1:units"
+      ],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04V",
+      "r_meta": null,
+      "reason": "Owned by F04V; this CPU packet records UNKNOWN without substitution.",
+      "scope_status": "DEFERRED_SCOPE",
+      "transform": "unit-change",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F26",
+      "family": "vlm",
+      "legacy_unassigned_observation_refs": [],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04V",
+      "r_meta": null,
+      "reason": "Owned by F04V; this CPU packet records UNKNOWN without substitution.",
+      "scope_status": "DEFERRED_SCOPE",
+      "transform": "block-explode",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F27",
+      "family": "vlm",
+      "legacy_unassigned_observation_refs": [],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04V",
+      "r_meta": null,
+      "reason": "Owned by F04V; this CPU packet records UNKNOWN without substitution.",
+      "scope_status": "DEFERRED_SCOPE",
+      "transform": "layer-rename",
+      "verdict": "UNKNOWN"
+    },
+    {
+      "cell_id": "F28",
+      "family": "vlm",
+      "legacy_unassigned_observation_refs": [],
+      "measurement_state": "UNKNOWN",
+      "owner_axis": "F04V",
+      "r_meta": null,
+      "reason": "Owned by F04V; this CPU packet records UNKNOWN without substitution.",
+      "scope_status": "DEFERRED_SCOPE",
+      "transform": "coord-jitter",
+      "verdict": "UNKNOWN"
+    }
+  ],
+  "confirmation": {
+    "reason": "No family has seven admissible numeric relation cells.",
+    "status": "NOT_RUN_NO_SENTINEL_QUALIFIED_COMPLETE_FAMILY"
+  },
+  "corrected_vs_older_discrepancies": [
+    {
+      "corrected_observation": "b4_fold_v2:mirror",
+      "formula": "corrected 1 - older 1 = 0 invariance",
+      "mean_invariance_delta_corrected_minus_older": 0.0,
+      "mean_invariance_delta_exact": "0",
+      "older_observation": "w2_independence_audit_v1:mirror",
+      "policy": "retain both; corrected source has precedence; never average",
+      "r_meta_delta_corrected_minus_older": 0.0,
+      "r_meta_delta_exact": "0",
+      "transform": "mirror"
+    },
+    {
+      "corrected_observation": "b4_fold_v2:rotate",
+      "formula": "corrected 1 - older 1 = 0 invariance",
+      "mean_invariance_delta_corrected_minus_older": 0.0,
+      "mean_invariance_delta_exact": "0",
+      "older_observation": "w2_independence_audit_v1:rotate",
+      "policy": "retain both; corrected source has precedence; never average",
+      "r_meta_delta_corrected_minus_older": 0.0,
+      "r_meta_delta_exact": "0",
+      "transform": "rotate"
+    },
+    {
+      "corrected_observation": "b4_fold_v2:scale",
+      "formula": "corrected 0.7624 - older 0.8795 = -0.1171 invariance",
+      "mean_invariance_delta_corrected_minus_older": -0.1171,
+      "mean_invariance_delta_exact": "-0.1171",
+      "older_observation": "w2_independence_audit_v1:scale",
+      "policy": "retain both; corrected source has precedence; never average",
+      "r_meta_delta_corrected_minus_older": 0.1171,
+      "r_meta_delta_exact": "0.1171",
+      "transform": "scale"
+    },
+    {
+      "corrected_observation": "b4_fold_v2:translate",
+      "formula": "corrected 1 - older 1 = 0 invariance",
+      "mean_invariance_delta_corrected_minus_older": 0.0,
+      "mean_invariance_delta_exact": "0",
+      "older_observation": "w2_independence_audit_v1:translate",
+      "policy": "retain both; corrected source has precedence; never average",
+      "r_meta_delta_corrected_minus_older": 0.0,
+      "r_meta_delta_exact": "0",
+      "transform": "translate"
+    },
+    {
+      "corrected_observation": "b4_fold_v2:units",
+      "formula": "corrected 1 - older 1 = 0 invariance",
+      "mean_invariance_delta_corrected_minus_older": 0.0,
+      "mean_invariance_delta_exact": "0",
+      "older_observation": "w2_independence_audit_v1:units",
+      "policy": "retain both; corrected source has precedence; never average",
+      "r_meta_delta_corrected_minus_older": 0.0,
+      "r_meta_delta_exact": "0",
+      "transform": "units"
+    }
+  ],
+  "effects_and_interactions": {
+    "admissible_numeric_cells": 0,
+    "expected_cells": 28,
+    "family_main_effects": null,
+    "formula_basis": "7 preregistered transforms x 4 preregistered families = 28 cells",
+    "imputation": "NONE",
+    "missing_cells": 28,
+    "status": "NOT_COMPUTABLE_MISSING_CANONICAL_CELLS",
+    "transform_by_family_interactions": null,
+    "transform_main_effects": null
+  },
+  "executed_utc": "2026-07-20T02:24:46Z",
+  "families": [
+    {
+      "cell_ids": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07"
+      ],
+      "execution_class": "CPU",
+      "id": "deterministic_v0",
+      "owner_axis": "F04",
+      "required_artifact": "exact frozen v0 method manifest; current v1 must not substitute"
+    },
+    {
+      "cell_ids": [
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14"
+      ],
+      "execution_class": "CPU",
+      "id": "classical_ml",
+      "owner_axis": "F04",
+      "required_artifact": "frozen HGBDT model, six-feature schema, threshold, and training manifest"
+    },
+    {
+      "cell_ids": [
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21"
+      ],
+      "current_packet_status": "DEFERRED_SCOPE",
+      "execution_class": "GPU_LOCAL_SERIAL",
+      "id": "gnn",
+      "owner_axis": "F04G"
+    },
+    {
+      "cell_ids": [
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28"
+      ],
+      "current_packet_status": "DEFERRED_SCOPE",
+      "execution_class": "DGX_QUEUE",
+      "id": "vlm",
+      "owner_axis": "F04V"
+    }
+  ],
+  "family_summaries": [
+    {
+      "family": "deterministic_v0",
+      "family_verdict": "UNKNOWN",
+      "n_cells": 7,
+      "owner_axis": "F04",
+      "reason": "At least one canonical cell lacks an admissible numeric measurement.",
+      "verdict_counts": {
+        "FAIL": 0,
+        "INCONCLUSIVE": 0,
+        "PASS": 0,
+        "UNKNOWN": 7
+      }
+    },
+    {
+      "family": "classical_ml",
+      "family_verdict": "UNKNOWN",
+      "n_cells": 7,
+      "owner_axis": "F04",
+      "reason": "At least one canonical cell lacks an admissible numeric measurement.",
+      "verdict_counts": {
+        "FAIL": 0,
+        "INCONCLUSIVE": 0,
+        "PASS": 0,
+        "UNKNOWN": 7
+      }
+    },
+    {
+      "family": "gnn",
+      "family_verdict": "UNKNOWN",
+      "n_cells": 7,
+      "owner_axis": "F04G",
+      "reason": "At least one canonical cell lacks an admissible numeric measurement.",
+      "verdict_counts": {
+        "FAIL": 0,
+        "INCONCLUSIVE": 0,
+        "PASS": 0,
+        "UNKNOWN": 7
+      }
+    },
+    {
+      "family": "vlm",
+      "family_verdict": "UNKNOWN",
+      "n_cells": 7,
+      "owner_axis": "F04V",
+      "reason": "At least one canonical cell lacks an admissible numeric measurement.",
+      "verdict_counts": {
+        "FAIL": 0,
+        "INCONCLUSIVE": 0,
+        "PASS": 0,
+        "UNKNOWN": 7
+      }
+    }
+  ],
+  "input_validation": [
+    {
+      "actual_sha256": "03ace40a101894eb0bd5d2ff3fd124c342485ef3221e0d382f5e4946645ec35b",
+      "exists": true,
+      "expected_sha256": "03ace40a101894eb0bd5d2ff3fd124c342485ef3221e0d382f5e4946645ec35b",
+      "hash_match": true,
+      "path": "D:\\runs\\e2_program\\build\\PACKET_f04_common_judge.md",
+      "role": "packet"
+    },
+    {
+      "actual_sha256": "9000f4e36246e7d450e358251cad9aa44f788536cdc6bec8669f5aac2f4996ad",
+      "exists": true,
+      "expected_sha256": "9000f4e36246e7d450e358251cad9aa44f788536cdc6bec8669f5aac2f4996ad",
+      "hash_match": true,
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\w2_independence_audit_v1.json",
+      "role": "legacy_independence_projection"
+    },
+    {
+      "actual_sha256": "866fadf11fa93fa5f8bd6c185c63124f3b7ef40cac0d7b7e12cbace4be6472dc",
+      "exists": true,
+      "expected_sha256": "866fadf11fa93fa5f8bd6c185c63124f3b7ef40cac0d7b7e12cbace4be6472dc",
+      "hash_match": true,
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\s5\\b4_fold_v2.json",
+      "role": "corrected_strict_metamorphic_fold"
+    },
+    {
+      "actual_sha256": "53efc08a96d8b0a770b5f0b5eaf9ae2d9ca8b5ce7db6422dce64e86afb75fda0",
+      "exists": true,
+      "expected_sha256": "53efc08a96d8b0a770b5f0b5eaf9ae2d9ca8b5ce7db6422dce64e86afb75fda0",
+      "hash_match": true,
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\synthesis\\FINAL_PROGRAM_PLAN.md",
+      "role": "F04_system_of_truth"
+    },
+    {
+      "actual_sha256": "fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2",
+      "exists": true,
+      "expected_sha256": "fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2",
+      "hash_match": true,
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\prereg_r2_v1.json",
+      "role": "upstream_program_prereg"
+    },
+    {
+      "actual_sha256": "4a55c843c7224a2e5800f116e360dfe327e13d1fc04e78e882099cfe96f32fc3",
+      "exists": true,
+      "expected_sha256": "4a55c843c7224a2e5800f116e360dfe327e13d1fc04e78e882099cfe96f32fc3",
+      "hash_match": true,
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\dossiers\\doe_P5.md",
+      "role": "relation_and_family_design"
+    }
+  ],
+  "preferred_legacy_observations": [
+    {
+      "admissibility": "INADMISSIBLE",
+      "admissibility_checks": {
+        "artifact_manifest_present": false,
+        "family_identified": false,
+        "lid_bijection_certificate_present": false,
+        "method_id_identified": false,
+        "relation_registered": true,
+        "repeat_checksum_present_and_matching": false,
+        "sentinel_qualified": false,
+        "transform_certificate_present": false
+      },
+      "admissibility_reasons": [
+        "family_id_absent",
+        "method_id_absent",
+        "artifact_manifest_absent",
+        "transform_certificate_absent",
+        "lid_bijection_certificate_absent",
+        "repeat_checksum_unproven",
+        "sentinel_qualification_unproven_or_failed",
+        "sentinel_all_trips=20"
+      ],
+      "canonical_cell_promoted": false,
+      "derived_r_meta": 0.0,
+      "derived_r_meta_exact": "0",
+      "derived_r_meta_formula": "1 - 1 = 0",
+      "diagnostic_band_from_r_meta": "PASS",
+      "mean_invariance": 1.0,
+      "mean_invariance_exact": "1",
+      "observation_id": "b4_fold_v2:translate",
+      "observed_family": null,
+      "observed_method_id": null,
+      "registry_relation": "translate",
+      "source_id": "b4_fold_v2",
+      "source_path": "reports/e2/s5/b4_fold_v2.json",
+      "source_pointer": "/transforms/translate",
+      "source_precedence": 2,
+      "source_sha256": "866fadf11fa93fa5f8bd6c185c63124f3b7ef40cac0d7b7e12cbace4be6472dc",
+      "source_transform": "translate",
+      "source_values": {
+        "banded": true,
+        "mean_invariance": 1.0,
+        "mean_recall_after": 1.0,
+        "min_invariance": 1,
+        "n": 20,
+        "n_recall_below_floor": 0,
+        "n_sentinel_all": 20,
+        "n_sentinel_zero": 0,
+        "strict_reason": "sentinel_all trips on 20/20 rows; sealed rule: any sentinel trip = automatic FAIL",
+        "verdict_strict": "FAIL"
+      },
+      "source_verdict": "FAIL"
+    },
+    {
+      "admissibility": "INADMISSIBLE",
+      "admissibility_checks": {
+        "artifact_manifest_present": false,
+        "family_identified": false,
+        "lid_bijection_certificate_present": false,
+        "method_id_identified": false,
+        "relation_registered": true,
+        "repeat_checksum_present_and_matching": false,
+        "sentinel_qualified": false,
+        "transform_certificate_present": false
+      },
+      "admissibility_reasons": [
+        "family_id_absent",
+        "method_id_absent",
+        "artifact_manifest_absent",
+        "transform_certificate_absent",
+        "lid_bijection_certificate_absent",
+        "repeat_checksum_unproven",
+        "sentinel_qualification_unproven_or_failed",
+        "sentinel_all_trips=20"
+      ],
+      "canonical_cell_promoted": false,
+      "derived_r_meta": 0.0,
+      "derived_r_meta_exact": "0",
+      "derived_r_meta_formula": "1 - 1 = 0",
+      "diagnostic_band_from_r_meta": "PASS",
+      "mean_invariance": 1.0,
+      "mean_invariance_exact": "1",
+      "observation_id": "b4_fold_v2:rotate",
+      "observed_family": null,
+      "observed_method_id": null,
+      "registry_relation": "rotate",
+      "source_id": "b4_fold_v2",
+      "source_path": "reports/e2/s5/b4_fold_v2.json",
+      "source_pointer": "/transforms/rotate",
+      "source_precedence": 2,
+      "source_sha256": "866fadf11fa93fa5f8bd6c185c63124f3b7ef40cac0d7b7e12cbace4be6472dc",
+      "source_transform": "rotate",
+      "source_values": {
+        "banded": true,
+        "mean_invariance": 1.0,
+        "mean_recall_after": 1.0,
+        "min_invariance": 1,
+        "n": 20,
+        "n_recall_below_floor": 0,
+        "n_sentinel_all": 20,
+        "n_sentinel_zero": 0,
+        "strict_reason": "sentinel_all trips on 20/20 rows; sealed rule: any sentinel trip = automatic FAIL",
+        "verdict_strict": "FAIL"
+      },
+      "source_verdict": "FAIL"
+    },
+    {
+      "admissibility": "OUT_OF_CATALOG",
+      "admissibility_checks": {
+        "artifact_manifest_present": false,
+        "family_identified": false,
+        "lid_bijection_certificate_present": false,
+        "method_id_identified": false,
+        "relation_registered": false,
+        "repeat_checksum_present_and_matching": false,
+        "sentinel_qualified": false,
+        "transform_certificate_present": false
+      },
+      "admissibility_reasons": [
+        "relation_not_registered",
+        "family_id_absent",
+        "method_id_absent",
+        "artifact_manifest_absent",
+        "transform_certificate_absent",
+        "lid_bijection_certificate_absent",
+        "repeat_checksum_unproven",
+        "sentinel_qualification_unproven_or_failed",
+        "sentinel_all_trips=20"
+      ],
+      "canonical_cell_promoted": false,
+      "derived_r_meta": 0.0,
+      "derived_r_meta_exact": "0",
+      "derived_r_meta_formula": "1 - 1 = 0",
+      "diagnostic_band_from_r_meta": "PASS",
+      "mean_invariance": 1.0,
+      "mean_invariance_exact": "1",
+      "observation_id": "b4_fold_v2:mirror",
+      "observed_family": null,
+      "observed_method_id": null,
+      "registry_relation": null,
+      "source_id": "b4_fold_v2",
+      "source_path": "reports/e2/s5/b4_fold_v2.json",
+      "source_pointer": "/transforms/mirror",
+      "source_precedence": 2,
+      "source_sha256": "866fadf11fa93fa5f8bd6c185c63124f3b7ef40cac0d7b7e12cbace4be6472dc",
+      "source_transform": "mirror",
+      "source_values": {
+        "banded": true,
+        "mean_invariance": 1.0,
+        "mean_recall_after": 1.0,
+        "min_invariance": 1,
+        "n": 20,
+        "n_recall_below_floor": 0,
+        "n_sentinel_all": 20,
+        "n_sentinel_zero": 0,
+        "strict_reason": "sentinel_all trips on 20/20 rows; sealed rule: any sentinel trip = automatic FAIL",
+        "verdict_strict": "FAIL"
+      },
+      "source_verdict": "FAIL"
+    },
+    {
+      "admissibility": "INADMISSIBLE",
+      "admissibility_checks": {
+        "artifact_manifest_present": false,
+        "family_identified": false,
+        "lid_bijection_certificate_present": false,
+        "method_id_identified": false,
+        "relation_registered": true,
+        "repeat_checksum_present_and_matching": false,
+        "sentinel_qualified": false,
+        "transform_certificate_present": false
+      },
+      "admissibility_reasons": [
+        "family_id_absent",
+        "method_id_absent",
+        "artifact_manifest_absent",
+        "transform_certificate_absent",
+        "lid_bijection_certificate_absent",
+        "repeat_checksum_unproven",
+        "sentinel_qualification_unproven_or_failed",
+        "sentinel_all_trips=20"
+      ],
+      "canonical_cell_promoted": false,
+      "derived_r_meta": 0.2376,
+      "derived_r_meta_exact": "0.2376",
+      "derived_r_meta_formula": "1 - 0.7624 = 0.2376",
+      "diagnostic_band_from_r_meta": "FAIL",
+      "mean_invariance": 0.7624,
+      "mean_invariance_exact": "0.7624",
+      "observation_id": "b4_fold_v2:scale",
+      "observed_family": null,
+      "observed_method_id": null,
+      "registry_relation": "uniform-scale",
+      "source_id": "b4_fold_v2",
+      "source_path": "reports/e2/s5/b4_fold_v2.json",
+      "source_pointer": "/transforms/scale",
+      "source_precedence": 2,
+      "source_sha256": "866fadf11fa93fa5f8bd6c185c63124f3b7ef40cac0d7b7e12cbace4be6472dc",
+      "source_transform": "scale",
+      "source_values": {
+        "banded": true,
+        "mean_invariance": 0.7624,
+        "mean_recall_after": 0.7624,
+        "min_invariance": 0.5,
+        "n": 20,
+        "n_recall_below_floor": 0,
+        "n_sentinel_all": 20,
+        "n_sentinel_zero": 0,
+        "strict_reason": "sentinel_all trips on 20/20 rows; sealed rule: any sentinel trip = automatic FAIL; invariance 0.7624 also below 0.90",
+        "verdict_strict": "FAIL"
+      },
+      "source_verdict": "FAIL"
+    },
+    {
+      "admissibility": "INADMISSIBLE",
+      "admissibility_checks": {
+        "artifact_manifest_present": false,
+        "family_identified": false,
+        "lid_bijection_certificate_present": false,
+        "method_id_identified": false,
+        "relation_registered": true,
+        "repeat_checksum_present_and_matching": false,
+        "sentinel_qualified": false,
+        "transform_certificate_present": false
+      },
+      "admissibility_reasons": [
+        "family_id_absent",
+        "method_id_absent",
+        "artifact_manifest_absent",
+        "transform_certificate_absent",
+        "lid_bijection_certificate_absent",
+        "repeat_checksum_unproven",
+        "sentinel_qualification_unproven_or_failed",
+        "sentinel_all_trips=20"
+      ],
+      "canonical_cell_promoted": false,
+      "derived_r_meta": 0.0,
+      "derived_r_meta_exact": "0",
+      "derived_r_meta_formula": "1 - 1 = 0",
+      "diagnostic_band_from_r_meta": "PASS",
+      "mean_invariance": 1.0,
+      "mean_invariance_exact": "1",
+      "observation_id": "b4_fold_v2:units",
+      "observed_family": null,
+      "observed_method_id": null,
+      "registry_relation": "unit-change",
+      "source_id": "b4_fold_v2",
+      "source_path": "reports/e2/s5/b4_fold_v2.json",
+      "source_pointer": "/transforms/units",
+      "source_precedence": 2,
+      "source_sha256": "866fadf11fa93fa5f8bd6c185c63124f3b7ef40cac0d7b7e12cbace4be6472dc",
+      "source_transform": "units",
+      "source_values": {
+        "banded": false,
+        "mean_invariance": 1.0,
+        "mean_recall_after": 1.0,
+        "min_invariance": 1,
+        "n": 20,
+        "n_recall_below_floor": 0,
+        "n_sentinel_all": 20,
+        "n_sentinel_zero": 0,
+        "strict_reason": "sentinel_all trips on 20/20 rows; sealed rule: any sentinel trip = automatic FAIL",
+        "verdict_strict": "REPORT_ONLY"
+      },
+      "source_verdict": "REPORT_ONLY"
+    }
+  ],
+  "prereg_path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\cells\\f04_completion\\PREREG_local.json",
+  "prereg_sha256": "444fa333d0ba816d723e9fc2b0125714a1ad31940710da7a79932b425d7587c0",
+  "prohibited_action_counts": {
+    "existing_source_files_modified": 0,
+    "model_api_calls": 0,
+    "original_cad_reads": 0,
+    "original_cad_writes": 0,
+    "test_set_reads": 0
+  },
+  "raw_output_root": "D:\\runs\\e2_program\\cells\\f04_completion",
+  "relation_registry": [
+    {
+      "binary_relation": "invariant",
+      "id": "translate",
+      "parameters": [
+        {
+          "dx_over_bbox_diagonal": 0.1,
+          "dy_over_bbox_diagonal": -0.2
+        },
+        {
+          "dx_over_bbox_diagonal": 10.0,
+          "dy_over_bbox_diagonal": 10.0
+        },
+        {
+          "dx_over_bbox_diagonal": -10.0,
+          "dy_over_bbox_diagonal": 3.0
+        }
+      ],
+      "structured_relation": "axis translated by the same vector; thickness unchanged",
+      "validity_gate": "inverse transform restores endpoints and topology"
+    },
+    {
+      "binary_relation": "invariant",
+      "id": "rotate",
+      "parameters": [
+        {
+          "angle_degrees": 17.0,
+          "center": "bbox_centroid"
+        },
+        {
+          "angle_degrees": 90.0,
+          "center": "bbox_centroid"
+        },
+        {
+          "angle_degrees": 173.0,
+          "center": "bbox_centroid"
+        }
+      ],
+      "structured_relation": "axis rotated about bbox centroid; thickness unchanged",
+      "validity_gate": "inverse rotation restores endpoints and topology"
+    },
+    {
+      "binary_relation": "invariant",
+      "id": "uniform-scale",
+      "parameters": [
+        {
+          "center": "bbox_centroid",
+          "factor": 0.5
+        },
+        {
+          "center": "bbox_centroid",
+          "factor": 2.0
+        },
+        {
+          "center": "bbox_centroid",
+          "factor": 10.0
+        }
+      ],
+      "structured_relation": "axis scaled about bbox centroid; thickness multiplied by absolute factor",
+      "validity_gate": "factor is positive and inverse scaling restores geometry"
+    },
+    {
+      "binary_relation": "invariant",
+      "id": "unit-change",
+      "parameters": [
+        {
+          "coordinate_factor": 0.001,
+          "from": "mm",
+          "to": "m"
+        },
+        {
+          "coordinate_factor": 1000.0,
+          "from": "m",
+          "to": "mm"
+        }
+      ],
+      "structured_relation": "raw coordinates and thickness scale while canonical millimetre quantities remain unchanged",
+      "validity_gate": "coordinates, $INSUNITS, and scale_mm_per_unit encode the same physical quantities"
+    },
+    {
+      "binary_relation": "invariant",
+      "id": "block-explode",
+      "parameters": [
+        {
+          "mode": "full_recursive_to_fixpoint"
+        }
+      ],
+      "structured_relation": "world geometry unchanged with occurrence-level LID mapping",
+      "validity_gate": "no remaining INSERT; occurrence mapping bijective; world topology unchanged"
+    },
+    {
+      "binary_relation": "invariant",
+      "id": "layer-rename",
+      "parameters": [
+        {
+          "scheme": "anonymize",
+          "seed": null
+        },
+        {
+          "scheme": "bijective_shuffle",
+          "seed": 11
+        },
+        {
+          "scheme": "bijective_shuffle",
+          "seed": 47
+        }
+      ],
+      "structured_relation": "geometry and LID unchanged; layer map bijective",
+      "validity_gate": "layer map bijective and geometry hash unchanged"
+    },
+    {
+      "binary_relation": "invariant",
+      "id": "coord-jitter",
+      "parameters": [
+        {
+          "q_over_bbox_diagonal": 1e-09,
+          "seed": 101
+        },
+        {
+          "q_over_bbox_diagonal": 1e-07,
+          "seed": 211
+        },
+        {
+          "q_over_bbox_diagonal": 1e-05,
+          "seed": 307
+        }
+      ],
+      "structured_relation": "shared logical vertices receive the same deterministic bounded dither",
+      "validity_gate": "nonzero segments, unchanged incidence/topology, certified parallel-band margin, and input-only decision-margin certificate"
+    }
+  ],
+  "scale_failure_observation_ids": [
+    "w2_independence_audit_v1:scale",
+    "b4_fold_v2:scale"
+  ],
+  "schema": "ariadne.e2.f04_common_judge.result.v1",
+  "scientific_gate_pass": false,
+  "scientific_gate_status": "INCOMPLETE_CANONICAL_EVIDENCE",
+  "selftest_evidence": {
+    "checks": [
+      {
+        "id": "fixed_band_boundaries",
+        "n_cases": 5,
+        "status": "PASS"
+      },
+      {
+        "id": "fixed_fold_and_catalog_abstention",
+        "n_cases": 3,
+        "status": "PASS"
+      },
+      {
+        "id": "fixed_source_precedence",
+        "n_cases": 3,
+        "status": "PASS"
+      },
+      {
+        "id": "fixed_nonaveraged_deltas",
+        "n_cases": 4,
+        "status": "PASS"
+      },
+      {
+        "id": "fixed_unknown_preservation",
+        "n_cases": 4,
+        "status": "PASS"
+      }
+    ],
+    "expectation_source": "hand-fixed literals in f04_common_judge_selftest.py",
+    "n_checks": 5,
+    "n_literal_cases": 19,
+    "production_inputs_used": false,
+    "schema": "ariadne.e2.f04_common_judge.selftest.v1",
+    "status": "PASS"
+  },
+  "unknown_preservation": {
+    "canonical_cells": 28,
+    "imputed_cells": 0,
+    "unknown_cells": 28
+  }
+}

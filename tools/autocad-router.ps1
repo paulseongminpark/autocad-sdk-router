@@ -18,6 +18,7 @@ param(
   [string]$OpListPath = '',
   [string]$JobListPath = '',
   [int]$BatchTimeoutMs = 0,
+  [int]$ScriptTimeoutMs = 120000,
   [string]$RouterHome = '',
   [string]$ConfigPath = '',
   [string]$PythonExe = ''
@@ -129,7 +130,24 @@ function Write-Json {
   $json = $Payload | ConvertTo-Json -Depth 16
   if (-not [string]::IsNullOrWhiteSpace($Path)) {
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Path) | Out-Null
-    $json | Set-Content -LiteralPath $Path -Encoding UTF8
+    # Concurrency-safe write: a parallel across-drawing sweep runs many router
+    # invocations at once, and the 'status'/'run' actions all write the SHARED
+    # reports\autocad_router_status_latest.json. A bare Set-Content fails
+    # "cannot create the stream" when two writers race the destination handle --
+    # observed to abort a concurrent pre-inspect 'run' entirely. Render to a
+    # per-process temp (each writer owns its temp, so the slow write never
+    # contends), then atomically rename over the target with a short retry (a
+    # fast metadata op; last-writer-wins on the shared status file is harmless
+    # telemetry). Result files go to unique out-dirs, so they never contend and
+    # rename on the first try; a real IO error on the temp write still throws.
+    $tmp = "$Path.$PID.tmp"
+    $json | Set-Content -LiteralPath $tmp -Encoding UTF8 -ErrorAction Stop
+    $renamed = $false
+    for ($i = 0; $i -lt 6 -and -not $renamed; $i++) {
+      try { Move-Item -LiteralPath $tmp -Destination $Path -Force -ErrorAction Stop; $renamed = $true }
+      catch { Start-Sleep -Milliseconds 50 }
+    }
+    if (-not $renamed) { Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue }
   }
   $json
 }
@@ -414,7 +432,7 @@ function Test-NativeAcadModules {
     }
   }
 
-  $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+  $stamp = (Get-Date -Format 'yyyyMMdd_HHmmssfff') + '_p' + $PID + '_' + (Get-Random -Maximum 9999).ToString('D4')  # collision-proof: second-granularity stamps let CONCURRENT pipelines claim the SAME staging dir (measured: R4j b149 ran on a foreign 37KB drawing staged by another process in the same second)
   $stageRoot = Join-Path $StagingDir "native_status_$stamp"
   $runOut = Join-Path $RunsDir "native_status_$stamp"
   New-Item -ItemType Directory -Force -Path $stageRoot | Out-Null
@@ -430,6 +448,7 @@ function Test-NativeAcadModules {
   $scrPath = Join-Path $stageRoot 'native_status.scr'
   $scrLines = @(
     '(vl-load-com)',
+    '(if (getvar "REPORTERROR") (setvar "REPORTERROR" 0))',
     '(setvar "SECURELOAD" 0)',
     '(setvar "FILEDIA" 0)',
     ('(setq dbx-r (vl-catch-all-apply ''arxload (list "{0}")))' -f $dbxFwd),
@@ -992,6 +1011,7 @@ function Invoke-FullAutoCadCadJob {
     ('(setq ariadne-mailbox-file "{0}")' -f $mailboxFwd),
     '(defun ariadne-write-done (/ f) (setq f (open ariadne-done-file "w")) (if f (progn (write-line "done" f) (close f))) (princ))',
     ('(defun ariadne-write-mailbox (/ f) (setq f (open ariadne-mailbox-file "w")) (if f (progn (write-line "ARIADNE_CAD_JOB_IN={0}" f) (write-line "ARIADNE_CAD_JOB_OUT={1}" f) (write-line "ARIADNE_CAD_JOB_HOST_MODE=full_autocad" f) (close f))) (princ))' -f $jobFwd, $resultFwd),
+    '(if (getvar "REPORTERROR") (setvar "REPORTERROR" 0))',
     '(setvar "SECURELOAD" 0)',
     '(setvar "FILEDIA" 0)',
     '(setvar "CMDECHO" 0)',
@@ -1103,7 +1123,7 @@ function Invoke-DwgWriteOriginalScript {
     }
   }
 
-  $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+  $stamp = (Get-Date -Format 'yyyyMMdd_HHmmssfff') + '_p' + $PID + '_' + (Get-Random -Maximum 9999).ToString('D4')  # collision-proof: second-granularity stamps let CONCURRENT pipelines claim the SAME staging dir (measured: R4j b149 ran on a foreign 37KB drawing staged by another process in the same second)
   $runOut = Join-Path $RunsDir "dwg_truth_autocad_write_original_$stamp"
   New-Item -ItemType Directory -Force -Path $runOut | Out-Null
   $dwgDir = Split-Path -Parent $InputPath
@@ -1137,7 +1157,7 @@ function Invoke-CadJobRoute {
   }
 
   $effectiveWriteMode = Get-EffectiveDwgWriteMode
-  $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+  $stamp = (Get-Date -Format 'yyyyMMdd_HHmmssfff') + '_p' + $PID + '_' + (Get-Random -Maximum 9999).ToString('D4')  # collision-proof: second-granularity stamps let CONCURRENT pipelines claim the SAME staging dir (measured: R4j b149 ran on a foreign 37KB drawing staged by another process in the same second)
   $runOut = Join-Path $RunsDir "dwg_truth_autocad_cad_job_$stamp"
   New-Item -ItemType Directory -Force -Path $runOut | Out-Null
 
@@ -1185,6 +1205,7 @@ function Invoke-CadJobRoute {
     $trusted = (Split-Path -Parent $crx).Replace('\', '\\')
     $scrPath = Join-Path $runOut 'native_cad_job.scr'
     $scrLines = @(
+      '(if (getvar "REPORTERROR") (setvar "REPORTERROR" 0))',
       '(setvar "SECURELOAD" 0)',
       '(setvar "FILEDIA" 0)',
       '(setvar "CMDECHO" 0)',
@@ -1299,7 +1320,7 @@ function Invoke-CadNativeBatchRoute {
     return [ordered]@{ status = 'ERROR'; detail = "op list is empty: $OpListPath" }
   }
 
-  $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+  $stamp = (Get-Date -Format 'yyyyMMdd_HHmmssfff') + '_p' + $PID + '_' + (Get-Random -Maximum 9999).ToString('D4')  # collision-proof: second-granularity stamps let CONCURRENT pipelines claim the SAME staging dir (measured: R4j b149 ran on a foreign 37KB drawing staged by another process in the same second)
   $runOut = Join-Path $RunsDir "native_batch_$stamp"
   $jobsDir = Join-Path $runOut 'jobs'
   $resDir = Join-Path $runOut 'results'
@@ -1320,6 +1341,7 @@ function Invoke-CadNativeBatchRoute {
   $trusted = (Split-Path -Parent $crx).Replace('\', '\\')
 
   $scrLines = [System.Collections.Generic.List[string]]::new()
+  $scrLines.Add('(if (getvar "REPORTERROR") (setvar "REPORTERROR" 0))')
   $scrLines.Add('(setvar "SECURELOAD" 0)')
   $scrLines.Add('(setvar "FILEDIA" 0)')
   $scrLines.Add('(setvar "CMDECHO" 0)')
@@ -1567,7 +1589,7 @@ function Invoke-AutoCadRoute {
     return [ordered]@{ engine_exit_code = -1; engine_output = "Input DWG not found: $InputPath" }
   }
 
-  $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+  $stamp = (Get-Date -Format 'yyyyMMdd_HHmmssfff') + '_p' + $PID + '_' + (Get-Random -Maximum 9999).ToString('D4')  # collision-proof: second-granularity stamps let CONCURRENT pipelines claim the SAME staging dir (measured: R4j b149 ran on a foreign 37KB drawing staged by another process in the same second)
   $stageRoot = Join-Path $StagingDir "dwg_$stamp"
   New-Item -ItemType Directory -Force -Path $stageRoot | Out-Null
   # ASCII-safe staged copy of the input for the batch extractor path.
@@ -1583,7 +1605,7 @@ function Invoke-AutoCadRoute {
   if (-not [string]::IsNullOrWhiteSpace($Script) -and (Test-Path -LiteralPath $Script)) {
     $scrPath = Join-Path $stageRoot 'job.scr'
     Copy-Item -LiteralPath $Script -Destination $scrPath -Force
-    $r = Invoke-AccoreScr -Engine $engine -StagedDwg $stagedDwg -ScrPath $scrPath -DwgDir $dwgDir -RunOut $runOut -EnvVars @{} -Tag 'custom'
+    $r = Invoke-AccoreScr -Engine $engine -StagedDwg $stagedDwg -ScrPath $scrPath -DwgDir $dwgDir -RunOut $runOut -EnvVars @{} -Tag 'custom' -TimeoutMs $ScriptTimeoutMs
     return [ordered]@{
       engine_exit_code = $r.ExitCode
       engine_output    = [ordered]@{
@@ -1745,7 +1767,7 @@ switch ($Action) {
     if (
       ($HostMode -eq 'full_autocad' -or $jobRequiresAttendedHost) -and $hasJob
     ) {
-      $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+      $stamp = (Get-Date -Format 'yyyyMMdd_HHmmssfff') + '_p' + $PID + '_' + (Get-Random -Maximum 9999).ToString('D4')  # collision-proof: second-granularity stamps let CONCURRENT pipelines claim the SAME staging dir (measured: R4j b149 ran on a foreign 37KB drawing staged by another process in the same second)
       $runOut = Join-Path $RunsDir "dwg_truth_autocad_full_job_$stamp"
       New-Item -ItemType Directory -Force -Path $runOut | Out-Null
       $exec = Invoke-FullAutoCadCadJob -RunOut $runOut
@@ -1754,7 +1776,7 @@ switch ($Action) {
       $exec = Invoke-CadJobRoute -Capabilities $capabilities
     }
       elseif ($HostMode -eq 'full_autocad' -or $effectiveWriteMode -eq 'live_edit') {
-        $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+        $stamp = (Get-Date -Format 'yyyyMMdd_HHmmssfff') + '_p' + $PID + '_' + (Get-Random -Maximum 9999).ToString('D4')  # collision-proof: second-granularity stamps let CONCURRENT pipelines claim the SAME staging dir (measured: R4j b149 ran on a foreign 37KB drawing staged by another process in the same second)
         $runOut = Join-Path $RunsDir "dwg_truth_autocad_live_edit_$stamp"
         New-Item -ItemType Directory -Force -Path $runOut | Out-Null
         $exec = Invoke-FullAutoCadScript -RunOut $runOut

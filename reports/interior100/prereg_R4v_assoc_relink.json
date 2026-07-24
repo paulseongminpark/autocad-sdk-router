@@ -1,0 +1,47 @@
+{
+  "schema": "ariadne.interior100.prereg.v1",
+  "arc": "R4v: P3 associativity relink -- append-op census ledger -> engine handle translation -> write.block.relink_hatch_assoc (id-derived loop replacement) + LEX-0011 cardinality quotient",
+  "registered_at_local": "2026-07-11T00:5x (file mtime is the binding evidence; committed BEFORE launch)",
+  "r4u_adjudication": {
+    "verdict": "FAIL (band + per-def guard) -- 27,057/27,130 = 0.997309 vs band [27,118, 27,123]",
+    "cause_measured": "R4u was the FIRST flight of 6d59fd5's loop-local assoc extraction (stale-deploy trap had starved every earlier flight). The fresh census reads 66/66 flagged hatches WITH per-loop assoc_source_handles, all 77 refs resolving in-def (63 lwpolyline + 14 spline, 0 unresolved) -- the orphan claim is RETRACTED (docs/ASSOC_ORPHAN_FINDING.md); the rebuild does not re-link, so 66 pairs unmasked as REAL residue. lw-z landed +25 exactly (gainers match predicted defs).",
+    "report": "reports/interior100/R4u_remeasure_lwz.json"
+  },
+  "baseline": {
+    "report": "reports/interior100/R4u_remeasure_lwz.json",
+    "diff0_total": 27057,
+    "a_entity_total": 27130,
+    "a_def_count": 294,
+    "interior_diff0_fraction": 0.9973092517508293
+  },
+  "prediction": {
+    "diff0_total": 27123,
+    "band": [27118, 27123],
+    "interior_diff0_fraction_at_center": 0.9997420567,
+    "ceiling_note": "27,123 = 27,130 minus the 7 loops real-geometry pairs (unrepaired, next arc).",
+    "decomposition": [
+      {
+        "family": "assoc relink (66 hatches, 18 X-* defs)",
+        "pairs": 66,
+        "evidence": [
+          "mini E2E probe runs/relink_e2e_probe_20260711: full engine path (append source ledger -> census->rebuilt translation -> native relink) round-trips flag=true + per-loop payload [[<rebuilt lw handle>]] through save/re-extract on the refreshed prebuilt",
+          "A/B probe runs/relink_ab_probe_20260711: relink changes ONLY assoc canonical fields on the probe drawing; the loop notation delta observed there (explicit closing vertex) is an authored-vs-derived artifact of the synthetic census",
+          "census loop-notation census (66 hatches): 58 edge-loops (line x47/x10/x1 + spline x12/x2) + 5 polyline loops ALL already explicit-close 5-verts -- i.e. the census stores AutoCAD's own derived notation; relink preserves each loop's original loop_type, and the type drives the derived form (probe: type 7 -> polyline explicit-close, exactly the census polyline shape)"
+        ]
+      }
+    ],
+    "band_rationale": "single mechanism, probe-verified end-to-end; floor 27,118 absorbs flight noise only. H3/sweep/lw-z families re-fly and are protected by the per-def no-regression guard vs the R4u baseline.",
+    "risk_register": [
+      "derived-loop notation drift: insertLoopAt(ids) re-derives loop data from the rebuilt sources at evaluate time; if the 2027 derivation emits edge decomposition or float noise differing from the census-stored notation, those pairs stay modified on loops[] and the run lands BELOW band -- adjudication rule stays FAIL-to-investigate, never rename",
+      "ObjectARX 2027 has NO per-loop assoc setter (dbhatch.h) -- the implementation is removeLoopAt+insertLoopAt(int, type, AcDbObjectIdArray)+evaluateHatch; a C2039 on setAssocObjIdsAt was caught at build time and the header contract is pinned in the registry entry"
+    ],
+    "residual_after_success": "7 loops real-geometry pairs, 0 removed"
+  },
+  "measurement_contract": "LEX-0011 (candidate -> legislates on this adjudication): canonical assoc payload = per-loop source CARDINALITY, order-aligned to loops[] (raw handles are not rebuild-stable); LEX-0008 fold unchanged for sourceless flags. Unit contract: tests/unit/test_blockdef_diff.py assoc cases + tests/unit/test_relink_assoc.py (18 cases: emission, stream tail, ledger passthrough, translation + fail-loud, batch barrier, registry lockstep).",
+  "population_pin": {
+    "source_dwg": "D:\\dev\\.build\\1.dwg",
+    "source_dwg_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+    "launch_command": "python tools/full_roundtrip_capstone.py --dwg D:\\dev\\.build\\1.dwg --out-dir runs\\e2e_1dwg_R4v_assoc_20260711 --batch-size 100 --with-records",
+    "required": "census must reproduce 294 defs / 27,130 entities; identity sha must equal the pin (LEX-0006); per-def diff0 >= R4u for every def"
+  }
+}

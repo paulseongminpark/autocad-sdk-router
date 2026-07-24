@@ -1,0 +1,69 @@
+{
+  "band": "B4_invariance",
+  "prereg": "e2.wave1.v1",
+  "note_sentinel_all": "sentinel_all trips on all 20 S drawings are a pack-composition artifact: truth wall_frac == 1.0 for 20/20 (scored handle universe = wall handles only), so the >0.9 wall-share sentinel is vacuously tripped by ground truth itself. sentinel_zero (the pathology sentinel) fired 0 times.",
+  "note_scale": "scale x2 keeps INSUNITS fixed, so physical wall thickness genuinely doubles; thickness-prior detector drops walls leaving the mm band. Non-semantics-preserving transform per physical prior; recorded as measured, no post-hoc band move.",
+  "transforms": {
+    "rotate": {
+      "n": 20,
+      "mean_invariance": 1.0,
+      "min_invariance": 1,
+      "n_errors": 0,
+      "n_sentinel_zero": 0,
+      "n_sentinel_all": 20,
+      "mean_recall_after": 1.0,
+      "n_recall_below_floor": 0,
+      "banded": true,
+      "verdict": "PASS"
+    },
+    "translate": {
+      "n": 20,
+      "mean_invariance": 1.0,
+      "min_invariance": 1,
+      "n_errors": 0,
+      "n_sentinel_zero": 0,
+      "n_sentinel_all": 20,
+      "mean_recall_after": 1.0,
+      "n_recall_below_floor": 0,
+      "banded": true,
+      "verdict": "PASS"
+    },
+    "mirror": {
+      "n": 20,
+      "mean_invariance": 1.0,
+      "min_invariance": 1,
+      "n_errors": 0,
+      "n_sentinel_zero": 0,
+      "n_sentinel_all": 20,
+      "mean_recall_after": 1.0,
+      "n_recall_below_floor": 0,
+      "banded": true,
+      "verdict": "PASS"
+    },
+    "scale": {
+      "n": 20,
+      "mean_invariance": 0.8795,
+      "min_invariance": 0.7,
+      "n_errors": 0,
+      "n_sentinel_zero": 0,
+      "n_sentinel_all": 20,
+      "mean_recall_after": 0.8795,
+      "n_recall_below_floor": 0,
+      "banded": true,
+      "verdict": "FAIL"
+    },
+    "units": {
+      "n": 20,
+      "mean_invariance": 1.0,
+      "min_invariance": 1,
+      "n_errors": 0,
+      "n_sentinel_zero": 0,
+      "n_sentinel_all": 20,
+      "mean_recall_after": 1.0,
+      "n_recall_below_floor": 0,
+      "banded": false,
+      "verdict": "REPORT_ONLY"
+    }
+  },
+  "overall": "FAIL"
+}

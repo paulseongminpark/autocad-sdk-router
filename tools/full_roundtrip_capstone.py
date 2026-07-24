@@ -513,6 +513,132 @@ RECORD_TABLE_CLASSES: Tuple[Dict[str, str], ...] = (
 )
 
 
+# app_id / RegApp is a census symbol table (25 records in 1.dwg: ACAD,
+# ACAD_PSEXT, ...) that a faithful "replay all records" WOULD reproduce -- but
+# its only native write op, write.regapp.register, is a ROLLBACK-ONLY smoke
+# probe: m08eHandleRegappRegister (src/Ariadne.AcadNative/families/
+# m08e_handlers.inc:451-462) wraps ensureRegApp in an AriadneStagedWriteTransaction
+# it NEVER commits and always reports "staged_rolled_back":true, so no APPID
+# record ever persists (the m08e header lines 20-28 list it among the 6
+# probe-only ops; only write.block.append_entity was graduated to a real
+# persisting primitive). Counting a regapp op as "applied" is FM8 (executed !=
+# success): it returns registered:true from inside a transaction that is
+# discarded. So app_id is EXCLUDED here and surfaced loudly in
+# build_meta["excluded_table_kinds"] -- a DEFERRAL, not a silent omission and
+# not a fabricated pass. Re-include it only when the native op is graduated to
+# persist (as append_entity was).
+EXCLUDED_TABLE_KINDS: Dict[str, str] = {
+    "app_id": (
+        "write.regapp.register is a rollback-only smoke probe "
+        "(src/Ariadne.AcadNative/families/m08e_handlers.inc:451-462: "
+        "AriadneStagedWriteTransaction is never committed, always reports "
+        "staged_rolled_back:true) -- it cannot persist an APPID record, so "
+        "replaying app_ids would be a no-op falsely counted as applied (FM8). "
+        "Deferred until the native op is graduated to a persisting primitive."
+    ),
+}
+
+
+# AutoCAD system-reserved / default records that are ALWAYS present regardless
+# of whether any entity references them; include_unreferenced=False keeps these
+# (they are mandatory, not "unreferenced"). Any "*"-prefixed record (e.g. the
+# vport "*Active", "*Model_Space") is reserved by definition.
+_RESERVED_RECORD_NAMES: Dict[str, frozenset] = {
+    "layer": frozenset({"0"}),
+    "linetype": frozenset({"ByLayer", "ByBlock", "Continuous"}),
+    "textstyle": frozenset({"Standard"}),
+    "dimstyle": frozenset({"Standard"}),
+    "vport": frozenset({"*Active"}),
+}
+
+
+def _is_reserved_record(label: str, name: Any) -> bool:
+    """True for AutoCAD-reserved/default records (never "unreferenced")."""
+    if not isinstance(name, str) or not name:
+        return False
+    if name.startswith("*"):
+        return True
+    return name in _RESERVED_RECORD_NAMES.get(label, frozenset())
+
+
+def referenced_record_names(census_ir: Dict[str, Any],
+                            table_classes: Tuple[Dict[str, str], ...] = RECORD_TABLE_CLASSES
+                            ) -> Dict[str, set]:
+    """{label: set(names)} of records reachable from the reference edges the
+    census IR ACTUALLY records -- the basis for build_records_patch(...,
+    include_unreferenced=False).
+
+    dwg_graph_ir.v1 does NOT record every AutoCAD reference edge, so this is a
+    STRICT UNDERAPPROXIMATION of AutoCAD's entity/xdata replay reachability, not
+    a faithful reproduction of it:
+
+      CAPTURED (edges the IR records):
+        - entity.layer                       -> layers
+        - layer.linetype                     -> linetypes   (layer->linetype hop)
+        - dim_styles.dimtxsty                -> text_styles  (dimstyle->textstyle)
+        - dim_styles.dim{ltype,ltex1,ltex2}  -> linetypes    (dimstyle->linetype)
+
+      NOT CAPTURED (edges the IR omits; records reachable ONLY through them are
+      reported as skipped_unreferenced under =False even though AutoCAD keeps
+      them):
+        - entity -> text_style: dwg_graph_ir.v1 stores NO per-entity style field
+          (verified on 1.dwg: all 384 TEXT/MTEXT entities carry no 'style' key),
+          so a text style used only by TEXT/MTEXT (and by no dimstyle) is
+          unreachable here.
+        - entity -> dimstyle: DIMENSION entities carry no dimstyle field either,
+          so no dimstyle is ever marked used; the dimstyle->{textstyle,linetype}
+          hops above only fire for dimstyles reached some OTHER recorded way
+          (none exist today) -- i.e. in practice =False reaches layers plus the
+          linetypes those layers name, and little else.
+        - entity -> linetype override (BYLAYER is the norm and not recorded),
+          INSERT/block internal record use, ucs, view.
+
+    Reserved/default records ("0", "Standard", "ByLayer", vport "*Active", ...)
+    are handled separately by _is_reserved_record and are always kept.
+    """
+    st = census_ir.get("symbol_tables") or {}
+    label_by_key = {cls["table_key"]: cls["label"] for cls in table_classes}
+    used: Dict[str, set] = {cls["label"]: set() for cls in table_classes}
+
+    def _mark(table_key: str, name: Any) -> None:
+        label = label_by_key.get(table_key)
+        if label is not None and isinstance(name, str) and name:
+            used[label].add(name)
+
+    def _iter_all_entities():
+        for e in census_ir.get("entities") or []:
+            if isinstance(e, dict):
+                yield e
+        for bd in census_ir.get("block_definitions") or []:
+            for e in (bd.get("def_entities") or []):
+                if isinstance(e, dict):
+                    yield e
+
+    # entity.layer -> layers
+    for e in _iter_all_entities():
+        _mark("layers", e.get("layer"))
+
+    # layer.linetype -> linetypes (only for layers that are actually used)
+    layers_by_name = {r.get("name"): r for r in (st.get("layers") or [])
+                      if isinstance(r, dict)}
+    for layer_name in list(used.get("layer", ())):
+        rec = layers_by_name.get(layer_name)
+        if isinstance(rec, dict):
+            _mark("linetypes", rec.get("linetype"))
+
+    # dim_styles.* -> text_styles / linetypes (fires only for used dimstyles)
+    dimstyles_by_name = {r.get("name"): r for r in (st.get("dim_styles") or [])
+                         if isinstance(r, dict)}
+    for ds_name in list(used.get("dimstyle", ())):
+        rec = dimstyles_by_name.get(ds_name)
+        if isinstance(rec, dict):
+            _mark("text_styles", rec.get("dimtxsty"))
+            for f in ("dimltype", "dimltex1", "dimltex2"):
+                _mark("linetypes", rec.get(f))
+
+    return used
+
+
 # --------------------------------------------------------------------------- #
 # 3.6 vport "*Active" managed-field policy (closeout follow-up F-a): AutoCAD
 #     reserves the "*Active" viewport record and recomputes several of its
@@ -575,7 +701,7 @@ def classify_vport_managed_drift(row: Dict[str, Any]) -> Dict[str, Any]:
 
 def build_records_patch(census_ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id: str, *,
                         op_roundtrip_probe_mod=None, table_classes: Tuple[Dict[str, str], ...] = RECORD_TABLE_CLASSES,
-                        per_table_limit: Optional[int] = None
+                        per_table_limit: Optional[int] = None, include_unreferenced: bool = True
                         ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     """A SINGLE cad_patch.v1 whose operations[] replicate every requested
     symbol_tables record across every RECORD_TABLE_CLASSES entry (one
@@ -590,12 +716,35 @@ def build_records_patch(census_ir: Dict[str, Any], target_dwg: Dict[str, Any], p
     [label] is the op count actually built for that table -- the
     "requested" side of this batch's own gate arithmetic (see
     regen_gate_report).
+
+    ``include_unreferenced`` (default True -- the shipping behaviour; P5 design
+    anchor: replay ALL census symbol-table records, including unreferenced ones):
+      - True  : replay every named record of every table_classes entry.
+      - False : replay only records that are RESERVED (_is_reserved_record) or
+                reachable from the reference edges the census IR records
+                (referenced_record_names) -- an APPROXIMATE, documented subset,
+                NOT a faithful reproduction of AutoCAD's replay reachability
+                (see referenced_record_names for exactly which edges are and are
+                not captured; text styles used only by TEXT/MTEXT, dimstyles, and
+                most linetypes are NOT reachable from dwg_graph_ir.v1 and are
+                reported in meta["skipped_unreferenced"][label]).
+
+    ``meta["excluded_table_kinds"]`` names table kinds deliberately NOT replayed
+    because no native op can honestly persist them (app_id -> write.regapp.register
+    is rollback-only; see EXCLUDED_TABLE_KINDS). These are DEFERRED, never counted
+    as applied -- the alternative (emit a create op that silently no-ops and count
+    it applied) is FM8.
     """
     op_roundtrip_probe_mod = op_roundtrip_probe_mod or importlib.import_module("op_roundtrip_probe")
     operations: List[Dict[str, Any]] = []
     postconditions: List[Dict[str, Any]] = []
     skipped_unnamed: Dict[str, int] = {}
+    skipped_unreferenced: Dict[str, int] = {}
     per_table_requested: Dict[str, int] = {}
+    # Only computed for the narrower =False mode; the shipping =True path never
+    # touches the (incomplete) reference graph.
+    referenced = (referenced_record_names(census_ir, table_classes)
+                  if not include_unreferenced else None)
     for cls in table_classes:
         records = [r for r in ((census_ir.get("symbol_tables") or {}).get(cls["table_key"]) or [])
                   if isinstance(r, dict)]
@@ -606,6 +755,12 @@ def build_records_patch(census_ir: Dict[str, Any], target_dwg: Dict[str, Any], p
                 break
             if not rec.get("name"):
                 skipped_unnamed[cls["label"]] = skipped_unnamed.get(cls["label"], 0) + 1
+                continue
+            name = rec.get("name")
+            if (not include_unreferenced
+                    and not _is_reserved_record(cls["label"], name)
+                    and name not in referenced.get(cls["label"], frozenset())):
+                skipped_unreferenced[cls["label"]] = skipped_unreferenced.get(cls["label"], 0) + 1
                 continue
             args = record_op_args_from_record(rec, fields)
             operations.append({"step_id": "%s_%d" % (cls["label"], count),
@@ -638,7 +793,13 @@ def build_records_patch(census_ir: Dict[str, Any], target_dwg: Dict[str, Any], p
         "postconditions": postconditions,
         "policy": {"staged_copy": True, "write_mode": "write_copy"},
     }
-    return patch, {"skipped_unnamed": skipped_unnamed, "per_table_requested": per_table_requested}
+    return patch, {
+        "skipped_unnamed": skipped_unnamed,
+        "skipped_unreferenced": skipped_unreferenced,
+        "per_table_requested": per_table_requested,
+        "include_unreferenced": include_unreferenced,
+        "excluded_table_kinds": dict(EXCLUDED_TABLE_KINDS),
+    }
 
 
 def table_record_diff_reports(census_ir: Dict[str, Any], post_ir: Optional[Dict[str, Any]], *,
@@ -888,9 +1049,53 @@ def run_census(staged_path: str, original_path: str, run_dir: str, *,
         ir_builder_mod, run_res, staged_path, original_path, ir_path, "census")
 
 
+def census_extraction_vacuous(census_ir: Dict[str, Any]) -> bool:
+    """True when an extraction returned a structurally-valid but EMPTY graph
+    (0 entities AND 0 block definitions)."""
+    return (not (census_ir.get("entities") or [])
+            and not (census_ir.get("block_definitions") or []))
+
+
+def run_census_with_vacuous_retry(staged_path: str, original_path: str, out_dir: str,
+                                  *, retries: int = 2, pause_seconds: float = 10.0,
+                                  allow_empty: bool = False, census_fn=None):
+    """run_census plus a fail-closed vacuous-extraction guard.
+
+    Measured failure (runs/e2e_1dwg_R3_full_20260708, 2026-07-08): an
+    accoreconsole double-script race executed ARIADNE_NATIVE_JOB after the
+    first script instance's QUIT had discarded the drawing, so the native job
+    inspected a blank default document and reported 0 entities / 0 block
+    definitions with empty errors -- structurally valid, semantically vacuous
+    (native modelspace count null, coverage match vacuously true). A vacuous
+    extraction is retried (the race is transient) and, if it persists, the
+    census FAILS (VACUOUS != PASS) unless allow_empty declares the drawing
+    genuinely empty.
+
+    Returns (census, census_ir_or_None, attempts, vacuous_final).
+    """
+    census_fn = census_fn or run_census
+    attempts = 0
+    census: Dict[str, Any] = {}
+    census_ir = None
+    while attempts <= retries:
+        attempts += 1
+        census_dir = os.path.join(
+            out_dir, "census" if attempts == 1 else "census_retry%d" % (attempts - 1))
+        census = census_fn(staged_path, original_path, census_dir)
+        if not census.get("ok"):
+            return census, None, attempts, False
+        census_ir = json.load(open(census["ir_path"], encoding="utf-8-sig"))
+        if allow_empty or not census_extraction_vacuous(census_ir):
+            return census, census_ir, attempts, False
+        if attempts <= retries:
+            time.sleep(pause_seconds)
+    return census, census_ir, attempts, True
+
+
 def run_records_batch(census_ir: Dict[str, Any], blank_seed_path: str, run_dir: str,
                       patch_id: str, *, per_table_limit: Optional[int] = None,
                       table_classes: Tuple[Dict[str, str], ...] = RECORD_TABLE_CLASSES,
+                      include_unreferenced: bool = True,
                       op_roundtrip_probe_mod=None, patch_engine_mod=None) -> Dict[str, Any]:
     """Table-tier sibling of run_regen_batch: build ONE cad_patch.v1 via
     build_records_patch (7 record classes: layer/dimstyle/linetype/
@@ -907,7 +1112,8 @@ def run_records_batch(census_ir: Dict[str, Any], blank_seed_path: str, run_dir: 
     }
     patch, build_meta = build_records_patch(
         census_ir, target_dwg, patch_id, op_roundtrip_probe_mod=op_roundtrip_probe_mod,
-        table_classes=table_classes, per_table_limit=per_table_limit)
+        table_classes=table_classes, per_table_limit=per_table_limit,
+        include_unreferenced=include_unreferenced)
     ops_report = resolvable_ops_report(patch)
     t0 = time.time()
     result = patch_engine_mod.apply_staged(patch, blank_seed_path, run_dir)
@@ -921,7 +1127,8 @@ def run_records_batch(census_ir: Dict[str, Any], blank_seed_path: str, run_dir: 
 
 
 def run_regen_batch(filtered_ir: Dict[str, Any], blank_seed_path: str, run_dir: str,
-                    patch_id: str, *, ir_to_patch_mod=None, patch_engine_mod=None
+                    patch_id: str, *, batch_size: Optional[int] = None,
+                    ir_to_patch_mod=None, patch_engine_mod=None
                     ) -> Dict[str, Any]:
     """Build ONE cad_patch.v1 from ``filtered_ir`` (via the existing, unedited
     ir_to_patch.build_patch_from_ir) and apply it in ONE patch_engine.
@@ -943,13 +1150,28 @@ def run_regen_batch(filtered_ir: Dict[str, Any], blank_seed_path: str, run_dir: 
     patch, deferred = ir_to_patch_mod.build_patch_from_ir(filtered_ir, target_dwg, patch_id)
     ops_report = resolvable_ops_report(patch)
     t0 = time.time()
-    result = patch_engine_mod.apply_staged(patch, blank_seed_path, run_dir)
+    result = patch_engine_mod.apply_staged(
+        patch, blank_seed_path, run_dir, batch_size=batch_size)
     elapsed = time.time() - t0
     op_count = len(patch.get("operations") or [])
     return {
         "patch": patch, "deferred": deferred, "resolvable_ops": ops_report,
         "apply_result": result, "op_count": op_count, "elapsed_seconds": elapsed,
         "seconds_per_op": (elapsed / op_count) if op_count else None,
+    }
+
+
+def build_regen_summary(batch: Dict[str, Any], gate: Dict[str, Any]) -> Dict[str, Any]:
+    apply_result = (batch or {}).get("apply_result") or {}
+    return {
+        "op_count": batch["op_count"], "deferred_count": len(batch["deferred"]),
+        "resolvable_ops": batch["resolvable_ops"],
+        "elapsed_seconds": batch["elapsed_seconds"], "seconds_per_op": batch["seconds_per_op"],
+        "apply_status": apply_result.get("status"),
+        "apply_reason": apply_result.get("reason"),
+        "batch_size": apply_result.get("batch_size"),
+        "batch_count": apply_result.get("batch_count"),
+        "gate": gate,
     }
 
 
@@ -1053,6 +1275,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     ap.add_argument("--kinds", default=None, help="comma-separated geometry.kind allowlist for regen")
     ap.add_argument("--limit", type=int, default=None, help="global op cap for this batch")
     ap.add_argument("--per-kind-limit", type=int, default=None, help="per-kind op cap for this batch")
+    ap.add_argument("--batch-size", type=int, default=None,
+                   help="EXPERIMENTAL flag-gated native batching size for the regen apply_staged call")
     ap.add_argument("--max-def-entities-per-block", type=int, default=None,
                    help="drop block_definitions entries with more def_entities than this "
                         "from the regen input; their INSERTs then defer honestly in "
@@ -1064,7 +1288,84 @@ def build_arg_parser() -> argparse.ArgumentParser:
                    help="run LibreDWG sidecar verification as a post-write gate (default: on)")
     ap.add_argument("--visual-gate", dest="visual_gate", action=argparse.BooleanOptionalAction, default=True,
                    help="run SVG->raster SSIM visual verification as a post-write gate (default: on)")
+    ap.add_argument("--interior-gate", dest="interior_gate", action=argparse.BooleanOptionalAction, default=True,
+                   help="gate on block-interior fidelity (blockdef_diff census vs post, "
+                        "anon_remap-aware): fraction must not regress below the committed "
+                        "ratchet baseline (default: on; P8, approved 2026-07-09)")
+    ap.add_argument("--semantic-gates", dest="semantic_gates", action=argparse.BooleanOptionalAction, default=True,
+                   help="run semantic-gates (L5 dimension-geometry consistency): on by default")
+    ap.add_argument("--interior-baseline", type=float, default=None,
+                   help="override the interior-gate ratchet floor (default: read "
+                        "config/roundtrip_interior_baseline.json)")
+    ap.add_argument("--allow-empty-census", action="store_true",
+                   help="accept a 0-entity/0-blockdef extraction as census truth. Without "
+                        "this flag a vacuous extraction is retried and then FAILS the run "
+                        "(fail-closed guard for the accoreconsole blank-document race)")
     return ap
+
+
+def interior_gate_report(census_ir, post_ir, *, anon_remap=None,
+                         baseline=None, baseline_source=None):
+    """P8 (approved 2026-07-09): block-interior fidelity is a GATE, not a
+    report. Ratchet semantics: the canonical interior_diff0_fraction
+    (blockdef_diff, anon_remap-aware) must not regress below the committed
+    floor; raising the floor is a deliberate commit after a verified better
+    run, never automatic. Returns (interior_diff_doc, gate_doc)."""
+    blockdef_diff_mod = importlib.import_module("blockdef_diff")
+    interior = blockdef_diff_mod.diff_block_definitions(
+        census_ir, post_ir, name_map=anon_remap)
+    totals = interior.get("totals") or {}
+    fraction = totals.get("interior_diff0_fraction")
+    gate = {
+        "schema": "ariadne.interior_gate.v1",
+        "fraction": fraction,
+        "baseline": baseline,
+        "baseline_source": baseline_source,
+        "diff0_total": totals.get("diff0_total"),
+        "a_entity_total": totals.get("a_entity_total"),
+    }
+    if not totals.get("a_entity_total"):
+        gate["status"] = "ok"
+        gate["note"] = "no block interiors in source (vacuously ok)"
+    elif baseline is None:
+        gate["status"] = "blocked"
+        gate["reason"] = ("no ratchet baseline (config/roundtrip_interior_baseline.json "
+                          "missing and no --interior-baseline)")
+    elif fraction is not None and fraction + 1e-9 >= baseline:
+        gate["status"] = "ok"
+    else:
+        gate["status"] = "blocked"
+        gate["reason"] = ("interior fraction %.4f regressed below ratchet baseline %.4f"
+                          % (fraction or 0.0, baseline))
+    return interior, gate
+
+
+def dim_semantic_gate_report(census_ir, post_ir):
+    """L5 semantic-gate predicate: dimensions in census IR should be preserved by
+    rebuild dimension extraction.
+
+    Vacuum branch: if census has no extractable dimensions this is explicitly vacuous
+    and returns ok.
+    """
+    dim_geometry_mod = importlib.import_module("semantic_gates.dim_geometry")
+    rows_a = dim_geometry_mod.extract_dim_relations(census_ir)
+    rows_b = dim_geometry_mod.extract_dim_relations(post_ir)
+    report = dim_geometry_mod.compare_dim_relations(rows_a, rows_b)
+    if not rows_a:
+        report["status"] = "ok"
+        report["note"] = "no source dimensions (vacuously ok)"
+    return report
+
+
+def _load_interior_baseline():
+    """(baseline_fraction, source_string) from the committed ratchet config,
+    or (None, None) when absent."""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir,
+                        "config", "roundtrip_interior_baseline.json")
+    if not os.path.isfile(path):
+        return None, None
+    doc = json.load(open(path, encoding="utf-8-sig"))
+    return doc.get("baseline_fraction"), doc.get("source")
 
 
 def main(argv=None) -> int:
@@ -1089,17 +1390,22 @@ def main(argv=None) -> int:
         print(json.dumps(summary, ensure_ascii=False, indent=2, default=str))
         return 2
 
-    census = run_census(staged["staged_path"], staged["original_path"],
-                        os.path.join(out_dir, "census"))
-    summary["census_ok"] = census.get("ok")
-    if not census.get("ok"):
-        summary["status"] = "partial"
-        summary["reason"] = census.get("reason")
+    census, census_ir, census_attempts, census_vacuous = run_census_with_vacuous_retry(
+        staged["staged_path"], staged["original_path"], out_dir,
+        allow_empty=args.allow_empty_census)
+    summary["census_ok"] = bool(census.get("ok")) and not census_vacuous
+    summary["census_attempts"] = census_attempts
+    if not census.get("ok") or census_vacuous:
+        summary["status"] = "blocked" if census_vacuous else "partial"
+        summary["reason"] = (
+            ("census extraction vacuous after %d attempt(s): 0 entities and 0 "
+             "block definitions (VACUOUS != PASS; pass --allow-empty-census "
+             "only for a genuinely empty drawing)" % census_attempts)
+            if census_vacuous else census.get("reason"))
         _write_json(os.path.join(out_dir, "summary.json"), summary)
         print(json.dumps(summary, ensure_ascii=False, indent=2, default=str))
         return 2
 
-    census_ir = json.load(open(census["ir_path"], encoding="utf-8-sig"))
     report = census_report(census_ir)
     summary["census_report"] = report
     _write_json(os.path.join(out_dir, "census_report.json"), report)
@@ -1137,16 +1443,11 @@ def main(argv=None) -> int:
     summary["regen_target"] = regen_target
 
     regen_dir = os.path.join(out_dir, "regen")
-    batch = run_regen_batch(filtered, regen_target["target"], regen_dir, "full_roundtrip_capstone/batch")
+    batch = run_regen_batch(
+        filtered, regen_target["target"], regen_dir, "full_roundtrip_capstone/batch",
+        batch_size=args.batch_size)
     entity_gate = regen_gate_report(batch["op_count"], batch["apply_result"])
-    summary["regen"] = {
-        "op_count": batch["op_count"], "deferred_count": len(batch["deferred"]),
-        "resolvable_ops": batch["resolvable_ops"],
-        "elapsed_seconds": batch["elapsed_seconds"], "seconds_per_op": batch["seconds_per_op"],
-        "apply_status": (batch["apply_result"] or {}).get("status"),
-        "apply_reason": (batch["apply_result"] or {}).get("reason"),
-        "gate": entity_gate,
-    }
+    summary["regen"] = build_regen_summary(batch, entity_gate)
     _write_json(os.path.join(out_dir, "regen_summary.json"), summary["regen"])
     _write_json(os.path.join(out_dir, "deferred.json"), batch["deferred"])
     gate_statuses = [entity_gate["gate_status"]]
@@ -1188,6 +1489,36 @@ def main(argv=None) -> int:
             )
             summary["regen"]["visual_gate"] = visual_gate_result
             gate_statuses.append(visual_gate_result["status"])
+        patch_doc_path = os.path.join(regen_dir, "patch.json")
+        anon_remap = None
+        if os.path.isfile(patch_doc_path):
+            anon_remap = (json.load(open(patch_doc_path, encoding="utf-8-sig"))
+                          or {}).get("anon_remap")
+        if args.interior_gate:
+            baseline, baseline_source = (
+                (args.interior_baseline, "--interior-baseline CLI override")
+                if args.interior_baseline is not None else _load_interior_baseline())
+            interior_diff, interior_gate = interior_gate_report(
+                census_ir, post_ir, anon_remap=anon_remap,
+                baseline=baseline, baseline_source=baseline_source)
+            _write_json(os.path.join(out_dir, "interior_diff.json"), interior_diff)
+            summary["regen"]["interior_gate"] = interior_gate
+            gate_statuses.append(interior_gate["status"])
+        if args.semantic_gates:
+            dim_semantic_gate = dim_semantic_gate_report(census_ir, post_ir)
+            _write_json(os.path.join(out_dir, "dim_semantic_gate.json"), dim_semantic_gate)
+            summary["regen"]["dim_semantic_gate"] = dim_semantic_gate
+            gate_statuses.append(dim_semantic_gate["status"])
+            # L5 #2: insert-graph preservation (contract pre-verified on R4l:
+            # 290/290 reachable defs, 711/711 edges -- see
+            # semantic_gates.block_topology.block_topology_gate_report).
+            block_topology_mod = importlib.import_module(
+                "semantic_gates.block_topology")
+            topology_gate = block_topology_mod.block_topology_gate_report(
+                census_ir, post_ir, name_map=anon_remap)
+            _write_json(os.path.join(out_dir, "block_topology_gate.json"), topology_gate)
+            summary["regen"]["block_topology_gate"] = topology_gate
+            gate_statuses.append(topology_gate["status"])
     else:
         summary["verdict"] = None
         summary["verdict_skipped_reason"] = (

@@ -1,0 +1,31 @@
+{
+  "map": "lm.v1",
+  "sets": {
+    "floorplancad": {
+      "wall": {"label": "wall", "confidence": "assumed"},
+      "interior-wall": {"label": "wall", "confidence": "assumed"},
+      "exterior-wall": {"label": "wall", "confidence": "assumed"},
+      "door": {"label": "opening", "confidence": "assumed"},
+      "window": {"label": "opening", "confidence": "assumed"},
+      "opening": {"label": "opening", "confidence": "assumed"},
+      "room": {"label": "other", "confidence": "assumed"},
+      "stairs": {"label": "other", "confidence": "assumed"},
+      "furniture": {"label": "other", "confidence": "assumed"},
+      "text": {"label": "other", "confidence": "assumed"},
+      "dimension": {"label": "other", "confidence": "assumed"}
+    },
+    "cubicasa": {
+      "Wall": {"label": "wall", "confidence": "assumed"},
+      "Door": {"label": "opening", "confidence": "assumed"},
+      "Window": {"label": "opening", "confidence": "assumed"},
+      "Opening": {"label": "opening", "confidence": "assumed"},
+      "Room": {"label": "other", "confidence": "assumed"},
+      "Space": {"label": "other", "confidence": "assumed"},
+      "FixedFurniture": {"label": "other", "confidence": "assumed"},
+      "Furniture": {"label": "other", "confidence": "assumed"},
+      "Text": {"label": "other", "confidence": "assumed"},
+      "Dimension": {"label": "other", "confidence": "assumed"}
+    }
+  },
+  "unmapped_policy": "other"
+}

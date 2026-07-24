@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-d355-61",
+    "def": "*D355",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D355): vertical linear dimension of 10400 with DIMDOT terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D355 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 3 DIM-layer LINEs form a dimension frame -- two horizontal extension lines (8D88, 8D89) and one vertical dimension line (8D8A) -- terminated by two dot (DIMDOT) INSERTs (8D8B, 8D8C), with a single MTEXT (8D8D) reading '10400', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "These parallel lines are 10400 units apart, far beyond any single wall thickness, and carry dimension terminators and a value MTEXT; the judgment would only flip toward a wall if the lines moved to an architectural layer and shed those dimension markers.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d356-62",
+    "def": "*D356",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D356): vertical linear dimension of 1700 with DIMDOT terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D356 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 3 DIM-layer LINEs form a dimension frame -- two horizontal extension lines (8D91, 8D92) and one vertical dimension line (8D93) -- terminated by two dot (DIMDOT) INSERTs (8D94, 8D95), with a single MTEXT (8D96) reading '1700', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "These parallel lines are 1700 units apart, far beyond any single wall thickness, and carry dimension terminators and a value MTEXT; the judgment would only flip toward a wall if the lines moved to an architectural layer and shed those dimension markers.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d357-63",
+    "def": "*D357",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D357): vertical linear dimension of 865 with DIMDOT terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D357 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 3 DIM-layer LINEs form a dimension frame -- two horizontal extension lines (8D9A, 8D9B) and one vertical dimension line (8D9C) -- terminated by two dot (DIMDOT) INSERTs (8D9D, 8D9E), with a single MTEXT (8D9F) reading '865', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "These parallel lines are 865 units apart, far beyond any single wall thickness, and carry dimension terminators and a value MTEXT; the judgment would only flip toward a wall if the lines moved to an architectural layer and shed those dimension markers.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d358-64",
+    "def": "*D358",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D358): vertical linear dimension of 2300 with _ArchTick terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D358 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 3 DIM-layer LINEs form a dimension frame -- two horizontal extension lines (8DA3, 8DA4) and one vertical dimension line (8DA5) -- terminated by two architectural tick (_ArchTick) INSERTs (8DA6, 8DA7), with a single MTEXT (8DA8) reading '2300', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "These parallel lines are 2300 units apart, far beyond any single wall thickness, and carry dimension terminators and a value MTEXT; the judgment would only flip toward a wall if the lines moved to an architectural layer and shed those dimension markers.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d359-65",
+    "def": "*D359",
+    "role": "치수캐시",
+    "wall_likelihood": 0.04,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D359): vertical linear dimension of 150 with _ArchTick terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D359 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 3 DIM-layer LINEs form a dimension frame -- two horizontal extension lines (8DAC, 8DAD) and one vertical dimension line (8DAE) -- terminated by two architectural tick (_ArchTick) INSERTs (8DB0, 8DB1), with a single MTEXT (8DAF) reading '150', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "The two extension lines are only 150 units apart -- within real wall-thickness range -- so on a wall/architectural layer, stripped of the DEFPOINTS points, _ArchTick terminators and value MTEXT, they could be mistaken for a wall's two faces; those dimension markers are exactly what rule a wall out here.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d360-66",
+    "def": "*D360",
+    "role": "치수캐시",
+    "wall_likelihood": 0.04,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D360): vertical linear dimension of 150 with _ArchTick terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D360 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 3 DIM-layer LINEs form a dimension frame -- two horizontal extension lines (8DB5, 8DB6) and one vertical dimension line (8DB7) -- terminated by two architectural tick (_ArchTick) INSERTs (8DB9, 8DBA), with a single MTEXT (8DB8) reading '150', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "The two extension lines are only 150 units apart -- within real wall-thickness range -- so on a wall/architectural layer, stripped of the DEFPOINTS points, _ArchTick terminators and value MTEXT, they could be mistaken for a wall's two faces; those dimension markers are exactly what rule a wall out here.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d361-67",
+    "def": "*D361",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D361): vertical linear dimension of 3600 with _ArchTick terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D361 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 3 DIM-layer LINEs form a dimension frame -- two horizontal extension lines (8DBE, 8DBF) and one vertical dimension line (8DC0) -- terminated by two architectural tick (_ArchTick) INSERTs (8DC1, 8DC2), with a single MTEXT (8DC3) reading '3600', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "These parallel lines are 3600 units apart, far beyond any single wall thickness, and carry dimension terminators and a value MTEXT; the judgment would only flip toward a wall if the lines moved to an architectural layer and shed those dimension markers.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d362-68",
+    "def": "*D362",
+    "role": "치수캐시",
+    "wall_likelihood": 0.04,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D362): vertical linear dimension of 155 with _ArchTick terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D362 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 5 DIM-layer LINEs form a dimension frame -- two horizontal extension lines (8DC7, 8DC8) and one vertical dimension line (8DCB), plus two short tick-jog segments (8DC9, 8DCA) -- terminated by two architectural tick (_ArchTick) INSERTs (8DCC, 8DCD), with a single MTEXT (8DCE) reading '155', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "The two extension lines are only 155 units apart -- within real wall-thickness range -- so on a wall/architectural layer, stripped of the DEFPOINTS points, _ArchTick terminators and value MTEXT, they could be mistaken for a wall's two faces; those dimension markers are exactly what rule a wall out here.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d363-69",
+    "def": "*D363",
+    "role": "치수캐시",
+    "wall_likelihood": 0.04,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D363): vertical linear dimension of 190 with _ArchTick terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D363 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 5 DIM-layer LINEs form a dimension frame -- two horizontal extension lines (8DD2, 8DD3) and one vertical dimension line (8DD6), plus two short tick-jog segments (8DD4, 8DD5) -- terminated by two architectural tick (_ArchTick) INSERTs (8DD7, 8DD8), with a single MTEXT (8DD9) reading '190', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "The two extension lines are only 190 units apart -- within real wall-thickness range -- so on a wall/architectural layer, stripped of the DEFPOINTS points, _ArchTick terminators and value MTEXT, they could be mistaken for a wall's two faces; those dimension markers are exactly what rule a wall out here.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d364-70",
+    "def": "*D364",
+    "role": "치수캐시",
+    "wall_likelihood": 0.04,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D364): horizontal linear dimension of 215 with DIMDOT terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D364 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 5 DIM-layer LINEs form a dimension frame -- two vertical extension lines (8DDD, 8DDE) and one horizontal dimension line (8DE1), plus two short tick-jog segments (8DDF, 8DE0) -- terminated by two dot (DIMDOT) INSERTs (8DE2, 8DE3), with a single MTEXT (8DE4) reading '215', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "The two extension lines are only 215 units apart -- within real wall-thickness range -- so on a wall/architectural layer, stripped of the DEFPOINTS points, DIMDOT terminators and value MTEXT, they could be mistaken for a wall's two faces; those dimension markers are exactly what rule a wall out here.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d365-71",
+    "def": "*D365",
+    "role": "치수캐시",
+    "wall_likelihood": 0.04,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D365): vertical linear dimension of 275 with DIMDOT terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D365 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 5 DIM-layer LINEs form a dimension frame -- two horizontal extension lines (8DE8, 8DE9) and one vertical dimension line (8DEC), plus two short tick-jog segments (8DEA, 8DEB) -- terminated by two dot (DIMDOT) INSERTs (8DED, 8DEE), with a single MTEXT (8DEF) reading '275', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "The two extension lines are only 275 units apart -- within real wall-thickness range -- so on a wall/architectural layer, stripped of the DEFPOINTS points, DIMDOT terminators and value MTEXT, they could be mistaken for a wall's two faces; those dimension markers are exactly what rule a wall out here.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d366-72",
+    "def": "*D366",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D366): vertical linear dimension of 7175 with DIMDOT terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D366 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 3 DIM-layer LINEs form a dimension frame -- two horizontal extension lines (8DF3, 8DF4) and one vertical dimension line (8DF5) -- terminated by two dot (DIMDOT) INSERTs (8DF6, 8DF7), with a single MTEXT (8DF8) reading '7175', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "These parallel lines are 7175 units apart, far beyond any single wall thickness, and carry dimension terminators and a value MTEXT; the judgment would only flip toward a wall if the lines moved to an architectural layer and shed those dimension markers.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d367-73",
+    "def": "*D367",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D367): horizontal linear dimension of 4750 with DIMDOT terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D367 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 3 DIM-layer LINEs form a dimension frame -- two vertical extension lines (8DFC, 8DFD) and one horizontal dimension line (8DFE) -- terminated by two dot (DIMDOT) INSERTs (8DFF, 8E00), with a single MTEXT (8E01) reading '4750', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "These parallel lines are 4750 units apart, far beyond any single wall thickness, and carry dimension terminators and a value MTEXT; the judgment would only flip toward a wall if the lines moved to an architectural layer and shed those dimension markers.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d368-74",
+    "def": "*D368",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D368): horizontal linear dimension of 10350 with DIMDOT terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D368 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 3 DIM-layer LINEs form a dimension frame -- two vertical extension lines (8E05, 8E06) and one horizontal dimension line (8E07) -- terminated by two dot (DIMDOT) INSERTs (8E08, 8E09), with a single MTEXT (8E0A) reading '10350', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "These parallel lines are 10350 units apart, far beyond any single wall thickness, and carry dimension terminators and a value MTEXT; the judgment would only flip toward a wall if the lines moved to an architectural layer and shed those dimension markers.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d369-75",
+    "def": "*D369",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D369): vertical linear dimension of 660 with DIMDOT terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D369 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 3 DIM-layer LINEs form a dimension frame -- two horizontal extension lines (8E0E, 8E0F) and one vertical dimension line (8E10) -- terminated by two dot (DIMDOT) INSERTs (8E11, 8E12), with a single MTEXT (8E13) reading '660', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "These parallel lines are 660 units apart, far beyond any single wall thickness, and carry dimension terminators and a value MTEXT; the judgment would only flip toward a wall if the lines moved to an architectural layer and shed those dimension markers.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d370-76",
+    "def": "*D370",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D370): horizontal linear dimension of 2070 with DIMDOT terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D370 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 3 DIM-layer LINEs form a dimension frame -- two vertical extension lines (8E17, 8E18) and one horizontal dimension line (8E19) -- terminated by two dot (DIMDOT) INSERTs (8E1A, 8E1B), with a single MTEXT (8E1C) reading '2070', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "These parallel lines are 2070 units apart, far beyond any single wall thickness, and carry dimension terminators and a value MTEXT; the judgment would only flip toward a wall if the lines moved to an architectural layer and shed those dimension markers.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d371-77",
+    "def": "*D371",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D371): horizontal linear dimension of 920 with DIMDOT terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D371 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 3 DIM-layer LINEs form a dimension frame -- two vertical extension lines (8E20, 8E21) and one horizontal dimension line (8E22) -- terminated by two dot (DIMDOT) INSERTs (8E23, 8E24), with a single MTEXT (8E25) reading '920', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "These parallel lines are 920 units apart, far beyond any single wall thickness, and carry dimension terminators and a value MTEXT; the judgment would only flip toward a wall if the lines moved to an architectural layer and shed those dimension markers.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d372-78",
+    "def": "*D372",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D372): horizontal linear dimension of 585 with DIMDOT terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D372 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 3 DIM-layer LINEs form a dimension frame -- two vertical extension lines (8E29, 8E2A) and one horizontal dimension line (8E2B) -- terminated by two dot (DIMDOT) INSERTs (8E2C, 8E2D), with a single MTEXT (8E2E) reading '585', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "These parallel lines are 585 units apart, far beyond any single wall thickness, and carry dimension terminators and a value MTEXT; the judgment would only flip toward a wall if the lines moved to an architectural layer and shed those dimension markers.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d373-79",
+    "def": "*D373",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D373): horizontal linear dimension of 495 with DIMDOT terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D373 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 3 DIM-layer LINEs form a dimension frame -- two vertical extension lines (8E32, 8E33) and one horizontal dimension line (8E34) -- terminated by two dot (DIMDOT) INSERTs (8E35, 8E36), with a single MTEXT (8E37) reading '495', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "These parallel lines are 495 units apart, far beyond any single wall thickness, and carry dimension terminators and a value MTEXT; the judgment would only flip toward a wall if the lines moved to an architectural layer and shed those dimension markers.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-d374-80",
+    "def": "*D374",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous AutoCAD dimension block (*D374): horizontal linear dimension of 1620 with DIMDOT terminators on DIM/DEFPOINTS; annotation cache with no wall geometry.",
+    "rationale": {
+      "evidence": "Block name *D374 follows AutoCAD's anonymous-dimension naming pattern (*D<n>). Its 3 DIM-layer LINEs form a dimension frame -- two vertical extension lines (8E3B, 8E3C) and one horizontal dimension line (8E3D) -- terminated by two dot (DIMDOT) INSERTs (8E3E, 8E3F), with a single MTEXT (8E40) reading '1620', equal to the gap between the two extension lines. Three POINTs sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous *D<n> block whose lines sit on the DIM layer with definition points on DEFPOINTS, dot/tick terminator INSERTs and one value-bearing MTEXT is a cached dimension; its lines are extension and dimension lines, so they do not represent walls regardless of their length.",
+      "counterfactual": "These parallel lines are 1620 units apart, far beyond any single wall thickness, and carry dimension terminators and a value MTEXT; the judgment would only flip toward a wall if the lines moved to an architectural layer and shed those dimension markers.",
+      "uncertainty": "This projection does not expose the interior geometry of the terminator sub-blocks or which model edge the dimension measures, and layer names are only labels, so a single mis-layered line cannot be excluded with total certainty; the coincident DEFPOINTS points and value-bearing MTEXT nonetheless make a wall reading very unlikely."
+    }
+  }
+]

@@ -1,0 +1,282 @@
+[
+ {
+  "unit_id": "defannot-u282-221",
+  "def": "*U282",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "42개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 표본은 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u283-222",
+  "def": "*U283",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "70개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 표본은 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u290-223",
+  "def": "*U290",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "30개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 표본은 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u45-224",
+  "def": "*U45",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "38개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 표본은 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u47-225",
+  "def": "*U47",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "38개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 표본은 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u48-226",
+  "def": "*U48",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "12개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 각각 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u49-227",
+  "def": "*U49",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "105개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 표본은 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u50-228",
+  "def": "*U50",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "41개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 표본은 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u51-229",
+  "def": "*U51",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "101개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 표본은 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u52-230",
+  "def": "*U52",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "102개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 표본은 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u53-231",
+  "def": "*U53",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "19개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 각각 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u54-232",
+  "def": "*U54",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "68개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 표본은 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u55-233",
+  "def": "*U55",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "23개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 각각 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u56-234",
+  "def": "*U56",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "130개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 표본은 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u57-235",
+  "def": "*U57",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "112개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 표본은 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u58-236",
+  "def": "*U58",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "19개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 각각 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u59-237",
+  "def": "*U59",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "63개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 표본은 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u60-238",
+  "def": "*U60",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "18개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 각각 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u61-239",
+  "def": "*U61",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "16개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 각각 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u62-240",
+  "def": "*U62",
+  "role": "기타",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "단열 패턴으로 보이는 5정점 폴리라인 묶음.",
+  "rationale": {
+   "evidence": "23개 엔티티가 모두 INSUL 레이어의 LWPOLYLINE이며, 각각 반복되는 5정점 형상이다. LINE과 명시적인 벽 경계 레이어가 없고 선분 bbox도 산출되지 않는다.",
+   "rule": "INSUL 레이어의 반복적인 소형 폴리라인은 벽 경계선보다 단열 해치나 재료 패턴으로 분류한다.",
+   "counterfactual": "WALL 계열 레이어의 길고 평행한 선 또는 개구부와 접합된 경계가 있다면 평면 부분도 및 벽 가능성을 높인다.",
+   "uncertainty": "좌표와 폐합 정보가 없어 실제 배열과 벽 내부 배치 여부는 판단할 수 없다."
+  }
+ }
+]

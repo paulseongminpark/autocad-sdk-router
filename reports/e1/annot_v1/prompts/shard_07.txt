@@ -1,0 +1,621 @@
+DWG block definition annotation task v1 / DWG 블록 정의 주석 작업 v1
+The model has no filesystem access. Use only the inline projections below.
+You will annotate 20 block definitions. Definitions are independent; judge each on its own.
+
+For EACH definition output one JSON object with ALL of these fields:
+- "unit_id": copied exactly from the definition header
+- "def": definition name exactly as given
+- "role": exactly one of "평면 부분도" | "심볼" | "치수캐시" | "가구" | "기타"
+- "wall_likelihood": number 0..1
+- "wall_line_handles": up to 10 [{"handle":"...","reason":"one phrase"}] entities that look like wall lines; [] if none
+- "notes": one-line summary
+- "rationale": {
+    "evidence": which concrete entities/layers/patterns drove the judgment (2-4 sentences),
+    "rule": the general principle applied, stated so it would transfer to other drawings (1-2 sentences),
+    "counterfactual": what, if present or absent in this projection, would flip the judgment (1-2 sentences),
+    "uncertainty": what cannot be determined from this projection alone and why (1-2 sentences)
+  }
+
+Answer STRICTLY as one JSON array of 20 objects, in the same order as the definitions below.
+No surrounding prose, no markdown fence, no trailing commentary.
+
+=== DEFINITION 1/20 (unit_id: defannot-u110-121) ===
+Definition name: *U110
+entity_count: 38
+dxf_name histogram: LWPOLYLINE=38
+layer histogram: X-평면도(기본형)$0$INSUL=38
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=44F5 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=44F6 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=44F7 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=44F8 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=44F9 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=44FA vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=44FB vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=44FC vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=44FD vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=44FE vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=44FF vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4500 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4501 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4502 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4503 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4504 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4505 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4506 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4507 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4508 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4509 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=450A vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=450B vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=450C vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=450D vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=450E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=450F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4510 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4511 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4512 vertices=5
+
+=== DEFINITION 2/20 (unit_id: defannot-u111-122) ===
+Definition name: *U111
+entity_count: 22
+dxf_name histogram: LWPOLYLINE=22
+layer histogram: X-평면도(기본형)$0$INSUL=22
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4520 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4521 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4522 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4523 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4524 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4525 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4526 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4527 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4528 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4529 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=452A vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=452B vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=452C vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=452D vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=452E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=452F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4530 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4531 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4532 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4533 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4534 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4535 vertices=5
+
+=== DEFINITION 3/20 (unit_id: defannot-u112-123) ===
+Definition name: *U112
+entity_count: 12
+dxf_name histogram: LWPOLYLINE=12
+layer histogram: X-평면도(기본형)$0$INSUL=12
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=453B vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=453C vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=453D vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=453E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=453F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4540 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4541 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4542 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4543 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4544 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4545 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4546 vertices=5
+
+=== DEFINITION 4/20 (unit_id: defannot-u113-124) ===
+Definition name: *U113
+entity_count: 41
+dxf_name histogram: LWPOLYLINE=41
+layer histogram: X-평면도(기본형)$0$INSUL=41
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=454C vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=454D vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=454E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=454F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4550 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4551 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4552 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4553 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4554 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4555 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4556 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4557 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4558 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4559 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=455A vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=455B vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=455C vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=455D vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=455E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=455F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4560 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4561 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4562 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4563 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4564 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4565 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4566 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4567 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4568 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4569 vertices=5
+
+=== DEFINITION 5/20 (unit_id: defannot-u114-125) ===
+Definition name: *U114
+entity_count: 13
+dxf_name histogram: LWPOLYLINE=13
+layer histogram: X-평면도(기본형)$0$INSUL=13
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=457A vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=457B vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=457C vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=457D vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=457E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=457F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4580 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4581 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4582 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4583 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4584 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4585 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4586 vertices=5
+
+=== DEFINITION 6/20 (unit_id: defannot-u115-126) ===
+Definition name: *U115
+entity_count: 149
+dxf_name histogram: LWPOLYLINE=149
+layer histogram: X-평면도(기본형)$0$INSUL=149
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=458C vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=458D vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=458E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=458F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4590 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4591 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4592 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4593 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4594 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4595 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4596 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4597 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4598 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4599 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=459A vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=459B vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=459C vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=459D vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=459E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=459F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=45A0 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=45A1 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=45A2 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=45A3 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=45A4 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=45A5 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=45A6 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=45A7 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=45A8 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=45A9 vertices=5
+
+=== DEFINITION 7/20 (unit_id: defannot-u116-127) ===
+Definition name: *U116
+entity_count: 29
+dxf_name histogram: LWPOLYLINE=29
+layer histogram: X-평면도(기본형)$0$INSUL=29
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4626 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4627 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4628 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4629 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=462A vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=462B vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=462C vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=462D vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=462E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=462F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4630 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4631 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4632 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4633 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4634 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4635 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4636 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4637 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4638 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4639 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=463A vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=463B vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=463C vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=463D vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=463E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=463F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4640 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4641 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4642 vertices=5
+
+=== DEFINITION 8/20 (unit_id: defannot-u117-128) ===
+Definition name: *U117
+entity_count: 78
+dxf_name histogram: LWPOLYLINE=78
+layer histogram: X-평면도(기본형)$0$INSUL=78
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4648 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4649 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=464A vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=464B vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=464C vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=464D vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=464E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=464F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4650 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4651 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4652 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4653 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4654 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4655 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4656 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4657 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4658 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4659 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=465A vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=465B vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=465C vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=465D vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=465E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=465F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4660 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4661 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4662 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4663 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4664 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4665 vertices=5
+
+=== DEFINITION 9/20 (unit_id: defannot-u118-129) ===
+Definition name: *U118
+entity_count: 16
+dxf_name histogram: LWPOLYLINE=16
+layer histogram: X-평면도(기본형)$0$INSUL=16
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=469B vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=469C vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=469D vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=469E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=469F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46A0 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46A1 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46A2 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46A3 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46A4 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46A5 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46A6 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46A7 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46A8 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46A9 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46AA vertices=5
+
+=== DEFINITION 10/20 (unit_id: defannot-u119-130) ===
+Definition name: *U119
+entity_count: 40
+dxf_name histogram: LWPOLYLINE=40
+layer histogram: X-평면도(기본형)$0$INSUL=40
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46B0 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46B1 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46B2 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46B3 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46B4 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46B5 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46B6 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46B7 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46B8 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46B9 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46BA vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46BB vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46BC vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46BD vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46BE vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46BF vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46C0 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46C1 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46C2 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46C3 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46C4 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46C5 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46C6 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46C7 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46C8 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46C9 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46CA vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46CB vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46CC vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46CD vertices=5
+
+=== DEFINITION 11/20 (unit_id: defannot-u120-131) ===
+Definition name: *U120
+entity_count: 10
+dxf_name histogram: LWPOLYLINE=10
+layer histogram: X-평면도(기본형)$0$INSUL=10
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46DD vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46DE vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46DF vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46E0 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46E1 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46E2 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46E3 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46E4 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46E5 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46E6 vertices=5
+
+=== DEFINITION 12/20 (unit_id: defannot-u121-132) ===
+Definition name: *U121
+entity_count: 51
+dxf_name histogram: LWPOLYLINE=51
+layer histogram: X-평면도(기본형)$0$INSUL=51
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46EC vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46ED vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46EE vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46EF vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46F0 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46F1 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46F2 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46F3 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46F4 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46F5 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46F6 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46F7 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46F8 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46F9 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46FA vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46FB vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46FC vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46FD vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46FE vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=46FF vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4700 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4701 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4702 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4703 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4704 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4705 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4706 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4707 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4708 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4709 vertices=5
+
+=== DEFINITION 13/20 (unit_id: defannot-u122-133) ===
+Definition name: *U122
+entity_count: 10
+dxf_name histogram: LWPOLYLINE=10
+layer histogram: X-평면도(기본형)$0$INSUL=10
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4724 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4725 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4726 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4727 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4728 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4729 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=472A vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=472B vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=472C vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=472D vertices=5
+
+=== DEFINITION 14/20 (unit_id: defannot-u123-134) ===
+Definition name: *U123
+entity_count: 54
+dxf_name histogram: LWPOLYLINE=54
+layer histogram: X-평면도(기본형)$0$INSUL=54
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4733 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4734 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4735 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4736 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4737 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4738 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4739 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=473A vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=473B vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=473C vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=473D vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=473E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=473F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4740 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4741 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4742 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4743 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4744 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4745 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4746 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4747 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4748 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4749 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=474A vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=474B vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=474C vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=474D vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=474E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=474F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4750 vertices=5
+
+=== DEFINITION 15/20 (unit_id: defannot-u124-135) ===
+Definition name: *U124
+entity_count: 69
+dxf_name histogram: LWPOLYLINE=69
+layer histogram: X-평면도(기본형)$0$INSUL=69
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=476E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=476F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4770 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4771 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4772 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4773 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4774 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4775 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4776 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4777 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4778 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4779 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=477A vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=477B vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=477C vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=477D vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=477E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=477F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4780 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4781 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4782 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4783 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4784 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4785 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4786 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4787 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4788 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4789 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=478A vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=478B vertices=5
+
+=== DEFINITION 16/20 (unit_id: defannot-u125-136) ===
+Definition name: *U125
+entity_count: 30
+dxf_name histogram: LWPOLYLINE=30
+layer histogram: X-평면도(기본형)$0$INSUL=30
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47B8 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47B9 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47BA vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47BB vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47BC vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47BD vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47BE vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47BF vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47C0 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47C1 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47C2 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47C3 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47C4 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47C5 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47C6 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47C7 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47C8 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47C9 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47CA vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47CB vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47CC vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47CD vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47CE vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47CF vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47D0 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47D1 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47D2 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47D3 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47D4 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47D5 vertices=5
+
+=== DEFINITION 17/20 (unit_id: defannot-u126-137) ===
+Definition name: *U126
+entity_count: 51
+dxf_name histogram: LWPOLYLINE=51
+layer histogram: X-평면도(기본형)$0$INSUL=51
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47DB vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47DC vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47DD vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47DE vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47DF vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47E0 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47E1 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47E2 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47E3 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47E4 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47E5 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47E6 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47E7 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47E8 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47E9 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47EA vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47EB vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47EC vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47ED vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47EE vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47EF vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47F0 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47F1 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47F2 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47F3 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47F4 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47F5 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47F6 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47F7 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=47F8 vertices=5
+
+=== DEFINITION 18/20 (unit_id: defannot-u127-138) ===
+Definition name: *U127
+entity_count: 6
+dxf_name histogram: LWPOLYLINE=6
+layer histogram: X-평면도(기본형)$0$INSUL=6
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4813 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4814 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4815 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4816 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4817 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4818 vertices=5
+
+=== DEFINITION 19/20 (unit_id: defannot-u128-139) ===
+Definition name: *U128
+entity_count: 6
+dxf_name histogram: LWPOLYLINE=6
+layer histogram: X-평면도(기본형)$0$INSUL=6
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=481E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=481F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4820 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4821 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4822 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4823 vertices=5
+
+=== DEFINITION 20/20 (unit_id: defannot-u129-140) ===
+Definition name: *U129
+entity_count: 17
+dxf_name histogram: LWPOLYLINE=17
+layer histogram: X-평면도(기본형)$0$INSUL=17
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4829 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=482A vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=482B vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=482C vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=482D vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=482E vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=482F vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4830 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4831 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4832 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4833 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4834 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4835 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4836 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4837 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4838 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$INSUL handle=4839 vertices=5

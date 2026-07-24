@@ -1,0 +1,48 @@
+{
+ "schema": "ariadne.e2_prereg.v1",
+ "prereg_id": "e2.program.v1",
+ "sealed_at": "2026-07-18T22:30:00+09:00",
+ "plan_of_record": {
+  "file": "reports/e2/synthesis/FINAL_PROGRAM_PLAN.md",
+  "commit": "2eb9564",
+  "cells": 42,
+  "queues": {"cpu_parallel_capped": 26, "gpu_local_serial": 8, "dgx_queue": 5, "vision_jury": 2, "test_once": 1},
+  "note": "42셀 정의·킬 원장 K01-K08·모순 원장 C01-C14·역색인 26/26은 plan_of_record 파일이 정본. 본 봉인은 그 위의 실행 결정을 고정한다."
+ },
+ "paul_decisions": {
+  "D1_a61_adoption_band": {
+   "resolution": "feyerabend strict band (cost saving >=30%, error <=0.02) governs ADOPTION; both bands still measured per-claim",
+   "basis": "권고안 채택 — Paul 포괄 발사 지시(2026-07-18 '모두 진행해라')에 의거. A61 채택 판정 셀 발사 전까지 개별 번복 가능."
+  },
+  "D2_band_semantics": {
+   "resolution": "이원화 — 밴드=과학적 가치 표시, 발사상태=스케줄러 정본. 미해결 게이트 셀은 스케줄러에서 GATED/BLOCKED.",
+   "basis": "권고안 채택 (동일 근거)."
+  },
+  "D3_fidelity_pack": {
+   "resolution": "소비자별 3단 게이트 유지. 단일 confirmatory 팩은 대외 비교 주장 필요 시 별도 결재로만 신설.",
+   "basis": "권고안 채택 (동일 근거)."
+  }
+ },
+ "scope_gate": {
+  "rule": "이미지 판정(vision jury) 셀 전까지 전 셀 진행. vision jury 셀은 DEFERRED — 선행 전 페이즈 완료 + Paul 재신호 후 발사.",
+  "vision_jury_reassignment": "Paul 지시(2026-07-18): 이미지 판정은 전량 grok 4.5 high 전담. 단 cursor CLI에 이미지 첨부 플래그 부재가 실측되어(2026-07-18), agentic 파일 읽기 경유 시각 능력 카나리아 PASS가 해당 셀 발사의 하드 선결. 카나리아 FAIL 시 Paul 재결정 요청 (silent 대체 금지).",
+  "billing": "zero-marginal-cost 교리 — 전 셀이 구독(Claude Max x5, ChatGPT x2, Cursor) 또는 로컬(RTX 5070 Ti, DGX LAN) 표면. per-call API 과금 셀 없음. 통화=쿼터: 계정 분산·배치 페이싱·캡 이월 규율 적용."
+ },
+ "execution_principles": [
+  "val=개발·튜닝, test=방법당 단발(F06 확정 셀에서만)",
+  "합격선 사후이동 금지 — 본 파일 및 plan_of_record가 봉인",
+  "셔플 대조군 전 학습 셀 동행",
+  "증거 xlsx 의무, 실패 셀도 사유와 함께 기록",
+  "payload 판정(산출물 실재+마커), exit code 불신",
+  "CPU 동시성 캡+RAM 워치독 (전면 병렬 금지, 32-48GB 피크 작업 존재)",
+  "GPU 로컬 직렬 큐, RLVR은 시드 3 순차·arm당 캡",
+  "총 소요 공표는 큐별 첫 셀 실측 후 (ETA 규율)"
+ ],
+ "data_staging": {
+  "cubicasa_ir": "runs/e2_ext_cubicasa/ir/{train,val,test} = 4200/400/400 segir+truth (2026-07-18 실측), 생성기=tools/e2/ext/cubicasa_ir.py@b2241f3 결정론 재생성 가능",
+  "features": "runs/e2_ext_cubicasa/features/{train,val}.npz (386만/35.4만 행)",
+  "floorplancad": "D:/dev/_ariadne/alm/datasets/FloorPlanCAD (래스터 5,308+벽 마스크, read-only)",
+  "real_dxf": "runs/e2_b3_dxfout_20260717/1_export.dxf sha256=5a6035721630... (WSD-EVAL-v1 매니페스트 @4d42948)",
+  "synthetic_packs": "reports/e2/s2/packs S/F/M @git (WSD-EVAL-v1 동결)"
+ }
+}

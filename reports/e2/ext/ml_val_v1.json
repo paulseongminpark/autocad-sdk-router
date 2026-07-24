@@ -1,0 +1,42 @@
+{
+ "schema": "ariadne.e2_ext_ml_val.v1",
+ "prereg": "e2.wave2.ext.v1",
+ "scale_mm_per_px": 12.0,
+ "features": [
+  "parallel",
+  "thickness",
+  "junction",
+  "log10_len",
+  "sin2t",
+  "cos2t"
+ ],
+ "seed": 7,
+ "n_train": 3862317,
+ "n_val": 353953,
+ "wall_frac": {
+  "train": 0.1145,
+  "val": 0.1151
+ },
+ "models": {
+  "hist_gbdt": {
+   "tp": 15073,
+   "fp": 2461,
+   "fn": 25673,
+   "precision": 0.8596,
+   "recall": 0.3699,
+   "f1": 0.5173,
+   "roc_auc": 0.9215
+  },
+  "logistic": {
+   "tp": 1149,
+   "fp": 1306,
+   "fn": 39597,
+   "precision": 0.468,
+   "recall": 0.0282,
+   "f1": 0.0532,
+   "roc_auc": 0.7614
+  }
+ },
+ "anti_permutation_auc": 0.3752,
+ "EXT-B3_preview": "PASS"
+}

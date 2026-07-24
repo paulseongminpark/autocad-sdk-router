@@ -1,0 +1,17 @@
+{
+  "schema": "e2.prereg.r2.v1.amendment2",
+  "sealed_utc": "2026-07-18T18:20:00Z",
+  "parent": "reports/e2/prereg_r2_v1.json @31494b6 + amendment1 @53103e6",
+  "amendment_rule_compliance": "절차 강화(의무 추가)만 — 신규 arm/band/route 없음, 완화 0",
+  "trigger": "chainverify_L1b seat4 CRITICAL-2 — 도시에 전역 규칙(feyerabend_P2.md:738-740)의 이중 사전봉인 산출물이 C0→L1b 사슬에 부재",
+  "dual_seal_mandate": {
+    "rule": "모든 향후 셀·루프 패킷은 실행 전에 셀 로컬 prereg.json + evidence.xlsx의 PREREG 시트를 생성하고 그 SHA를 REPORT 서두에 기록해야 한다. 부재 시 그 셀의 밴드 불이동 주장은 성립 불가로 취급.",
+    "applies_from": "loop_l1c 이후 전 셀",
+    "historic_note": "C0/C1/L1/L1b는 절차 미충족으로 기록. 완화 사실(문면 준수 주장 아님): 밴드를 담은 도시에가 실행 전 git 커밋됨(@e3bf728) — 시간적 선행 증거만 성립."
+  },
+  "claim_wording_mandate": {
+    "rule": "재현 주장은 '휘발 필드(runtime·타임스탬프) 제외 수치 전 필드 동일'로만 — '바이트 동일' 유의 주장 금지 (seat4 CRITICAL-1: 204중 3 파일이 runtime/docProps로 원리적 불일치)."
+  },
+  "l1b_claim_status": "주장 문안 ⑥·⑦ RETRACTED — 수치 실질은 4석 전원 재현 확인. 상세: reports/e2/chainverify_L1b/SYNTHESIS.md",
+  "c2_gate": "C2 개방은 loop_l1c replay 통과(반례 회귀 0 상승 + 단조성 속성 시험 전수 + 정상 수치 델타 전문 공개)까지 폐쇄 유지"
+}

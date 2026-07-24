@@ -1,0 +1,674 @@
+DWG block definition annotation task v1 / DWG 블록 정의 주석 작업 v1
+The model has no filesystem access. Use only the inline projections below.
+You will annotate 20 block definitions. Definitions are independent; judge each on its own.
+
+For EACH definition output one JSON object with ALL of these fields:
+- "unit_id": copied exactly from the definition header
+- "def": definition name exactly as given
+- "role": exactly one of "평면 부분도" | "심볼" | "치수캐시" | "가구" | "기타"
+- "wall_likelihood": number 0..1
+- "wall_line_handles": up to 10 [{"handle":"...","reason":"one phrase"}] entities that look like wall lines; [] if none
+- "notes": one-line summary
+- "rationale": {
+    "evidence": which concrete entities/layers/patterns drove the judgment (2-4 sentences),
+    "rule": the general principle applied, stated so it would transfer to other drawings (1-2 sentences),
+    "counterfactual": what, if present or absent in this projection, would flip the judgment (1-2 sentences),
+    "uncertainty": what cannot be determined from this projection alone and why (1-2 sentences)
+  }
+
+Answer STRICTLY as one JSON array of 20 objects, in the same order as the definitions below.
+No surrounding prose, no markdown fence, no trailing commentary.
+
+=== DEFINITION 1/20 (unit_id: defannot-x-0-dw1600-341) ===
+Definition name: X-평면도(기본형)$0$dw1600
+entity_count: 53
+dxf_name histogram: LINE=27, LWPOLYLINE=26
+layer histogram: X-평면도(기본형)$0$WID=53
+bbox from LINE start/end: [45, -295, 0, 1555, 50, 0]
+sampled entities (max 30):
+- LINE layer=X-평면도(기본형)$0$WID handle=1D32 (1555,0)->(45,0)
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=1D33 vertices=12
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=1D34 vertices=12
+- LINE layer=X-평면도(기본형)$0$WID handle=1D35 (1525,-160)->(820,-160)
+- LINE layer=X-평면도(기본형)$0$WID handle=1D36 (780,-195)->(75,-195)
+- LINE layer=X-평면도(기본형)$0$WID handle=1D37 (780,-165)->(75,-165)
+- LINE layer=X-평면도(기본형)$0$WID handle=1D38 (71.519,-178)->(783.481,-178)
+- LINE layer=X-평면도(기본형)$0$WID handle=1D39 (71.519,-182)->(783.481,-182)
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=1D3A vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=1D3B vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=1D3C vertices=8
+- LINE layer=X-평면도(기본형)$0$WID handle=1D3D (71.519,-178)->(71.519,-182)
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=1D3E vertices=8
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=1D3F vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=1D40 vertices=4
+- LINE layer=X-평면도(기본형)$0$WID handle=1D41 (783.481,-178)->(783.481,-182)
+- LINE layer=X-평면도(기본형)$0$WID handle=1D42 (780,-115)->(75,-115)
+- LINE layer=X-평면도(기본형)$0$WID handle=1D43 (780,-85)->(75,-85)
+- LINE layer=X-평면도(기본형)$0$WID handle=1D44 (71.519,-98)->(783.481,-98)
+- LINE layer=X-평면도(기본형)$0$WID handle=1D45 (71.519,-102)->(783.481,-102)
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=1D46 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=1D47 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=1D48 vertices=8
+- LINE layer=X-평면도(기본형)$0$WID handle=1D49 (71.519,-98)->(71.519,-102)
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=1D4A vertices=8
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=1D4B vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=1D4C vertices=4
+- LINE layer=X-평면도(기본형)$0$WID handle=1D4D (783.481,-98)->(783.481,-102)
+- LINE layer=X-평면도(기본형)$0$WID handle=1D4E (1525,-130)->(820,-130)
+- LINE layer=X-평면도(기본형)$0$WID handle=1D4F (816.519,-143)->(1528.481,-143)
+
+=== DEFINITION 2/20 (unit_id: defannot-x-0-dw2100-342) ===
+Definition name: X-평면도(기본형)$0$dw2100
+entity_count: 53
+dxf_name histogram: LINE=27, LWPOLYLINE=26
+layer histogram: X-평면도(기본형)$0$WID=53
+bbox from LINE start/end: [45, -295, 0, 2055, 50, 0]
+sampled entities (max 30):
+- LINE layer=X-평면도(기본형)$0$WID handle=53BC (2055,0)->(45,0)
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=53BD vertices=12
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=53BE vertices=12
+- LINE layer=X-평면도(기본형)$0$WID handle=53BF (2025,-160)->(1070,-160)
+- LINE layer=X-평면도(기본형)$0$WID handle=53C0 (1030,-195)->(75,-195)
+- LINE layer=X-평면도(기본형)$0$WID handle=53C1 (1030,-165)->(75,-165)
+- LINE layer=X-평면도(기본형)$0$WID handle=53C2 (71.519,-178)->(1033.481,-178)
+- LINE layer=X-평면도(기본형)$0$WID handle=53C3 (71.519,-182)->(1033.481,-182)
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=53C4 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=53C5 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=53C6 vertices=8
+- LINE layer=X-평면도(기본형)$0$WID handle=53C7 (71.519,-178)->(71.519,-182)
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=53C8 vertices=8
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=53C9 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=53CA vertices=4
+- LINE layer=X-평면도(기본형)$0$WID handle=53CB (1033.481,-178)->(1033.481,-182)
+- LINE layer=X-평면도(기본형)$0$WID handle=53CC (1030,-115)->(75,-115)
+- LINE layer=X-평면도(기본형)$0$WID handle=53CD (1030,-85)->(75,-85)
+- LINE layer=X-평면도(기본형)$0$WID handle=53CE (71.519,-98)->(1033.481,-98)
+- LINE layer=X-평면도(기본형)$0$WID handle=53CF (71.519,-102)->(1033.481,-102)
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=53D0 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=53D1 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=53D2 vertices=8
+- LINE layer=X-평면도(기본형)$0$WID handle=53D3 (71.519,-98)->(71.519,-102)
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=53D4 vertices=8
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=53D5 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=53D6 vertices=4
+- LINE layer=X-평면도(기본형)$0$WID handle=53D7 (1033.481,-98)->(1033.481,-102)
+- LINE layer=X-평면도(기본형)$0$WID handle=53D8 (2025,-130)->(1070,-130)
+- LINE layer=X-평면도(기본형)$0$WID handle=53D9 (1066.519,-143)->(2028.481,-143)
+
+=== DEFINITION 3/20 (unit_id: defannot-x-0-dw2700v-343) ===
+Definition name: X-평면도(기본형)$0$DW2700v
+entity_count: 53
+dxf_name histogram: LINE=27, LWPOLYLINE=26
+layer histogram: X-평면도(기본형)$0$WID=53
+bbox from LINE start/end: [45, -295, 0, 2655, 50, 0]
+sampled entities (max 30):
+- LINE layer=X-평면도(기본형)$0$WID handle=3F24 (45,-245)->(2655,-245)
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=3F25 vertices=12
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=3F26 vertices=12
+- LINE layer=X-평면도(기본형)$0$WID handle=3F27 (75,-85)->(880,-85)
+- LINE layer=X-평면도(기본형)$0$WID handle=3F28 (920,-50)->(2625,-50)
+- LINE layer=X-평면도(기본형)$0$WID handle=3F29 (920,-80)->(2625,-80)
+- LINE layer=X-평면도(기본형)$0$WID handle=3F2A (2628.481,-67)->(916.519,-67)
+- LINE layer=X-평면도(기본형)$0$WID handle=3F2B (2628.481,-63)->(916.519,-63)
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=3F2C vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=3F2D vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=3F2E vertices=8
+- LINE layer=X-평면도(기본형)$0$WID handle=3F2F (2628.481,-67)->(2628.481,-63)
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=3F30 vertices=8
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=3F31 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=3F32 vertices=4
+- LINE layer=X-평면도(기본형)$0$WID handle=3F33 (916.519,-67)->(916.519,-63)
+- LINE layer=X-평면도(기본형)$0$WID handle=3F34 (920,-130)->(2625,-130)
+- LINE layer=X-평면도(기본형)$0$WID handle=3F35 (920,-160)->(2625,-160)
+- LINE layer=X-평면도(기본형)$0$WID handle=3F36 (2628.481,-147)->(916.519,-147)
+- LINE layer=X-평면도(기본형)$0$WID handle=3F37 (2628.481,-143)->(916.519,-143)
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=3F38 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=3F39 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=3F3A vertices=8
+- LINE layer=X-평면도(기본형)$0$WID handle=3F3B (2628.481,-147)->(2628.481,-143)
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=3F3C vertices=8
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=3F3D vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$WID handle=3F3E vertices=4
+- LINE layer=X-평면도(기본형)$0$WID handle=3F3F (916.519,-147)->(916.519,-143)
+- LINE layer=X-평면도(기본형)$0$WID handle=3F40 (75,-115)->(880,-115)
+- LINE layer=X-평면도(기본형)$0$WID handle=3F41 (883.481,-102)->(71.519,-102)
+
+=== DEFINITION 4/20 (unit_id: defannot-x-0-esp-344) ===
+Definition name: X-평면도(기본형)$0$esp
+entity_count: 11
+dxf_name histogram: LINE=6, LWPOLYLINE=5
+layer histogram: X-평면도(기본형)$0$FUR=4, X-평면도(기본형)$0$MC=1, X-평면도(기본형)$0$피난구=6
+bbox from LINE start/end: [125, 50, 0, 1525, 1150, 0]
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$MC handle=1D6C vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$FUR handle=1D6D vertices=4
+- LINE layer=X-평면도(기본형)$0$FUR handle=1D6E (375,400)->(1275,50)
+- LINE layer=X-평면도(기본형)$0$FUR handle=1D6F (375,50)->(1275,400)
+- LINE layer=X-평면도(기본형)$0$피난구 handle=1D70 (125,550)->(725,1150)
+- LINE layer=X-평면도(기본형)$0$피난구 handle=1D71 (125,1150)->(725,550)
+- LWPOLYLINE layer=X-평면도(기본형)$0$FUR handle=1D72 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$피난구 handle=1D73 vertices=4
+- LINE layer=X-평면도(기본형)$0$피난구 handle=1D74 (925,550)->(1525,1150)
+- LINE layer=X-평면도(기본형)$0$피난구 handle=1D75 (925,1150)->(1525,550)
+- LWPOLYLINE layer=X-평면도(기본형)$0$피난구 handle=1D76 vertices=4
+
+=== DEFINITION 5/20 (unit_id: defannot-x-0-ev13k-345) ===
+Definition name: X-평면도(기본형)$0$ev13k
+entity_count: 47
+dxf_name histogram: LINE=34, LWPOLYLINE=12, TEXT=1
+layer histogram: X-평면도(기본형)$0$DEFPOINTS-1=1, X-평면도(기본형)$0$DEFTXT=1, X-평면도(기본형)$0$ELEV=45
+bbox from LINE start/end: [-1080, -125, 0, 1080, 2190, 0]
+sampled entities (max 30):
+- TEXT layer=X-평면도(기본형)$0$DEFTXT handle=7FCE '13인승(피난용)'
+- LWPOLYLINE layer=X-평면도(기본형)$0$DEFPOINTS-1 handle=7FCF vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$ELEV handle=7FD0 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$ELEV handle=7FD1 vertices=4
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FD2 (0,-85)->(0,2190)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FD3 (780,370)->(780,1745)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FD4 (-780,370)->(-780,1745)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FD5 (780,370)->(455,370)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FD6 (-455,370)->(-780,370)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FD7 (455,310)->(455,370)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FD8 (455,310)->(485,310)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FD9 (-455,310)->(-455,370)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FDA (-455,310)->(-485,310)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FDB (-780,1745)->(780,1745)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FDC (830,310)->(830,1795)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FDD (-830,310)->(-830,1795)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FDE (830,310)->(912,310)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FDF (-912,240)->(912,240)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FE0 (912,240)->(912,310)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FE1 (-830,310)->(-912,310)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FE2 (-912,240)->(-912,310)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FE3 (-912,215)->(912,215)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FE4 (-912,160)->(-520,160)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FE5 (520,160)->(912,160)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FE6 (912,160)->(912,215)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FE7 (-912,160)->(-912,215)
+- LWPOLYLINE layer=X-평면도(기본형)$0$ELEV handle=7FE8 vertices=18
+- LINE layer=X-평면도(기본형)$0$ELEV handle=7FE9 (1080,1052.5)->(-1080,1052.5)
+- LWPOLYLINE layer=X-평면도(기본형)$0$ELEV handle=7FEA vertices=18
+- LWPOLYLINE layer=X-평면도(기본형)$0$ELEV handle=7FEB vertices=4
+
+=== DEFINITION 6/20 (unit_id: defannot-x-0-ev16k-346) ===
+Definition name: X-평면도(기본형)$0$ev16k
+entity_count: 47
+dxf_name histogram: LINE=34, LWPOLYLINE=12, TEXT=1
+layer histogram: X-평면도(기본형)$0$DEFPOINTS-1=1, X-평면도(기본형)$0$DEFTXT=1, X-평면도(기본형)$0$ELEV=45
+bbox from LINE start/end: [-1170, -125, 0, 1175, 2525, 0]
+sampled entities (max 30):
+- TEXT layer=X-평면도(기본형)$0$DEFTXT handle=8002 '16인승'
+- LWPOLYLINE layer=X-평면도(기본형)$0$DEFPOINTS-1 handle=8003 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$ELEV handle=8004 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$ELEV handle=8005 vertices=4
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8006 (0,-85)->(0,2525)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8007 (880,370)->(880,2070)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8008 (-880,370)->(-880,2070)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8009 (880,370)->(500,370)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=800A (-500,370)->(-880,370)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=800B (500,310)->(500,370)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=800C (500,310)->(530,310)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=800D (-500,310)->(-500,370)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=800E (-500,310)->(-530,310)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=800F (-880,2070)->(880,2070)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8010 (930,310)->(930,2120)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8011 (-930,310)->(-930,2120)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8012 (930,310)->(1012,310)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8013 (-1012,240)->(1012,240)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8014 (1012,240)->(1012,310)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8015 (-930,310)->(-1012,310)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8016 (-1012,240)->(-1012,310)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8017 (-1012,215)->(1012,215)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8018 (-1012,160)->(-515,160)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8019 (515,160)->(1012,160)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=801A (1012,160)->(1012,215)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=801B (-1012,160)->(-1012,215)
+- LWPOLYLINE layer=X-평면도(기본형)$0$ELEV handle=801C vertices=18
+- LWPOLYLINE layer=X-평면도(기본형)$0$ELEV handle=801D vertices=18
+- LWPOLYLINE layer=X-평면도(기본형)$0$ELEV handle=801E vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$ELEV handle=801F vertices=4
+
+=== DEFINITION 7/20 (unit_id: defannot-x-0-ev16x2k-347) ===
+Definition name: X-평면도(기본형)$0$ev16x2k
+entity_count: 94
+dxf_name histogram: LINE=69, LWPOLYLINE=23, TEXT=2
+layer histogram: X-평면도(기본형)$0$DEFPOINTS-1=1, X-평면도(기본형)$0$DEFTXT=2, X-평면도(기본형)$0$ELEV=91
+bbox from LINE start/end: [-1220, -125, 0, 3575, 2515, 0]
+sampled entities (max 30):
+- TEXT layer=X-평면도(기본형)$0$DEFTXT handle=8036 '16인승(비상용)'
+- LWPOLYLINE layer=X-평면도(기본형)$0$DEFPOINTS-1 handle=8037 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$ELEV handle=8038 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$ELEV handle=8039 vertices=4
+- LINE layer=X-평면도(기본형)$0$ELEV handle=803A (0,-85)->(0,2515)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=803B (880,370)->(880,2070)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=803C (-880,370)->(-880,2070)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=803D (880,370)->(500,370)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=803E (-500,370)->(-880,370)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=803F (500,310)->(500,370)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8040 (500,310)->(530,310)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8041 (-500,310)->(-500,370)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8042 (-500,310)->(-530,310)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8043 (-880,2070)->(880,2070)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8044 (930,310)->(930,2120)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8045 (-930,310)->(-930,2120)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8046 (930,310)->(1012,310)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8047 (-1012,240)->(1012,240)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8048 (1012,240)->(1012,310)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=8049 (-930,310)->(-1012,310)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=804A (-1012,240)->(-1012,310)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=804B (-1012,215)->(1012,215)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=804C (-1012,160)->(-515,160)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=804D (515,160)->(1012,160)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=804E (1012,160)->(1012,215)
+- LINE layer=X-평면도(기본형)$0$ELEV handle=804F (-1012,160)->(-1012,215)
+- LWPOLYLINE layer=X-평면도(기본형)$0$ELEV handle=8050 vertices=18
+- LWPOLYLINE layer=X-평면도(기본형)$0$ELEV handle=8051 vertices=18
+- LWPOLYLINE layer=X-평면도(기본형)$0$ELEV handle=8052 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$ELEV handle=8053 vertices=4
+
+=== DEFINITION 8/20 (unit_id: defannot-x-0-fsd1120-348) ===
+Definition name: X-평면도(기본형)$0$FSD1120
+entity_count: 7
+dxf_name histogram: ARC=1, LINE=3, LWPOLYLINE=3
+layer histogram: X-평면도(기본형)$0$DOOR=7
+bbox from LINE start/end: [30, 0, 0, 1170, 100, 0]
+sampled entities (max 30):
+- LINE layer=X-평면도(기본형)$0$DOOR handle=7E45 (30,100)->(1170,100)
+- LWPOLYLINE layer=X-평면도(기본형)$0$DOOR handle=7E46 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$DOOR handle=7E47 vertices=6
+- LWPOLYLINE layer=X-평면도(기본형)$0$DOOR handle=7E48 vertices=6
+- LINE layer=X-평면도(기본형)$0$DOOR handle=7E49 (1155,60)->(45,60)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=7E4A (1155,0)->(45,0)
+- ARC layer=X-평면도(기본형)$0$DOOR handle=7E4B
+
+=== DEFINITION 9/20 (unit_id: defannot-x-0-fsd1500-2-349) ===
+Definition name: X-평면도(기본형)$0$FSD1500-2
+entity_count: 9
+dxf_name histogram: ARC=2, LINE=3, LWPOLYLINE=4
+layer histogram: X-평면도(기본형)$0$A-DOOR=9
+bbox from LINE start/end: [-1470, -100, 0, -30, 0, 0]
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$A-DOOR handle=79F6 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$A-DOOR handle=79F7 vertices=6
+- LINE layer=X-평면도(기본형)$0$A-DOOR handle=79F8 (-30,0)->(-1470,0)
+- LINE layer=X-평면도(기본형)$0$A-DOOR handle=79F9 (-45,-40)->(-1455,-40)
+- LINE layer=X-평면도(기본형)$0$A-DOOR handle=79FA (-45,-100)->(-1455,-100)
+- LWPOLYLINE layer=X-평면도(기본형)$0$A-DOOR handle=79FB vertices=7
+- LWPOLYLINE layer=X-평면도(기본형)$0$A-DOOR handle=79FC vertices=5
+- ARC layer=X-평면도(기본형)$0$A-DOOR handle=79FD
+- ARC layer=X-평면도(기본형)$0$A-DOOR handle=79FE
+
+=== DEFINITION 10/20 (unit_id: defannot-x-0-fsdfsdf321-350) ===
+Definition name: X-평면도(기본형)$0$FSDFSDF321
+entity_count: 5
+dxf_name histogram: CIRCLE=1, LINE=2, LWPOLYLINE=2
+layer histogram: X-평면도(기본형)$0$A06-시설물-설비=5
+bbox from LINE start/end: [25, -91.374, 0, 125, -58.626, 0]
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$A06-시설물-설비 handle=6956 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$A06-시설물-설비 handle=6957 vertices=4
+- LINE layer=X-평면도(기본형)$0$A06-시설물-설비 handle=6958 (125,-58.626)->(25,-58.626)
+- CIRCLE layer=X-평면도(기본형)$0$A06-시설물-설비 handle=6959 radius=50
+- LINE layer=X-평면도(기본형)$0$A06-시설물-설비 handle=695A (125,-91.374)->(25,-91.374)
+
+=== DEFINITION 11/20 (unit_id: defannot-x-0-fu1-351) ===
+Definition name: X-평면도(기본형)$0$FU1
+entity_count: 115
+dxf_name histogram: ARC=31, ELLIPSE=23, LINE=16, SPLINE=45
+layer histogram: X-평면도(기본형)$0$FUR=115
+bbox from LINE start/end: [-24.5, -550, 0, 24.5, -20, 36.5]
+sampled entities (max 30):
+- LINE layer=X-평면도(기본형)$0$FUR handle=5852 (0,-20)->(0,-550)
+- ARC layer=X-평면도(기본형)$0$FUR handle=5853
+- ARC layer=X-평면도(기본형)$0$FUR handle=5854
+- ARC layer=X-평면도(기본형)$0$FUR handle=5855
+- ARC layer=X-평면도(기본형)$0$FUR handle=5856
+- ARC layer=X-평면도(기본형)$0$FUR handle=5857
+- ARC layer=X-평면도(기본형)$0$FUR handle=5858
+- ARC layer=X-평면도(기본형)$0$FUR handle=5859
+- ARC layer=X-평면도(기본형)$0$FUR handle=585A
+- ARC layer=X-평면도(기본형)$0$FUR handle=585B
+- ARC layer=X-평면도(기본형)$0$FUR handle=585C
+- ARC layer=X-평면도(기본형)$0$FUR handle=585D
+- ARC layer=X-평면도(기본형)$0$FUR handle=585E
+- ARC layer=X-평면도(기본형)$0$FUR handle=585F
+- ARC layer=X-평면도(기본형)$0$FUR handle=5860
+- ARC layer=X-평면도(기본형)$0$FUR handle=5861
+- ARC layer=X-평면도(기본형)$0$FUR handle=5862
+- ARC layer=X-평면도(기본형)$0$FUR handle=5863
+- ARC layer=X-평면도(기본형)$0$FUR handle=5864
+- ARC layer=X-평면도(기본형)$0$FUR handle=5865
+- ARC layer=X-평면도(기본형)$0$FUR handle=5866
+- ARC layer=X-평면도(기본형)$0$FUR handle=5867
+- ARC layer=X-평면도(기본형)$0$FUR handle=5868
+- ARC layer=X-평면도(기본형)$0$FUR handle=5869
+- ARC layer=X-평면도(기본형)$0$FUR handle=586A
+- ARC layer=X-평면도(기본형)$0$FUR handle=586B
+- ARC layer=X-평면도(기본형)$0$FUR handle=586C
+- ARC layer=X-평면도(기본형)$0$FUR handle=586D
+- ARC layer=X-평면도(기본형)$0$FUR handle=586E
+- ARC layer=X-평면도(기본형)$0$FUR handle=586F
+
+=== DEFINITION 12/20 (unit_id: defannot-x-0-hd1050-352) ===
+Definition name: X-평면도(기본형)$0$hd1050
+entity_count: 244
+dxf_name histogram: ARC=1, ELLIPSE=28, LINE=210, LWPOLYLINE=5
+layer histogram: X-평면도(기본형)$0$DOOR=244
+bbox from LINE start/end: [11.166, -100, 0, 1021, 24.834, 0]
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$DOOR handle=1C10 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$DOOR handle=1C11 vertices=38
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C12 (996.084,-60.185)->(995.139,-59.239)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C13 (996.873,-60.185)->(995.209,-58.521)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C14 (997.662,-60.185)->(995.281,-57.803)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C15 (998.451,-60.185)->(995.352,-57.086)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C16 (999.24,-60.185)->(995.423,-56.368)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C17 (1000.029,-60.185)->(995.495,-55.651)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C18 (1000.818,-60.185)->(995.566,-54.933)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C19 (1001.606,-60.185)->(1000.555,-59.134)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C1A (999.277,-57.855)->(995.637,-54.216)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C1B (1002.395,-60.185)->(1001.414,-59.203)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C1C (999.51,-57.3)->(995.709,-53.498)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C1D (1003.184,-60.185)->(1002.074,-59.075)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C1E (999.942,-56.942)->(995.78,-52.781)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C1F (1003.973,-60.185)->(1002.604,-58.816)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C20 (1000.504,-56.715)->(995.851,-52.063)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C21 (1004.698,-60.121)->(1002.996,-58.419)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C22 (1001.203,-56.626)->(995.996,-51.419)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C23 (1005.125,-59.759)->(1003.135,-57.769)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C24 (999.321,-53.955)->(996.251,-50.885)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C25 (1002.157,-56.791)->(1000.095,-54.729)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C26 (1005.257,-59.103)->(1001.118,-54.964)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C27 (999.389,-53.235)->(996.552,-50.398)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C28 (1005.257,-58.314)->(1001.839,-54.895)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C29 (999.761,-52.817)->(996.897,-49.953)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C2A (1005.257,-57.525)->(1002.417,-54.684)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C2B (1000.275,-52.542)->(997.283,-49.55)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C2C (1005.257,-56.736)->(1002.866,-54.344)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C2D (999.729,-51.208)->(997.71,-49.188)
+
+=== DEFINITION 13/20 (unit_id: defannot-x-0-hobgas19-353) ===
+Definition name: X-평면도(기본형)$0$HOBGAS19
+entity_count: 30
+dxf_name histogram: CIRCLE=12, LINE=2, LWPOLYLINE=16
+layer histogram: X-평면도(기본형)$0$KIT=30
+bbox from LINE start/end: [9.278, 49.144, 0, 599.278, 539.145, 0]
+sampled entities (max 30):
+- LINE layer=X-평면도(기본형)$0$KIT handle=1DCD (9.278,49.144)->(599.278,49.145)
+- LINE layer=X-평면도(기본형)$0$KIT handle=1DCE (599.278,539.145)->(9.278,539.144)
+- CIRCLE layer=X-평면도(기본형)$0$KIT handle=1DCF radius=51.957
+- CIRCLE layer=X-평면도(기본형)$0$KIT handle=1DD0 radius=37.365
+- LWPOLYLINE layer=X-평면도(기본형)$0$KIT handle=1DD1 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$KIT handle=1DD2 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$KIT handle=1DD3 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$KIT handle=1DD4 vertices=4
+- CIRCLE layer=X-평면도(기본형)$0$KIT handle=1DD5 radius=82.599
+- CIRCLE layer=X-평면도(기본형)$0$KIT handle=1DD6 radius=31.563
+- CIRCLE layer=X-평면도(기본형)$0$KIT handle=1DD7 radius=42.774
+- LWPOLYLINE layer=X-평면도(기본형)$0$KIT handle=1DD8 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$KIT handle=1DD9 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$KIT handle=1DDA vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$KIT handle=1DDB vertices=4
+- CIRCLE layer=X-평면도(기본형)$0$KIT handle=1DDC radius=82.599
+- CIRCLE layer=X-평면도(기본형)$0$KIT handle=1DDD radius=51.957
+- CIRCLE layer=X-평면도(기본형)$0$KIT handle=1DDE radius=37.365
+- LWPOLYLINE layer=X-평면도(기본형)$0$KIT handle=1DDF vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$KIT handle=1DE0 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$KIT handle=1DE1 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$KIT handle=1DE2 vertices=4
+- CIRCLE layer=X-평면도(기본형)$0$KIT handle=1DE3 radius=82.599
+- CIRCLE layer=X-평면도(기본형)$0$KIT handle=1DE4 radius=15.361
+- LWPOLYLINE layer=X-평면도(기본형)$0$KIT handle=1DE5 vertices=4
+- CIRCLE layer=X-평면도(기본형)$0$KIT handle=1DE6 radius=15.361
+- LWPOLYLINE layer=X-평면도(기본형)$0$KIT handle=1DE7 vertices=4
+- CIRCLE layer=X-평면도(기본형)$0$KIT handle=1DE8 radius=15.361
+- LWPOLYLINE layer=X-평면도(기본형)$0$KIT handle=1DE9 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$KIT handle=1DEA vertices=4
+
+=== DEFINITION 14/20 (unit_id: defannot-x-0-ic708-354) ===
+Definition name: X-평면도(기본형)$0$IC708
+entity_count: 100
+dxf_name histogram: ARC=32, CIRCLE=2, LINE=52, SPLINE=14
+layer histogram: X-평면도(기본형)$0$FUR=100
+bbox from LINE start/end: [284032.598, 50219.318, 0, 284840.425, 50656.175, 0]
+sampled entities (max 30):
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=5F8A
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=5F8B
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=5F8C
+- LINE layer=X-평면도(기본형)$0$FUR handle=5F8D (284038.27,50455.956)->(284840.425,50455.956)
+- LINE layer=X-평면도(기본형)$0$FUR handle=5F8E (284262.234,50655.848)->(284105.194,50655.848)
+- LINE layer=X-평면도(기본형)$0$FUR handle=5F8F (284065.194,50615.848)->(284065.194,50296.063)
+- ARC layer=X-평면도(기본형)$0$FUR handle=5F90
+- ARC layer=X-평면도(기본형)$0$FUR handle=5F91
+- ARC layer=X-평면도(기본형)$0$FUR handle=5F92
+- LINE layer=X-평면도(기본형)$0$FUR handle=5F93 (284075.163,50315.832)->(284032.598,50315.832)
+- LINE layer=X-평면도(기본형)$0$FUR handle=5F94 (284407.688,50255.738)->(284262.988,50256.201)
+- ARC layer=X-평면도(기본형)$0$FUR handle=5F95
+- ARC layer=X-평면도(기본형)$0$FUR handle=5F96
+- LINE layer=X-평면도(기본형)$0$FUR handle=5F97 (284407.688,50656.175)->(284262.234,50655.848)
+- ARC layer=X-평면도(기본형)$0$FUR handle=5F98
+- LINE layer=X-평면도(기본형)$0$FUR handle=5F99 (284478.924,50433.525)->(284515.437,50433.525)
+- LINE layer=X-평면도(기본형)$0$FUR handle=5F9A (284479.088,50479.611)->(284515.437,50479.611)
+- ARC layer=X-평면도(기본형)$0$FUR handle=5F9B
+- ARC layer=X-평면도(기본형)$0$FUR handle=5F9C
+- ARC layer=X-평면도(기본형)$0$FUR handle=5F9D
+- ARC layer=X-평면도(기본형)$0$FUR handle=5F9E
+- ARC layer=X-평면도(기본형)$0$FUR handle=5F9F
+- ARC layer=X-평면도(기본형)$0$FUR handle=5FA0
+- ARC layer=X-평면도(기본형)$0$FUR handle=5FA1
+- ARC layer=X-평면도(기본형)$0$FUR handle=5FA2
+- ARC layer=X-평면도(기본형)$0$FUR handle=5FA3
+- LINE layer=X-평면도(기본형)$0$FUR handle=5FA4 (284270.254,50647.848)->(284270.254,50264.063)
+- LINE layer=X-평면도(기본형)$0$FUR handle=5FA5 (284059.506,50320.015)->(284065.194,50320.015)
+- LINE layer=X-평면도(기본형)$0$FUR handle=5FA6 (284059.506,50311.649)->(284065.194,50311.649)
+- LINE layer=X-평면도(기본형)$0$FUR handle=5FA7 (284059.506,50323.55)->(284059.506,50315.832)
+
+=== DEFINITION 15/20 (unit_id: defannot-x-0-iw990-355) ===
+Definition name: X-평면도(기본형)$0$IW990
+entity_count: 451
+dxf_name histogram: ARC=97, CIRCLE=10, ELLIPSE=8, LINE=195, LWPOLYLINE=7, POLYLINE=1, SPLINE=133
+layer histogram: X-평면도(기본형)$0$F-BATH=2, X-평면도(기본형)$0$FUR=449
+bbox from LINE start/end: [237991.892, 45901.401, 0, 238739.396, 46380.22, 0]
+sampled entities (max 30):
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=5FF3
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=5FF4
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=5FF5
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=5FF6
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=5FF7
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=5FF8
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=5FF9
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=5FFA
+- LINE layer=X-평면도(기본형)$0$FUR handle=5FFB (238482.159,46338.991)->(238482.235,46338.986)
+- LINE layer=X-평면도(기본형)$0$FUR handle=5FFC (238482.235,46338.986)->(238483.792,46339.163)
+- ARC layer=X-평면도(기본형)$0$FUR handle=5FFD
+- LINE layer=X-평면도(기본형)$0$FUR handle=5FFE (238529.384,46339.674)->(238529.384,46339.674)
+- LINE layer=X-평면도(기본형)$0$FUR handle=5FFF (238529.374,46374.328)->(238529.374,46375.884)
+- LINE layer=X-평면도(기본형)$0$FUR handle=6000 (238529.374,46375.884)->(238529.384,46339.674)
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6001
+- LINE layer=X-평면도(기본형)$0$FUR handle=6002 (238588.055,45984.593)->(238588.055,45984.314)
+- LINE layer=X-평면도(기본형)$0$FUR handle=6003 (238614.422,45982.239)->(238614.597,45982.447)
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6004
+- LINE layer=X-평면도(기본형)$0$FUR handle=6005 (238612.727,45982.22)->(238612.925,45982.4)
+- LINE layer=X-평면도(기본형)$0$FUR handle=6006 (238598.635,45982.984)->(238598.635,45983.03)
+- LINE layer=X-평면도(기본형)$0$FUR handle=6007 (238600.066,45982.181)->(238600.066,45981.869)
+- LINE layer=X-평면도(기본형)$0$FUR handle=6008 (238598.96,45982.184)->(238598.96,45982.042)
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6009
+- LINE layer=X-평면도(기본형)$0$FUR handle=600A (238587.684,45984.485)->(238587.477,45984.298)
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=600B
+- LINE layer=X-평면도(기본형)$0$FUR handle=600C (238615.574,45982.806)->(238615.789,45982.985)
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=600D
+- LINE layer=X-평면도(기본형)$0$FUR handle=600E (238470.16,46180.172)->(238470.163,46181.863)
+- LINE layer=X-평면도(기본형)$0$FUR handle=600F (238470.261,46195.03)->(238470.377,46206.276)
+- LINE layer=X-평면도(기본형)$0$FUR handle=6010 (238528.573,46376.911)->(238528.875,46376.376)
+
+=== DEFINITION 16/20 (unit_id: defannot-x-0-jjbl-356) ===
+Definition name: X-평면도(기본형)$0$jjbl
+entity_count: 37
+dxf_name histogram: CIRCLE=36, LWPOLYLINE=1
+layer histogram: X-평면도(기본형)$0$TILE=37
+bbox from LINE start/end: (not derivable from LINE start/end)
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$TILE handle=7B66 vertices=4
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B67 radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B68 radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B69 radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B6A radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B6B radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B6C radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B6D radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B6E radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B6F radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B70 radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B71 radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B72 radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B73 radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B74 radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B75 radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B76 radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B77 radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B78 radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B79 radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B7A radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B7B radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B7C radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B7D radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B7E radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B7F radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B80 radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B81 radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B82 radius=10
+- CIRCLE layer=X-평면도(기본형)$0$TILE handle=7B83 radius=10
+
+=== DEFINITION 17/20 (unit_id: defannot-x-0-kh-530s-1-top-357) ===
+Definition name: X-평면도(기본형)$0$KH-530S-1 TOP
+entity_count: 132
+dxf_name histogram: ARC=24, LINE=66, LWPOLYLINE=4, SPLINE=38
+layer histogram: X-평면도(기본형)$0$FUR=132
+bbox from LINE start/end: [830447.85, -150968.431, 0, 830997.85, -150888.398, 0]
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$FUR handle=59DD vertices=18
+- LINE layer=X-평면도(기본형)$0$FUR handle=59DE (830447.85,-150945.551)->(830447.85,-150895.548)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59DF (830449,-150929.198)->(830449,-150895.548)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59E0 (830455,-150889.548)->(830455,-150888.398)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59E1 (830457,-150929.198)->(830457,-150924.275)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59E2 (830458.15,-150929.577)->(830458.15,-150924.548)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59E3 (830476,-150945.565)->(830476,-150946.076)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59E4 (830476,-150906.698)->(830476,-150905.548)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59E5 (830480.15,-150945.565)->(830480.15,-150968.431)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59E6 (830480.65,-150968.281)->(830480.65,-150945.716)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59E7 (830490,-150906.698)->(830490,-150905.548)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59E8 (830501,-150894.548)->(830501,-150889.548)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59E9 (830502.15,-150888.398)->(830502.15,-150894.548)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59EA (830466.305,-150909.561)->(830465.68,-150908.595)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59EB (830455.21,-150961.76)->(830455.932,-150962.362)
+- LWPOLYLINE layer=X-평면도(기본형)$0$FUR handle=59EC vertices=25
+- LINE layer=X-평면도(기본형)$0$FUR handle=59ED (830971.7,-150968.431)->(830965.55,-150968.431)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59EE (830480.15,-150968.431)->(830474,-150968.431)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59EF (830965.05,-150968.281)->(830480.65,-150968.281)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59F0 (830971.7,-150968.237)->(830965.55,-150968.237)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59F1 (830474,-150968.237)->(830480.15,-150968.237)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59F2 (830965.05,-150968.112)->(830480.65,-150968.112)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59F3 (830965.55,-150966.587)->(830965.05,-150966.587)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59F4 (830480.15,-150966.587)->(830480.65,-150966.587)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59F5 (830480.15,-150952.656)->(830474,-150952.656)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59F6 (830965.55,-150952.656)->(830971.7,-150952.656)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59F7 (830965.05,-150952.532)->(830480.65,-150952.532)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59F8 (830965.55,-150951.564)->(830965.05,-150951.564)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59F9 (830480.15,-150951.564)->(830480.65,-150951.564)
+- LINE layer=X-평면도(기본형)$0$FUR handle=59FA (830965.05,-150951.144)->(830480.65,-150951.144)
+
+=== DEFINITION 18/20 (unit_id: defannot-x-0-l933-top-358) ===
+Definition name: X-평면도(기본형)$0$L933 TOP
+entity_count: 191
+dxf_name histogram: ARC=16, CIRCLE=2, LINE=34, SPLINE=139
+layer histogram: X-평면도(기본형)$0$FUR=191
+bbox from LINE start/end: [830022.895, -142854.286, -0.593, 830527.895, -142364.786, 0.253]
+sampled entities (max 30):
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6371
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6372
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6373
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6374
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6375
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6376
+- LINE layer=X-평면도(기본형)$0$FUR handle=6377 (830261.591,-142564.425)->(830261.591,-142564.425)
+- LINE layer=X-평면도(기본형)$0$FUR handle=6378 (830260.972,-142564.308)->(830260.972,-142564.309)
+- LINE layer=X-평면도(기본형)$0$FUR handle=6379 (830261.749,-142556.173)->(830261.742,-142556.171)
+- LINE layer=X-평면도(기본형)$0$FUR handle=637A (830275.37,-142565.242)->(830275.37,-142565.219)
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=637B
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=637C
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=637D
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=637E
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=637F
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6380
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6381
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6382
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6383
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6384
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6385
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6386
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6387
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6388
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=6389
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=638A
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=638B
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=638C
+- LINE layer=X-평면도(기본형)$0$FUR handle=638D (830257.859,-142563.158)->(830257.859,-142563.158)
+- SPLINE layer=X-평면도(기본형)$0$FUR handle=638E
+
+=== DEFINITION 19/20 (unit_id: defannot-x-0-ng-359) ===
+Definition name: X-평면도(기본형)$0$ng
+entity_count: 23
+dxf_name histogram: INSERT=1, LINE=20, WIPEOUT=2
+layer histogram: 0=22, X-평면도(기본형)$0$국기계양대=1
+bbox from LINE start/end: [-520.287, -56, 0, 520.287, 70, 0]
+sampled entities (max 30):
+- WIPEOUT layer=0 handle=3D60
+- WIPEOUT layer=0 handle=3D61
+- INSERT layer=X-평면도(기본형)$0$국기계양대 handle=3D62 block=X-평면도(기본형)$0$국기계양대
+- LINE layer=0 handle=3D63 (498.287,-3)->(-498.287,-3)
+- LINE layer=0 handle=3D64 (-498.287,-3)->(-498.287,-53)
+- LINE layer=0 handle=3D65 (-498.287,-53)->(498.287,-53)
+- LINE layer=0 handle=3D66 (498.287,-53)->(498.287,-3)
+- LINE layer=0 handle=3D67 (510.287,70)->(520.287,70)
+- LINE layer=0 handle=3D68 (520.287,70)->(520.287,-56)
+- LINE layer=0 handle=3D69 (520.287,-56)->(498.287,-56)
+- LINE layer=0 handle=3D6A (498.287,-56)->(498.287,-53)
+- LINE layer=0 handle=3D6B (498.287,-53)->(-498.287,-53)
+- LINE layer=0 handle=3D6C (-498.287,-53)->(-498.287,-56)
+- LINE layer=0 handle=3D6D (-498.287,-56)->(-520.287,-56)
+- LINE layer=0 handle=3D6E (-520.287,-56)->(-520.287,70)
+- LINE layer=0 handle=3D6F (-520.287,70)->(-510.287,70)
+- LINE layer=0 handle=3D70 (-510.287,70)->(-510.287,0)
+- LINE layer=0 handle=3D71 (-520.287,0)->(-498.287,0)
+- LINE layer=0 handle=3D72 (-498.287,0)->(-498.287,-3)
+- LINE layer=0 handle=3D73 (-498.287,-3)->(498.287,-3)
+- LINE layer=0 handle=3D74 (498.287,-3)->(498.287,0)
+- LINE layer=0 handle=3D75 (498.287,0)->(520.287,0)
+- LINE layer=0 handle=3D76 (510.287,0)->(510.287,70)
+
+=== DEFINITION 20/20 (unit_id: defannot-x-0-pd900-360) ===
+Definition name: X-평면도(기본형)$0$pd900
+entity_count: 19
+dxf_name histogram: ARC=1, LINE=8, LWPOLYLINE=10
+layer histogram: X-평면도(기본형)$0$DOOR=19
+bbox from LINE start/end: [0, 0, 0, 900, 140, 0]
+sampled entities (max 30):
+- LWPOLYLINE layer=X-평면도(기본형)$0$DOOR handle=1BF8 vertices=4
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1BF9 (40,0)->(860,140)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1BFA (860,0)->(40,140)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1BFB (30,140)->(870,140)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1BFC (30,100)->(870,100)
+- LWPOLYLINE layer=X-평면도(기본형)$0$DOOR handle=1BFD vertices=7
+- LWPOLYLINE layer=X-평면도(기본형)$0$DOOR handle=1BFE vertices=8
+- LWPOLYLINE layer=X-평면도(기본형)$0$DOOR handle=1BFF vertices=4
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C00 (877,0)->(900,130)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C01 (877,130)->(900,0)
+- LWPOLYLINE layer=X-평면도(기본형)$0$DOOR handle=1C02 vertices=7
+- LWPOLYLINE layer=X-평면도(기본형)$0$DOOR handle=1C03 vertices=8
+- LWPOLYLINE layer=X-평면도(기본형)$0$DOOR handle=1C04 vertices=4
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C05 (23,0)->(0,130)
+- LINE layer=X-평면도(기본형)$0$DOOR handle=1C06 (23,130)->(0,0)
+- LWPOLYLINE layer=X-평면도(기본형)$0$DOOR handle=1C07 vertices=5
+- LWPOLYLINE layer=X-평면도(기본형)$0$DOOR handle=1C08 vertices=4
+- LWPOLYLINE layer=X-평면도(기본형)$0$DOOR handle=1C09 vertices=5
+- ARC layer=X-평면도(기본형)$0$DOOR handle=1C0A

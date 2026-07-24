@@ -1,0 +1,22 @@
+{
+  "family": "entities",
+  "_note": "P3b pipeline PILOT — 2 args-only create ops, evidence-grounded from m08g handler reads. Validates fragment->merge->probe->RUNNABLE end-to-end before the fleet wave.",
+  "fixtures": {
+    "write.entity.polyline3d": {
+      "args": {"layer": "ARIADNE_F1_PROBE", "points": [
+        {"x": 0.0, "y": 0.0, "z": 0.0},
+        {"x": 5.0, "y": 0.0, "z": 2.0},
+        {"x": 5.0, "y": 5.0, "z": 4.0}
+      ]},
+      "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc:673 (write.entity.polyline3d: reads 'points':[{x,y,z}] and appends AcDb3dPolyline vertices; distinct non-planar 3D path)"
+    },
+    "write.entity.mline": {
+      "args": {"layer": "ARIADNE_F1_PROBE", "points": [
+        {"x": 0.0, "y": 0.0, "z": 0.0},
+        {"x": 10.0, "y": 0.0, "z": 0.0},
+        {"x": 10.0, "y": 8.0, "z": 0.0}
+      ]},
+      "evidence": "src/Ariadne.AcadNative/families/m08g_handlers.inc:915 (write.entity.mline: m08gReadPointArray 'points'/'vertices' requires >=2 {x,y,z}; handler sets normal/justification explicitly per w3-wbug fix)"
+    }
+  }
+}

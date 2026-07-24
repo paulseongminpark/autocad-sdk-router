@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-d315-21",
+    "def": "*D315",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: vertical 5795-unit dimension with DIMDOT arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D315 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two horizontal extension lines at y=33170.207 and y=27375.207 (handles 8C0E, 8C0F) with one vertical dimension line at x=41368.83 (8C10); the gap between extension lines is exactly 5795, matching the MTEXT. Two INSERTs of arrowhead block DIMDOT and the single MTEXT (handle 8C13, '5795') complete the vertical dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d316-22",
+    "def": "*D316",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: vertical 1420-unit dimension with DIMDOT arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D316 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two horizontal extension lines at y=27375.207 and y=25955.207 (handles 8C17, 8C18) with a vertical dimension line at x=41368.83 (8C19); their separation is exactly 1420, matching the MTEXT. Two INSERTs of arrowhead block DIMDOT and the single MTEXT (handle 8C1C, '1420') complete the vertical dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d317-23",
+    "def": "*D317",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: vertical 10400-unit dimension with DIMDOT arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D317 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two horizontal extension lines at y=36080.207 and y=25680.207 (handles 8C20, 8C21) with a vertical dimension line at x=41048.83 (8C22); their separation is exactly 10400, matching the MTEXT. Two INSERTs of arrowhead block DIMDOT and the single MTEXT (handle 8C25, '10400') complete the vertical dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d318-24",
+    "def": "*D318",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: vertical 800-unit dimension with DIMDOT arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D318 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two horizontal extension lines at y=33170.207 and y=33970.207 (handles 8C29, 8C2A) with a vertical dimension line at x=41368.83 (8C2B); their separation is exactly 800, matching the MTEXT. Two INSERTs of arrowhead block DIMDOT and the single MTEXT (handle 8C2E, '800') complete the vertical dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d319-25",
+    "def": "*D319",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: vertical 375-unit dimension with DIMDOT arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D319 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two horizontal extension lines at y=35705.207 and y=36080.207 (handles 8C32, 8C33) with a vertical dimension line at x=41368.83 (8C34); their separation is exactly 375, matching the MTEXT. Two INSERTs of arrowhead block DIMDOT and the single MTEXT (handle 8C37, '375') complete the vertical dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d320-26",
+    "def": "*D320",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: vertical 185-unit dimension with _ArchTick arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D320 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two horizontal extension lines at y=27375.207 and y=27560.207 (handles 8C3B, 8C3C), a short vertical dimension line (8C3F) plus two overshoot stubs (8C3D, 8C3E); the 185 separation matches the MTEXT exactly. Two INSERTs of arrowhead block _ArchTick and the single MTEXT (handle 8C42, '185') complete the vertical dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d321-27",
+    "def": "*D321",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: vertical 2400-unit dimension with _ArchTick arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D321 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two horizontal extension lines at y=27560.207 and y=29960.207 (handles 8C46, 8C47) with a vertical dimension line at x=42008.83 (8C48); their separation is exactly 2400, matching the MTEXT. Two INSERTs of arrowhead block _ArchTick and the single MTEXT (handle 8C4B, '2400') complete the vertical dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d322-28",
+    "def": "*D322",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: vertical 80-unit dimension with _ArchTick arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D322 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two horizontal extension lines at y=29960.207 and y=30040.207 (handles 8C4F, 8C50), a short vertical dimension line (8C54) plus two overshoot stubs (8C51, 8C52); the 80 separation matches the MTEXT exactly. Two INSERTs of arrowhead block _ArchTick and the single MTEXT (handle 8C53, '80') complete the vertical dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d323-29",
+    "def": "*D323",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: vertical 80-unit dimension with _ArchTick arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D323 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two horizontal extension lines at y=30040.207 and y=30120.207 (handles 8C5A, 8C5B) with a vertical dimension line at x=42008.83 (8C5C); their separation is exactly 80, matching the MTEXT. Two INSERTs of arrowhead block _ArchTick and the single MTEXT (handle 8C5D, '80') complete the vertical dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d324-30",
+    "def": "*D324",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: vertical 2200-unit dimension with _ArchTick arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D324 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two horizontal extension lines at y=30120.207 and y=32320.207 (handles 8C63, 8C64) with a vertical dimension line at x=42008.83 (8C65); their separation is exactly 2200, matching the MTEXT. Two INSERTs of arrowhead block _ArchTick and the single MTEXT (handle 8C68, '2200') complete the vertical dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d325-31",
+    "def": "*D325",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: vertical 70-unit dimension with _ArchTick arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D325 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two horizontal extension lines at y=32320.207 and y=32390.207 (handles 8C6C, 8C6D), a short vertical dimension line (8C70) plus two overshoot stubs (8C6E, 8C6F); the 70 separation matches the MTEXT exactly. Two INSERTs of arrowhead block _ArchTick and the single MTEXT (handle 8C73, '70') complete the vertical dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d326-32",
+    "def": "*D326",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: horizontal 1820-unit dimension with DIMDOT arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D326 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two vertical extension lines at x=44248.83 and x=46068.83 (handles 8C77, 8C78) with a horizontal dimension line at y=38440.207 (8C79); their separation is exactly 1820, matching the MTEXT. Two INSERTs of arrowhead block DIMDOT and the single MTEXT (handle 8C7C, '1820') complete the horizontal dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d327-33",
+    "def": "*D327",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: horizontal 2715-unit dimension with DIMDOT arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D327 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two vertical extension lines at x=46068.83 and x=48783.83 (handles 8C80, 8C81) with a horizontal dimension line at y=38440.207 (8C82); their separation is exactly 2715, matching the MTEXT. Two INSERTs of arrowhead block DIMDOT and the single MTEXT (handle 8C85, '2715') complete the horizontal dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d328-34",
+    "def": "*D328",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: horizontal 6530-unit dimension with DIMDOT arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D328 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two vertical extension lines at x=48998.83 and x=55528.83 (handles 8C89, 8C8A) with a horizontal dimension line at y=38440.207 (8C8B); their separation is exactly 6530, matching the MTEXT. Two INSERTs of arrowhead block DIMDOT and the single MTEXT (handle 8C8E, '6530') complete the horizontal dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d329-35",
+    "def": "*D329",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: horizontal 1980-unit dimension with DIMDOT arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D329 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two vertical extension lines at x=55528.83 and x=57508.83 (handles 8C92, 8C93) with a horizontal dimension line at y=38440.207 (8C94); their separation is exactly 1980, matching the MTEXT. Two INSERTs of arrowhead block DIMDOT and the single MTEXT (handle 8C97, '1980') complete the horizontal dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d330-36",
+    "def": "*D330",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: horizontal 1840-unit dimension with DIMDOT arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D330 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two vertical extension lines at x=57508.83 and x=59348.83 (handles 8C9B, 8C9C) with a horizontal dimension line at y=38440.207 (8C9D); their separation is exactly 1840, matching the MTEXT. Two INSERTs of arrowhead block DIMDOT and the single MTEXT (handle 8CA0, '1840') complete the horizontal dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d331-37",
+    "def": "*D331",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: horizontal 15100-unit dimension with DIMDOT arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D331 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two vertical extension lines at x=44248.83 and x=59348.83 (handles 8CA4, 8CA5) with a horizontal dimension line at y=39080.207 (8CA6); their separation is exactly 15100, matching the MTEXT — an overall dimension spanning the same band as the D326-D330 chain. Two INSERTs of arrowhead block DIMDOT and the single MTEXT (handle 8CA9, '15100') complete the horizontal dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d332-38",
+    "def": "*D332",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: horizontal 240-unit dimension with _ArchTick arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D332 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two vertical extension lines at x=44248.83 and x=44488.83 (handles 8CAD, 8CAE), a short horizontal dimension line (8CB1) plus two overshoot stubs (8CAF, 8CB0); the 240 separation matches the MTEXT exactly. Two INSERTs of arrowhead block _ArchTick and the single MTEXT (handle 8CB4, '240') complete the horizontal dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d333-39",
+    "def": "*D333",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: horizontal 1500-unit dimension with _ArchTick arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D333 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two vertical extension lines at x=44488.83 and x=45988.83 (handles 8CB8, 8CB9) with a horizontal dimension line at y=38120.207 (8CBA); their separation is exactly 1500, matching the MTEXT. Two INSERTs of arrowhead block _ArchTick and the single MTEXT (handle 8CBD, '1500') complete the horizontal dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d334-40",
+    "def": "*D334",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous dimension block: horizontal 80-unit dimension with _ArchTick arrowheads on layer DIM; no wall geometry.",
+    "rationale": {
+      "evidence": "The definition name *D334 is an AutoCAD anonymous dimension block, and every visible entity sits on layer DIM with the three POINT entities on DEFPOINTS — the classic anatomy of an associative dimension's cached geometry. Two vertical extension lines at x=45988.83 and x=46068.83 (handles 8CC1, 8CC2), a short horizontal dimension line (8CC6) plus two overshoot stubs (8CC3, 8CC4); the 80 separation matches the MTEXT exactly. Two INSERTs of arrowhead block _ArchTick and the single MTEXT (handle 8CC5, '80') complete the horizontal dimension structure.",
+      "rule": "Anonymous *D### blocks whose contents are LINE + arrowhead-INSERT + MTEXT on a DIM layer plus DEFPOINTS points are dimension-geometry caches, not building geometry; the decisive confirmation is that the extension-line gap numerically equals the MTEXT value.",
+      "counterfactual": "If the block contained polylines, arcs, or hatches on wall/architectural layers, or if the MTEXT value did not equal the extension-line separation, I would reconsider it as a partial plan view or symbol rather than a dimension cache.",
+      "uncertainty": "The projection cannot show what physical feature this dimension measures or where its INSERT is placed in the host drawing, so whether the dimensioned object is a wall, opening, or something else is unknowable from the block contents alone."
+    }
+  }
+]

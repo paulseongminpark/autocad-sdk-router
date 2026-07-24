@@ -1,0 +1,1164 @@
+{
+  "seg_ir": {
+    "ir": "seg.v1",
+    "drawing_id": "0013",
+    "units": "mm",
+    "scale_mm_per_unit": null,
+    "segments": [
+      {
+        "sid": "s0001",
+        "handle": "32",
+        "pts": [
+          [
+            0.0,
+            50.0
+          ],
+          [
+            8000.0,
+            50.0
+          ]
+        ],
+        "layer": "WALL",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0002",
+        "handle": "35",
+        "pts": [
+          [
+            8120.0,
+            0.0
+          ],
+          [
+            8120.0,
+            6000.0
+          ]
+        ],
+        "layer": "WALL",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0003",
+        "handle": "36",
+        "pts": [
+          [
+            8000.0,
+            5850.0
+          ],
+          [
+            0.0,
+            5850.0
+          ]
+        ],
+        "layer": "WALL",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0004",
+        "handle": "38",
+        "pts": [
+          [
+            100.0,
+            6000.0
+          ],
+          [
+            100.0,
+            0.0
+          ]
+        ],
+        "layer": "WALL",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0005",
+        "handle": "3A",
+        "pts": [
+          [
+            4522.0,
+            0.0
+          ],
+          [
+            4522.0,
+            6000.0
+          ]
+        ],
+        "layer": "WALL",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0006",
+        "handle": "3C",
+        "pts": [
+          [
+            0.0,
+            3423.0
+          ],
+          [
+            4642.0,
+            3423.0
+          ]
+        ],
+        "layer": "WALL",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0007",
+        "handle": "3F",
+        "pts": [
+          [
+            4642.0,
+            2724.0
+          ],
+          [
+            8000.0,
+            2724.0
+          ]
+        ],
+        "layer": "WALL",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0008",
+        "handle": "41",
+        "pts": [
+          [
+            2195.0,
+            0.0
+          ],
+          [
+            2195.0,
+            3373.0
+          ]
+        ],
+        "layer": "WALL",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0009",
+        "handle": "43",
+        "pts": [
+          [
+            3082.0,
+            3373.0
+          ],
+          [
+            3082.0,
+            6000.0
+          ]
+        ],
+        "layer": "WALL",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0010",
+        "handle": "44",
+        "pts": [
+          [
+            4394.389032392771,
+            -240.0
+          ],
+          [
+            4394.389032392771,
+            240.0
+          ]
+        ],
+        "layer": "OPENING",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0011",
+        "handle": "46",
+        "pts": [
+          [
+            970.6426279842726,
+            6300.0
+          ],
+          [
+            970.6426279842726,
+            5700.0
+          ]
+        ],
+        "layer": "OPENING",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0012",
+        "handle": "47",
+        "pts": [
+          [
+            -240.0,
+            4264.599929420729
+          ],
+          [
+            240.0,
+            4264.599929420729
+          ]
+        ],
+        "layer": "OPENING",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0013",
+        "handle": "49",
+        "pts": [
+          [
+            3917.9993149209995,
+            3133.0
+          ],
+          [
+            3917.9993149209995,
+            3613.0
+          ]
+        ],
+        "layer": "OPENING",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0014",
+        "handle": "4C",
+        "pts": [
+          [
+            3247.0,
+            4521.89762966506
+          ],
+          [
+            2767.0,
+            4521.89762966506
+          ]
+        ],
+        "layer": "OPENING",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0015",
+        "handle": "50",
+        "pts": [
+          [
+            0.0,
+            3323.0
+          ],
+          [
+            4642.0,
+            3323.0
+          ]
+        ],
+        "layer": "WALL",
+        "kind": "poly-edge",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0016",
+        "handle": "51",
+        "pts": [
+          [
+            -100.0,
+            6000.0
+          ],
+          [
+            -100.0,
+            0.0
+          ]
+        ],
+        "layer": "WALL",
+        "kind": "poly-edge",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0017",
+        "handle": "52",
+        "pts": [
+          [
+            4762.0,
+            0.0
+          ],
+          [
+            4762.0,
+            6000.0
+          ]
+        ],
+        "layer": "WALL",
+        "kind": "poly-edge",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0018",
+        "handle": "53",
+        "pts": [
+          [
+            1995.0,
+            0.0
+          ],
+          [
+            1995.0,
+            3373.0
+          ]
+        ],
+        "layer": "WALL",
+        "kind": "poly-edge",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0019",
+        "handle": "54",
+        "pts": [
+          [
+            7880.0,
+            0.0
+          ],
+          [
+            7880.0,
+            6000.0
+          ]
+        ],
+        "layer": "WALL",
+        "kind": "poly-edge",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0020",
+        "handle": "55",
+        "pts": [
+          [
+            2932.0,
+            3373.0
+          ],
+          [
+            2932.0,
+            6000.0
+          ]
+        ],
+        "layer": "WALL",
+        "kind": "poly-edge",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0021",
+        "handle": "56",
+        "pts": [
+          [
+            4642.0,
+            2824.0
+          ],
+          [
+            8000.0,
+            2824.0
+          ]
+        ],
+        "layer": "WALL",
+        "kind": "poly-edge",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0022",
+        "handle": "57",
+        "pts": [
+          [
+            8000.0,
+            6150.0
+          ],
+          [
+            0.0,
+            6150.0
+          ]
+        ],
+        "layer": "WALL",
+        "kind": "poly-edge",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0023",
+        "handle": "58",
+        "pts": [
+          [
+            0.0,
+            -50.0
+          ],
+          [
+            8000.0,
+            -50.0
+          ]
+        ],
+        "layer": "WALL",
+        "kind": "poly-edge",
+        "label": "unknown",
+        "source": "native"
+      },
+      {
+        "sid": "s0024",
+        "handle": "5D",
+        "pts": [
+          [
+            298.543929228381,
+            3478.5432685205674
+          ],
+          [
+            898.543929228381,
+            3478.5432685205674
+          ]
+        ],
+        "layer": "FURN",
+        "kind": "poly-edge",
+        "label": "unknown",
+        "source": "native",
+        "insert_path": [
+          "69",
+          "66"
+        ]
+      },
+      {
+        "sid": "s0025",
+        "handle": "5D",
+        "pts": [
+          [
+            898.543929228381,
+            3478.5432685205674
+          ],
+          [
+            898.543929228381,
+            3878.5432685205674
+          ]
+        ],
+        "layer": "FURN",
+        "kind": "poly-edge",
+        "label": "unknown",
+        "source": "native",
+        "insert_path": [
+          "69",
+          "66"
+        ]
+      },
+      {
+        "sid": "s0026",
+        "handle": "5D",
+        "pts": [
+          [
+            898.543929228381,
+            3878.5432685205674
+          ],
+          [
+            298.543929228381,
+            3878.5432685205674
+          ]
+        ],
+        "layer": "FURN",
+        "kind": "poly-edge",
+        "label": "unknown",
+        "source": "native",
+        "insert_path": [
+          "69",
+          "66"
+        ]
+      },
+      {
+        "sid": "s0027",
+        "handle": "5D",
+        "pts": [
+          [
+            298.543929228381,
+            3878.5432685205674
+          ],
+          [
+            298.543929228381,
+            3478.5432685205674
+          ]
+        ],
+        "layer": "FURN",
+        "kind": "poly-edge",
+        "label": "unknown",
+        "source": "native",
+        "insert_path": [
+          "69",
+          "66"
+        ]
+      },
+      {
+        "sid": "s0028",
+        "handle": "5D",
+        "pts": [
+          [
+            298.543929228381,
+            3478.5432685205674
+          ],
+          [
+            298.543929228381,
+            3478.5432685205674
+          ]
+        ],
+        "layer": "FURN",
+        "kind": "poly-edge",
+        "label": "unknown",
+        "source": "native",
+        "insert_path": [
+          "69",
+          "66"
+        ]
+      },
+      {
+        "sid": "s0029",
+        "handle": "5E",
+        "pts": [
+          [
+            298.543929228381,
+            3478.5432685205674
+          ],
+          [
+            898.543929228381,
+            3878.5432685205674
+          ]
+        ],
+        "layer": "FURN",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native",
+        "insert_path": [
+          "69",
+          "66"
+        ]
+      },
+      {
+        "sid": "s0030",
+        "handle": "5F",
+        "pts": [
+          [
+            2521.5609295218696,
+            3192.0948034112284
+          ],
+          [
+            2041.5609295218696,
+            3192.0948034112284
+          ]
+        ],
+        "layer": "OPENING",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native",
+        "insert_path": [
+          "69",
+          "66"
+        ]
+      },
+      {
+        "sid": "s0031",
+        "handle": "60",
+        "pts": [
+          [
+            5068.560929521869,
+            1617.6748355818124
+          ],
+          [
+            4588.560929521869,
+            1617.6748355818124
+          ]
+        ],
+        "layer": "OPENING",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native",
+        "insert_path": [
+          "69",
+          "66"
+        ]
+      },
+      {
+        "sid": "s0032",
+        "handle": "61",
+        "pts": [
+          [
+            7092.488008895583,
+            3148.9125337300707
+          ],
+          [
+            7092.488008895583,
+            3628.9125337300707
+          ]
+        ],
+        "layer": "OPENING",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native",
+        "insert_path": [
+          "69",
+          "66"
+        ]
+      },
+      {
+        "sid": "s0033",
+        "handle": "62",
+        "pts": [
+          [
+            8426.56092952187,
+            3722.463710213045
+          ],
+          [
+            7946.560929521869,
+            3722.463710213045
+          ]
+        ],
+        "layer": "OPENING",
+        "kind": "line",
+        "label": "unknown",
+        "source": "native",
+        "insert_path": [
+          "69",
+          "66"
+        ]
+      }
+    ],
+    "_expand_info": {
+      "top_segments": 23,
+      "top_inserts": 1,
+      "inserts_walked": 2,
+      "nested_segments": 10
+    }
+  },
+  "scores": {
+    "per_handle": {
+      "32": {
+        "score": 1.0,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "35": {
+        "score": 0.875,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 0.5,
+          "layer": 0.0
+        }
+      },
+      "36": {
+        "score": 1.0,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "38": {
+        "score": 1.0,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "3A": {
+        "score": 1.0,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "3C": {
+        "score": 1.0,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "3F": {
+        "score": 1.0,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "41": {
+        "score": 1.0,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "43": {
+        "score": 1.0,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "44": {
+        "score": 0.78125,
+        "evidence": {
+          "parallel": 0.5,
+          "thickness": 1.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "46": {
+        "score": 0.25,
+        "evidence": {
+          "parallel": 0.0,
+          "thickness": 0.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "47": {
+        "score": 0.25,
+        "evidence": {
+          "parallel": 0.0,
+          "thickness": 0.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "49": {
+        "score": 0.25,
+        "evidence": {
+          "parallel": 0.0,
+          "thickness": 0.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "4C": {
+        "score": 0.25,
+        "evidence": {
+          "parallel": 0.0,
+          "thickness": 0.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "50": {
+        "score": 1.0,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "51": {
+        "score": 0.875,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 0.5,
+          "layer": 0.0
+        }
+      },
+      "52": {
+        "score": 1.0,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "53": {
+        "score": 1.0,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "54": {
+        "score": 1.0,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "55": {
+        "score": 1.0,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "56": {
+        "score": 1.0,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "57": {
+        "score": 0.875,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 0.5,
+          "layer": 0.0
+        }
+      },
+      "58": {
+        "score": 0.875,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 0.5,
+          "layer": 0.0
+        }
+      },
+      "5D": {
+        "score": 1.0,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "5E": {
+        "score": 0.25,
+        "evidence": {
+          "parallel": 0.0,
+          "thickness": 0.0,
+          "junction": 1.0,
+          "layer": 0.0
+        }
+      },
+      "5F": {
+        "score": 0.875,
+        "evidence": {
+          "parallel": 1.0,
+          "thickness": 1.0,
+          "junction": 0.5,
+          "layer": 0.0
+        }
+      },
+      "60": {
+        "score": 0.125,
+        "evidence": {
+          "parallel": 0.0,
+          "thickness": 0.0,
+          "junction": 0.5,
+          "layer": 0.0
+        }
+      },
+      "61": {
+        "score": 0.0,
+        "evidence": {
+          "parallel": 0.0,
+          "thickness": 0.0,
+          "junction": 0.0,
+          "layer": 0.0
+        }
+      },
+      "62": {
+        "score": 0.125,
+        "evidence": {
+          "parallel": 0.0,
+          "thickness": 0.0,
+          "junction": 0.5,
+          "layer": 0.0
+        }
+      }
+    },
+    "walls": [
+      {
+        "handles": [
+          "32",
+          "58"
+        ],
+        "axis": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            8000.0,
+            0.0
+          ]
+        ],
+        "thickness": 100.0
+      },
+      {
+        "handles": [
+          "35",
+          "54"
+        ],
+        "axis": [
+          [
+            8000.0,
+            0.0
+          ],
+          [
+            8000.0,
+            6000.0
+          ]
+        ],
+        "thickness": 240.0
+      },
+      {
+        "handles": [
+          "36",
+          "57"
+        ],
+        "axis": [
+          [
+            8000.0,
+            6000.0
+          ],
+          [
+            0.0,
+            6000.0
+          ]
+        ],
+        "thickness": 300.0
+      },
+      {
+        "handles": [
+          "38",
+          "51"
+        ],
+        "axis": [
+          [
+            0.0,
+            6000.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "thickness": 200.0
+      },
+      {
+        "handles": [
+          "3A",
+          "52"
+        ],
+        "axis": [
+          [
+            4642.0,
+            0.0
+          ],
+          [
+            4642.0,
+            6000.0
+          ]
+        ],
+        "thickness": 240.0
+      },
+      {
+        "handles": [
+          "3C",
+          "50"
+        ],
+        "axis": [
+          [
+            0.0,
+            3373.0
+          ],
+          [
+            4642.0,
+            3373.0
+          ]
+        ],
+        "thickness": 100.0
+      },
+      {
+        "handles": [
+          "3F",
+          "56"
+        ],
+        "axis": [
+          [
+            4642.0,
+            2774.0
+          ],
+          [
+            8000.0,
+            2774.0
+          ]
+        ],
+        "thickness": 100.0
+      },
+      {
+        "handles": [
+          "41",
+          "53"
+        ],
+        "axis": [
+          [
+            2095.0,
+            0.0
+          ],
+          [
+            2095.0,
+            3373.0
+          ]
+        ],
+        "thickness": 200.0
+      },
+      {
+        "handles": [
+          "43",
+          "55"
+        ],
+        "axis": [
+          [
+            3007.0,
+            3373.0
+          ],
+          [
+            3007.0,
+            6000.0
+          ]
+        ],
+        "thickness": 150.0
+      },
+      {
+        "handles": [
+          "3A",
+          "44"
+        ],
+        "axis": [
+          [
+            4458.194516,
+            -240.0
+          ],
+          [
+            4458.194516,
+            240.0
+          ]
+        ],
+        "thickness": 127.610968
+      },
+      {
+        "handles": [
+          "3C",
+          "5D"
+        ],
+        "axis": [
+          [
+            298.543929,
+            3450.771634
+          ],
+          [
+            898.543929,
+            3450.771634
+          ]
+        ],
+        "thickness": 55.543269
+      },
+      {
+        "handles": [
+          "5D",
+          "5D"
+        ],
+        "axis": [
+          [
+            898.543929,
+            3678.543269
+          ],
+          [
+            298.543929,
+            3678.543269
+          ]
+        ],
+        "thickness": 400.0
+      },
+      {
+        "handles": [
+          "38",
+          "5D"
+        ],
+        "axis": [
+          [
+            199.271965,
+            3878.543269
+          ],
+          [
+            199.271965,
+            3478.543269
+          ]
+        ],
+        "thickness": 198.543929
+      },
+      {
+        "handles": [
+          "3C",
+          "5F"
+        ],
+        "axis": [
+          [
+            2521.56093,
+            3307.547402
+          ],
+          [
+            2041.56093,
+            3307.547402
+          ]
+        ],
+        "thickness": 230.905197
+      }
+    ],
+    "unit_anchor": {
+      "scale_mm_per_unit": 1.0,
+      "confidence": 0.45,
+      "evidence": [
+        "scanned modelspace: 14 LINE(s), 0 numeric annotation(s), 0 geometric anchor(s)",
+        "INSUNITS=4 (Millimeters) -> 1 mm/unit (header only, no geometric anchor)",
+        "native-mm (INSUNITS says millimetres)"
+      ]
+    }
+  }
+}

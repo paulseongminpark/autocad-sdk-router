@@ -1,0 +1,248 @@
+{
+  "schema": "ariadne.p3b.enriched_fixture_manifest.v1",
+  "source_fixture": "tests\\fixtures\\native_sample.dwg",
+  "source_sha256": "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+  "output_fixture": "tests\\fixtures\\enriched_seed_20260716.dwg",
+  "output_sha256": "f8eba385204d1273ac3005890ba9134cff6dc5fffbde8fcdc79daeb5b9493376",
+  "builder": "tools/build_enriched_fixture.py (sequential sanctioned-probe chain)",
+  "handles": {
+    "solid_a": "19191",
+    "solid_b": "191A7",
+    "ext_dict_on_solid_a": "19191",
+    "xdata_on_solid_a": "19191",
+    "assoc_action": "19237",
+    "line_1": "191BB",
+    "line_2": "191CF",
+    "circle_1": "191E3",
+    "preexisting_insert": "11995",
+    "preexisting_insert_block": "X-평면도(기본형)$0$ev16x2k",
+    "preexisting_mtext": "1199B"
+  },
+  "steps": [
+    {
+      "step": 1,
+      "ref": "solid_a",
+      "op": "write.entity.solid3d.primitive",
+      "args": {
+        "layer": "ARIADNE_P3B_TAIL",
+        "primitive": "wedge",
+        "x_len": 2.0,
+        "y_len": 1.5,
+        "z_len": 3.5
+      },
+      "status": "ok",
+      "handle": "19191",
+      "result_keys": [
+        "created",
+        "errorstatus",
+        "handle",
+        "kind",
+        "layer",
+        "modelspace_entities_after"
+      ],
+      "staged_result_sha256": "c7ee45af6ddbc13c82cab7f10135b1fd3d5d4e8d36fc7723c2bd77617e564add",
+      "probe_result": "runs\\p3b_tail\\enrich_chain\\e01_write_entity_solid3d_primitive\\probe_result.json"
+    },
+    {
+      "step": 2,
+      "ref": "solid_b",
+      "op": "write.entity.solid3d.primitive",
+      "args": {
+        "layer": "ARIADNE_P3B_TAIL",
+        "primitive": "wedge",
+        "x_len": 2.0,
+        "y_len": 1.5,
+        "z_len": 3.5
+      },
+      "status": "ok",
+      "handle": "191A7",
+      "result_keys": [
+        "created",
+        "errorstatus",
+        "handle",
+        "kind",
+        "layer",
+        "modelspace_entities_after"
+      ],
+      "staged_result_sha256": "e44f9b3a7ddde97f02e5eb274f0af8b503c93cf5ba84325b96816a88c13aeb06",
+      "probe_result": "runs\\p3b_tail\\enrich_chain\\e02_write_entity_solid3d_primitive\\probe_result.json"
+    },
+    {
+      "step": 3,
+      "ref": "line_1",
+      "op": "write.entity.line",
+      "args": {
+        "layer": "ARIADNE_P3B_TAIL",
+        "start": {
+          "x": 1.0,
+          "y": 2.0,
+          "z": 0.0
+        },
+        "end": {
+          "x": 11.0,
+          "y": 12.0,
+          "z": 0.0
+        }
+      },
+      "status": "ok",
+      "handle": null,
+      "result_keys": [
+        "created",
+        "end",
+        "errorstatus",
+        "layer",
+        "modelspace_entities_after",
+        "start"
+      ],
+      "staged_result_sha256": "2d95575d944170e0cc9f98fd8d460b535978b03c4fe0c984edec2fde7d21efd0",
+      "probe_result": "runs\\p3b_tail\\enrich_chain\\e03_write_entity_line\\probe_result.json"
+    },
+    {
+      "step": 4,
+      "ref": "line_2",
+      "op": "write.entity.line",
+      "args": {
+        "layer": "ARIADNE_P3B_TAIL",
+        "start": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "end": {
+          "x": 10.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "status": "ok",
+      "handle": null,
+      "result_keys": [
+        "created",
+        "end",
+        "errorstatus",
+        "layer",
+        "modelspace_entities_after",
+        "start"
+      ],
+      "staged_result_sha256": "0c0597f48e2e893e7c586ffccde1eefa6ba414b62f64e27fb575ae258c8cbe97",
+      "probe_result": "runs\\p3b_tail\\enrich_chain\\e04_write_entity_line\\probe_result.json"
+    },
+    {
+      "step": 5,
+      "ref": "circle_1",
+      "op": "write.entity.circle",
+      "args": {
+        "layer": "ARIADNE_P3B_TAIL",
+        "center": {
+          "x": 12.0,
+          "y": 14.0,
+          "z": 0.0
+        },
+        "radius": 3.5
+      },
+      "status": "ok",
+      "handle": null,
+      "result_keys": [
+        "center",
+        "created",
+        "errorstatus",
+        "layer",
+        "modelspace_entities_after",
+        "radius"
+      ],
+      "staged_result_sha256": "30a8f14c0ff78e7425e236d7d665099ccb5e2833e0f3ca81f72a7be4a0fd08af",
+      "probe_result": "runs\\p3b_tail\\enrich_chain\\e05_write_entity_circle\\probe_result.json"
+    },
+    {
+      "step": 6,
+      "ref": "ext_dict_on_solid_a",
+      "op": "write.object.create_ext_dict",
+      "args": {
+        "handle": "19191"
+      },
+      "status": "ok",
+      "handle": "19191",
+      "result_keys": [
+        "created",
+        "errorstatus",
+        "existed",
+        "extension_dictionary_handle",
+        "handle"
+      ],
+      "staged_result_sha256": "500ed46c0819354ebb6eab15aeda0bc3b214325e035b21b463c44c8182932793",
+      "probe_result": "runs\\p3b_tail\\enrich_chain\\e06_write_object_create_ext_dict\\probe_result.json"
+    },
+    {
+      "step": 7,
+      "ref": "xdata_on_solid_a",
+      "op": "modify.entity.xdata",
+      "args": {
+        "handle": "19191",
+        "app_name": "ARIADNE_P3B_TAIL",
+        "values": [
+          {
+            "code": 1000,
+            "value": "p3b-tail-enriched"
+          },
+          {
+            "code": 1040,
+            "value": 42.5
+          }
+        ]
+      },
+      "status": "ok",
+      "handle": "19191",
+      "result_keys": [
+        "app_name",
+        "errorstatus",
+        "handle",
+        "item_count",
+        "set"
+      ],
+      "staged_result_sha256": "85b505e217d5c875fe8a555184d355324689c38d0381975618c92f74c3b0d6cb",
+      "probe_result": "runs\\p3b_tail\\enrich_chain\\e07_modify_entity_xdata\\probe_result.json"
+    },
+    {
+      "step": 8,
+      "ref": "layerstate",
+      "op": "write.layerstate.save",
+      "args": {
+        "name": "ARIADNE_P3B_TAIL_LS",
+        "description": "P3b tail enriched fixture layer state",
+        "mask": [
+          "all"
+        ],
+        "overwrite": 1
+      },
+      "status": "ok",
+      "handle": null,
+      "result_keys": [
+        "description",
+        "description_error",
+        "layer_count",
+        "mask",
+        "name",
+        "overwritten",
+        "saved"
+      ],
+      "staged_result_sha256": "33595deb673a55316d374421587873c18f5c0c5ae2a9d00e7317026b2596a637",
+      "probe_result": "runs\\p3b_tail\\enrich_chain\\e08_write_layerstate_save\\probe_result.json"
+    },
+    {
+      "step": 9,
+      "ref": "assoc_action",
+      "op": "define.assocaction.create",
+      "args": {},
+      "status": "ok",
+      "handle": "19237",
+      "result_keys": [
+        "action_handle",
+        "created",
+        "evaluated",
+        "network_handle"
+      ],
+      "staged_result_sha256": "f8eba385204d1273ac3005890ba9134cff6dc5fffbde8fcdc79daeb5b9493376",
+      "probe_result": "runs\\p3b_tail\\enrich_chain\\e09_define_assocaction_create\\probe_result.json"
+    }
+  ]
+}

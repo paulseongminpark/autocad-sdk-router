@@ -1,0 +1,78 @@
+{
+ "schema": "ariadne.read_bench.scores.v0",
+ "passed": 10,
+ "total": 10,
+ "suspicious": 0,
+ "detail": [
+  {
+   "id": "READ-001",
+   "ok": true,
+   "answer": 375,
+   "gold": 375,
+   "method_suspicious": false
+  },
+  {
+   "id": "READ-002",
+   "ok": true,
+   "answer": 113,
+   "gold": 113,
+   "method_suspicious": false
+  },
+  {
+   "id": "READ-003",
+   "ok": true,
+   "answer": 117,
+   "gold": 117,
+   "method_suspicious": false
+  },
+  {
+   "id": "READ-004",
+   "ok": true,
+   "answer": 407,
+   "gold": 407,
+   "method_suspicious": false
+  },
+  {
+   "id": "READ-005",
+   "ok": true,
+   "answer": 113,
+   "gold": 113,
+   "method_suspicious": false
+  },
+  {
+   "id": "READ-006",
+   "ok": true,
+   "answer": 28183,
+   "gold": 28183,
+   "method_suspicious": false
+  },
+  {
+   "id": "READ-007",
+   "ok": true,
+   "answer": 265,
+   "gold": 265,
+   "method_suspicious": false
+  },
+  {
+   "id": "READ-008",
+   "ok": true,
+   "answer": 6,
+   "gold": 6,
+   "method_suspicious": false
+  },
+  {
+   "id": "READ-009",
+   "ok": true,
+   "answer": 50,
+   "gold": 50,
+   "method_suspicious": false
+  },
+  {
+   "id": "READ-010",
+   "ok": true,
+   "answer": "X-평면도(기본형)",
+   "gold": "X-평면도(기본형)",
+   "method_suspicious": false
+  }
+ ]
+}

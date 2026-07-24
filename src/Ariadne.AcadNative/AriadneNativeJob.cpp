@@ -1048,7 +1048,7 @@ static std::string xdataBlocksJson(resbuf* rb, int& blockCount, int& itemCount)
             firstItem = true;
             const ACHAR* raw = cur->resval.rstring;
             arr << "{\"app\":\"" << jsonEscape(raw != nullptr ? acharToAscii(raw) : std::string())
-                << "\",\"items\":[";
+                << "\",\"rows\":[";
             ++blockCount;
             continue;
         }
@@ -1058,7 +1058,7 @@ static std::string xdataBlocksJson(resbuf* rb, int& blockCount, int& itemCount)
             firstBlock = false;
             blockOpen = true;
             firstItem = true;
-            arr << "{\"app\":\"\",\"items\":[";
+            arr << "{\"app\":\"\",\"rows\":[";
             ++blockCount;
         }
         if (!firstItem)
@@ -1173,23 +1173,23 @@ static std::string extensionDictionaryJson(const std::string& ownerHandle,
 }
 
 // a1-hatchread: one hatch boundary edge, from the AcDbHatch::getLoopAt edge-array
-// overload. edgePtr is the raw AcGeVoidPointerArray element for this edge;
-// edgeType is AutoCAD's own AcDbHatch::HatchEdgeType tag (kLine=1/kCirArc=2/
-// kEllArc=3/kSpline=4) telling us which AcGeCurve2d subclass it actually points
-// at -- ObjectARX's documented contract is that EACH of these edge objects is
-// individually heap-allocated by getLoopAt and ownership passes to the caller
-// (must be deleted here, once, after this function has read it). Coordinates
-// are the curve's own 2D (loop-plane) values -- the hatch's elevation/normal
-// (emitted once at the entity level, not per-edge) already places that plane
-// in space, so no z is fabricated here (unlike the polyline-loop vertices
-// below, which keep the pre-existing "[x,y,elevation]" shape for continuity
-// with what op_roundtrip_probe/ir_builder already expect from THAT branch).
-static std::string hatchEdgeJson(void* edgePtr, int edgeType)
+// overload. edgePtr is the raw AcGeVoidPointerArray element for this edge.
+// getLoopAt also returns AutoCAD's HatchEdgeType tag per edge, but the JSON
+// contract here intentionally keys off the AcGeCurve2d object's own type() so
+// the emitted shape matches the real subclass. ObjectARX returns each edge
+// heap-allocated; this TU already takes ownership of recognized types and
+// deletes them after serialization, so this helper keeps that same memory
+// discipline. Coordinates are the curve's own 2D (loop-plane) values -- the
+// hatch's elevation/normal already places that plane in space, so no z is
+// fabricated here.
+static std::string hatchEdgeJson(void* edgePtr, int /*edgeType*/)
 {
     std::ostringstream o; o.precision(kJsonDoublePrecision);
-    switch (edgeType) {
-    case AcDbHatch::kLine: {
-        AcGeLineSeg2d* seg = static_cast<AcGeLineSeg2d*>(edgePtr);
+    AcGeCurve2d* curve = static_cast<AcGeCurve2d*>(edgePtr);
+    const int curveType = curve ? static_cast<int>(curve->type()) : -1;
+    switch (curve ? curve->type() : static_cast<AcGe::EntityId>(-1)) {
+    case AcGe::kLineSeg2d: {
+        AcGeLineSeg2d* seg = static_cast<AcGeLineSeg2d*>(curve);
         const AcGePoint2d sp = seg->startPoint();
         const AcGePoint2d ep = seg->endPoint();
         o << "{\"type\":\"line\""
@@ -1198,35 +1198,37 @@ static std::string hatchEdgeJson(void* edgePtr, int edgeType)
         delete seg;
         break;
     }
-    case AcDbHatch::kCirArc: {
-        AcGeCircArc2d* a = static_cast<AcGeCircArc2d*>(edgePtr);
+    case AcGe::kCircArc2d: {
+        AcGeCircArc2d* a = static_cast<AcGeCircArc2d*>(curve);
         const AcGePoint2d c = a->center();
-        o << "{\"type\":\"circ_arc\""
+        o << "{\"type\":\"arc\""
           << ",\"center\":[" << c.x << "," << c.y << "]"
           << ",\"radius\":" << a->radius()
           << ",\"start_angle\":" << a->startAng()
           << ",\"end_angle\":" << a->endAng()
-          << ",\"counterclockwise\":" << (a->isClockWise() ? "false" : "true") << "}";
+          << ",\"ccw\":" << (a->isClockWise() ? "false" : "true") << "}";
         delete a;
         break;
     }
-    case AcDbHatch::kEllArc: {
-        AcGeEllipArc2d* e = static_cast<AcGeEllipArc2d*>(edgePtr);
+    case AcGe::kEllipArc2d: {
+        AcGeEllipArc2d* e = static_cast<AcGeEllipArc2d*>(curve);
         const AcGePoint2d c = e->center();
-        const AcGeVector2d maj = e->majorAxis();
-        o << "{\"type\":\"ellipse_arc\""
+        const AcGeVector2d majorAxis = e->majorAxis();
+        const double majorRadius = e->majorRadius();
+        const double minorRadius = e->minorRadius();
+        const double ratio = (majorRadius != 0.0) ? (minorRadius / majorRadius) : 0.0;
+        o << "{\"type\":\"ellipse\""
           << ",\"center\":[" << c.x << "," << c.y << "]"
-          << ",\"major_axis\":[" << maj.x << "," << maj.y << "]"
-          << ",\"major_radius\":" << e->majorRadius()
-          << ",\"minor_radius\":" << e->minorRadius()
+          << ",\"major\":[" << (majorAxis.x * majorRadius) << "," << (majorAxis.y * majorRadius) << "]"
+          << ",\"ratio\":" << ratio
           << ",\"start_angle\":" << e->startAng()
           << ",\"end_angle\":" << e->endAng()
-          << ",\"counterclockwise\":" << (e->isClockWise() ? "false" : "true") << "}";
+          << ",\"ccw\":" << (e->isClockWise() ? "false" : "true") << "}";
         delete e;
         break;
     }
-    case AcDbHatch::kSpline: {
-        AcGeNurbCurve2d* n = static_cast<AcGeNurbCurve2d*>(edgePtr);
+    case AcGe::kNurbCurve2d: {
+        AcGeNurbCurve2d* n = static_cast<AcGeNurbCurve2d*>(curve);
         int degree = 0;
         Adesk::Boolean rational = Adesk::kFalse, periodic = Adesk::kFalse;
         AcGeKnotVector knots;
@@ -1248,23 +1250,28 @@ static std::string hatchEdgeJson(void* edgePtr, int edgeType)
             kns << knots[ki];
         }
         kns << "]";
+        std::ostringstream wts; wts.precision(kJsonDoublePrecision);
+        wts << "[";
+        for (int wi = 0; wi < weights.length(); ++wi) {
+            if (wi) wts << ",";
+            wts << weights[wi];
+        }
+        wts << "]";
         o << "{\"type\":\"spline\""
           << ",\"degree\":" << degree
+          << ",\"control\":" << cps.str()
+          << ",\"knots\":" << kns.str()
           << ",\"rational\":" << (rational ? "true" : "false")
-          << ",\"periodic\":" << (periodic ? "true" : "false")
-          << ",\"control_points\":" << cps.str()
-          << ",\"knots\":" << kns.str() << "}";
+          << ",\"weights\":" << wts.str() << "}";
         delete n;
         break;
     }
     default:
-        // No-fake-success: an edge type AutoCAD did not document to us yet
-        // (HatchEdgeType is a closed 4-value enum today) is surfaced honestly
-        // instead of silently dropped or misdecoded. Nothing to delete: we
-        // never cast (and therefore never identified an owning type for) an
-        // unrecognized edgePtr, so leaking a typed delete on an unknown
-        // subclass would be worse than leaving this one edge unreleased.
-        o << "{\"type\":\"unknown\",\"raw_edge_type\":" << edgeType << "}";
+        // No-fake-success: an unexpected AcGe subtype is surfaced honestly and
+        // countably instead of silently dropped. We do NOT delete unknown
+        // subclasses through AcGeCurve2d* here because this TU only performs
+        // typed deletes for recognized edge classes.
+        o << "{\"type\":\"unsupported_" << curveType << "\"}";
         break;
     }
     return o.str();
@@ -1340,6 +1347,39 @@ static std::string hatchLoopsJson(AcDbHatch* pHatch, int& loopCount, int& vertex
             }
             arr << "]}";
         }
+    }
+    arr << "]";
+    return arr.str();
+}
+
+static std::string hatchPatternDefinitionsJson(AcDbHatch* pHatch)
+{
+    std::ostringstream arr; arr.precision(kJsonDoublePrecision);
+    arr << "[";
+    bool firstDef = true;
+    const int defs = pHatch->numPatternDefinitions();
+    for (int di = 0; di < defs; ++di) {
+        double angle = 0.0, baseX = 0.0, baseY = 0.0, offsetX = 0.0, offsetY = 0.0;
+        AcGeDoubleArray dashes;
+        const Acad::ErrorStatus es =
+            pHatch->getPatternDefinitionAt(di, angle, baseX, baseY, offsetX, offsetY, dashes);
+        if (es != Acad::eOk)
+            continue;
+        if (!firstDef)
+            arr << ",";
+        firstDef = false;
+        // ObjectARX reports hatch definition angles in radians; preserve that
+        // verbatim so .pat synthesis is the single degrees-conversion site.
+        arr << "{\"angle\":" << angle
+            << ",\"base\":[" << baseX << "," << baseY << "]"
+            << ",\"offset\":[" << offsetX << "," << offsetY << "]"
+            << ",\"dashes\":[";
+        for (int dashIdx = 0; dashIdx < dashes.length(); ++dashIdx) {
+            if (dashIdx != 0)
+                arr << ",";
+            arr << dashes[dashIdx];
+        }
+        arr << "]}";
     }
     arr << "]";
     return arr.str();
@@ -1853,7 +1893,13 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
             int loopCount = 0, vertexCount = 0;
             const std::string loopsJson = hatchLoopsJson(pHatch, loopCount, vertexCount);
             const AcGeVector3d hNormal = pHatch->normal();
+            const bool isSolidFill = pHatch->isSolidFill() ? true : false;
             const bool isGradientHatch = pHatch->isGradient() ? true : false;
+            const bool isAssociativeHatch = pHatch->associative() ? true : false;
+            const int patternDefinitionCount =
+                (!isSolidFill && !isGradientHatch) ? pHatch->numPatternDefinitions() : 0;
+            const std::string patternDefinitionsJson =
+                (patternDefinitionCount > 0) ? hatchPatternDefinitionsJson(pHatch) : std::string();
             // a1-hatchread: pattern/style/gradient state -- previously only
             // pattern_name + loops surfaced; is_solid_fill/is_associative/
             // pattern_scale/pattern_angle/pattern_double/hatch_style/elevation/
@@ -1872,27 +1918,59 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
                 // DXF value, verified exactly, 0 exceptions across 669).
                 << ",\"pattern_angle\":" << pHatch->patternAngle()
                 << ",\"pattern_scale\":" << pHatch->patternScale()
+                // Per-hatch pattern origin (HPORIGIN) -- the phase anchor the
+                // R4l residue analysis had to INFER from scale-baked
+                // getPatternDefinitionAt bases (21/22 boundary-paired custom
+                // hatches differed only here). Direct read for direct replay.
+                << ",\"pattern_origin\":[" << pHatch->originPoint().x
+                << "," << pHatch->originPoint().y << "]"
                 << ",\"pattern_double\":" << (pHatch->patternDouble() ? "true" : "false")
                 << ",\"hatch_style\":" << static_cast<int>(pHatch->hatchStyle())
-                << ",\"is_solid_fill\":" << (pHatch->isSolidFill() ? "true" : "false")
-                << ",\"is_associative\":" << (pHatch->associative() ? "true" : "false")
-                << ",\"is_gradient\":" << (isGradientHatch ? "true" : "false")
+                << ",\"is_solid_fill\":" << (isSolidFill ? "true" : "false")
+                << ",\"is_associative\":" << (isAssociativeHatch ? "true" : "false");
+            // R4n census 2026-07-09: 66 assoc-mismatch hatch pairs;
+            // loops carry no source refs, so this field is the re-link prerequisite.
+            // 2026-07-10 census probe: the hatch-level getAssocObjIds read 0/66
+            // on 1.dwg -- the real store is loop-local. Emit array-of-arrays
+            // aligned to loops[] via getAssocObjIdsAt (design contract in
+            // docs/ASSOC_RELINK_DESIGN.md); when every loop reads empty the
+            // field is omitted entirely (Missing == unsupported, honest).
+            if (isAssociativeHatch) {
+                const int assocLoopCount = pHatch->numLoops();
+                std::string assocJson("[");
+                bool anyLoopIds = false;
+                for (int li = 0; li < assocLoopCount; ++li) {
+                    if (li) assocJson += ",";
+                    assocJson += "[";
+                    AcDbObjectIdArray loopIds;
+                    if (pHatch->getAssocObjIdsAt(li, loopIds) == Acad::eOk) {
+                        for (int ai = 0; ai < loopIds.length(); ++ai) {
+                            if (ai) assocJson += ",";
+                            assocJson += "\"";
+                            assocJson += jsonEscape(handleOfId(loopIds[ai]));
+                            assocJson += "\"";
+                            anyLoopIds = true;
+                        }
+                    }
+                    assocJson += "]";
+                }
+                assocJson += "]";
+                if (anyLoopIds) {
+                    arr << ",\"assoc_source_handles\":" << assocJson;
+                }
+            }
+            arr << ",\"is_gradient\":" << (isGradientHatch ? "true" : "false")
                 << ",\"elevation\":" << pHatch->elevation()
                 << ",\"normal\":[" << hNormal.x << "," << hNormal.y << "," << hNormal.z << "]"
                 << ",\"loop_count\":" << loopCount
                 << ",\"loops\":" << loopsJson;
+            if (patternDefinitionCount > 0)
+                arr << ",\"pattern_definitions\":" << patternDefinitionsJson;
             if (isGradientHatch) {
                 arr << ",\"gradient_name\":\"" << jsonEscape(acharToAscii(pHatch->gradientName())) << "\""
                     << ",\"gradient_type\":" << static_cast<int>(pHatch->gradientType())
                     << ",\"gradient_angle\":" << pHatch->gradientAngle();
             }
-            // Associated boundary object ids (associative hatches only, via
-            // getAssocObjIdsAt) are deliberately NOT resolved here: those ids
-            // name the OTHER entities (e.g. a circle) this hatch tracks, which
-            // is live-DB-state, not a property of the hatch itself -- same
-            // reasoning T3a's dim_block_handle omission-from-geometry already
-            // documents for dimensions (see op_roundtrip_probe.py). Noted as
-            // an honest exclusion, not silently dropped.
             richCounters.hatchLoops += loopCount;
             richCounters.hatchLoopVertices += vertexCount;
         }
@@ -3115,13 +3193,10 @@ static std::string vportsRichJson(AcDbDatabase* pDb, int& count)
 // LINETYPE table with the D-class TABLES tier's representative field subset
 // (w3-ltts): AcDbLinetypeTableRecord's own name/comments plus its dash
 // pattern (numDashes()/dashLengthAt(i) -- positive=dash, negative=gap, 0=dot,
-// per DXF/AutoCAD LINETYPE semantics). patternLength() is AutoCAD-maintained
-// FROM the dash array rather than an independent write input, so it is out
-// of scope here -- not part of write.linetype.create's own write contract
-// (see LinetypePropertyArgs below). Complex-linetype shape/text embedding
-// (shapeStyleAt/textAt et al.) is likewise out of scope: this covers simple
-// dash-only patterns only, the same "representative, not exhaustive" scoping
-// dimStylesRichJson already established for DIMVARs above.
+// per DXF/AutoCAD LINETYPE semantics). P5b also emits the synthesis-ready
+// pattern metadata and complex-linetype text/shape markers so .lin sidecar
+// generation can consume real extractor rows and defer unsupported segments
+// honestly.
 static std::string linetypesRichJson(AcDbDatabase* pDb, int& count)
 {
     count = 0;
@@ -3154,6 +3229,8 @@ static std::string linetypesRichJson(AcDbDatabase* pDb, int& count)
             arr << "{\"handle\":\"" << jsonEscape(handle) << "\""
                 << ",\"name\":\"" << jsonEscape(name) << "\""
                 << ",\"description\":\"" << jsonEscape(comments) << "\""
+                << ",\"pattern_length\":" << pRec->patternLength()
+                << ",\"is_scaled_to_fit\":" << (pRec->isScaledToFit() ? "true" : "false")
                 << ",\"dash_lengths\":[";
             const int numDashes = pRec->numDashes();
             for (int di = 0; di < numDashes; ++di) {
@@ -3161,7 +3238,31 @@ static std::string linetypesRichJson(AcDbDatabase* pDb, int& count)
                     arr << ",";
                 arr << pRec->dashLengthAt(di);
             }
-            arr << "]}";
+            arr << "]";
+            if (numDashes > 0) {
+                arr << ",\"dashes\":[";
+                for (int di = 0; di < numDashes; ++di) {
+                    if (di > 0)
+                        arr << ",";
+                    arr << "{\"length\":" << pRec->dashLengthAt(di);
+                    const ACHAR* textRaw = nullptr;
+                    if (pRec->textAt(di, textRaw) == Acad::eOk && textRaw != nullptr && textRaw[0] != 0)
+                        arr << ",\"text\":\"" << jsonEscape(acharToAscii(textRaw)) << "\"";
+                    const AcDbObjectId shapeStyleId = pRec->shapeStyleAt(di);
+                    if (!shapeStyleId.isNull()) {
+                        arr << ",\"shape\":true"
+                            << ",\"shape_number\":" << pRec->shapeNumberAt(di)
+                            << ",\"shape_style_handle\":\"" << jsonEscape(handleOfId(shapeStyleId)) << "\""
+                            << ",\"shape_scale\":" << pRec->shapeScaleAt(di)
+                            << ",\"shape_rotation\":" << pRec->shapeRotationAt(di)
+                            << ",\"shape_is_ucs_oriented\":"
+                            << (pRec->shapeIsUcsOrientedAt(di) ? "true" : "false");
+                    }
+                    arr << "}";
+                }
+                arr << "]";
+            }
+            arr << "}";
             ++count;
             pRec->close();
         }
@@ -3239,20 +3340,21 @@ static std::string textStylesRichJson(AcDbDatabase* pDb, int& count)
     return arr.str();
 }
 
-// Block table records + the user-block-definition projection. w3-blockdef:
-// def geometry is now INLINED under block_definitions[].def_entities (the
-// docs/DWG_GRAPH_IR_SPEC.md Section 4.3 "inlined" strategy) via the SAME
-// collectEntitiesFromBlock per-entity extraction collectModelSpaceGraph
-// uses -- NOT referenced from the top-level entities[] by owner_handle. The
-// flat entities[] stays modelspace-only; its length is the golden-pinned
-// truth-gate numerator (tests/golden/expected_counts.json's
-// modelspace_total), so block-def contents must never be appended there.
+// Block table records + the capturable block-definition projection.
+// w3-blockdef: def geometry is now INLINED under
+// block_definitions[].def_entities (the docs/DWG_GRAPH_IR_SPEC.md Section
+// 4.3 "inlined" strategy) via the SAME collectEntitiesFromBlock per-entity
+// extraction collectModelSpaceGraph uses -- NOT referenced from the top-level
+// entities[] by owner_handle. The flat entities[] stays modelspace-only; its
+// length is the golden-pinned truth-gate numerator
+// (tests/golden/expected_counts.json's modelspace_total), so block-def
+// contents must never be appended there.
 static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
-                                         int& userBlockDefs,
+                                         int& capturedBlockDefs,
                                          std::string& blockDefsJson)
 {
     btrCount = 0;
-    userBlockDefs = 0;
+    capturedBlockDefs = 0;
     std::ostringstream arr; arr.precision(kJsonDoublePrecision);
     arr << "[";
     bool first = true;
@@ -3281,31 +3383,23 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
             const bool isLayout = pBTR->isLayout();
             const bool isAnon = pBTR->isAnonymous();
             const bool isXref = pBTR->isFromExternalReference();
-            const bool isUserBlock = !isLayout && !isAnon && !isXref;
-            // #66/#68: anonymous blocks hold real referenced geometry --
-            // *D### dimension blocks (rendered dimension geometry), and
-            // *U###/*X###/*T### dynamic-block/array/table representations that
-            // model-space INSERTs point at. Deferring the *U/*X/etc. defs made
-            // the builder unable to resolve those inserts, dropping large amounts
-            // of real content (repeated symbols, detail callouts inside sheets).
-            // Collect ALL anonymous block defs (layouts + xref contents are still
-            // excluded: isUserBlock already gates those out, and isAnon is false
-            // for *Model_Space/*Paper_Space which are walked separately).
-            const bool collectDefs = isUserBlock || isAnon;
+            // Capture every non-layout, non-xref block definition. Named
+            // defs preserve the legacy payload shape; anonymous *U###/*D###
+            // defs gain only an additive "anonymous":true marker so
+            // downstream rebuild can distinguish clone/remap paths later.
+            // (#66 note: this SUPERSET already covers PR #29's *D### dimension-
+            // block collection -- *D defs carry the rendered dimension geometry,
+            // and *U/*X dynamic-block reps are captured too.)
+            const bool emitBlockDef = !isLayout && !isXref;
             int entityCount = 0;
             std::string defEntitiesJson = "[]";
-            if (collectDefs) {
-                // w3-blockdef: full contents extraction for user block defs
-                // only (*Model_Space/paper-space layouts are already walked
-                // elsewhere; anonymous *U###/*D### and xref block contents
-                // are a documented v1 deferral, same class as attributes/
-                // nested-block recursion). entityCount comes from this SAME
-                // walk, so it can never disagree with len(def_entities).
-                // extension-dictionary/xrecord content and richCounters
-                // aggregation for block-def-owned entities are local/
-                // discarded here (v1 scope) -- the top-level
-                // extension_dictionaries[]/xrecords[]/coverage.counts stay
-                // modelspace-only, byte-identical to before this change.
+            if (emitBlockDef) {
+                // entityCount comes from this SAME walk, so it can never
+                // disagree with len(def_entities). extension-dictionary/
+                // xrecord content and richCounters aggregation for block-def-
+                // owned entities are local/discarded here (v1 scope) -- the
+                // top-level extension_dictionaries[]/xrecords[]/coverage.counts
+                // stay modelspace-only, byte-identical to before this change.
                 std::string defExtDicts, defExtXrecords;
                 RichGraphCounters localCounters;
                 collectEntitiesFromBlock(pBTR, "block", entityCount, defEntitiesJson,
@@ -3329,14 +3423,16 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
                 << ",\"is_xref\":" << (isXref ? "true" : "false")
                 << ",\"entity_count\":" << entityCount << "}";
             ++btrCount;
-            if (collectDefs) {
-                ++userBlockDefs;
+            if (emitBlockDef) {
+                ++capturedBlockDefs;
                 if (!dfirst)
                     defs << ",";
                 dfirst = false;
                 defs << "{\"handle\":\"" << jsonEscape(handle) << "\""
-                     << ",\"name\":\"" << jsonEscape(name) << "\""
-                     << ",\"entity_count\":" << entityCount
+                     << ",\"name\":\"" << jsonEscape(name) << "\"";
+                if (isAnon)
+                    defs << ",\"anonymous\":true";
+                defs << ",\"entity_count\":" << entityCount
                      << ",\"def_entities\":" << defEntitiesJson << "}";
             }
             pBTR->close();
@@ -3556,9 +3652,9 @@ static std::string collectDatabaseGraph(AcDbDatabase* pDb,
         << ",\"views\":" << viewsJson << "}";
     addPresent("symbol_tables");
 
-    int btrCount = 0, userBlockDefs = 0;
+    int btrCount = 0, capturedBlockDefs = 0;
     std::string blockDefsJson;
-    const std::string btrJson = blockTableRecordsJson(pDb, btrCount, userBlockDefs, blockDefsJson);
+    const std::string btrJson = blockTableRecordsJson(pDb, btrCount, capturedBlockDefs, blockDefsJson);
     sec << ",\"block_table_records\":" << btrJson
         << ",\"block_definitions\":" << blockDefsJson;
     addPresent("block_table_records");
@@ -3613,7 +3709,7 @@ static std::string collectDatabaseGraph(AcDbDatabase* pDb,
         << ",\"ucs\":" << ucsCount
         << ",\"views\":" << viewCount
         << ",\"block_table_records\":" << btrCount
-        << ",\"block_definitions\":" << userBlockDefs
+        << ",\"block_definitions\":" << capturedBlockDefs
         << ",\"layouts\":" << layoutCount
         << ",\"xrefs\":" << xrefCount
         << ",\"dictionary_entries\":" << dictEntryCount
@@ -5689,7 +5785,8 @@ static bool listModelSpaceEntities(AcDbDatabase* pDb, const std::string& type,
 static Acad::ErrorStatus createSimpleBlock(AcDbDatabase* pDb,
                                            const std::string& name,
                                            bool& created,
-                                           int& definitionCount)
+                                           int& definitionCount,
+                                           bool seedLine = true)
 {
     created = false;
     definitionCount = 0;
@@ -5720,16 +5817,25 @@ static Acad::ErrorStatus createSimpleBlock(AcDbDatabase* pDb,
         return es;
     }
 
-    AcDbLine* pLine = new AcDbLine(AcGePoint3d(0.0, 0.0, 0.0),
-                                  AcGePoint3d(5.0, 0.0, 0.0));
-    AcDbObjectId lineId;
-    es = pBlock->appendAcDbEntity(lineId, pLine);
-    if (es == Acad::eOk) {
-        pLine->close();
-        created = true;
+    if (seedLine) {
+        // Self-test heritage: the original op proved writability by seeding a
+        // visible line. Regen synthesis passes seed_line=0 - a phantom
+        // (0,0,0)->(5,0,0) line in every rebuilt definition was the measured
+        // "+1 per def" fixed-point drift (GEN2 / R4b blockdef_diff).
+        AcDbLine* pLine = new AcDbLine(AcGePoint3d(0.0, 0.0, 0.0),
+                                      AcGePoint3d(5.0, 0.0, 0.0));
+        AcDbObjectId lineId;
+        es = pBlock->appendAcDbEntity(lineId, pLine);
+        if (es == Acad::eOk) {
+            pLine->close();
+            created = true;
+        }
+        else {
+            delete pLine;
+        }
     }
     else {
-        delete pLine;
+        created = true;
     }
     pBlock->close();
 
@@ -6304,9 +6410,10 @@ static void ariadneNativeJob()
     else if (op == "inspect.database.graph") {
         // Pure DB read -> NO host gating (runs in coreconsole + full_autocad).
         // The enclosing AriadneDocumentWriteLock is kept as-is (harmless for a
-        // read). modelspace_entities is the array length by construction, so the
-        // emitted count and entities[] are internally consistent and (modulo the
-        // same model-space walk) equal to inspect.database.summary's count.
+        // read). entities[] now holds model space PLUS every non-Model layout's
+        // paper space (spliced in below), so modelspace_entities is no longer
+        // the array length by construction -- entities[].length ==
+        // modelspace_entities + paperspace_entities.
         int total = 0;
         std::string entitiesJson;
         std::string extensionDictionariesJson;
@@ -6319,6 +6426,54 @@ static void ariadneNativeJob()
             extensionDictionariesJson = "[]";
             extensionXrecordsJson = "[]";
         }
+
+        // w-paperscope: splice paper-space (layout) entities into entities[]
+        // using the SAME per-entity walker (collectEntitiesFromBlock,
+        // spaceLabel="paper") model space and block defs already use. Layout
+        // enumeration mirrors layoutsRichJson (~line 3280) above. The "Model"
+        // layout is skipped (already walked via collectModelSpaceGraph).
+        // Paper entities' extension-dictionary/xrecord CONTENTS are folded into the
+        // same top-level rich sections as model space (below), so the shared
+        // richCounters stay consistent with the emitted content: a paper entity that
+        // increments a coverage counter also lands in the emitted arrays (SBC audit).
+        int paperTotal = 0;
+        AcDbDictionary* pLayouts = nullptr;
+        if (pDb->getLayoutDictionary(pLayouts, AcDb::kForRead) == Acad::eOk) {
+            AcDbDictionaryIterator* pIt = pLayouts->newIterator();
+            for (; pIt != nullptr && !pIt->done(); pIt->next()) {
+                AcDbObject* pObj = nullptr;
+                if (acdbOpenObject(pObj, pIt->objectId(), AcDb::kForRead) == Acad::eOk) {
+                    AcDbLayout* pLayout = AcDbLayout::cast(pObj);
+                    if (pLayout != nullptr) {
+                        const ACHAR* nameRaw = nullptr;
+                        std::string layoutName;
+                        if (pLayout->getLayoutName(nameRaw) == Acad::eOk)
+                            layoutName = acharToAscii(nameRaw);
+                        if (layoutName != "Model") {
+                            AcDbBlockTableRecord* pBTR = nullptr;
+                            if (acdbOpenObject(pBTR, pLayout->getBlockTableRecordId(),
+                                                AcDb::kForRead) == Acad::eOk) {
+                                int paperCount = 0;
+                                std::string paperEntitiesJson, paperExtDicts, paperXrecords;
+                                if (collectEntitiesFromBlock(
+                                        pBTR, "paper", paperCount, paperEntitiesJson,
+                                        paperExtDicts, paperXrecords, richCounters)) {
+                                    entitiesJson = mergeJsonArrays(entitiesJson, paperEntitiesJson);
+                                    extensionDictionariesJson = mergeJsonArrays(extensionDictionariesJson, paperExtDicts);
+                                    extensionXrecordsJson = mergeJsonArrays(extensionXrecordsJson, paperXrecords);
+                                    paperTotal += paperCount;
+                                }
+                                pBTR->close();
+                            }
+                        }
+                    }
+                    pObj->close();
+                }
+            }
+            delete pIt;
+            pLayouts->close();
+        }
+
         // M02: rich database graph (symbol tables, blocks, layouts, xrefs,
         // dictionaries, xrecords) spliced alongside the model-space entities[].
         // collectDatabaseGraph is a guarded pure read; coverage reports which
@@ -6327,6 +6482,7 @@ static void ariadneNativeJob()
         const std::string richSections = collectDatabaseGraph(
             pDb, extensionDictionariesJson, extensionXrecordsJson, richCounters, coverageJson);
         r << "\"result\":{\"modelspace_entities\":" << total
+          << ",\"paperspace_entities\":" << paperTotal
           << ",\"entities\":" << entitiesJson
           << "," << richSections
           << ",\"coverage\":" << coverageJson << "},"
@@ -6877,13 +7033,16 @@ static void ariadneNativeJob()
     else if (op == "write.block.simple_create") {
         std::string name;
         jsonFindString(job, "name", name);
+        double seedLineNum = 1.0;
+        jsonFindNumber(job, "seed_line", seedLineNum);
         bool created = false;
         int definitionCount = 0;
         const Acad::ErrorStatus es = createSimpleBlock(
             pDb,
             name,
             created,
-            definitionCount);
+            definitionCount,
+            seedLineNum != 0.0);
         r << "\"result\":{\"created\":" << (created ? "true" : "false")
           << ",\"errorstatus\":" << static_cast<int>(es)
           << ",\"name\":\"" << jsonEscape(name) << "\""

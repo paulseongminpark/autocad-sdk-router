@@ -1,0 +1,272 @@
+[
+  {
+    "unit_id": "defannot-x-0-a-c66ac16f3-321",
+    "answer": {
+      "def": "X-평면도(기본형)$0$A$C66AC16F3",
+      "role": "심볼",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [
+        {"handle": "1E10", "reason": "34.6-len horizontal line, parallel to 1E12 at ~20 offset (thin double-line, likely bracket not wall)"},
+        {"handle": "1E12", "reason": "parallel counterpart to 1E10, thin spacing atypical of wall thickness"},
+        {"handle": "1E15", "reason": "longest single straight run (64 units) in the symbol"}
+      ],
+      "notes": "All 32 entities on one layer named 시설물-설비 (facility/equipment) with 21 ARC + 3 CIRCLE dominating a small ~109x80 bbox — classic plumbing/equipment fixture symbol (e.g. floor drain or cleanout), not a wall segment."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c66e6687a-322",
+    "answer": {
+      "def": "X-평면도(기본형)$0$A$C66e6687a",
+      "role": "심볼",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "Layer is literally 수전 (faucet/tap). 85 ARC + short radiating LINE pairs (len ~3-4) around a ~90x93 bbox form a faucet/spray fixture symbol. No long straight segments resembling wall lines were present in the sampled entities."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c71b42895-323",
+    "answer": {
+      "def": "X-평면도(기본형)$0$A$C71B42895",
+      "role": "심볼",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [
+        {"handle": "6221", "reason": "vertical jamb line (len 52) bounding a rectangular opening"},
+        {"handle": "6223", "reason": "parallel jamb line to 6221, opening frame"},
+        {"handle": "6226", "reason": "opposite-side jamb line (len 52)"},
+        {"handle": "6227", "reason": "parallel jamb line to 6226"},
+        {"handle": "621A", "reason": "111-len horizontal head/sill line of the framed opening"}
+      ],
+      "notes": "This exact def is referenced elsewhere (other units in this shard) via INSERT on an _A-WAL-2 (wall) layer, so it functions as a wall-opening component. Its own geometry (ARC+ELLIPSE+LINE+SPLINE, plus a tight repeating series of parallel short lines at handles 6230-6237) looks like a window/glass-block texture panel rather than solid wall — likely a window unit set into a wall opening."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c745b7f2c-324",
+    "answer": {
+      "def": "X-평면도(기본형)$0$A$C745B7F2C",
+      "role": "가구",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [
+        {"handle": "33FF", "reason": "900-len line parallel to where a wall would sit behind the counter run"},
+        {"handle": "33FE", "reason": "150-len top edge of the counter run"},
+        {"handle": "33FD", "reason": "150-len bottom edge of the counter run"}
+      ],
+      "notes": "Layers FUR-FIX / FUR-KIT and a narrow-but-long (152x1030) bbox indicate a fixed kitchen counter/cabinet run against a wall, drawn in plan. LWPOLYLINE rectangles (33E9, 33EA, etc.) look like sink/appliance cutouts, not wall segments."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c7cf27c93-325",
+    "answer": {
+      "def": "X-평면도(기본형)$0$A$C7CF27C93",
+      "role": "가구",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [
+        {"handle": "4150", "reason": "1480-len line spanning the full bbox height, could be a wall-alignment reference line for the fixture group"},
+        {"handle": "4165", "reason": "300-len line near-parallel to 4150"},
+        {"handle": "4152", "reason": "690-len horizontal boundary segment"}
+      ],
+      "notes": "Layer I-FL-FUR(S) (small furniture group) with a cluster of fixture-like arc/line details (toilet-shaped outline near -1030,-135; floor-drain-like detail near -192,-411). Mostly furniture/fixture contours; one very long line (4150) may be a placement reference rather than true wall."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c7d8e4760-326",
+    "answer": {
+      "def": "X-평면도(기본형)$0$A$C7D8E4760",
+      "role": "가구",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [
+        {"handle": "6AFF", "reason": "475-len vertical edge, part of a clean double-line rectangular boundary"},
+        {"handle": "6B01", "reason": "parallel vertical edge to 6AFF (inner boundary)"},
+        {"handle": "6B03", "reason": "435-len vertical edge, outer double-line pair"},
+        {"handle": "6B05", "reason": "parallel to 6B03, inner double-line pair"},
+        {"handle": "6B00", "reason": "325-len horizontal edge of the same double-line rectangle"},
+        {"handle": "6B02", "reason": "325-len horizontal edge, opposite side"}
+      ],
+      "notes": "Single-layer FUR def with 345 entities incl. 85 SPLINE — the clean double-line rectangle (outer ~385x535, inner ~305x455) reads as a large fixture rim (e.g. bathtub) rather than a wall footprint, but the double-line pattern is structurally wall-like so likelihood is elevated."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-cc2871f03-327",
+    "answer": {
+      "def": "X-평면도(기본형)$0$A$Cc2871f03",
+      "role": "가구",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [
+        {"handle": "4F44", "reason": "1819-len horizontal line, parallel to 4F4C at ~390 offset (double-line spacing resembles a wall)"},
+        {"handle": "4F4C", "reason": "1914-len horizontal line, parallel counterpart to 4F44"},
+        {"handle": "4F47", "reason": "370-len vertical divider, evenly spaced with 4F48-4F4B"},
+        {"handle": "4F48", "reason": "370-len vertical divider"},
+        {"handle": "4F49", "reason": "370-len vertical divider"},
+        {"handle": "4F4A", "reason": "370-len vertical divider"},
+        {"handle": "4F4B", "reason": "370-len vertical divider"}
+      ],
+      "notes": "Layer I-FL-FUR(B) (large furniture) with a very long (~2050mm) run. The two long parallel lines at 390 offset are the strongest wall-like candidates in this shard, but layer naming and the presence of many LWPOLYLINE cabinet-front rectangles favor a long cabinet/counter run rather than structural wall."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ba15001400-328",
+    "answer": {
+      "def": "X-평면도(기본형)$0$ba15001400",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [
+        {"handle": "6435", "reason": "7-vertex closed LWPOLYLINE on the dedicated MC layer, likely the room/wall boundary outline"}
+      ],
+      "notes": "Room-code style name (ba=bathroom, 1500x1400 dims) with TIL (tile grid) lines and multiple furniture INSERTs (T1 toilet, KH-530S-1 sink, corner shelf, IW990). No explicit wall-layer INSERT like the ba17.../BA235... variants, so wall evidence rests only on the MC-layer boundary polyline."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ba15002200-329",
+    "answer": {
+      "def": "X-평면도(기본형)$0$ba15002200",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [
+        {"handle": "58CA", "reason": "4-vertex closed LWPOLYLINE on the MC layer, likely a simple rectangular room/wall boundary"}
+      ],
+      "notes": "Same family as ba15001400: bathroom partial-plan with TIL grid + FUR inserts (코너 선반, BS-03 TOP, KH-530S-1 TOP, SB1703, IC708, 세면대_공통). No dedicated wall-layer insert present."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ba15002700-330",
+    "answer": {
+      "def": "X-평면도(기본형)$0$ba15002700",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "Larger bathroom partial-plan (144 entities incl. HATCH pattern=SOLID, likely a sink/fixture fill), TIL grid + FUR inserts and detail lines. Layer histogram shows an MC=1 entity (likely the room boundary) but its handle was not present in the 30-entity sample shown, so no handle is cited."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ba17001400-331",
+    "answer": {
+      "def": "X-평면도(기본형)$0$ba17001400",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.35,
+      "wall_line_handles": [
+        {"handle": "62AF", "reason": "7-vertex closed LWPOLYLINE on the MC layer, likely the room/wall boundary outline"},
+        {"handle": "62C1", "reason": "930-len line on FUR layer at x=450, collinear with 62C2/62C5 across gaps left for door/insert — likely a partition wall broken by an opening"}
+      ],
+      "notes": "Bathroom partial-plan that also carries an INSERT on layer _A-WAL-2 referencing block A$C71B42895 (the window/wall-opening block from elsewhere in this shard) and an INSERT on DS-F-BATH referencing A$C01A306AE — direct evidence this def participates in an actual wall assembly, unlike ba15... variants."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ba18601500-332",
+    "answer": {
+      "def": "X-평면도(기본형)$0$ba18601500",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [
+        {"handle": "6459", "reason": "4-vertex closed LWPOLYLINE on the MC layer, likely a simple rectangular room/wall boundary"}
+      ],
+      "notes": "Small bathroom partial-plan (14 entities): TIL grid lines + 4 FUR inserts (IC708, corner shelf, BS-03 TOP, SB1703 1500). No wall-layer insert present, similar to ba15... family."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ba23502100-333",
+    "answer": {
+      "def": "X-평면도(기본형)$0$BA23502100",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.35,
+      "wall_line_handles": [
+        {"handle": "647B", "reason": "8-vertex closed LWPOLYLINE on the MC layer, likely the room/wall boundary outline"},
+        {"handle": "6477", "reason": "1180-len line on FUR layer at y=450, collinear with 6478/6479 across gaps — likely a partition wall broken by an opening"}
+      ],
+      "notes": "Same pattern as ba17001400: includes an INSERT on _A-WAL-2 referencing block A$C71B42895 (window/wall-opening block) and an INSERT on DS-F-BATH referencing A$C01A306AE, indicating this def is part of an actual wall assembly rather than a pure fixture layout."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-bs-03-top-334",
+    "answer": {
+      "def": "X-평면도(기본형)$0$BS-03 TOP",
+      "role": "가구",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [
+        {"handle": "1D8C", "reason": "534-len horizontal line, one of a regularly repeating parallel series (grate/lattice pattern, not wall)"},
+        {"handle": "1D8F", "reason": "534-len horizontal line, repeats at ~50 spacing from 1D8C"},
+        {"handle": "1D92", "reason": "534-len horizontal line, part of same repeating series"},
+        {"handle": "1D95", "reason": "534-len horizontal line, part of same repeating series"}
+      ],
+      "notes": "All 33 entities are LINE on the FUR layer. The unusual world-scale coordinates (~832000, -151000) suggest this was captured far from block origin. The regular ~50-unit-spaced parallel line series strongly resembles a fixture top-view grate/lattice pattern (e.g. a shower/floor drain named BS-03) rather than a wall."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ca2405caa-335",
+    "answer": {
+      "def": "X-평면도(기본형)$0$Ca2405caa",
+      "role": "가구",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [
+        {"handle": "389E", "reason": "1314-len vertical line on a distinct layer (_0), possibly a centerline/reference rather than a shelf edge"},
+        {"handle": "3884", "reason": "380-len horizontal shelf-front line, full cabinet width"},
+        {"handle": "3892", "reason": "380-len horizontal shelf-front line, full cabinet width"}
+      ],
+      "notes": "Tall, narrow (380x1354) bbox on layer I-FL-FUR(B) with many horizontal lines at varying y (shelf lines) and mitred-corner ARC/LINE pairs at top and bottom — reads as a wardrobe/cabinet elevation, not a wall."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-cw1200-336",
+    "answer": {
+      "def": "X-평면도(기본형)$0$cw1200",
+      "role": "심볼",
+      "wall_likelihood": 0.4,
+      "wall_line_handles": [
+        {"handle": "7A19", "reason": "1100-len line spanning full width at y=-100, likely one wall face bounding the window opening"},
+        {"handle": "7A20", "reason": "1100-len line spanning full width at y=0, parallel to 7A19 at 100-unit offset — typical wall thickness"},
+        {"handle": "7A08", "reason": "50-len corner-return line connecting the two wall-face lines at one jamb"},
+        {"handle": "7A09", "reason": "100-len corner-return line at the opposite jamb"}
+      ],
+      "notes": "Layer WID (window ID), bbox 1200x100 — a thin cross-section plan symbol of a casement window. The two long parallel lines at 100-unit offset (typical wall thickness) most likely represent the wall faces the window frame sits within, so wall_likelihood is elevated relative to other symbol defs."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-cw900-337",
+    "answer": {
+      "def": "X-평면도(기본형)$0$CW900",
+      "role": "심볼",
+      "wall_likelihood": 0.4,
+      "wall_line_handles": [
+        {"handle": "79A6", "reason": "800-len line spanning full width at y=-100, likely one wall face bounding the window opening"},
+        {"handle": "79AD", "reason": "800-len line spanning full width at y=0, parallel to 79A6 at 100-unit offset — typical wall thickness"},
+        {"handle": "7994", "reason": "50-len corner-return line connecting the wall-face lines at one jamb"},
+        {"handle": "7996", "reason": "100-len corner-return line at the opposite jamb"}
+      ],
+      "notes": "Structurally identical to cw1200 (same WID layer, same 100-unit-deep cross-section pattern) but scaled to 900mm width — same window symbol interpretation applies."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-dw1200-338",
+    "answer": {
+      "def": "X-평면도(기본형)$0$dw1200",
+      "role": "심볼",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [
+        {"handle": "57C8", "reason": "1110-len line spanning full width, likely one wall face / lintel line at the door opening"}
+      ],
+      "notes": "Layer WID, bbox 1110x345 with LINE=27/LWPOLYLINE=26 — the heavier LWPOLYLINE share (12- and 8-vertex polylines) suggests door leaf + swing arc geometry rather than a simple window cross-section. Only one long full-width line is visible in the sample, so wall evidence is weaker/less symmetric than the cw* window blocks."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-dw1400-339",
+    "answer": {
+      "def": "X-평면도(기본형)$0$dw1400",
+      "role": "심볼",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [
+        {"handle": "546C", "reason": "1310-len line spanning full width, likely one wall face / lintel line at the door opening"}
+      ],
+      "notes": "Same structure as dw1200, scaled to 1400mm width — door plan symbol with swing-arc detail drawn via LWPOLYLINE."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-dw1500-340",
+    "answer": {
+      "def": "X-평면도(기본형)$0$DW1500",
+      "role": "심볼",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [
+        {"handle": "3EC6", "reason": "1410-len line spanning full width, likely one wall face / lintel line at the door opening"}
+      ],
+      "notes": "Same structure as dw1200/dw1400, scaled to 1500mm width — door plan symbol with swing-arc detail drawn via LWPOLYLINE."
+    }
+  }
+]

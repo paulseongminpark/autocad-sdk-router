@@ -1,0 +1,450 @@
+[
+ {
+  "unit_id": "defannot-x-0-a-c66ac16f3-321",
+  "def": "X-평면도(기본형)$0$A$C66AC16F3",
+  "role": "심볼",
+  "wall_likelihood": 0.05,
+  "wall_line_handles": [],
+  "notes": "설비 레이어의 ARC/CIRCLE 위주 시설물 심볼; 벽 기하 없음.",
+  "rationale": {
+   "evidence": "All 32 entities sit on layer A06-시설물-설비 with a histogram dominated by ARC=21 plus CIRCLE=3 and only 8 short LINE segments. Sampled lines are short orthogonal stubs (e.g. 1E0B, 1E10–1E13, 1E15) and circles have fixture-scale radii (5.3–17.9), not wall-length runs. The mix matches a plumbing/MEP fixture glyph rather than room or wall drafting.",
+   "rule": "When a block lives entirely on a facility/MEP equipment layer and is composed mostly of arcs/circles with short connector lines, classify it as a symbol and assign near-zero wall likelihood.",
+   "counterfactual": "If long paired parallel lines on a wall/structure layer appeared at a constant ~100–200 unit offset, or if the layer were WAL/A-WALL instead of 시설물-설비, the judgment would flip toward 평면 부분도 with populated wall_line_handles.",
+   "uncertainty": "ARC centers/radii and circle centers are not fully projected, so the exact fixture type (drain, valve, outlet) cannot be named; insertion context in the host floor plan is also unknown."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-a-c66e6687a-322",
+  "def": "X-평면도(기본형)$0$A$C66e6687a",
+  "role": "심볼",
+  "wall_likelihood": 0.02,
+  "wall_line_handles": [],
+  "notes": "수전 레이어 ARC 군집의 수전/급수 기구 심볼.",
+  "rationale": {
+   "evidence": "Every entity is on layer 수전; ARC=85 dominates with only small CIRCLE radii (2.5) and short LINE segments such as 68A1–68A6 (~3–4 units) and diagonal stubs 68A7–68AA. The ~90×90 bbox and faucet-named layer indicate a water-fixture symbol, not architectural wallwork.",
+   "rule": "A block wholly on a faucet/fixture layer whose geometry is dense arcs plus tiny connector lines is a fixture symbol; do not treat those stubs as walls.",
+   "counterfactual": "Presence of long double-line wall pairs on a wall layer, or renaming/relayering onto WAL with continuous room-scale edges, would raise wall_likelihood and change the role toward 평면 부분도.",
+   "uncertainty": "Individual ARC parameters are unsampled, so brand/model of the faucet and whether it includes a basin outline cannot be confirmed from this projection alone."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-a-c71b42895-323",
+  "def": "X-평면도(기본형)$0$A$C71B42895",
+  "role": "가구",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "FUR 레이어 대형 수납/가구 입면형 평면 디테일.",
+  "rationale": {
+   "evidence": "All 144 entities are on FUR with many parallel horizontal LINEs (621A, 6220, 6222, 6224–6225, 6230–6237) spanning ~111 units and verticals 6221/6223/6226/6227 forming a cabinet box. ARC/ELLIPSE/SPLINE counts add decorative or hardware detail typical of furniture, not wall cores. Bbox spans hundreds of units consistent with a vanity/cabinet assembly.",
+   "rule": "Closed or stacked parallel outlines confined to a FUR furniture layer are furniture geometry even when outer edges look rectilinear; wall_line_handles stay empty unless a wall/structure layer is present.",
+   "counterfactual": "If the same outer rectangle lived on _A-WAL / WALL as a thickness pair (~100–200 apart) without FUR shelving hatch lines, it would read as wall and wall_line_handles would list those edges.",
+   "uncertainty": "Whether this is a wall-hung vanity versus freestanding cabinet, and which face is the wall side, cannot be told without insertion context; nested use on _A-WAL-2 elsewhere is outside this definition's own layers."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-a-c745b7f2c-324",
+  "def": "X-평면도(기본형)$0$A$C745B7F2C",
+  "role": "가구",
+  "wall_likelihood": 0.06,
+  "wall_line_handles": [],
+  "notes": "FUR-FIX/FUR-KIT 고정·키친 가구 박스 아웃라인.",
+  "rationale": {
+   "evidence": "21 entities on FUR-FIX and 3 on FUR-KIT; geometry is LINE/LWPOLYLINE rectangles and tall vertical runs (e.g. 33EF/33F0 from y=980 to 920, 33F2/33F3 from -50 to 20) forming fixed-furniture boxes. No wall-named layer appears. Diagonal 33F5/33F7 look like door-swing or corner marks on furniture, not wall faces.",
+   "rule": "Blocks whose layers are explicitly FUR-FIX/FUR-KIT and whose entities are rectangular cabinet footprints should be labeled 가구 with negligible wall likelihood.",
+   "counterfactual": "Relayering the long verticals onto a wall layer as a parallel thickness pair, or adding WAL inserts, would flip this toward 평면 부분도 and fill wall_line_handles.",
+   "uncertainty": "Product identity (closet vs kitchen unit) and whether the ~1000-unit height is plan depth or elevation bleed cannot be confirmed from the sparse sample alone."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-a-c7cf27c93-325",
+  "def": "X-평면도(기본형)$0$A$C7CF27C93",
+  "role": "가구",
+  "wall_likelihood": 0.12,
+  "wall_line_handles": [
+   {
+    "handle": "4150",
+    "reason": "long vertical perimeter edge"
+   },
+   {
+    "handle": "4151",
+    "reason": "outer vertical stub"
+   },
+   {
+    "handle": "4152",
+    "reason": "long horizontal return"
+   },
+   {
+    "handle": "4165",
+    "reason": "inner parallel vertical"
+   }
+  ],
+  "notes": "I-FL-FUR(S) 대형 가구/붙박이 윤곽; 외곽선이 벽처럼 보일 수 있음.",
+  "rationale": {
+   "evidence": "Entire content is on I-FL-FUR(S) with LINE=108 plus arcs; sampled edges include room-scale runs such as 4150 (0,-1480)->(0,0) and L-shaped returns 4151–4152, plus dense local fixture detailing near x≈-1020. The FUR(S) layer name marks floor furniture, but the long orthogonal perimeter can visually resemble wall faces.",
+   "rule": "Furniture-layer blocks with long orthogonal outer edges get role 가구; list only those perimeter lines that could be mistaken for walls in wall_line_handles and keep wall_likelihood low-to-moderate.",
+   "counterfactual": "If those long edges were duplicated as a parallel pair on a wall layer at wall thickness, or if TIL/WAL room composition inserts appeared, role would shift to 평면 부분도 and wall_likelihood would rise above 0.5.",
+   "uncertainty": "Most of the 146 entities are unsampled, so interior partition vs single cabinet carcass is unclear; true wall adjacency depends on unseen host-plan insertion."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-a-c7d8e4760-326",
+  "def": "X-평면도(기본형)$0$A$C7D8E4760",
+  "role": "가구",
+  "wall_likelihood": 0.1,
+  "wall_line_handles": [
+   {
+    "handle": "6AFF",
+    "reason": "outer vertical frame"
+   },
+   {
+    "handle": "6B00",
+    "reason": "top horizontal frame"
+   },
+   {
+    "handle": "6B01",
+    "reason": "outer vertical frame"
+   },
+   {
+    "handle": "6B02",
+    "reason": "bottom horizontal frame"
+   }
+  ],
+  "notes": "FUR 대형 복합 가구(원·스플라인·프레임) 평면 심볼성 가구.",
+  "rationale": {
+   "evidence": "All 345 entities are on FUR; outer rectangle 6AFF–6B02 (~385×535) plus inner parallels 6B03–6B06, CIRCLE radii 32.5/23, and heavy ARC/SPLINE counts describe a richly detailed furniture piece. No wall/structure layer is present. Outer frame lines are the only candidates that look wall-like.",
+   "rule": "Rich FUR-layer assemblies with decorative circles/splines inside a rectangular frame are furniture; outer frame lines may be noted as wall-lookalikes but should not drive a wall role.",
+   "counterfactual": "Stripping interior furniture detail and placing a parallel thickness pair on WAL would reclassify this as wall/부분도 content.",
+   "uncertainty": "Exact furniture type (bed, sofa, island) cannot be resolved because most arcs/splines lack coordinates in the sample; scale relative to the room is insertion-dependent."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-a-cc2871f03-327",
+  "def": "X-평면도(기본형)$0$A$Cc2871f03",
+  "role": "가구",
+  "wall_likelihood": 0.1,
+  "wall_line_handles": [
+   {
+    "handle": "4F44",
+    "reason": "long top horizontal edge"
+   },
+   {
+    "handle": "4F4C",
+    "reason": "long bottom horizontal edge"
+   }
+  ],
+  "notes": "I-FL-FUR(B) 장축 붙박이/수납 가구와 수직 칸막이.",
+  "rationale": {
+   "evidence": "All entities are on I-FL-FUR(B); long horizontals 4F44 (~1820 units) and 4F4C plus many vertical dividers (4F47–4F4B, 4F5B, 4F5C) and X-marked LWPOLYLINE corners form a built-in cabinet run. Layer naming and repeated bay spacing are furniture, not wall cores.",
+   "rule": "Floor-furniture (I-FL-FUR) blocks with long runs and regular vertical partitions are 가구; only the extreme long edges warrant low-confidence wall-lookalike listing.",
+   "counterfactual": "If the long horizontals were a parallel pair on a wall layer ~150 apart without cabinet dividers, they would be true wall faces and role would become 평면 부분도.",
+   "uncertainty": "Whether this is a wardrobe, kitchen bank, or vanity run, and which side abuts a wall, cannot be determined without the host insert and unsampled polylines."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-ba15001400-328",
+  "def": "X-평면도(기본형)$0$ba15001400",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.15,
+  "wall_line_handles": [],
+  "notes": "타일 그리드+가구 INSERT 조합의 욕실/유닛 평면 부분도.",
+  "rationale": {
+   "evidence": "The block mixes TIL grid LINEs at 300-unit modules (6436–643F, 644A–644E), FUR INSERTs of named products (코너 선반, IW990, T1, KH-530S-1 TOP), an MC polyline, and a FUR baseline 6446. This is a composed bathroom/unit bay rather than a single symbol or lone furniture definition. No direct WAL-layer LINE sample appears.",
+   "rule": "Anonymous ba* unit blocks that compose tile grids plus multiple furniture INSERTs are 평면 부분도; tile joint lines are not walls unless on a wall layer or forming thickness pairs.",
+   "counterfactual": "If continuous double-line wall outlines on _A-WAL appeared instead of TIL joints, wall_likelihood would jump and those handles would fill wall_line_handles; if only one furniture INSERT remained with no TIL/MC, role would drop to 가구/심볼.",
+   "uncertainty": "Walls may exist only inside nested INSERTs not exploded here; TIL lines could coincide with wall faces in the host drawing but that cannot be proven from this projection."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-ba15002200-329",
+  "def": "X-평면도(기본형)$0$ba15002200",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.12,
+  "wall_line_handles": [],
+  "notes": "가구 INSERT·TIL 그리드 욕실 유닛 부분 평면도.",
+  "rationale": {
+   "evidence": "Six FUR INSERTs name fixtures/furniture (코너 선반, BS-03 TOP, KH-530S-1 TOP, SB1703 1500, IC708, 세면대_공통) while TIL lines form a 300-module grid (58D3–58DF) and MC supplies a boundary polyline. Entity mix is a composed wet-area partial plan, not a solitary symbol.",
+   "rule": "Unit blocks combining multiple product INSERTs with tile-grid lines belong to 평면 부분도; classify TIL orthogonals as finish joints, not walls, absent wall-layer evidence.",
+   "counterfactual": "Removing the TIL/MC composition and leaving a single FUR insert would make this 가구/심볼; adding explicit wall-thickness LINE pairs on WAL would raise wall_likelihood substantially.",
+   "uncertainty": "No wall-layer entities are sampled, so whether the module boundary is a true wall or only tile extent remains unknown; nested block interiors are opaque."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-ba15002700-330",
+  "def": "X-평면도(기본형)$0$ba15002700",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.18,
+  "wall_line_handles": [
+   {
+    "handle": "649A",
+    "reason": "long horizontal division edge"
+   },
+   {
+    "handle": "649B",
+    "reason": "parallel long horizontal edge"
+   }
+  ],
+  "notes": "FUR 디테일+TIL+INSERT가 섞인 욕실 유닛 부분도.",
+  "rationale": {
+   "evidence": "Layer mix TIL+FUR+MC with INSERT 코너 선반, dense FUR detailing (arcs, SOLID hatch 64A3), and TIL grid lines 6490–6499 shows a composed bathroom bay. Parallel FUR horizontals 649A/649B at y=-900/-860 span the full 1500 width and could be read as a thin partition or wall face pair (~40 apart).",
+   "rule": "Composed ba* modules with tile grids and furniture inserts are 평면 부분도; only long parallel edges that could be thickness pairs earn wall_line_handles, still at modest likelihood if on FUR not WAL.",
+   "counterfactual": "If 649A/649B lived on _A-WAL with ~100–200 spacing and no furniture hatch clutter, wall_likelihood would exceed 0.7; if the block collapsed to only the tiny FUR glyph near 863,-880, role would become 심볼.",
+   "uncertainty": "Whether 649A/649B are a wall, curb, or vanity backplane cannot be settled from layer FUR alone; most of 144 entities remain unsampled."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-ba17001400-331",
+  "def": "X-평면도(기본형)$0$ba17001400",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.35,
+  "wall_line_handles": [
+   {
+    "handle": "62C1",
+    "reason": "long vertical edge possible wall face"
+   },
+   {
+    "handle": "62C2",
+    "reason": "colinear vertical wall-edge segment"
+   },
+   {
+    "handle": "62C5",
+    "reason": "colinear vertical wall-edge segment"
+   }
+  ],
+  "notes": "_A-WAL-2·욕조 INSERT와 TIL/FUR이 있는 욕실 부분 평면도.",
+  "rationale": {
+   "evidence": "Besides TIL grid and FUR product INSERTs, the block includes INSERT 62CA on _A-WAL-2 (nested A$C71B42895) and DS-F-BATH INSERT 62CB, signaling wall-associated and bath fixtures inside a unit plan. Vertical FUR segments 62C1/62C2/62C5 at x=450 form a broken long edge that can read as a wall face. TIL lines remain finish grid, not walls.",
+   "rule": "Partial-plan unit blocks that explicitly INSERT content on a wall-named layer plus room finishes/fixtures are 평면 부분도 with elevated wall_likelihood even when many wall strokes are nested.",
+   "counterfactual": "Absent the _A-WAL-2 and DS-F-BATH inserts and the x=450 edge, this would look like a pure tile+furniture collage with wall_likelihood near 0.1; exploded wall thickness pairs would push likelihood higher still.",
+   "uncertainty": "Wall geometry inside INSERT 62CA is not visible here, so actual wall handles inside the nest are unknown; gaps in 62C1–62C5 may be openings rather than continuous wall."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-ba18601500-332",
+  "def": "X-평면도(기본형)$0$ba18601500",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.1,
+  "wall_line_handles": [],
+  "notes": "소형 타일 그리드+가구 INSERT 욕실 유닛 부분도.",
+  "rationale": {
+   "evidence": "Only 14 entities: MC boundary, four FUR INSERTs (IC708, 코너 선반, BS-03 TOP, SB1703 1500), and TIL grid LINEs at 300/600 modules (645E–6466). Pattern matches other ba* wet-unit partial plans without a sampled wall layer.",
+   "rule": "Small composed blocks of tile-grid lines plus multiple furniture INSERTs remain 평면 부분도; lack of wall-layer geometry keeps wall_likelihood low and wall_line_handles empty.",
+   "counterfactual": "Adding _A-WAL inserts or parallel wall-thickness lines would raise wall_likelihood; reducing to a single INSERT with no TIL would reclassify as 가구/심볼.",
+   "uncertainty": "Walls may be implied only by host context or nested blocks; TIL extents versus true room boundary cannot be distinguished from this thin projection."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-ba23502100-333",
+  "def": "X-평면도(기본형)$0$BA23502100",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.35,
+  "wall_line_handles": [
+   {
+    "handle": "6477",
+    "reason": "long horizontal possible wall face"
+   },
+   {
+    "handle": "6478",
+    "reason": "colinear wall-edge segment"
+   },
+   {
+    "handle": "6479",
+    "reason": "colinear wall-edge segment"
+   }
+  ],
+  "notes": "_A-WAL-2·욕조 INSERT 포함 욕실 유닛 부분 평면도.",
+  "rationale": {
+   "evidence": "Same composition family as ba17001400: TIL grid, FUR product INSERTs, MC polyline, DS-F-BATH INSERT 647A, and _A-WAL-2 INSERT 6476 of A$C71B42895. FUR horizontals 6477–6479 at y=450 form a broken full-width edge that can act as a wall face. This is a bathroom unit partial plan with explicit wall-layer nesting.",
+   "rule": "When a unit block both composes finishes/fixtures and INSERTs on a wall-named layer, role is 평면 부분도 and wall_likelihood should be moderately elevated; list only host-level edges that look like wall faces.",
+   "counterfactual": "Without _A-WAL-2/DS-F-BATH and without the y=450 edge chain, wall_likelihood would fall to ~0.1; visible exploded wall pairs on WAL would push it above 0.6.",
+   "uncertainty": "Nested wall drawing inside 6476 is opaque; whether 6477–6479 are wall, curb, or furniture back edge remains ambiguous on FUR."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-bs-03-top-334",
+  "def": "X-평면도(기본형)$0$BS-03 TOP",
+  "role": "가구",
+  "wall_likelihood": 0.03,
+  "wall_line_handles": [],
+  "notes": "BS-03 TOP 선반/수납 가구 평면; FUR LINE만 존재.",
+  "rationale": {
+   "evidence": "Name BS-03 TOP and all 33 LINEs on FUR show a rectangular shelf/cabinet with repeated horizontal slats (1D8C–1D97) between vertical sides 1D7C/1D81. Coordinates are large world-space values typical of product blocks, with no wall layer or thickness pair.",
+   "rule": "Named product TOP blocks composed solely of FUR rectangular/slat linework are 가구 (furniture symbols in plan), not walls or partial plans.",
+   "counterfactual": "If the outer pair were on WAL at wall thickness without slat fills, or if the block aggregated room TIL/INSERTs, classification would change to wall/부분도.",
+   "uncertainty": "Real width/depth after insertion scale is unknown from absolute world coordinates; whether BS-03 is wall-mounted cannot be seen without the host plan."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-ca2405caa-335",
+  "def": "X-평면도(기본형)$0$Ca2405caa",
+  "role": "가구",
+  "wall_likelihood": 0.1,
+  "wall_line_handles": [
+   {
+    "handle": "3882",
+    "reason": "long vertical cabinet side"
+   },
+   {
+    "handle": "3883",
+    "reason": "long vertical cabinet side"
+   }
+  ],
+  "notes": "I-FL-FUR(B) 수납장 박스와 X형 코너 마크.",
+  "rationale": {
+   "evidence": "Almost all entities are on I-FL-FUR(B): outer box 3882–3886/3892, shelf horizontals 3885/3889/388A, and X-crossing lines 388F/3890 and 3894/3895 typical of cabinet door/end marks, plus a lone _0 vertical 389E. This is built-in furniture drafting, not a room partial plan.",
+   "rule": "I-FL-FUR cabinet boxes with X end-marks are 가구; long sides may be listed as wall-lookalikes but stay low likelihood without a wall layer.",
+   "counterfactual": "Parallel copies of 3882/3883 on a wall layer at ~150 offset without shelf lines would indicate a true wall pair and raise wall_likelihood sharply.",
+   "uncertainty": "ARC details 3899/389B/389D are unsampled so hardware type is unclear; wall adjacency of the cabinet is insertion-dependent."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-cw1200-336",
+  "def": "X-평면도(기본형)$0$cw1200",
+  "role": "심볼",
+  "wall_likelihood": 0.45,
+  "wall_line_handles": [
+   {
+    "handle": "7A1C",
+    "reason": "left jamb wall-thickness edge"
+   },
+   {
+    "handle": "7A09",
+    "reason": "right jamb wall-thickness edge"
+   },
+   {
+    "handle": "7A1F",
+    "reason": "left jamb top return"
+   },
+   {
+    "handle": "7A1E",
+    "reason": "left jamb bottom return"
+   },
+   {
+    "handle": "7A06",
+    "reason": "right jamb top return"
+   },
+   {
+    "handle": "7A07",
+    "reason": "right jamb bottom return"
+   },
+   {
+    "handle": "7A20",
+    "reason": "opening head/sill line"
+   },
+   {
+    "handle": "7A19",
+    "reason": "opening sill line"
+   }
+  ],
+  "notes": "WID 레이어 cw1200 창호(창) 심볼; 양단 벽후 표현.",
+  "rationale": {
+   "evidence": "Name cw1200 and all entities on WID span exactly width 1200 with depth 100; end pockets 0–50 and 1150–1200 (7A1C/7A09 plus returns 7A1E–7A1F/7A06–7A07) depict wall thickness at jambs, while 7A0A/7A0B mark the glazing centerline. This is a window opening symbol that intentionally includes short wall stubs.",
+   "rule": "WID-layer cw* blocks sized to a nominal clear width with 50–100 deep jamb rectangles are window symbols; jamb segments count as wall-line lookalikes and justify mid wall_likelihood without changing role to 평면 부분도.",
+   "counterfactual": "If the block contained full room walls, furniture INSERTs, or tile grids beyond the 1200 opening, it would become 평면 부분도; if jamb returns were omitted and only glass lines remained, wall_likelihood would drop near 0.",
+   "uncertainty": "Whether cw means curtain-wall or casement window, and the true host wall thickness, cannot be verified because only the symbolized stub length is shown."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-cw900-337",
+  "def": "X-평면도(기본형)$0$CW900",
+  "role": "심볼",
+  "wall_likelihood": 0.45,
+  "wall_line_handles": [
+   {
+    "handle": "79A9",
+    "reason": "left jamb wall-thickness edge"
+   },
+   {
+    "handle": "7996",
+    "reason": "right jamb wall-thickness edge"
+   },
+   {
+    "handle": "79AC",
+    "reason": "left jamb top return"
+   },
+   {
+    "handle": "79AB",
+    "reason": "left jamb bottom return"
+   },
+   {
+    "handle": "7993",
+    "reason": "right jamb top return"
+   },
+   {
+    "handle": "7994",
+    "reason": "right jamb bottom return"
+   },
+   {
+    "handle": "79AD",
+    "reason": "opening head/sill line"
+   },
+   {
+    "handle": "79A6",
+    "reason": "opening sill line"
+   }
+  ],
+  "notes": "WID 레이어 CW900 창호 심볼; 900폭 개구+벽후 잼.",
+  "rationale": {
+   "evidence": "Identical WID window pattern to cw1200 but scaled to width 900: jamb pockets at 0–50 and 850–900 (79A9/7996 and returns), dual glazing lines 7997/7998, and head/sill 79AD/79A6. Entity histogram LINE=27 LWPOLYLINE=4 matches the sibling window block.",
+   "rule": "Nominal-width CW*/cw* blocks on WID with jamb thickness stubs are window symbols; report jamb edges in wall_line_handles and keep mid wall_likelihood.",
+   "counterfactual": "Extension into a multi-bay curtain-wall assembly with mullion grids across a room, or addition of wall-layer runs beyond the opening, would shift toward 평면 부분도 and higher wall_likelihood.",
+   "uncertainty": "Host wall thickness may differ from the drawn 100-unit depth; swing/fixed orientation is not encoded in the sampled lines."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-dw1200-338",
+  "def": "X-평면도(기본형)$0$dw1200",
+  "role": "심볼",
+  "wall_likelihood": 0.4,
+  "wall_line_handles": [
+   {
+    "handle": "57C8",
+    "reason": "wall-face opening line at y=0"
+   }
+  ],
+  "notes": "WID dw1200 문 심볼; 문짝 LWPOLYLINE+개구선.",
+  "rationale": {
+   "evidence": "Name dw1200 on WID with LINE=27 and LWPOLYLINE=26; top LINE 57C8 spans the 1200 opening at y=0 while paired leaf polylines/lines at y≈-85 to -195 (57CB–57E5) describe door leaves/panels. This is a door symbol in plan, with the y=0 line representing the wall face/opening, not a full wall network.",
+   "rule": "WID dw* blocks whose geometry is an opening-width header line plus door-leaf polylines are door symbols; count the wall-face opening line as a wall lookalike with moderate likelihood.",
+   "counterfactual": "If multiple connected wall segments enclosing a room appeared, role would become 평면 부분도; if the y=0 line vanished and only floating leaf geometry remained, wall_likelihood would drop.",
+   "uncertainty": "Swing direction, frame thickness, and whether 57C9/57CA twelve-vertex polylines are frames or leaves cannot be fully read without vertex coordinates."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-dw1400-339",
+  "def": "X-평면도(기본형)$0$dw1400",
+  "role": "심볼",
+  "wall_likelihood": 0.4,
+  "wall_line_handles": [
+   {
+    "handle": "546C",
+    "reason": "wall-face opening line at y=0"
+   }
+  ],
+  "notes": "WID dw1400 문 심볼; 1400폭 개구+문짝.",
+  "rationale": {
+   "evidence": "Same WID door schema as dw1200 scaled to 1400: opening LINE 546C (1355,0)->(45,0) and mirrored leaf/panel linework (546F–5489) with many LWPOLYLINEs. Histogram matches the door family exactly. No furniture or tile composition is present.",
+   "rule": "Nominal-width dw* blocks on WID combining one wall-face opening line with door-leaf polylines are 심볼; attribute moderate wall_likelihood to the opening line only.",
+   "counterfactual": "Embedding this door into a larger ba*-style unit with TIL/FUR/WAL inserts would reclassify as 평면 부분도; removing 546C would leave a free-floating leaf symbol with near-zero wall_likelihood.",
+   "uncertainty": "Leaf count (single vs double) and hinge side are ambiguous without polyline vertex order; true wall thickness beyond the symbolized opening is unknown."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-dw1500-340",
+  "def": "X-평면도(기본형)$0$DW1500",
+  "role": "심볼",
+  "wall_likelihood": 0.4,
+  "wall_line_handles": [
+   {
+    "handle": "3EC6",
+    "reason": "wall-face opening line at y=0"
+   }
+  ],
+  "notes": "WID DW1500 문 심볼; 1500폭 개구+문짝.",
+  "rationale": {
+   "evidence": "WID door block DW1500 mirrors dw1200/dw1400: opening LINE 3EC6 (1455,0)->(45,0) plus leaf/panel LINEs and LWPOLYLINEs (3EC9–3EE3) sized for a 1500 clear opening. Entity mix is purely door drafting on WID with no room-composition layers.",
+   "rule": "DW*/dw* WID blocks of opening line plus leaf polylines are door symbols; the opening line is the sole wall-associated handle and supports mid wall_likelihood without a 평면 부분도 role.",
+   "counterfactual": "If surrounding wall-thickness pairs or unit-plan INSERTs were added, judgment would move to 평면 부분도 with higher wall_likelihood; absence of 3EC6 would collapse wall association.",
+   "uncertainty": "Exact panel articulation inside the 12-vertex polylines is unseen; host wall fire-rating/thickness and swing clearances are outside this projection."
+  }
+ }
+]

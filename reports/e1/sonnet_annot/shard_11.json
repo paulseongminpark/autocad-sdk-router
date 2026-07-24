@@ -1,0 +1,211 @@
+[
+  {
+    "unit_id": "defannot-u197-201",
+    "answer": {
+      "def": "*U197",
+      "role": "평면 부분도",
+      "wall_likelihood": 0.55,
+      "wall_line_handles": [
+        {"handle": "57B4", "reason": "long vertical run (610,22.5)->(610,-103.5), outer wall face"},
+        {"handle": "57BA", "reason": "long vertical run (-610,-103.5)->(-610,22.5), matching outer wall face on opposite side"},
+        {"handle": "57B1", "reason": "long horizontal run at y=-100.5, inner wall face parallel to outer boundary"},
+        {"handle": "57B7", "reason": "duplicate horizontal run at same y=-100.5, doubled wall-face line (double-line wall convention)"},
+        {"handle": "57AF", "reason": "horizontal run at y=-50.5, second wall-face pair defining wall thickness"},
+        {"handle": "57BF", "reason": "duplicate horizontal run at y=-50.5, doubled wall-face line"},
+        {"handle": "57B9", "reason": "short return (-588,-103.5)->(-610,-103.5) joining outer/inner faces, jamb-return at wall end"},
+        {"handle": "57B5", "reason": "short return (610,-103.5)->(588,-103.5) joining outer/inner faces, jamb-return at wall end"}
+      ],
+      "notes": "23 entities: 1 INSERT nesting 'X-평면도(기본형)$0$국기계양대' (flagpole mount) plus 2 WIPEOUT masks and 20 LINE. The LINEs trace two concentric offset rectangles (outer ~1220x126, inner ~1176x50) joined by short jamb-return segments at both ends -- the classic double-line plan-wall signature around an embedded flagpole mount, so likely a partial floor-plan wall detail rather than a pure symbol."
+    }
+  },
+  {
+    "unit_id": "defannot-u199-202",
+    "answer": {
+      "def": "*U199",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "17개 LWPOLYLINE(핸들 5802-5812), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 단열재(batt insulation) 지그재그 심볼의 반복 타일. LINE 엔티티가 없어 bbox 도출 불가. 개별 엔티티는 벽 경계선이 아니라 충전재 패턴이므로 벽선으로 보기 어려움; 벽체 조립체 내부(공동)에 삽입되는 부재로 추정."
+    }
+  },
+  {
+    "unit_id": "defannot-u200-203",
+    "answer": {
+      "def": "*U200",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "11개 LWPOLYLINE(핸들 5818-5822), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 단열재 지그재그 심볼의 반복 타일(U199보다 짧은 벽 공동 길이에 대응). LINE 엔티티가 없어 bbox 도출 불가. 벽선 자체가 아니라 충전재 패턴."
+    }
+  },
+  {
+    "unit_id": "defannot-u201-204",
+    "answer": {
+      "def": "*U201",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "7개 LWPOLYLINE(핸들 5828-582E), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 가장 짧은 벽 공동 구간용 단열재 지그재그 심볼 타일. LINE 없어 bbox 도출 불가. 벽선이 아닌 충전재 패턴."
+    }
+  },
+  {
+    "unit_id": "defannot-u202-205",
+    "answer": {
+      "def": "*U202",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "12개 LWPOLYLINE(핸들 5834-583F), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 단열재 지그재그 심볼 타일. LINE 없어 bbox 도출 불가. 벽선이 아닌 충전재 패턴."
+    }
+  },
+  {
+    "unit_id": "defannot-u232-206",
+    "answer": {
+      "def": "*U232",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "27개 LWPOLYLINE(핸들 6CE9-6D03), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 단열재 지그재그 심볼의 반복 타일, 중간 길이 벽 공동 대응. LINE 없어 bbox 도출 불가. 벽선이 아닌 충전재 패턴."
+    }
+  },
+  {
+    "unit_id": "defannot-u236-207",
+    "answer": {
+      "def": "*U236",
+      "role": "심볼",
+      "wall_likelihood": 0.18,
+      "wall_line_handles": [],
+      "notes": "총 61개 LWPOLYLINE 중 30개 샘플(핸들 7727-7744), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 단열재 지그재그 심볼 타일, 상대적으로 긴 벽 공동에 대응(개수가 많음). LINE 없어 bbox 도출 불가. 벽선이 아닌 충전재 패턴이나 긴 벽체와의 연관성은 더 강함."
+    }
+  },
+  {
+    "unit_id": "defannot-u237-208",
+    "answer": {
+      "def": "*U237",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "23개 LWPOLYLINE(핸들 7769-777F, 전량 샘플됨), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 단열재 지그재그 심볼 타일. LINE 없어 bbox 도출 불가. 벽선이 아닌 충전재 패턴."
+    }
+  },
+  {
+    "unit_id": "defannot-u238-209",
+    "answer": {
+      "def": "*U238",
+      "role": "심볼",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "총 214개 LWPOLYLINE 중 30개 샘플(핸들 7785-77A2), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 단열재 지그재그 심볼 타일, 매우 긴 벽 공동(직선형 벽체 전체 길이)에 대응하는 것으로 추정. LINE 없어 bbox 도출 불가. 벽선 자체는 아니지만 긴 벽체와의 연관성이 강함."
+    }
+  },
+  {
+    "unit_id": "defannot-u239-210",
+    "answer": {
+      "def": "*U239",
+      "role": "심볼",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "총 159개 LWPOLYLINE 중 30개 샘플(핸들 7860-787D), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 단열재 지그재그 심볼 타일, 긴 벽 공동에 대응. LINE 없어 bbox 도출 불가. 벽선이 아닌 충전재 패턴."
+    }
+  },
+  {
+    "unit_id": "defannot-u240-211",
+    "answer": {
+      "def": "*U240",
+      "role": "심볼",
+      "wall_likelihood": 0.2,
+      "wall_line_handles": [],
+      "notes": "총 106개 LWPOLYLINE 중 30개 샘플(핸들 7904-7921), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 단열재 지그재그 심볼 타일, 긴 벽 공동에 대응. LINE 없어 bbox 도출 불가. 벽선이 아닌 충전재 패턴."
+    }
+  },
+  {
+    "unit_id": "defannot-u241-212",
+    "answer": {
+      "def": "*U241",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "19개 LWPOLYLINE(핸들 7973-7985, 전량 샘플됨), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 단열재 지그재그 심볼 타일. LINE 없어 bbox 도출 불가. 벽선이 아닌 충전재 패턴."
+    }
+  },
+  {
+    "unit_id": "defannot-u272-213",
+    "answer": {
+      "def": "*U272",
+      "role": "심볼",
+      "wall_likelihood": 0.17,
+      "wall_line_handles": [],
+      "notes": "총 45개 LWPOLYLINE 중 30개 샘플(핸들 7DD0-7DED), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 단열재 지그재그 심볼 타일, 중간 길이 벽 공동 대응. LINE 없어 bbox 도출 불가. 벽선이 아닌 충전재 패턴."
+    }
+  },
+  {
+    "unit_id": "defannot-u273-214",
+    "answer": {
+      "def": "*U273",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "17개 LWPOLYLINE(핸들 7E02-7E12, 전량 샘플됨), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 단열재 지그재그 심볼 타일. LINE 없어 bbox 도출 불가. 벽선이 아닌 충전재 패턴."
+    }
+  },
+  {
+    "unit_id": "defannot-u274-215",
+    "answer": {
+      "def": "*U274",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "7개 LWPOLYLINE(핸들 7E18-7E1E, 전량 샘플됨), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 가장 짧은 벽 공동 구간용 단열재 지그재그 심볼 타일. LINE 없어 bbox 도출 불가. 벽선이 아닌 충전재 패턴."
+    }
+  },
+  {
+    "unit_id": "defannot-u275-216",
+    "answer": {
+      "def": "*U275",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "18개 LWPOLYLINE(핸들 7E24-7E35, 전량 샘플됨), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 단열재 지그재그 심볼 타일. LINE 없어 bbox 도출 불가. 벽선이 아닌 충전재 패턴."
+    }
+  },
+  {
+    "unit_id": "defannot-u278-217",
+    "answer": {
+      "def": "*U278",
+      "role": "심볼",
+      "wall_likelihood": 0.18,
+      "wall_line_handles": [],
+      "notes": "총 79개 LWPOLYLINE 중 30개 샘플(핸들 7E51-7E6E), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 단열재 지그재그 심볼 타일, 긴 벽 공동에 대응. LINE 없어 bbox 도출 불가. 벽선이 아닌 충전재 패턴."
+    }
+  },
+  {
+    "unit_id": "defannot-u279-218",
+    "answer": {
+      "def": "*U279",
+      "role": "심볼",
+      "wall_likelihood": 0.17,
+      "wall_line_handles": [],
+      "notes": "총 42개 LWPOLYLINE 중 30개 샘플(핸들 7EA5-7EC2), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 단열재 지그재그 심볼 타일, 중간 길이 벽 공동 대응. LINE 없어 bbox 도출 불가. 벽선이 아닌 충전재 패턴."
+    }
+  },
+  {
+    "unit_id": "defannot-u280-219",
+    "answer": {
+      "def": "*U280",
+      "role": "심볼",
+      "wall_likelihood": 0.18,
+      "wall_line_handles": [],
+      "notes": "총 95개 LWPOLYLINE 중 30개 샘플(핸들 7ED4-7EF1), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 단열재 지그재그 심볼 타일, 긴 벽 공동에 대응. LINE 없어 bbox 도출 불가. 벽선이 아닌 충전재 패턴."
+    }
+  },
+  {
+    "unit_id": "defannot-u281-220",
+    "answer": {
+      "def": "*U281",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [],
+      "notes": "23개 LWPOLYLINE(핸들 7F38-7F4E, 전량 샘플됨), 각 5-vertex, 전부 'X-평면도(기본형)$0$INSUL' 레이어 -- 단열재 지그재그 심볼 타일. LINE 없어 bbox 도출 불가. 벽선이 아닌 충전재 패턴."
+    }
+  }
+]

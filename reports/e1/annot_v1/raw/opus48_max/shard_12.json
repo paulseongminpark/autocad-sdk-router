@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-u282-221",
+    "def": "*U282",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U282: 42 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 42 entities in block *U282 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 7F54 and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this medium insulation run (42 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u283-222",
+    "def": "*U283",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U283: 70 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 70 entities in block *U283 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 7F83 and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this long insulation run (70 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u290-223",
+    "def": "*U290",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U290: 30 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 30 entities in block *U290 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 81EA and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this medium insulation run (30 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u45-224",
+    "def": "*U45",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U45: 38 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 38 entities in block *U45 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 3857 and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this medium insulation run (38 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u47-225",
+    "def": "*U47",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U47: 38 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 38 entities in block *U47 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 38A6 and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this medium insulation run (38 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u48-226",
+    "def": "*U48",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U48: 12 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 12 entities in block *U48 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 38D1 and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this short insulation run (12 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u49-227",
+    "def": "*U49",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U49: 105 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 105 entities in block *U49 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 38E2 and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this long insulation run (105 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u50-228",
+    "def": "*U50",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U50: 41 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 41 entities in block *U50 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 3950 and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this medium insulation run (41 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u51-229",
+    "def": "*U51",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U51: 101 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 101 entities in block *U51 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 397E and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this long insulation run (101 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u52-230",
+    "def": "*U52",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U52: 102 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 102 entities in block *U52 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 39E8 and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this long insulation run (102 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u53-231",
+    "def": "*U53",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U53: 19 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 19 entities in block *U53 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 3A53 and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this short insulation run (19 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u54-232",
+    "def": "*U54",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U54: 68 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 68 entities in block *U54 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 3A6B and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this long insulation run (68 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u55-233",
+    "def": "*U55",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U55: 23 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 23 entities in block *U55 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 3AB4 and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this medium insulation run (23 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u56-234",
+    "def": "*U56",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U56: 130 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 130 entities in block *U56 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 3AD0 and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this long insulation run (130 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u57-235",
+    "def": "*U57",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U57: 112 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 112 entities in block *U57 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 3B57 and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this long insulation run (112 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u58-236",
+    "def": "*U58",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U58: 19 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 19 entities in block *U58 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 3BCC and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this short insulation run (19 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u59-237",
+    "def": "*U59",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U59: 63 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 63 entities in block *U59 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 3BE4 and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this long insulation run (63 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u60-238",
+    "def": "*U60",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U60: 18 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 18 entities in block *U60 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 3C28 and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this short insulation run (18 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u61-239",
+    "def": "*U61",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U61: 16 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 16 entities in block *U61 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 3C3F and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this short insulation run (16 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  },
+  {
+    "unit_id": "defannot-u62-240",
+    "def": "*U62",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "Anonymous block *U62: 23 uniform 5-vertex LWPOLYLINEs on plan insulation layer ($INSUL) — reads as insulation hatch/fill (part of the plan), not wall lines, so wall-line likelihood is low.",
+    "rationale": {
+      "evidence": "All 23 entities in block *U62 are LWPOLYLINE with vertices=5 (closed quads) on a single layer X-평면도(기본형)$0$INSUL, whose bound-xref suffix '$INSUL' marks it as an insulation sub-layer of the '평면도(기본형)' plan; handles begin at 3C54 and increment contiguously. The dxf_name and layer histograms are both 100% single-valued, and there are no LINE/TEXT/MTEXT/INSERT/SOLID entities and no derivable bbox, so this is a uniform single-material fill graphic, not mixed plan geometry.",
+      "rule": "An anonymous block (*U…) whose entities are uniform small closed polylines confined to one material sub-layer named after a material token (here INSUL = insulation) under a '평면도' plan layer is a material hatch/fill fragment of the plan drawing — classify by the layer's material token, not as a reusable 심볼, a *D 치수캐시, or 가구.",
+      "counterfactual": "If these same entities sat on a wall layer (e.g. *WALL / 벽 / W-WALL) or appeared as long 2-point segments spanning room edges, wall_likelihood would rise sharply and the role would stay 평면 부분도 as wall-bearing; SOLID arrowheads + MTEXT with a *D name would flip it to 치수캐시, and a furniture layer token (FURN/가구) would flip it to 가구.",
+      "uncertainty": "Vertex coordinates are not provided (bbox not derivable — no LINE entities), so I cannot measure the polylines to confirm they are small hatch rectangles rather than thin wall-cavity outlines, nor verify whether this medium insulation run (23 elements) traces exterior vs. party walls; the layer name alone carries the material semantics."
+    }
+  }
+]

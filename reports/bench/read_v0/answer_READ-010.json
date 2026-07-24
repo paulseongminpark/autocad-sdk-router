@@ -1,0 +1,10 @@
+{
+  "id": "READ-010",
+  "answer": "X-평면도(기본형)",
+  "method": "Loaded dwg_graph_ir.json, iterated d['block_definitions'] (list of 407 dicts each with 'name' and 'entity_count'), took max(entity_count) then sorted names of all entries tied at that max lexicographically.",
+  "commands": [
+    "d = json.load(open(path, encoding='utf-8')); print(list(d.keys()))",
+    "bd = d['block_definitions']; print(type(bd), len(bd)); print(bd[0])",
+    "maxc = max(b['entity_count'] for b in bd); cands = sorted(b['name'] for b in bd if b['entity_count'] == maxc); print(maxc, cands)"
+  ]
+}

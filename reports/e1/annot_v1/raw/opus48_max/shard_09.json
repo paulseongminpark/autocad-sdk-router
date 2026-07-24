@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-u151-161",
+    "def": "*U151",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "Insulation hatch fill on X-평면도(기본형)$0$INSUL: 24 uniform 5-vertex LWPOLYLINE cells (from handle 4F0D); wall-adjacent fill, no wall-line geometry.",
+    "rationale": {
+      "evidence": "All 24 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, each with exactly 5 vertices (uniform closed-quad cells), starting at handle 4F0D. The layer's terminal token INSUL marks insulation, and the block carries no LINE, TEXT, DIMENSION, or INSERT entities. A dense set of identical small closed cells is the drawing signature of an insulation hatch fill rather than discrete wall drafting.",
+      "rule": "A block whose entities are exclusively small, uniform, closed LWPOLYLINEs on an *$INSUL layer is an insulation hatch fill; in plan view insulation sits inside the wall cavity, so it reliably co-locates with a wall yet is not itself the wall boundary line.",
+      "counterfactual": "Had these entities been on a WALL/벽 layer, or had the block also carried long 2-point LINE pairs tracing parallel offset faces, I would raise wall_likelihood and list those as wall_line_handles; a TEXT/DIMENSION or door-swing INSERT would instead push the role toward 치수캐시/심볼.",
+      "uncertainty": "This projection derives no vertex coordinates or bbox (all-LWPOLYLINE, no LINE start/end), so cell size, run length, orientation, and whether this is wall vs. slab/roof insulation cannot be confirmed — only layer semantics and entity uniformity are observable."
+    }
+  },
+  {
+    "unit_id": "defannot-u152-162",
+    "def": "*U152",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "Insulation hatch fill on X-평면도(기본형)$0$INSUL: 21 uniform 5-vertex LWPOLYLINE cells (from handle 4F2A); wall-adjacent fill, no wall-line geometry.",
+    "rationale": {
+      "evidence": "All 21 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, each with exactly 5 vertices (uniform closed-quad cells), starting at handle 4F2A. The layer's terminal token INSUL marks insulation, and the block carries no LINE, TEXT, DIMENSION, or INSERT entities. A dense set of identical small closed cells is the drawing signature of an insulation hatch fill rather than discrete wall drafting.",
+      "rule": "A block whose entities are exclusively small, uniform, closed LWPOLYLINEs on an *$INSUL layer is an insulation hatch fill; in plan view insulation sits inside the wall cavity, so it reliably co-locates with a wall yet is not itself the wall boundary line.",
+      "counterfactual": "Had these entities been on a WALL/벽 layer, or had the block also carried long 2-point LINE pairs tracing parallel offset faces, I would raise wall_likelihood and list those as wall_line_handles; a TEXT/DIMENSION or door-swing INSERT would instead push the role toward 치수캐시/심볼.",
+      "uncertainty": "This projection derives no vertex coordinates or bbox (all-LWPOLYLINE, no LINE start/end), so cell size, run length, orientation, and whether this is wall vs. slab/roof insulation cannot be confirmed — only layer semantics and entity uniformity are observable."
+    }
+  },
+  {
+    "unit_id": "defannot-u156-163",
+    "def": "*U156",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "Insulation hatch fill on X-평면도(기본형)$0$INSUL: 92 uniform 5-vertex LWPOLYLINE cells (from handle 4F98); wall-adjacent fill, no wall-line geometry.",
+    "rationale": {
+      "evidence": "All 92 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, each with exactly 5 vertices (uniform closed-quad cells), starting at handle 4F98. The layer's terminal token INSUL marks insulation, and the block carries no LINE, TEXT, DIMENSION, or INSERT entities. A dense set of identical small closed cells is the drawing signature of an insulation hatch fill rather than discrete wall drafting.",
+      "rule": "A block whose entities are exclusively small, uniform, closed LWPOLYLINEs on an *$INSUL layer is an insulation hatch fill; in plan view insulation sits inside the wall cavity, so it reliably co-locates with a wall yet is not itself the wall boundary line.",
+      "counterfactual": "Had these entities been on a WALL/벽 layer, or had the block also carried long 2-point LINE pairs tracing parallel offset faces, I would raise wall_likelihood and list those as wall_line_handles; a TEXT/DIMENSION or door-swing INSERT would instead push the role toward 치수캐시/심볼.",
+      "uncertainty": "This projection derives no vertex coordinates or bbox (all-LWPOLYLINE, no LINE start/end), so cell size, run length, orientation, and whether this is wall vs. slab/roof insulation cannot be confirmed — only layer semantics and entity uniformity are observable."
+    }
+  },
+  {
+    "unit_id": "defannot-u157-164",
+    "def": "*U157",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "Insulation hatch fill on X-평면도(기본형)$0$INSUL: 8 uniform 5-vertex LWPOLYLINE cells (from handle 4FF9); wall-adjacent fill, no wall-line geometry.",
+    "rationale": {
+      "evidence": "All 8 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, each with exactly 5 vertices (uniform closed-quad cells), starting at handle 4FF9. The layer's terminal token INSUL marks insulation, and the block carries no LINE, TEXT, DIMENSION, or INSERT entities. A dense set of identical small closed cells is the drawing signature of an insulation hatch fill rather than discrete wall drafting.",
+      "rule": "A block whose entities are exclusively small, uniform, closed LWPOLYLINEs on an *$INSUL layer is an insulation hatch fill; in plan view insulation sits inside the wall cavity, so it reliably co-locates with a wall yet is not itself the wall boundary line.",
+      "counterfactual": "Had these entities been on a WALL/벽 layer, or had the block also carried long 2-point LINE pairs tracing parallel offset faces, I would raise wall_likelihood and list those as wall_line_handles; a TEXT/DIMENSION or door-swing INSERT would instead push the role toward 치수캐시/심볼.",
+      "uncertainty": "This projection derives no vertex coordinates or bbox (all-LWPOLYLINE, no LINE start/end), so cell size, run length, orientation, and whether this is wall vs. slab/roof insulation cannot be confirmed — only layer semantics and entity uniformity are observable."
+    }
+  },
+  {
+    "unit_id": "defannot-u158-165",
+    "def": "*U158",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "Insulation hatch fill on X-평면도(기본형)$0$INSUL: 17 uniform 5-vertex LWPOLYLINE cells (from handle 5006); wall-adjacent fill, no wall-line geometry.",
+    "rationale": {
+      "evidence": "All 17 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, each with exactly 5 vertices (uniform closed-quad cells), starting at handle 5006. The layer's terminal token INSUL marks insulation, and the block carries no LINE, TEXT, DIMENSION, or INSERT entities. A dense set of identical small closed cells is the drawing signature of an insulation hatch fill rather than discrete wall drafting.",
+      "rule": "A block whose entities are exclusively small, uniform, closed LWPOLYLINEs on an *$INSUL layer is an insulation hatch fill; in plan view insulation sits inside the wall cavity, so it reliably co-locates with a wall yet is not itself the wall boundary line.",
+      "counterfactual": "Had these entities been on a WALL/벽 layer, or had the block also carried long 2-point LINE pairs tracing parallel offset faces, I would raise wall_likelihood and list those as wall_line_handles; a TEXT/DIMENSION or door-swing INSERT would instead push the role toward 치수캐시/심볼.",
+      "uncertainty": "This projection derives no vertex coordinates or bbox (all-LWPOLYLINE, no LINE start/end), so cell size, run length, orientation, and whether this is wall vs. slab/roof insulation cannot be confirmed — only layer semantics and entity uniformity are observable."
+    }
+  },
+  {
+    "unit_id": "defannot-u159-166",
+    "def": "*U159",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "Insulation hatch fill on X-평면도(기본형)$0$INSUL: 18 uniform 5-vertex LWPOLYLINE cells (from handle 501C); wall-adjacent fill, no wall-line geometry.",
+    "rationale": {
+      "evidence": "All 18 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, each with exactly 5 vertices (uniform closed-quad cells), starting at handle 501C. The layer's terminal token INSUL marks insulation, and the block carries no LINE, TEXT, DIMENSION, or INSERT entities. A dense set of identical small closed cells is the drawing signature of an insulation hatch fill rather than discrete wall drafting.",
+      "rule": "A block whose entities are exclusively small, uniform, closed LWPOLYLINEs on an *$INSUL layer is an insulation hatch fill; in plan view insulation sits inside the wall cavity, so it reliably co-locates with a wall yet is not itself the wall boundary line.",
+      "counterfactual": "Had these entities been on a WALL/벽 layer, or had the block also carried long 2-point LINE pairs tracing parallel offset faces, I would raise wall_likelihood and list those as wall_line_handles; a TEXT/DIMENSION or door-swing INSERT would instead push the role toward 치수캐시/심볼.",
+      "uncertainty": "This projection derives no vertex coordinates or bbox (all-LWPOLYLINE, no LINE start/end), so cell size, run length, orientation, and whether this is wall vs. slab/roof insulation cannot be confirmed — only layer semantics and entity uniformity are observable."
+    }
+  },
+  {
+    "unit_id": "defannot-u160-167",
+    "def": "*U160",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "Insulation hatch fill on X-평면도(기본형)$0$INSUL: 87 uniform 5-vertex LWPOLYLINE cells (from handle 5033); wall-adjacent fill, no wall-line geometry.",
+    "rationale": {
+      "evidence": "All 87 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, each with exactly 5 vertices (uniform closed-quad cells), starting at handle 5033. The layer's terminal token INSUL marks insulation, and the block carries no LINE, TEXT, DIMENSION, or INSERT entities. A dense set of identical small closed cells is the drawing signature of an insulation hatch fill rather than discrete wall drafting.",
+      "rule": "A block whose entities are exclusively small, uniform, closed LWPOLYLINEs on an *$INSUL layer is an insulation hatch fill; in plan view insulation sits inside the wall cavity, so it reliably co-locates with a wall yet is not itself the wall boundary line.",
+      "counterfactual": "Had these entities been on a WALL/벽 layer, or had the block also carried long 2-point LINE pairs tracing parallel offset faces, I would raise wall_likelihood and list those as wall_line_handles; a TEXT/DIMENSION or door-swing INSERT would instead push the role toward 치수캐시/심볼.",
+      "uncertainty": "This projection derives no vertex coordinates or bbox (all-LWPOLYLINE, no LINE start/end), so cell size, run length, orientation, and whether this is wall vs. slab/roof insulation cannot be confirmed — only layer semantics and entity uniformity are observable."
+    }
+  },
+  {
+    "unit_id": "defannot-u161-168",
+    "def": "*U161",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "Insulation hatch fill on X-평면도(기본형)$0$INSUL: 90 uniform 5-vertex LWPOLYLINE cells (from handle 508F); wall-adjacent fill, no wall-line geometry.",
+    "rationale": {
+      "evidence": "All 90 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, each with exactly 5 vertices (uniform closed-quad cells), starting at handle 508F. The layer's terminal token INSUL marks insulation, and the block carries no LINE, TEXT, DIMENSION, or INSERT entities. A dense set of identical small closed cells is the drawing signature of an insulation hatch fill rather than discrete wall drafting.",
+      "rule": "A block whose entities are exclusively small, uniform, closed LWPOLYLINEs on an *$INSUL layer is an insulation hatch fill; in plan view insulation sits inside the wall cavity, so it reliably co-locates with a wall yet is not itself the wall boundary line.",
+      "counterfactual": "Had these entities been on a WALL/벽 layer, or had the block also carried long 2-point LINE pairs tracing parallel offset faces, I would raise wall_likelihood and list those as wall_line_handles; a TEXT/DIMENSION or door-swing INSERT would instead push the role toward 치수캐시/심볼.",
+      "uncertainty": "This projection derives no vertex coordinates or bbox (all-LWPOLYLINE, no LINE start/end), so cell size, run length, orientation, and whether this is wall vs. slab/roof insulation cannot be confirmed — only layer semantics and entity uniformity are observable."
+    }
+  },
+  {
+    "unit_id": "defannot-u162-169",
+    "def": "*U162",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "Insulation hatch fill on X-평면도(기본형)$0$INSUL: 81 uniform 5-vertex LWPOLYLINE cells (from handle 50EE); wall-adjacent fill, no wall-line geometry.",
+    "rationale": {
+      "evidence": "All 81 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, each with exactly 5 vertices (uniform closed-quad cells), starting at handle 50EE. The layer's terminal token INSUL marks insulation, and the block carries no LINE, TEXT, DIMENSION, or INSERT entities. A dense set of identical small closed cells is the drawing signature of an insulation hatch fill rather than discrete wall drafting.",
+      "rule": "A block whose entities are exclusively small, uniform, closed LWPOLYLINEs on an *$INSUL layer is an insulation hatch fill; in plan view insulation sits inside the wall cavity, so it reliably co-locates with a wall yet is not itself the wall boundary line.",
+      "counterfactual": "Had these entities been on a WALL/벽 layer, or had the block also carried long 2-point LINE pairs tracing parallel offset faces, I would raise wall_likelihood and list those as wall_line_handles; a TEXT/DIMENSION or door-swing INSERT would instead push the role toward 치수캐시/심볼.",
+      "uncertainty": "This projection derives no vertex coordinates or bbox (all-LWPOLYLINE, no LINE start/end), so cell size, run length, orientation, and whether this is wall vs. slab/roof insulation cannot be confirmed — only layer semantics and entity uniformity are observable."
+    }
+  },
+  {
+    "unit_id": "defannot-u163-170",
+    "def": "*U163",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "Insulation hatch fill on X-평면도(기본형)$0$INSUL: 75 uniform 5-vertex LWPOLYLINE cells (from handle 5144); wall-adjacent fill, no wall-line geometry.",
+    "rationale": {
+      "evidence": "All 75 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, each with exactly 5 vertices (uniform closed-quad cells), starting at handle 5144. The layer's terminal token INSUL marks insulation, and the block carries no LINE, TEXT, DIMENSION, or INSERT entities. A dense set of identical small closed cells is the drawing signature of an insulation hatch fill rather than discrete wall drafting.",
+      "rule": "A block whose entities are exclusively small, uniform, closed LWPOLYLINEs on an *$INSUL layer is an insulation hatch fill; in plan view insulation sits inside the wall cavity, so it reliably co-locates with a wall yet is not itself the wall boundary line.",
+      "counterfactual": "Had these entities been on a WALL/벽 layer, or had the block also carried long 2-point LINE pairs tracing parallel offset faces, I would raise wall_likelihood and list those as wall_line_handles; a TEXT/DIMENSION or door-swing INSERT would instead push the role toward 치수캐시/심볼.",
+      "uncertainty": "This projection derives no vertex coordinates or bbox (all-LWPOLYLINE, no LINE start/end), so cell size, run length, orientation, and whether this is wall vs. slab/roof insulation cannot be confirmed — only layer semantics and entity uniformity are observable."
+    }
+  },
+  {
+    "unit_id": "defannot-u164-171",
+    "def": "*U164",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "Insulation hatch fill on X-평면도(기본형)$0$INSUL: 37 uniform 5-vertex LWPOLYLINE cells (from handle 5194); wall-adjacent fill, no wall-line geometry.",
+    "rationale": {
+      "evidence": "All 37 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, each with exactly 5 vertices (uniform closed-quad cells), starting at handle 5194. The layer's terminal token INSUL marks insulation, and the block carries no LINE, TEXT, DIMENSION, or INSERT entities. A dense set of identical small closed cells is the drawing signature of an insulation hatch fill rather than discrete wall drafting.",
+      "rule": "A block whose entities are exclusively small, uniform, closed LWPOLYLINEs on an *$INSUL layer is an insulation hatch fill; in plan view insulation sits inside the wall cavity, so it reliably co-locates with a wall yet is not itself the wall boundary line.",
+      "counterfactual": "Had these entities been on a WALL/벽 layer, or had the block also carried long 2-point LINE pairs tracing parallel offset faces, I would raise wall_likelihood and list those as wall_line_handles; a TEXT/DIMENSION or door-swing INSERT would instead push the role toward 치수캐시/심볼.",
+      "uncertainty": "This projection derives no vertex coordinates or bbox (all-LWPOLYLINE, no LINE start/end), so cell size, run length, orientation, and whether this is wall vs. slab/roof insulation cannot be confirmed — only layer semantics and entity uniformity are observable."
+    }
+  },
+  {
+    "unit_id": "defannot-u165-172",
+    "def": "*U165",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "Insulation hatch fill on X-평면도(기본형)$0$INSUL: 36 uniform 5-vertex LWPOLYLINE cells (from handle 51BE); wall-adjacent fill, no wall-line geometry.",
+    "rationale": {
+      "evidence": "All 36 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, each with exactly 5 vertices (uniform closed-quad cells), starting at handle 51BE. The layer's terminal token INSUL marks insulation, and the block carries no LINE, TEXT, DIMENSION, or INSERT entities. A dense set of identical small closed cells is the drawing signature of an insulation hatch fill rather than discrete wall drafting.",
+      "rule": "A block whose entities are exclusively small, uniform, closed LWPOLYLINEs on an *$INSUL layer is an insulation hatch fill; in plan view insulation sits inside the wall cavity, so it reliably co-locates with a wall yet is not itself the wall boundary line.",
+      "counterfactual": "Had these entities been on a WALL/벽 layer, or had the block also carried long 2-point LINE pairs tracing parallel offset faces, I would raise wall_likelihood and list those as wall_line_handles; a TEXT/DIMENSION or door-swing INSERT would instead push the role toward 치수캐시/심볼.",
+      "uncertainty": "This projection derives no vertex coordinates or bbox (all-LWPOLYLINE, no LINE start/end), so cell size, run length, orientation, and whether this is wall vs. slab/roof insulation cannot be confirmed — only layer semantics and entity uniformity are observable."
+    }
+  },
+  {
+    "unit_id": "defannot-u166-173",
+    "def": "*U166",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "Insulation hatch fill on X-평면도(기본형)$0$INSUL: 13 uniform 5-vertex LWPOLYLINE cells (from handle 51E7); wall-adjacent fill, no wall-line geometry.",
+    "rationale": {
+      "evidence": "All 13 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, each with exactly 5 vertices (uniform closed-quad cells), starting at handle 51E7. The layer's terminal token INSUL marks insulation, and the block carries no LINE, TEXT, DIMENSION, or INSERT entities. A dense set of identical small closed cells is the drawing signature of an insulation hatch fill rather than discrete wall drafting.",
+      "rule": "A block whose entities are exclusively small, uniform, closed LWPOLYLINEs on an *$INSUL layer is an insulation hatch fill; in plan view insulation sits inside the wall cavity, so it reliably co-locates with a wall yet is not itself the wall boundary line.",
+      "counterfactual": "Had these entities been on a WALL/벽 layer, or had the block also carried long 2-point LINE pairs tracing parallel offset faces, I would raise wall_likelihood and list those as wall_line_handles; a TEXT/DIMENSION or door-swing INSERT would instead push the role toward 치수캐시/심볼.",
+      "uncertainty": "This projection derives no vertex coordinates or bbox (all-LWPOLYLINE, no LINE start/end), so cell size, run length, orientation, and whether this is wall vs. slab/roof insulation cannot be confirmed — only layer semantics and entity uniformity are observable."
+    }
+  },
+  {
+    "unit_id": "defannot-u167-174",
+    "def": "*U167",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "Insulation hatch fill on X-평면도(기본형)$0$INSUL: 30 uniform 5-vertex LWPOLYLINE cells (from handle 51F9); wall-adjacent fill, no wall-line geometry.",
+    "rationale": {
+      "evidence": "All 30 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, each with exactly 5 vertices (uniform closed-quad cells), starting at handle 51F9. The layer's terminal token INSUL marks insulation, and the block carries no LINE, TEXT, DIMENSION, or INSERT entities. A dense set of identical small closed cells is the drawing signature of an insulation hatch fill rather than discrete wall drafting.",
+      "rule": "A block whose entities are exclusively small, uniform, closed LWPOLYLINEs on an *$INSUL layer is an insulation hatch fill; in plan view insulation sits inside the wall cavity, so it reliably co-locates with a wall yet is not itself the wall boundary line.",
+      "counterfactual": "Had these entities been on a WALL/벽 layer, or had the block also carried long 2-point LINE pairs tracing parallel offset faces, I would raise wall_likelihood and list those as wall_line_handles; a TEXT/DIMENSION or door-swing INSERT would instead push the role toward 치수캐시/심볼.",
+      "uncertainty": "This projection derives no vertex coordinates or bbox (all-LWPOLYLINE, no LINE start/end), so cell size, run length, orientation, and whether this is wall vs. slab/roof insulation cannot be confirmed — only layer semantics and entity uniformity are observable."
+    }
+  },
+  {
+    "unit_id": "defannot-u168-175",
+    "def": "*U168",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "Insulation hatch fill on X-평면도(기본형)$0$INSUL: 14 uniform 5-vertex LWPOLYLINE cells (from handle 521C); wall-adjacent fill, no wall-line geometry.",
+    "rationale": {
+      "evidence": "All 14 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, each with exactly 5 vertices (uniform closed-quad cells), starting at handle 521C. The layer's terminal token INSUL marks insulation, and the block carries no LINE, TEXT, DIMENSION, or INSERT entities. A dense set of identical small closed cells is the drawing signature of an insulation hatch fill rather than discrete wall drafting.",
+      "rule": "A block whose entities are exclusively small, uniform, closed LWPOLYLINEs on an *$INSUL layer is an insulation hatch fill; in plan view insulation sits inside the wall cavity, so it reliably co-locates with a wall yet is not itself the wall boundary line.",
+      "counterfactual": "Had these entities been on a WALL/벽 layer, or had the block also carried long 2-point LINE pairs tracing parallel offset faces, I would raise wall_likelihood and list those as wall_line_handles; a TEXT/DIMENSION or door-swing INSERT would instead push the role toward 치수캐시/심볼.",
+      "uncertainty": "This projection derives no vertex coordinates or bbox (all-LWPOLYLINE, no LINE start/end), so cell size, run length, orientation, and whether this is wall vs. slab/roof insulation cannot be confirmed — only layer semantics and entity uniformity are observable."
+    }
+  },
+  {
+    "unit_id": "defannot-u169-176",
+    "def": "*U169",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "Insulation hatch fill on X-평면도(기본형)$0$INSUL: 106 uniform 5-vertex LWPOLYLINE cells (from handle 522F); wall-adjacent fill, no wall-line geometry.",
+    "rationale": {
+      "evidence": "All 106 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, each with exactly 5 vertices (uniform closed-quad cells), starting at handle 522F. The layer's terminal token INSUL marks insulation, and the block carries no LINE, TEXT, DIMENSION, or INSERT entities. A dense set of identical small closed cells is the drawing signature of an insulation hatch fill rather than discrete wall drafting.",
+      "rule": "A block whose entities are exclusively small, uniform, closed LWPOLYLINEs on an *$INSUL layer is an insulation hatch fill; in plan view insulation sits inside the wall cavity, so it reliably co-locates with a wall yet is not itself the wall boundary line.",
+      "counterfactual": "Had these entities been on a WALL/벽 layer, or had the block also carried long 2-point LINE pairs tracing parallel offset faces, I would raise wall_likelihood and list those as wall_line_handles; a TEXT/DIMENSION or door-swing INSERT would instead push the role toward 치수캐시/심볼.",
+      "uncertainty": "This projection derives no vertex coordinates or bbox (all-LWPOLYLINE, no LINE start/end), so cell size, run length, orientation, and whether this is wall vs. slab/roof insulation cannot be confirmed — only layer semantics and entity uniformity are observable."
+    }
+  },
+  {
+    "unit_id": "defannot-u170-177",
+    "def": "*U170",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Flagpole (국기게양대) marker symbol: WIPEOUT mask + named INSERT + thin plaque frame on layer 0 (bbox ~1220x126); not walls.",
+    "rationale": {
+      "evidence": "The block contains an INSERT (handle 52A0) of block X-평면도(기본형)$0$국기게양대 — 국기게양대 = national-flag hoisting mast — plus 2 WIPEOUTs (529E/529F) that mask background and 20 LINEs on layer 0 (handles 52A1–52B4) forming a nested thin frame roughly 1220 wide by 126 tall with a central 1176-long bar only ~50 tall. Masking + a named-fixture INSERT + a small closed plaque frame is the signature of a plan symbol/marker, not building fabric.",
+      "rule": "A block combining WIPEOUT masking, a named-fixture INSERT, and a small closed frame on layer 0 is an annotation symbol/marker; symbols are self-contained fixtures, not wall runs, so wall_likelihood stays low even when some frame lines are long and thin.",
+      "counterfactual": "If the WIPEOUTs and the 국기게양대 INSERT were absent and the LINEs instead formed two long parallel offset faces on a wall layer spanning meters, I would reclassify as 평면 부분도 and mark those lines as wall candidates.",
+      "uncertainty": "I cannot see the inserted block's internal geometry or its placement/scale on the sheet, so the real-world size of the marker and whether the thin bar happens to abut a wall are not determinable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u171-178",
+    "def": "*U171",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "Insulation hatch fill on X-평면도(기본형)$0$INSUL: 29 uniform 5-vertex LWPOLYLINE cells (from handle 52BA); wall-adjacent fill, no wall-line geometry.",
+    "rationale": {
+      "evidence": "All 29 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, each with exactly 5 vertices (uniform closed-quad cells), starting at handle 52BA. The layer's terminal token INSUL marks insulation, and the block carries no LINE, TEXT, DIMENSION, or INSERT entities. A dense set of identical small closed cells is the drawing signature of an insulation hatch fill rather than discrete wall drafting.",
+      "rule": "A block whose entities are exclusively small, uniform, closed LWPOLYLINEs on an *$INSUL layer is an insulation hatch fill; in plan view insulation sits inside the wall cavity, so it reliably co-locates with a wall yet is not itself the wall boundary line.",
+      "counterfactual": "Had these entities been on a WALL/벽 layer, or had the block also carried long 2-point LINE pairs tracing parallel offset faces, I would raise wall_likelihood and list those as wall_line_handles; a TEXT/DIMENSION or door-swing INSERT would instead push the role toward 치수캐시/심볼.",
+      "uncertainty": "This projection derives no vertex coordinates or bbox (all-LWPOLYLINE, no LINE start/end), so cell size, run length, orientation, and whether this is wall vs. slab/roof insulation cannot be confirmed — only layer semantics and entity uniformity are observable."
+    }
+  },
+  {
+    "unit_id": "defannot-u172-179",
+    "def": "*U172",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Flagpole (국기게양대) marker symbol: WIPEOUT mask + named INSERT + thin plaque frame on layer 0 (bbox ~1620x126); not walls.",
+    "rationale": {
+      "evidence": "The block contains an INSERT (handle 52DE) of block X-평면도(기본형)$0$국기게양대 — 국기게양대 = national-flag hoisting mast — plus 2 WIPEOUTs (52DC/52DD) that mask background and 20 LINEs on layer 0 (handles 52DF–52F2) forming a nested thin frame roughly 1620 wide by 126 tall with a central 1576-long bar only ~50 tall. Masking + a named-fixture INSERT + a small closed plaque frame is the signature of a plan symbol/marker, not building fabric.",
+      "rule": "A block combining WIPEOUT masking, a named-fixture INSERT, and a small closed frame on layer 0 is an annotation symbol/marker; symbols are self-contained fixtures, not wall runs, so wall_likelihood stays low even when some frame lines are long and thin.",
+      "counterfactual": "If the WIPEOUTs and the 국기게양대 INSERT were absent and the LINEs instead formed two long parallel offset faces on a wall layer spanning meters, I would reclassify as 평면 부분도 and mark those lines as wall candidates.",
+      "uncertainty": "I cannot see the inserted block's internal geometry or its placement/scale on the sheet, so the real-world size of the marker and whether the thin bar happens to abut a wall are not determinable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u173-180",
+    "def": "*U173",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "Insulation hatch fill on X-평면도(기본형)$0$INSUL: 18 uniform 5-vertex LWPOLYLINE cells (from handle 52F8); wall-adjacent fill, no wall-line geometry.",
+    "rationale": {
+      "evidence": "All 18 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, each with exactly 5 vertices (uniform closed-quad cells), starting at handle 52F8. The layer's terminal token INSUL marks insulation, and the block carries no LINE, TEXT, DIMENSION, or INSERT entities. A dense set of identical small closed cells is the drawing signature of an insulation hatch fill rather than discrete wall drafting.",
+      "rule": "A block whose entities are exclusively small, uniform, closed LWPOLYLINEs on an *$INSUL layer is an insulation hatch fill; in plan view insulation sits inside the wall cavity, so it reliably co-locates with a wall yet is not itself the wall boundary line.",
+      "counterfactual": "Had these entities been on a WALL/벽 layer, or had the block also carried long 2-point LINE pairs tracing parallel offset faces, I would raise wall_likelihood and list those as wall_line_handles; a TEXT/DIMENSION or door-swing INSERT would instead push the role toward 치수캐시/심볼.",
+      "uncertainty": "This projection derives no vertex coordinates or bbox (all-LWPOLYLINE, no LINE start/end), so cell size, run length, orientation, and whether this is wall vs. slab/roof insulation cannot be confirmed — only layer semantics and entity uniformity are observable."
+    }
+  }
+]

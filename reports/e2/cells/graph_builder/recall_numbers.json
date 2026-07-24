@@ -1,0 +1,571 @@
+{
+  "config": {
+    "angle_collinear_deg": 2.0,
+    "angle_parallel_deg": 6.0,
+    "collinear_gap_norm": 2.0,
+    "collinear_offset_norm": 0.3,
+    "containment_entity_cap": 16,
+    "geometry_round_digits": 9,
+    "junction_snap_norm": 0.01,
+    "max_candidate_collect": 256,
+    "max_candidate_scan": 96,
+    "max_core_nodes_per_shard": 16384,
+    "max_index_cells_per_segment": 512,
+    "parallel_min_overlap": 0.2,
+    "parallel_offset_norm": 0.5,
+    "proximity_radius_norm": 0.5,
+    "topk_collinear": 8,
+    "topk_parallel": 12,
+    "topk_proximity": 12
+  },
+  "config_hash": "56911f4633979a3fe00fd56be2d0a39ac06757ed255ed49ed18ca20ba9d4ac49",
+  "drawing_count": 9,
+  "elapsed_seconds": 20.780457499990007,
+  "generator": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\gen2\\gen2.py",
+  "generator_sha256": "a8c2468b696b9271610e38bd87cec1402e9153bc464a5d9cf1429595f26dab55",
+  "graphs": [
+    {
+      "directed_edges": 28222,
+      "graph_hash": "7a81f6867b39ce810aceb02cdb6d4dd2a835a21266f264b65da317da43e43102",
+      "nodes": 2357,
+      "relation_recall": {
+        "collinearity": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 3,
+          "support": 3,
+          "uncapped_recovered": 3
+        },
+        "containment": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 9,
+          "support": 9,
+          "uncapped_recovered": 9
+        },
+        "instancing": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 118,
+          "support": 118,
+          "uncapped_recovered": 118
+        },
+        "intersection_junction": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 6,
+          "support": 6,
+          "uncapped_recovered": 6
+        },
+        "parallel_band": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 8,
+          "support": 8,
+          "uncapped_recovered": 8
+        },
+        "proximity": {
+          "cap_attributable_false_negatives": 0,
+          "recall": null,
+          "recovered": 0,
+          "support": 0,
+          "uncapped_recovered": 0
+        }
+      },
+      "seed": 20260718,
+      "tier": "S",
+      "unresolved_references": 0
+    },
+    {
+      "directed_edges": 28208,
+      "graph_hash": "4faed218ea567295cc9c29e19ee85bf58625c250e971b57b52e9f2f883bc3b49",
+      "nodes": 2357,
+      "relation_recall": {
+        "collinearity": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 3,
+          "support": 3,
+          "uncapped_recovered": 3
+        },
+        "containment": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 9,
+          "support": 9,
+          "uncapped_recovered": 9
+        },
+        "instancing": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 118,
+          "support": 118,
+          "uncapped_recovered": 118
+        },
+        "intersection_junction": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 6,
+          "support": 6,
+          "uncapped_recovered": 6
+        },
+        "parallel_band": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 8,
+          "support": 8,
+          "uncapped_recovered": 8
+        },
+        "proximity": {
+          "cap_attributable_false_negatives": 0,
+          "recall": null,
+          "recovered": 0,
+          "support": 0,
+          "uncapped_recovered": 0
+        }
+      },
+      "seed": 20260719,
+      "tier": "S",
+      "unresolved_references": 0
+    },
+    {
+      "directed_edges": 28210,
+      "graph_hash": "04269d83b2b5bd86dab8c9f559d5b56e84dc284721d781d6d4b63750dace0660",
+      "nodes": 2357,
+      "relation_recall": {
+        "collinearity": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 3,
+          "support": 3,
+          "uncapped_recovered": 3
+        },
+        "containment": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 9,
+          "support": 9,
+          "uncapped_recovered": 9
+        },
+        "instancing": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 118,
+          "support": 118,
+          "uncapped_recovered": 118
+        },
+        "intersection_junction": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 6,
+          "support": 6,
+          "uncapped_recovered": 6
+        },
+        "parallel_band": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 8,
+          "support": 8,
+          "uncapped_recovered": 8
+        },
+        "proximity": {
+          "cap_attributable_false_negatives": 0,
+          "recall": null,
+          "recovered": 0,
+          "support": 0,
+          "uncapped_recovered": 0
+        }
+      },
+      "seed": 20260720,
+      "tier": "S",
+      "unresolved_references": 0
+    },
+    {
+      "directed_edges": 28136,
+      "graph_hash": "784eb2ccc45ea71b0ba6ea2b2a4c0dbbd7ce3574d7f4fec976c48a64f4d690ae",
+      "nodes": 2357,
+      "relation_recall": {
+        "collinearity": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 3,
+          "support": 3,
+          "uncapped_recovered": 3
+        },
+        "containment": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 9,
+          "support": 9,
+          "uncapped_recovered": 9
+        },
+        "instancing": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 118,
+          "support": 118,
+          "uncapped_recovered": 118
+        },
+        "intersection_junction": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 6,
+          "support": 6,
+          "uncapped_recovered": 6
+        },
+        "parallel_band": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 9,
+          "support": 9,
+          "uncapped_recovered": 9
+        },
+        "proximity": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 1,
+          "support": 1,
+          "uncapped_recovered": 1
+        }
+      },
+      "seed": 20360718,
+      "tier": "F",
+      "unresolved_references": 0
+    },
+    {
+      "directed_edges": 28144,
+      "graph_hash": "b346024a8de53225843fcb3c37558403c754c9d1b59a415a73466faae236d6ab",
+      "nodes": 2357,
+      "relation_recall": {
+        "collinearity": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 3,
+          "support": 3,
+          "uncapped_recovered": 3
+        },
+        "containment": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 9,
+          "support": 9,
+          "uncapped_recovered": 9
+        },
+        "instancing": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 118,
+          "support": 118,
+          "uncapped_recovered": 118
+        },
+        "intersection_junction": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 6,
+          "support": 6,
+          "uncapped_recovered": 6
+        },
+        "parallel_band": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 9,
+          "support": 9,
+          "uncapped_recovered": 9
+        },
+        "proximity": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 1,
+          "support": 1,
+          "uncapped_recovered": 1
+        }
+      },
+      "seed": 20360719,
+      "tier": "F",
+      "unresolved_references": 0
+    },
+    {
+      "directed_edges": 28156,
+      "graph_hash": "88ba73716132b001343bb0450bc5c8fd2915799e325eb24efcbe04e7647d73c7",
+      "nodes": 2357,
+      "relation_recall": {
+        "collinearity": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 3,
+          "support": 3,
+          "uncapped_recovered": 3
+        },
+        "containment": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 9,
+          "support": 9,
+          "uncapped_recovered": 9
+        },
+        "instancing": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 118,
+          "support": 118,
+          "uncapped_recovered": 118
+        },
+        "intersection_junction": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 6,
+          "support": 6,
+          "uncapped_recovered": 6
+        },
+        "parallel_band": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 9,
+          "support": 9,
+          "uncapped_recovered": 9
+        },
+        "proximity": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 1,
+          "support": 1,
+          "uncapped_recovered": 1
+        }
+      },
+      "seed": 20360720,
+      "tier": "F",
+      "unresolved_references": 0
+    },
+    {
+      "directed_edges": 28130,
+      "graph_hash": "e23686a40a18c95b953051116729c20a4887f437936ab8e6876faa03a2e361ac",
+      "nodes": 2358,
+      "relation_recall": {
+        "collinearity": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 3,
+          "support": 3,
+          "uncapped_recovered": 3
+        },
+        "containment": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 9,
+          "support": 9,
+          "uncapped_recovered": 9
+        },
+        "instancing": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 118,
+          "support": 118,
+          "uncapped_recovered": 118
+        },
+        "intersection_junction": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 7,
+          "support": 7,
+          "uncapped_recovered": 7
+        },
+        "parallel_band": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 10,
+          "support": 10,
+          "uncapped_recovered": 10
+        },
+        "proximity": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 2,
+          "support": 2,
+          "uncapped_recovered": 2
+        }
+      },
+      "seed": 20460718,
+      "tier": "M",
+      "unresolved_references": 0
+    },
+    {
+      "directed_edges": 28140,
+      "graph_hash": "144968e8550465a6499d49683b9356d98088fa548b4e43711e3245f7381804f7",
+      "nodes": 2358,
+      "relation_recall": {
+        "collinearity": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 3,
+          "support": 3,
+          "uncapped_recovered": 3
+        },
+        "containment": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 9,
+          "support": 9,
+          "uncapped_recovered": 9
+        },
+        "instancing": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 118,
+          "support": 118,
+          "uncapped_recovered": 118
+        },
+        "intersection_junction": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 7,
+          "support": 7,
+          "uncapped_recovered": 7
+        },
+        "parallel_band": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 10,
+          "support": 10,
+          "uncapped_recovered": 10
+        },
+        "proximity": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 2,
+          "support": 2,
+          "uncapped_recovered": 2
+        }
+      },
+      "seed": 20460719,
+      "tier": "M",
+      "unresolved_references": 0
+    },
+    {
+      "directed_edges": 28146,
+      "graph_hash": "27ca914fe0637d8a05e601df0685e7fbd6b336f30f9b50c1014ae6922da7f7dd",
+      "nodes": 2358,
+      "relation_recall": {
+        "collinearity": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 3,
+          "support": 3,
+          "uncapped_recovered": 3
+        },
+        "containment": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 9,
+          "support": 9,
+          "uncapped_recovered": 9
+        },
+        "instancing": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 118,
+          "support": 118,
+          "uncapped_recovered": 118
+        },
+        "intersection_junction": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 7,
+          "support": 7,
+          "uncapped_recovered": 7
+        },
+        "parallel_band": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 10,
+          "support": 10,
+          "uncapped_recovered": 10
+        },
+        "proximity": {
+          "cap_attributable_false_negatives": 0,
+          "recall": 1.0,
+          "recovered": 2,
+          "support": 2,
+          "uncapped_recovered": 2
+        }
+      },
+      "seed": 20460720,
+      "tier": "M",
+      "unresolved_references": 0
+    }
+  ],
+  "micro": {
+    "cap_attributable_false_negatives": 0,
+    "recall": 1.0,
+    "recovered": 1317,
+    "support": 1317,
+    "uncapped_recovered": 1317
+  },
+  "n_per_tier": 3,
+  "relation_types": {
+    "collinearity": {
+      "cap_attributable_false_negatives": 0,
+      "oracle_sources": {
+        "gen2.wall.axis_collinear_fragment": 27
+      },
+      "recall": 1.0,
+      "recovered": 27,
+      "support": 27,
+      "uncapped_recovered": 27
+    },
+    "containment": {
+      "cap_attributable_false_negatives": 0,
+      "oracle_sources": {
+        "dxf.entity_component_structure_with_truth_handle": 81
+      },
+      "recall": 1.0,
+      "recovered": 81,
+      "support": 81,
+      "uncapped_recovered": 81
+    },
+    "instancing": {
+      "cap_attributable_false_negatives": 0,
+      "oracle_sources": {
+        "dxf.insert_occurrence_structure": 1062
+      },
+      "recall": 1.0,
+      "recovered": 1062,
+      "support": 1062,
+      "uncapped_recovered": 1062
+    },
+    "intersection_junction": {
+      "cap_attributable_false_negatives": 0,
+      "oracle_sources": {
+        "gen2.wall.axis_intersection": 57
+      },
+      "recall": 1.0,
+      "recovered": 57,
+      "support": 57,
+      "uncapped_recovered": 57
+    },
+    "parallel_band": {
+      "cap_attributable_false_negatives": 0,
+      "oracle_sources": {
+        "gen2.wall.handles": 81
+      },
+      "recall": 1.0,
+      "recovered": 81,
+      "support": 81,
+      "uncapped_recovered": 81
+    },
+    "proximity": {
+      "cap_attributable_false_negatives": 0,
+      "oracle_sources": {
+        "gen2.opening.wall_id_plus_nearest_door_geometry": 9
+      },
+      "recall": 1.0,
+      "recovered": 9,
+      "support": 9,
+      "uncapped_recovered": 9
+    }
+  },
+  "schema": "ariadne.e2.graph_recall_audit.v1",
+  "seed": 20260718,
+  "truth_boundary_note": "wall parallel/intersection/collinearity/opening proximity units derive from gen2 wall/opening ledger; containment and instancing units derive from the read-only DXF entity/INSERT structure because wall.v1 has no explicit relation table",
+  "uncapped_comparison_config_hash": "cbd4533a33438bef2504daffeb605d9b4f7f3891db53ab889c5a5e30ac166cbb",
+  "unresolved_required_reference_count": 0
+}

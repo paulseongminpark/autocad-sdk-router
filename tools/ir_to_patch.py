@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -23,6 +24,12 @@ if _THIS_DIR not in sys.path:
     sys.path.insert(0, _THIS_DIR)
 
 import patch_ops  # per-family op-case dispatch (PLAN F9)
+
+# *D<n> anonymous defs are per-dimension rendered caches (LEX-0001): the
+# rebuilt drawing's dimensions mint their own fresh *D records, so census
+# caches are never re-emitted -- including by the orphan-def sweep below.
+_DIM_CACHE_NAME = re.compile(r"^\*D\d+$")
+from patch_ops.xdata import build_xdata_ops
 
 
 def _op_for(ent: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -33,8 +40,52 @@ def _op_for(ent: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     return patch_ops.ir_op_for(ent)
 
 
+def _is_anonymous_block_name(block_name: Any, block_def: Optional[Dict[str, Any]] = None) -> bool:
+    return bool((block_def or {}).get("anonymous")) or (
+        isinstance(block_name, str) and block_name.startswith("*"))
+
+
+def _anon_clone_base_name(block_name: str) -> str:
+    sanitized = "".join(
+        ch if ch.isalnum() else "_"
+        for ch in block_name
+        if ch != "*"
+    )
+    return "ARIADNE_ANON_" + sanitized
+
+
+def _build_anon_remap(ir: Dict[str, Any],
+                      block_defs_by_name: Dict[str, Dict[str, Any]]) -> Dict[str, str]:
+    # Reserve every known BTR name so clone synthesis never collides with the
+    # source drawing's existing records.
+    reserved_names = set(block_defs_by_name)
+    for record in (ir.get("block_table_records") or []):
+        if not isinstance(record, dict):
+            continue
+        name = record.get("name")
+        if isinstance(name, str):
+            reserved_names.add(name)
+
+    remap: Dict[str, str] = {}
+    anon_names = sorted(
+        name for name, block_def in block_defs_by_name.items()
+        if _is_anonymous_block_name(name, block_def)
+    )
+    for name in anon_names:
+        base_name = _anon_clone_base_name(name)
+        clone_name = base_name
+        suffix = 2
+        while clone_name in reserved_names:
+            clone_name = "%s_%d" % (base_name, suffix)
+            suffix += 1
+        remap[name] = clone_name
+        reserved_names.add(clone_name)
+    return remap
+
+
 def build_patch_from_ir(ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id: str,
-                        kinds: Optional[set] = None) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
+                        kinds: Optional[set] = None,
+                        include_xdata: bool = False) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
     """Build a (cad_patch.v1, deferred[]) pair from a native_full IR.
 
     kinds: optional set of geometry.kind to include (e.g. {"line","circle"} for a
@@ -51,10 +102,53 @@ def build_patch_from_ir(ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id
     block_defs_by_name = {
         bd.get("name"): bd for bd in (ir.get("block_definitions") or []) if bd.get("name")
     }
+    anon_remap = _build_anon_remap(ir, block_defs_by_name)
     emitted_block_defs: set = set()
+    handle_map: Dict[Any, Any] = {}
     active_block_defs: List[str] = []
     block_def_step_counts: Dict[int, int] = {}
     cycle_notes_seen: set = set()
+    relink_ops: List[Dict[str, Any]] = []
+
+    def _emit_block_name(block_name: Any) -> Any:
+        return anon_remap.get(block_name, block_name)
+
+    def _block_def_for_emit(block_name: str) -> Dict[str, Any]:
+        block_def = block_defs_by_name[block_name]
+        emitted_name = _emit_block_name(block_name)
+        emitted_def = dict(block_def)
+        emitted_def["name"] = emitted_name
+        emitted_entities: List[Dict[str, Any]] = []
+        for def_ent in (block_def.get("def_entities") or []):
+            g = def_ent.get("geometry") or {}
+            if g.get("kind") != "block_reference":
+                emitted_entities.append(def_ent)
+                continue
+            nested_name = g.get("block_name")
+            emitted_nested_name = _emit_block_name(nested_name)
+            if emitted_nested_name == nested_name:
+                emitted_entities.append(def_ent)
+                continue
+            emitted_ent = dict(def_ent)
+            emitted_g = dict(g)
+            emitted_g["block_name"] = emitted_nested_name
+            emitted_ent["geometry"] = emitted_g
+            emitted_entities.append(emitted_ent)
+        emitted_def["def_entities"] = emitted_entities
+        return emitted_def
+
+    def _entity_for_emit(ent: Dict[str, Any]) -> Dict[str, Any]:
+        g = ent.get("geometry") or {}
+        if g.get("kind") != "block_reference":
+            return ent
+        emitted_name = _emit_block_name(g.get("block_name"))
+        if emitted_name == g.get("block_name"):
+            return ent
+        emitted_ent = dict(ent)
+        emitted_g = dict(g)
+        emitted_g["block_name"] = emitted_name
+        emitted_ent["geometry"] = emitted_g
+        return emitted_ent
 
     def _emit_block_def(block_name: str, root_entity_index: int) -> None:
         if block_name in emitted_block_defs:
@@ -96,15 +190,42 @@ def build_patch_from_ir(ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id
                     })
                     continue
                 _emit_block_def(nested_block_name, root_entity_index)
-            bd_ops, bd_deferred = patch_ops.blocks.block_def_ops(block_def)
+            bd_ops, bd_deferred = patch_ops.blocks.block_def_ops(_block_def_for_emit(block_name))
             next_step = block_def_step_counts.get(root_entity_index, 0)
             for bd_op in bd_ops:
+                # Nested block_reference appends are only sound when their
+                # target definition was actually synthesized (dependency
+                # order guarantees it is already in emitted_block_defs).
+                # Anonymous/missing/cycle targets never got emitted -- the
+                # native append would fail-loud on a missing block table
+                # record and abort the whole batch, so defer honestly here.
+                bd_ent = ((bd_op.get("args") or {}).get("entity") or {})
+                if (bd_op.get("operation") == "append_block_entity"
+                        and bd_ent.get("kind") == "block_reference"
+                        and bd_ent.get("block_name") not in emitted_block_defs):
+                    deferred.append({
+                        "block_name": block_name,
+                        "kind": "block_reference",
+                        "reason": "nested block_reference append skipped: target %r "
+                                  "not synthesized (anonymous/missing/cycle)"
+                                  % (bd_ent.get("block_name"),),
+                    })
+                    continue
                 bd_op["step_id"] = "bd%d_%d" % (root_entity_index, next_step)
                 ops.append(bd_op)
                 next_step += 1
             block_def_step_counts[root_entity_index] = next_step
             deferred.extend(bd_deferred)
+            # Assoc relink (P3, docs/ASSOC_RELINK_DESIGN.md): collected here
+            # per emitted def but appended to the op stream LAST (below), so
+            # every boundary source in every def exists before any relink job
+            # runs. Args carry CENSUS handles; patch_engine translates.
+            relink_ops.extend(
+                patch_ops.blocks.relink_hatch_assoc_ops(_block_def_for_emit(block_name)))
             emitted_block_defs.add(block_name)
+            remapped_name = anon_remap.get(block_name)
+            if remapped_name:
+                emitted_block_defs.add(remapped_name)
         finally:
             active_block_defs.pop()
 
@@ -128,12 +249,53 @@ def build_patch_from_ir(ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id
                 continue
             if block_name not in emitted_block_defs:
                 _emit_block_def(block_name, i)
-        op = _op_for(ent)
+            if block_name not in emitted_block_defs:
+                # _emit_block_def declined (cycle): a
+                # create_blockref would target a name the seed cannot
+                # resolve -- defer the INSERT honestly.
+                deferred.append({
+                    "index": i, "handle": ent.get("handle"), "kind": kind,
+                    "reason": "block definition %r not synthesizable "
+                              "(cycle) - INSERT deferred" % (block_name,),
+                })
+                continue
+        op = _op_for(_entity_for_emit(ent))
         if op is None:
             deferred.append({"index": i, "handle": ent.get("handle"), "kind": kind})
             continue
         op["step_id"] = "e%d" % i
         ops.append(op)
+        if ent.get("handle"):
+            handle_map[ent.get("handle")] = op["step_id"]
+    if kinds is None:
+        # Orphan-def sweep (R4s removed-28 finding): reference-reachability
+        # alone misses defs that are authored content but never INSERTed --
+        # measured on 1.dwg: DIMDOT + _ArchTick (referenced only from *D
+        # dimension caches, which the rebuild intentionally never emits,
+        # LEX-0001) and two unreferenced defs (...$0$ins-l, ...$0$ng), 4 defs
+        # / 28 entities scored removed on every R4 run. Emit every remaining
+        # non-*D-cache definition after the entity stream so the rebuilt
+        # drawing carries the full authored block table. Skipped for
+        # kind-filtered (tiered) runs, which are deliberately partial.
+        sweep_root = len(ir.get("entities") or [])
+        for block_name in sorted(block_defs_by_name):
+            if block_name in emitted_block_defs:
+                continue
+            if _DIM_CACHE_NAME.match(block_name or ""):
+                continue
+            _emit_block_def(block_name, sweep_root)
+    if include_xdata:
+        xdata_ops, xdata_deferred = build_xdata_ops(ir, handle_map)
+        for j, xdata_op in enumerate(xdata_ops):
+            xdata_op["step_id"] = "xd%d" % j
+            ops.append(xdata_op)
+        deferred.extend(xdata_deferred)
+    # Relink jobs are the absolute tail of the stream: every append (entity,
+    # def, sweep, xdata) precedes them, so the engine's handle ledger is
+    # complete for every source they will translate.
+    for j, relink_op in enumerate(relink_ops):
+        relink_op["step_id"] = "rl%d" % j
+        ops.append(relink_op)
     patch = {
         "schema": "ariadne.cad_patch.v1",
         "patch_id": patch_id,
@@ -144,6 +306,10 @@ def build_patch_from_ir(ir: Dict[str, Any], target_dwg: Dict[str, Any], patch_id
         "postconditions": [{"subject": "entity_count", "op": "delta_ge", "value": 1}],
         "policy": {"staged_copy": True, "write_mode": "write_copy"},
     }
+    if anon_remap:
+        patch["anon_remap"] = {
+            name: anon_remap[name] for name in sorted(anon_remap)
+        }
     return patch, deferred
 
 

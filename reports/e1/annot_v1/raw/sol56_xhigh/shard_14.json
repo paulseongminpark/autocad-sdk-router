@@ -1,0 +1,528 @@
+[
+ {
+  "unit_id": "defannot-u88-261",
+  "def": "*U88",
+  "role": "기타",
+  "wall_likelihood": 0.12,
+  "wall_line_handles": [],
+  "notes": "INSUL 레이어의 반복 폐합 폴리라인으로 구성된 단열 표현 보조 블록이다.",
+  "rationale": {
+   "evidence": "8개 엔티티가 모두 X-평면도(기본형)$0$INSUL 레이어의 5정점 LWPOLYLINE이다. 벽 경계를 직접 나타내는 LINE이나 W 계열 레이어는 없다.",
+   "rule": "단열 레이어의 반복 폐합 도형은 벽 재료 표현일 수 있지만 벽선을 직접 구성하지 않으면 벽 블록으로 보지 않는다.",
+   "counterfactual": "일정 간격의 평행 장선이 W1 같은 벽 레이어에 존재했다면 평면 부분도와 높은 벽 가능성으로 판정했을 것이다.",
+   "uncertainty": "정점 좌표가 없어 폴리라인이 실제 단열재인지 작은 벽 윤곽인지는 완전히 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u89-262",
+  "def": "*U89",
+  "role": "기타",
+  "wall_likelihood": 0.13,
+  "wall_line_handles": [],
+  "notes": "다수의 동일 형식 INSUL 폴리라인으로 만든 단열 패턴 블록이다.",
+  "rationale": {
+   "evidence": "30개 엔티티가 모두 INSUL 레이어의 5정점 LWPOLYLINE이며 다른 도형 유형은 없다. 반복성과 단일 재료 레이어 사용은 단열 채움 패턴에 가깝다.",
+   "rule": "재료 전용 레이어의 반복 셀은 벽과 연관되어도 벽 경계선 자체로는 선별하지 않는다.",
+   "counterfactual": "장거리 평행 LINE이나 벽 레이어의 연속 경계가 포함되었다면 벽 가능성이 크게 올라간다.",
+   "uncertainty": "폴리라인 좌표와 폐합 상태가 제시되지 않아 전체 배열의 형상은 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u90-263",
+  "def": "*U90",
+  "role": "기타",
+  "wall_likelihood": 0.14,
+  "wall_line_handles": [],
+  "notes": "INSUL 레이어의 반복 폴리라인 집합으로 보이는 대형 단열 표현 블록이다.",
+  "rationale": {
+   "evidence": "41개 엔티티 전체가 INSUL 레이어의 5정점 LWPOLYLINE이다. 벽 레이어, 중심선, 문 또는 공간 윤곽을 뒷받침하는 다른 엔티티는 없다.",
+   "rule": "동일한 작은 폴리라인이 재료 레이어에 반복되면 구조 경계보다 패턴 또는 채움 표현으로 분류한다.",
+   "counterfactual": "폴리라인들이 긴 이중 경계를 형성한다는 좌표 증거가 있으면 평면 벽 요소로 재분류할 수 있다.",
+   "uncertainty": "샘플에 좌표가 없어 각 폴리라인의 크기와 상호 배치를 판단할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u91-264",
+  "def": "*U91",
+  "role": "기타",
+  "wall_likelihood": 0.11,
+  "wall_line_handles": [],
+  "notes": "소수의 INSUL 폴리라인으로 구성된 단열 그래픽 조각이다.",
+  "rationale": {
+   "evidence": "6개 엔티티 모두 INSUL 레이어의 5정점 LWPOLYLINE이다. 직접적인 벽선 후보가 되는 LINE이나 W 계열 레이어가 없다.",
+   "rule": "단열 표시만 있는 익명 블록은 벽을 암시할 수 있어도 벽 경계 블록과 분리한다.",
+   "counterfactual": "평행한 벽면선이나 개구부와 결합된 벽 윤곽이 추가되면 평면 부분도 판정으로 바뀐다.",
+   "uncertainty": "정점 위치가 누락되어 단열 기호인지 폐합 벽 조각인지 확정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u92-265",
+  "def": "*U92",
+  "role": "기타",
+  "wall_likelihood": 0.13,
+  "wall_line_handles": [],
+  "notes": "INSUL 전용 반복 폴리라인으로 이루어진 단열 채움 블록이다.",
+  "rationale": {
+   "evidence": "23개 엔티티가 모두 INSUL 레이어의 5정점 LWPOLYLINE으로 동일한 구조를 가진다. 구조벽 레이어나 장거리 LINE은 나타나지 않는다.",
+   "rule": "재료 채움용 반복 도형은 벽과 함께 쓰이더라도 벽선 자체로 주석하지 않는다.",
+   "counterfactual": "W1 레이어의 연속 이중선이나 방 윤곽이 존재했다면 벽 가능성을 높였을 것이다.",
+   "uncertainty": "좌표와 축척이 없어 반복 도형의 실제 크기와 배열 방향은 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u93-266",
+  "def": "*U93",
+  "role": "기타",
+  "wall_likelihood": 0.11,
+  "wall_line_handles": [],
+  "notes": "단열 레이어에만 존재하는 소형 반복 그래픽 블록이다.",
+  "rationale": {
+   "evidence": "6개 엔티티가 모두 INSUL 레이어의 5정점 LWPOLYLINE이다. 벽 경계로 식별할 수 있는 선형 엔티티나 벽 레이어 단서가 없다.",
+   "rule": "단일 재료 레이어의 반복 폐합 도형은 구조선보다 패턴 구성요소로 우선 해석한다.",
+   "counterfactual": "긴 평행 경계와 교차·코너 연결이 확인되면 벽 요소로 판정할 수 있다.",
+   "uncertainty": "폴리라인 좌표가 없어 형상과 인접 관계를 직접 검증할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-x-form-267",
+  "def": "X-FORM_청주",
+  "role": "기타",
+  "wall_likelihood": 0.01,
+  "wall_line_handles": [],
+  "notes": "시트 테두리, 표 칸 및 문자를 포함하는 도면 양식 블록이다.",
+  "rationale": {
+   "evidence": "A-SHEET, A-SHEET-DEF, A-SHEET-TEXT 레이어에 105개 LINE과 72개 TEXT가 분포한다. 820×572 범위의 반복 수평선과 표 형상은 건축 평면보다 시트 양식을 나타낸다.",
+   "rule": "시트 전용 레이어와 표 형태의 선·문자 조합은 평면 벽이 아니라 도곽 또는 표제란으로 분류한다.",
+   "counterfactual": "W 계열 레이어에 공간을 둘러싸는 이중선과 문 개구부가 있었다면 평면 부분도로 판정했을 것이다.",
+   "uncertainty": "문자 내용이 샘플에 없어 정확한 표제란 구성과 삽입 블록의 기능은 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-x-form-0-block-5-268",
+  "def": "X-FORM_청주$0$Block_5",
+  "role": "심볼",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "스플라인과 솔리드 해치로 만든 시트 그래픽 심볼의 하위 블록이다.",
+  "rationale": {
+   "evidence": "4개 SPLINE과 2개 SOLID HATCH만 있으며 모두 A-SHEET 계열 레이어에 있다. 직선 벽 경계나 평면 구성 요소는 없다.",
+   "rule": "도곽 레이어의 곡선과 솔리드 채움으로 구성된 소형 블록은 로고 또는 장식 심볼로 본다.",
+   "counterfactual": "벽 레이어의 장거리 평행 LINE이 포함되면 심볼 판정을 재검토해야 한다.",
+   "uncertainty": "곡선 좌표와 실제 삽입 크기가 없어 어떤 로고 조각인지는 특정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-x-form-0-da-269",
+  "def": "X-FORM_청주$0$dA로고",
+  "role": "심볼",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "명칭과 곡선·솔리드 채움 구성이 일치하는 dA 로고 블록이다.",
+  "rationale": {
+   "evidence": "정의명에 로고가 명시되고 24개 SPLINE과 5개 SOLID HATCH가 A-SHEET 레이어에 있다. 삽입된 Block_5도 동일한 곡선형 시트 그래픽 구성요소다.",
+   "rule": "로고 명칭과 시트 레이어의 곡선·채움 조합은 건축 벽과 무관한 심볼로 분류한다.",
+   "counterfactual": "평면 벽 레이어와 직교 이중선 구조가 주된 구성이라면 평면 부분도로 바뀔 수 있다.",
+   "uncertainty": "투영에는 형상 좌표가 없어 로고의 시각적 외형은 재현할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-x-270",
+  "def": "X-평면도(기본형)",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.62,
+  "wall_line_handles": [],
+  "notes": "여러 동·세대 평면과 가구 및 설비 블록을 집약한 대규모 기본 평면 정의다.",
+  "rationale": {
+   "evidence": "정의명과 101동부터 106동까지의 TEXT, 세대형 표기, 대규모 GRID가 건축 평면 집합임을 보여준다. W1과 RW1 레이어가 존재하지만 샘플된 LINE은 GRID뿐이어서 특정 벽선 핸들은 선택하지 않았다.",
+   "rule": "동·세대 표기, 그리드, 문·계단·벽 레이어와 다수 삽입을 함께 가진 대형 정의는 복합 평면 정의로 분류한다.",
+   "counterfactual": "시트·가구 레이어만 있고 W 계열 및 건축 평면 표기가 없었다면 기타 또는 가구로 낮췄을 것이다.",
+   "uncertainty": "벽 레이어 엔티티의 좌표와 핸들이 샘플에 없어 실제 벽선의 범위와 연결성은 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-1000-271",
+  "def": "X-평면도(기본형)$0$1000",
+  "role": "심볼",
+  "wall_likelihood": 0.04,
+  "wall_line_handles": [],
+  "notes": "폭 약 1000의 문짝과 여닫이 궤적을 표현한 문 심볼이다.",
+  "rationale": {
+   "evidence": "16개 엔티티가 모두 DOOR 레이어에 있고 ARC 1개와 다수의 복잡한 LWPOLYLINE이 포함된다. 820C와 8218·8219는 문틀 또는 문짝 세부선으로 보이며 벽 레이어 선은 아니다.",
+   "rule": "DOOR 전용 레이어의 호와 문틀·문짝 형상 조합은 벽이 아니라 개구부 심볼로 분류한다.",
+   "counterfactual": "W1 레이어의 연속 평행선이 문 형상보다 우세했다면 벽 포함 평면 조각으로 볼 수 있다.",
+   "uncertainty": "폴리라인 좌표가 없어 정확한 문 종류와 여닫이 방향은 확정하기 어렵다."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-100012-272",
+  "def": "X-평면도(기본형)$0$100012",
+  "role": "심볼",
+  "wall_likelihood": 0.04,
+  "wall_line_handles": [],
+  "notes": "깊이 치수가 다른 폭 1000 계열 문 심볼이다.",
+  "rationale": {
+   "evidence": "모든 엔티티가 DOOR 레이어이며 ARC, 문틀형 LINE, 다수의 LWPOLYLINE으로 구성된다. 822C와 822D의 3단위 간격 평행선은 벽보다 문짝 또는 문틀 세부선에 가깝다.",
+   "rule": "문 전용 레이어에서 호와 짧은 평행 세부선이 결합되면 문 심볼로 판정한다.",
+   "counterfactual": "벽 레이어에서 방 윤곽으로 이어지는 장거리 이중선이 확인되면 평면 부분도로 바뀔 수 있다.",
+   "uncertainty": "전체 폴리라인 형상이 없어 접미 숫자의 의미와 문 사양은 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-1000m-273",
+  "def": "X-평면도(기본형)$0$1000m",
+  "role": "심볼",
+  "wall_likelihood": 0.04,
+  "wall_line_handles": [],
+  "notes": "회전 또는 반전된 폭 1000 계열 문 심볼이다.",
+  "rationale": {
+   "evidence": "14개 엔티티 전체가 DOOR 레이어에 있고 ARC와 복잡한 LWPOLYLINE이 주를 이룬다. 823F와 8240은 3단위 간격의 평행 문틀 세부선이며 독립 벽선으로 보기 어렵다.",
+   "rule": "DOOR 레이어의 호, 문짝 윤곽, 근접 평행선 조합은 방향 변형된 문 심볼로 해석한다.",
+   "counterfactual": "W 계열 레이어의 길고 연결된 벽 경계가 함께 존재하면 평면 조각일 가능성이 높아진다.",
+   "uncertainty": "폴리라인 좌표와 삽입 변환이 없어 실제 방향과 개폐 형식을 확정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-101co1-274",
+  "def": "X-평면도(기본형)$0$101co1",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.98,
+  "wall_line_handles": [
+   {
+    "handle": "7A9D",
+    "reason": "W1 레이어의 수직 벽 경계"
+   },
+   {
+    "handle": "7A9E",
+    "reason": "W1 레이어의 수직 벽 경계"
+   },
+   {
+    "handle": "7A9F",
+    "reason": "외곽 평행 벽선"
+   },
+   {
+    "handle": "7AA0",
+    "reason": "외곽 평행 벽선"
+   },
+   {
+    "handle": "7AA2",
+    "reason": "벽 두께를 닫는 횡선"
+   },
+   {
+    "handle": "7AA3",
+    "reason": "벽 두께를 닫는 횡선"
+   },
+   {
+    "handle": "7AA4",
+    "reason": "내부 W1 벽면선"
+   },
+   {
+    "handle": "7AA8",
+    "reason": "직교 벽 연결선"
+   },
+   {
+    "handle": "7AA9",
+    "reason": "장거리 외곽 벽선"
+   },
+   {
+    "handle": "7AAA",
+    "reason": "개구부 이후 연속 벽선"
+   }
+  ],
+  "notes": "W1 이중선, 중심선, 문 및 설비 개구부를 포함하는 코어 평면 조각이다.",
+  "rationale": {
+   "evidence": "98개 중 W1 레이어가 54개로 우세하며 여러 선이 250 또는 500 간격의 평행 벽면을 만든다. CEN, A-DOOR, STL, 설비OPEN 레이어가 함께 있어 건축 코어 평면의 전형적인 조합이다.",
+   "rule": "W 계열의 연결된 평행선이 중심선·문·개구부와 결합되면 높은 확률의 벽 포함 평면 부분도로 판정한다.",
+   "counterfactual": "W1 선이 없고 CEN 및 설비 기호만 남는다면 벽 가능성을 크게 낮출 것이다.",
+   "uncertainty": "샘플은 30개로 제한되어 전체 벽망의 폐합 여부와 각 공간 용도는 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-101co1-rf-275",
+  "def": "X-평면도(기본형)$0$101co1-RF",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.98,
+  "wall_line_handles": [
+   {
+    "handle": "7C42",
+    "reason": "장거리 W1 벽 경계"
+   },
+   {
+    "handle": "7C43",
+    "reason": "외곽 수평 벽선"
+   },
+   {
+    "handle": "7C44",
+    "reason": "연속 수직 벽선"
+   },
+   {
+    "handle": "7C4B",
+    "reason": "평행 외벽 면선"
+   },
+   {
+    "handle": "7C4C",
+    "reason": "평행 외벽 면선"
+   },
+   {
+    "handle": "7C4D",
+    "reason": "외곽 벽 경계"
+   },
+   {
+    "handle": "7C4E",
+    "reason": "외곽 벽 경계"
+   },
+   {
+    "handle": "7C50",
+    "reason": "벽 두께 횡연결선"
+   },
+   {
+    "handle": "7C51",
+    "reason": "벽 두께 횡연결선"
+   },
+   {
+    "handle": "7C54",
+    "reason": "장거리 외곽 벽선"
+   }
+  ],
+  "notes": "W1과 W3 벽체를 중심으로 구성된 101 코어 옥상층 평면 조각이다.",
+  "rationale": {
+   "evidence": "86개 중 W1 52개와 W3 9개가 주를 이루며 250~500 간격의 평행선과 직교 연결이 반복된다. CEN과 설비·입면 삽입이 결합되어 옥상층 코어 평면임을 뒷받침한다.",
+   "rule": "다수의 W 레이어 선이 평행 면과 코너를 구성하면 층 종류와 무관하게 벽 포함 평면으로 본다.",
+   "counterfactual": "W1과 W3 선들이 제거되고 중심선 및 설비 삽입만 남으면 벽 판정을 뒤집을 수 있다.",
+   "uncertainty": "전체 엔티티가 샘플되지 않아 벽선의 모든 개구와 지붕 경계 구분은 확정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-101co1-rf2-276",
+  "def": "X-평면도(기본형)$0$101co1-RF2",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.97,
+  "wall_line_handles": [
+   {
+    "handle": "7D3A",
+    "reason": "장거리 W1 벽 경계"
+   },
+   {
+    "handle": "7D3B",
+    "reason": "외곽 수평 벽선"
+   },
+   {
+    "handle": "7D42",
+    "reason": "평행 외벽 면선"
+   },
+   {
+    "handle": "7D43",
+    "reason": "평행 외벽 면선"
+   },
+   {
+    "handle": "7D44",
+    "reason": "외곽 수직 벽선"
+   },
+   {
+    "handle": "7D45",
+    "reason": "외곽 수직 벽선"
+   },
+   {
+    "handle": "7D47",
+    "reason": "벽 두께 횡연결선"
+   },
+   {
+    "handle": "7D48",
+    "reason": "벽 두께 횡연결선"
+   },
+   {
+    "handle": "7D49",
+    "reason": "내부 W1 벽면선"
+   },
+   {
+    "handle": "7D4B",
+    "reason": "장거리 외곽 벽선"
+   }
+  ],
+  "notes": "외벽, 개구부 및 안전사다리를 포함하는 101 코어 상부 옥상 평면이다.",
+  "rationale": {
+   "evidence": "60개 중 W1 레이어가 34개이고 긴 직교 벽선과 근접 평행선이 뚜렷하다. OPEN, WIN, 안전사다리 및 CEN 요소는 옥상 평면의 개구·설비 맥락을 제공한다.",
+   "rule": "W 레이어의 연속 경계가 개구 및 건축 설비 요소와 함께 있으면 벽이 있는 평면 부분도로 분류한다.",
+   "counterfactual": "W1 선들이 지붕 외곽이 아닌 단순 보조선으로 확인되거나 모두 사라지면 벽 가능성을 낮출 것이다.",
+   "uncertainty": "투영만으로 각 W1 선이 실내벽인지 파라펫인지 구분할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-101co1-rf3-277",
+  "def": "X-평면도(기본형)$0$101co1-RF3",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.18,
+  "wall_line_handles": [],
+  "notes": "중심선, 지붕 윤곽 및 우수관으로 이루어진 희소한 최상부 옥상 평면 조각이다.",
+  "rationale": {
+   "evidence": "14개 엔티티 중 LINE 6개가 CEN 레이어이고 W 계열 레이어는 없다. 7RF 폴리라인, 안전사다리, 우수관 삽입은 지붕 평면 맥락을 나타내지만 직접적인 벽선은 제공하지 않는다.",
+   "rule": "지붕 관련 윤곽과 설비가 있어도 W 레이어 또는 평행 벽면이 없으면 평면 역할은 유지하되 벽 가능성은 낮춘다.",
+   "counterfactual": "7RF 폴리라인이 두께를 가진 파라펫 윤곽임이 확인되거나 W1 평행선이 추가되면 벽 가능성이 상승한다.",
+   "uncertainty": "폴리라인 좌표가 없어 7RF 도형이 파라펫인지 단순 지붕 경계인지 판별할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-101co2-278",
+  "def": "X-평면도(기본형)$0$101co2",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.98,
+  "wall_line_handles": [
+   {
+    "handle": "7A33",
+    "reason": "W1 상부 벽 경계"
+   },
+   {
+    "handle": "7A34",
+    "reason": "평행 W1 벽면선"
+   },
+   {
+    "handle": "7A35",
+    "reason": "장거리 외곽 벽선"
+   },
+   {
+    "handle": "7A36",
+    "reason": "개구 전 수직 벽선"
+   },
+   {
+    "handle": "7A37",
+    "reason": "개구 후 수직 벽선"
+   },
+   {
+    "handle": "7A38",
+    "reason": "내부 수평 벽선"
+   },
+   {
+    "handle": "7A3A",
+    "reason": "평행 수평 벽선"
+   },
+   {
+    "handle": "7A3B",
+    "reason": "장거리 수평 벽선"
+   },
+   {
+    "handle": "7A3C",
+    "reason": "벽선 연장 구간"
+   },
+   {
+    "handle": "7A3D",
+    "reason": "평행 벽면 경계"
+   }
+  ],
+  "notes": "다수의 W1 벽선과 문·설비 개구부를 가진 101 코어 평면 조각이다.",
+  "rationale": {
+   "evidence": "99개 중 W1 레이어가 52개이며 250~500 간격의 평행선과 개구로 분절된 연속 벽면이 반복된다. CEN, A-DOOR, STL, 설비OPEN 및 해치가 함께 있어 완성된 코어 평면 패턴이다.",
+   "rule": "벽 레이어의 이중 경계가 문과 설비 개구부를 둘러싸며 연결되면 높은 벽 가능성의 평면 부분도로 판정한다.",
+   "counterfactual": "W1 선들이 없고 해치·중심선·설비 요소만 남는다면 벽 판정을 크게 낮출 것이다.",
+   "uncertainty": "샘플 밖의 선 연결과 삽입 블록 내부 형상은 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-103co1-279",
+  "def": "X-평면도(기본형)$0$103co1",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.98,
+  "wall_line_handles": [
+   {
+    "handle": "7B02",
+    "reason": "W1 상부 벽 경계"
+   },
+   {
+    "handle": "7B03",
+    "reason": "평행 W1 벽면선"
+   },
+   {
+    "handle": "7B04",
+    "reason": "장거리 외곽 벽선"
+   },
+   {
+    "handle": "7B05",
+    "reason": "수직 외곽 벽선"
+   },
+   {
+    "handle": "7B06",
+    "reason": "장거리 내부 벽선"
+   },
+   {
+    "handle": "7B07",
+    "reason": "수평 벽면선"
+   },
+   {
+    "handle": "7B09",
+    "reason": "평행 수평 벽선"
+   },
+   {
+    "handle": "7B0A",
+    "reason": "장거리 수평 벽선"
+   },
+   {
+    "handle": "7B0B",
+    "reason": "벽선 연장 구간"
+   },
+   {
+    "handle": "7B0C",
+    "reason": "평행 벽면 경계"
+   }
+  ],
+  "notes": "W1 이중벽과 개구부가 반복되는 103동 코어 평면 정의다.",
+  "rationale": {
+   "evidence": "106개 중 W1 선이 56개로 가장 많고 평행 수직·수평선이 일정 벽 두께를 형성한다. A-DOOR, STL, 설비OPEN, CEN 레이어가 함께 있어 공간과 개구부를 갖춘 코어 평면임을 보여준다.",
+   "rule": "W 레이어가 엔티티의 다수를 차지하고 이중선·코너·개구 패턴을 만들면 벽 평면으로 강하게 판정한다.",
+   "counterfactual": "W1 선이 단순 프레임 또는 설비선으로 확인되고 공간 경계를 만들지 않는다면 판정을 낮출 것이다.",
+   "uncertainty": "30개 샘플만으로 전체 평면의 폐합 공간 수와 모든 벽 종류는 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-x-0-104co1-280",
+  "def": "X-평면도(기본형)$0$104co1",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.98,
+  "wall_line_handles": [
+   {
+    "handle": "809D",
+    "reason": "장거리 수평 W1 벽선"
+   },
+   {
+    "handle": "809E",
+    "reason": "외곽 벽선 구간"
+   },
+   {
+    "handle": "809F",
+    "reason": "외곽 벽선 연속부"
+   },
+   {
+    "handle": "80A0",
+    "reason": "개구 전 수직 벽선"
+   },
+   {
+    "handle": "80A1",
+    "reason": "개구 후 수직 벽선"
+   },
+   {
+    "handle": "80A2",
+    "reason": "평행 수직 벽면선"
+   },
+   {
+    "handle": "80A3",
+    "reason": "평행 벽선 연속부"
+   },
+   {
+    "handle": "80AA",
+    "reason": "장거리 외곽 벽선"
+   },
+   {
+    "handle": "80AB",
+    "reason": "개구 이후 외곽 벽선"
+   },
+   {
+    "handle": "80AC",
+    "reason": "장거리 내부 벽선"
+   }
+  ],
+  "notes": "W1 벽체, 문, 설비 개구 및 중심선을 포함하는 104동 코어 평면이다.",
+  "rationale": {
+   "evidence": "106개 중 W1 레이어가 55개이며 여러 선이 250 또는 500 간격의 평행 벽면과 개구부를 형성한다. CEN, A-DOOR, STL, 설비OPEN과 해치가 함께 나타나 건축 코어 평면 구성을 뒷받침한다.",
+   "rule": "벽 전용 레이어의 장거리 이중선이 문·개구·중심선과 결합되면 실제 벽이 포함된 평면 부분도로 본다.",
+   "counterfactual": "W1 선들이 제거되거나 모두 단순 도곽선으로 판명되면 벽 가능성을 크게 낮춰야 한다.",
+   "uncertainty": "샘플에 없는 나머지 W1 선과 삽입 블록 때문에 전체 벽 연결망과 벽체 재료는 확정할 수 없다."
+  }
+ }
+]

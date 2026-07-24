@@ -1,0 +1,10 @@
+{
+  "id": "READ-001",
+  "answer": 375,
+  "method": "Loaded dwg_graph_ir.json, took len(d['entities']) and cross-checked via Counter(e['space'] for e in d['entities']) which showed all 375 entities have space=='model' (no paperspace entities present), so modelspace entity count = 375.",
+  "commands": [
+    "d=json.load(open(path,encoding='utf-8')); list(d.keys())",
+    "ent=d['entities']; type(ent), len(ent), ent[0]",
+    "from collections import Counter; Counter(e.get('space') for e in ent); len(ent)"
+  ]
+}

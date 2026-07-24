@@ -1,0 +1,42 @@
+{
+  "family": "brep_solids_1",
+  "fixtures": {},
+  "needs_state": [
+    {
+      "op": "compute.brep.line_containment",
+      "reason": "Shared brep bind gate (m08d_handlers.inc lines 926-937: m08dFindHandle 'handle', m08dBindBrep) must resolve to a pre-existing AcDb3dSolid/Surface/Region/Body before op-specific args are read; this op additionally requires line points via m08dFindNamedPoint 'a' and 'b' (lines 1083-1088). tests/fixtures/native_sample.dwg (P3b probe DWG) has no 3dSolid/Surface/Region/Body in modelspace IR, so a single stateless args-only call cannot supply a bindable handle."
+    },
+    {
+      "op": "compute.brep.massprops",
+      "reason": "Handler reads only 'handle' via m08dFindHandle then m08dBindBrep (m08d_handlers.inc lines 926-937, 1048-1062: brep.getMassProps). No AcDb3dSolid/Surface/Region/Body pre-exists in tests/fixtures/native_sample.dwg for a stateless single-call probe to reference."
+    },
+    {
+      "op": "compute.brep.perimeter",
+      "reason": "Handler reads only 'handle' via m08dFindHandle then m08dBindBrep (m08d_handlers.inc lines 926-937, 1041-1046: brep.getPerimeterLength). No AcDb3dSolid/Surface/Region/Body pre-exists in tests/fixtures/native_sample.dwg for a stateless single-call probe to reference."
+    },
+    {
+      "op": "compute.brep.point_containment",
+      "reason": "Shared brep bind gate (m08d_handlers.inc lines 926-937: m08dFindHandle 'handle', m08dBindBrep) must resolve to a pre-existing AcDb3dSolid/Surface/Region/Body before m08dFindNamedPoint 'point' is consumed (lines 1064-1068). tests/fixtures/native_sample.dwg has no bindable brep entity in modelspace IR, so a stateless single-call probe cannot obtain the prerequisite handle."
+    },
+    {
+      "op": "compute.brep.surface_area",
+      "reason": "Handler reads only 'handle' via m08dFindHandle then m08dBindBrep (m08d_handlers.inc lines 926-937, 1031-1039: brep.getSurfaceArea). No AcDb3dSolid/Surface/Region/Body pre-exists in tests/fixtures/native_sample.dwg for a stateless single-call probe to reference."
+    },
+    {
+      "op": "compute.brep.volume",
+      "reason": "Handler reads only 'handle' via m08dFindHandle then m08dBindBrep (m08d_handlers.inc lines 926-937, 1015-1029: brep.getVolume). No AcDb3dSolid/Surface/Region/Body pre-exists in tests/fixtures/native_sample.dwg for a stateless single-call probe to reference."
+    },
+    {
+      "op": "inspect.brep.bounds",
+      "reason": "Handler reads only 'handle' via m08dFindHandle then m08dBindBrep (m08d_handlers.inc lines 926-937, 968-980: brep.getBoundBlock). No AcDb3dSolid/Surface/Region/Body pre-exists in tests/fixtures/native_sample.dwg for a stateless single-call probe to reference."
+    },
+    {
+      "op": "inspect.brep.changed",
+      "reason": "Handler reads only 'handle' via m08dFindHandle then m08dBindBrep (m08d_handlers.inc lines 926-937, 954-958: brep.brepChanged). No AcDb3dSolid/Surface/Region/Body pre-exists in tests/fixtures/native_sample.dwg for a stateless single-call probe to reference."
+    },
+    {
+      "op": "inspect.brep.from_entity",
+      "reason": "Handler reads only 'handle' via m08dFindHandle then m08dBindBrep (m08d_handlers.inc lines 926-937, 943-946: bind success returns source_class). No AcDb3dSolid/Surface/Region/Body pre-exists in tests/fixtures/native_sample.dwg for a stateless single-call probe to reference."
+    }
+  ]
+}

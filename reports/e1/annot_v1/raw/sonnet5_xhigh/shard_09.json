@@ -1,0 +1,292 @@
+[
+{
+  "unit_id": "defannot-u151-161",
+  "def": "*U151",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.5,
+  "wall_line_handles": [],
+  "notes": "24 uniform 5-vertex LWPOLYLINE quads on X-평면도(기본형)$0$INSUL; insulation fill units, no discrete wall-boundary lines.",
+  "rationale": {
+    "evidence": "All 24 sampled entities (handles 4F0D-4F24) are LWPOLYLINE with exactly 5 vertices, 100% on layer X-평면도(기본형)$0$INSUL. There is no LINE, WALL-tagged layer, or bbox data; the entity type/layer histograms are perfectly homogeneous, which matches a tiled fill pattern rather than an outline.",
+    "rule": "A layer suffix naming a material (INSUL = insulation) rather than a structural element (벽/WALL), combined with many identically-shaped small closed polylines, indicates a fill/hatch-simulation series for that material and not the wall boundary line itself.",
+    "counterfactual": "If the layer name instead ended in 벽체/WALL, or if a subset of entities were simple 2-point LINE segments at a consistent offset (wall thickness), wall_likelihood and wall_line_handles would both rise.",
+    "uncertainty": "No bbox or vertex coordinates are given, so the aspect ratio of each quad and whether the 24 units tile along a straight wall run (versus a curved or isolated feature) cannot be confirmed from this projection."
+  }
+},
+{
+  "unit_id": "defannot-u152-162",
+  "def": "*U152",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.5,
+  "wall_line_handles": [],
+  "notes": "21 uniform 5-vertex LWPOLYLINE quads on X-평면도(기본형)$0$INSUL; same insulation-fill pattern as neighboring *U151/*U156.",
+  "rationale": {
+    "evidence": "All 21 entities (handles 4F2A-4F3E) are LWPOLYLINE with 5 vertices, entirely on layer X-평면도(기본형)$0$INSUL, mirroring the dxf_name/layer histogram profile of the adjacent *U151 definition.",
+    "rule": "A layer suffix naming a material (INSUL) rather than a structural element, paired with a homogeneous set of small closed polylines, signals a tiled material-fill series rather than the wall line itself.",
+    "counterfactual": "Presence of any LINE entities forming a parallel-offset pair, or a layer renamed to 벽/WALL, would raise wall_likelihood and populate wall_line_handles.",
+    "uncertainty": "No bbox is derivable and vertex coordinates are not shown, so the true shape and spatial extent of each polyline unit is unknown."
+  }
+},
+{
+  "unit_id": "defannot-u156-163",
+  "def": "*U156",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.5,
+  "wall_line_handles": [],
+  "notes": "92 LWPOLYLINE insulation-fill units (30 sampled, handles 4F98-4FB5) on X-평면도(기본형)$0$INSUL; largest instance of the repeating INSUL-fill family so far.",
+  "rationale": {
+    "evidence": "entity_count=92 with dxf_name histogram LWPOLYLINE=92 and layer histogram entirely X-평면도(기본형)$0$INSUL; the 30 sampled entities (4F98-4FB5) all share the same 5-vertex signature seen in every other pure-INSUL block in this shard.",
+    "rule": "A layer suffix naming a material (INSUL) rather than a structural element, combined with a large homogeneous run of identically-shaped closed polylines, indicates a long tiled material-fill series rather than a set of wall boundary lines.",
+    "counterfactual": "A mixed dxf_name histogram including LINE pairs at a fixed offset, or a layer renamed to a wall-specific tag, would shift this toward a wall classification with populated wall_line_handles.",
+    "uncertainty": "Only 30 of 92 entities are sampled and no coordinates or bbox are given, so whether all 92 units lie along one continuous run or several disjoint runs cannot be determined."
+  }
+},
+{
+  "unit_id": "defannot-u157-164",
+  "def": "*U157",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.5,
+  "wall_line_handles": [],
+  "notes": "8 uniform 5-vertex LWPOLYLINE quads on X-평면도(기본형)$0$INSUL; smallest instance of the repeating INSUL-fill family, likely a short wall segment.",
+  "rationale": {
+    "evidence": "entity_count=8, all LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, handles 4FF9-5000, each with 5 vertices — identical structural signature to the larger INSUL blocks in this shard, just fewer tiled units.",
+    "rule": "A layer suffix naming a material (INSUL) rather than a structural element, paired with a small homogeneous run of same-shaped closed polylines, indicates a short tiled material-fill segment rather than an explicit wall boundary.",
+    "counterfactual": "If the entity count were 2 with a clear parallel-line pair and a wall-thickness-scale offset, this would read far more directly as a literal wall segment.",
+    "uncertainty": "With only entity-count and layer data (no coordinates), the physical length this 8-unit segment covers, and hence whether it plausibly spans a full wall or just a corner/jamb, cannot be determined."
+  }
+},
+{
+  "unit_id": "defannot-u158-165",
+  "def": "*U158",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.5,
+  "wall_line_handles": [],
+  "notes": "17 uniform 5-vertex LWPOLYLINE quads on X-평면도(기본형)$0$INSUL; consistent with the shard's recurring insulation-fill pattern.",
+  "rationale": {
+    "evidence": "entity_count=17, dxf_name histogram LWPOLYLINE=17, layer histogram entirely X-평면도(기본형)$0$INSUL, handles 5006-5016, each 5-vertex — matches the same structural pattern as *U151/*U152/*U157 in this shard.",
+    "rule": "A material-named layer suffix (INSUL) combined with a homogeneous set of small closed polylines indicates a tiled fill series for that material rather than the wall's own boundary line.",
+    "counterfactual": "A layer renamed to a wall-specific tag, or the appearance of LINE entities at a fixed parallel offset, would raise wall_likelihood and populate wall_line_handles.",
+    "uncertainty": "No bbox or coordinate data is present, so the spatial layout and orientation of the 17 tiled units relative to any wall centerline cannot be verified."
+  }
+},
+{
+  "unit_id": "defannot-u159-166",
+  "def": "*U159",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.5,
+  "wall_line_handles": [],
+  "notes": "18 uniform 5-vertex LWPOLYLINE quads on X-평면도(기본형)$0$INSUL; recurring insulation-fill pattern.",
+  "rationale": {
+    "evidence": "entity_count=18, all LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, handles 501C-502D, each 5-vertex, immediately following *U158's handle range — consistent with a per-unit series of near-identical INSUL blocks.",
+    "rule": "A material-named layer suffix (INSUL) with a uniform run of same-shaped small closed polylines indicates a tiled fill series rather than the structural wall boundary itself.",
+    "counterfactual": "If any entity in this set were a bare LINE forming a parallel pair at a wall-thickness offset, or the layer were renamed to a wall tag, wall_likelihood would increase.",
+    "uncertainty": "No coordinates or bbox are supplied, so whether these 18 units run along a straight or curved wall, and their true dimensions, cannot be established from this projection."
+  }
+},
+{
+  "unit_id": "defannot-u160-167",
+  "def": "*U160",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.5,
+  "wall_line_handles": [],
+  "notes": "87 LWPOLYLINE insulation-fill units (30 sampled, handles 5033-5050) on X-평면도(기본형)$0$INSUL.",
+  "rationale": {
+    "evidence": "entity_count=87 with dxf_name histogram LWPOLYLINE=87 and layer histogram entirely X-평면도(기본형)$0$INSUL; the 30 sampled entities (5033-5050) share the same 5-vertex pattern as every other pure-INSUL block in this shard.",
+    "rule": "A material-named layer suffix (INSUL) with a large homogeneous run of identically-shaped closed polylines indicates a long tiled material-fill series rather than a set of wall boundary lines.",
+    "counterfactual": "A mixed dxf_name histogram including LINE pairs at a consistent wall-thickness offset would shift this toward an explicit wall classification.",
+    "uncertainty": "Only 30 of 87 entities are sampled and no coordinates or bbox are given, so the full spatial extent and continuity of the run is unverifiable."
+  }
+},
+{
+  "unit_id": "defannot-u161-168",
+  "def": "*U161",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.5,
+  "wall_line_handles": [],
+  "notes": "90 LWPOLYLINE insulation-fill units (30 sampled, handles 508F-50AC) on X-평면도(기본형)$0$INSUL.",
+  "rationale": {
+    "evidence": "entity_count=90 with dxf_name histogram LWPOLYLINE=90 and layer histogram entirely X-평면도(기본형)$0$INSUL; sampled handles 508F-50AC all carry the same 5-vertex signature as the rest of the INSUL family in this shard.",
+    "rule": "A material-named layer suffix (INSUL) combined with a large homogeneous run of same-shaped closed polylines indicates a tiled material-fill series rather than the wall boundary itself.",
+    "counterfactual": "A layer renamed to a wall-specific tag, or LINE entities at a fixed wall-thickness offset, would raise wall_likelihood and populate wall_line_handles.",
+    "uncertainty": "No bbox or coordinates are given, and only a third of entities are sampled, so the geometric layout of the full 90-unit run cannot be confirmed."
+  }
+},
+{
+  "unit_id": "defannot-u162-169",
+  "def": "*U162",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.5,
+  "wall_line_handles": [],
+  "notes": "81 LWPOLYLINE insulation-fill units (30 sampled, handles 50EE-510B) on X-평면도(기본형)$0$INSUL.",
+  "rationale": {
+    "evidence": "entity_count=81 with dxf_name histogram LWPOLYLINE=81 and layer histogram entirely X-평면도(기본형)$0$INSUL; sampled entities 50EE-510B all show the same 5-vertex closed-polyline structure as the rest of this shard's INSUL blocks.",
+    "rule": "A material-named layer suffix (INSUL) with a homogeneous run of identically-shaped small closed polylines indicates a tiled fill series for that material, not the wall's own boundary line.",
+    "counterfactual": "The presence of LINE-type wall-boundary entities at a consistent offset, or a wall-specific layer tag, would raise wall_likelihood and populate wall_line_handles.",
+    "uncertainty": "No coordinates or bbox are present, so the shape, orientation, and continuity of the 81 tiled units cannot be verified from this projection alone."
+  }
+},
+{
+  "unit_id": "defannot-u163-170",
+  "def": "*U163",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.5,
+  "wall_line_handles": [],
+  "notes": "75 LWPOLYLINE insulation-fill units (30 sampled, handles 5144-5161) on X-평면도(기본형)$0$INSUL.",
+  "rationale": {
+    "evidence": "entity_count=75 with dxf_name histogram LWPOLYLINE=75 and layer histogram entirely X-평면도(기본형)$0$INSUL; sampled handles 5144-5161 continue the identical 5-vertex closed-polyline signature seen throughout this shard's INSUL series.",
+    "rule": "A material-named layer suffix (INSUL) with a large homogeneous run of same-shaped closed polylines indicates a tiled material-fill series rather than a set of wall boundary lines.",
+    "counterfactual": "Introduction of LINE entities at a fixed parallel offset, or renaming the layer to a wall-specific tag, would raise wall_likelihood and populate wall_line_handles.",
+    "uncertainty": "Only 30 of 75 entities are sampled and no bbox/coordinates are provided, so the run's full spatial layout is unverifiable."
+  }
+},
+{
+  "unit_id": "defannot-u164-171",
+  "def": "*U164",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.5,
+  "wall_line_handles": [],
+  "notes": "37 LWPOLYLINE insulation-fill units (30 sampled, handles 5194-51B1) on X-평면도(기본형)$0$INSUL.",
+  "rationale": {
+    "evidence": "entity_count=37 with dxf_name histogram LWPOLYLINE=37 and layer histogram entirely X-평면도(기본형)$0$INSUL; sampled handles 5194-51B1 show the same 5-vertex closed-polyline signature as every other pure-INSUL block in this shard.",
+    "rule": "A material-named layer suffix (INSUL) combined with a homogeneous run of identically-shaped small closed polylines indicates a tiled material-fill series, not the wall boundary line itself.",
+    "counterfactual": "A wall-specific layer tag, or LINE entities forming a parallel pair at a consistent thickness offset, would raise wall_likelihood and populate wall_line_handles.",
+    "uncertainty": "No bbox or coordinates are given and only 30 of 37 entities are sampled, so the full extent and path of this run cannot be confirmed."
+  }
+},
+{
+  "unit_id": "defannot-u165-172",
+  "def": "*U165",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.5,
+  "wall_line_handles": [],
+  "notes": "36 LWPOLYLINE insulation-fill units (30 sampled, handles 51BE-51DB) on X-평면도(기본형)$0$INSUL.",
+  "rationale": {
+    "evidence": "entity_count=36 with dxf_name histogram LWPOLYLINE=36 and layer histogram entirely X-평면도(기본형)$0$INSUL; sampled handles 51BE-51DB immediately follow *U164's handle range and carry the same 5-vertex signature.",
+    "rule": "A material-named layer suffix (INSUL) with a homogeneous run of same-shaped small closed polylines indicates a tiled material-fill series rather than an explicit wall boundary.",
+    "counterfactual": "LINE entities at a fixed parallel offset, or a wall-specific layer rename, would raise wall_likelihood and populate wall_line_handles.",
+    "uncertainty": "No coordinates or bbox are supplied and only 30 of 36 entities are sampled, so the geometric path of the full run is unverifiable."
+  }
+},
+{
+  "unit_id": "defannot-u166-173",
+  "def": "*U166",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.5,
+  "wall_line_handles": [],
+  "notes": "13 uniform 5-vertex LWPOLYLINE quads on X-평면도(기본형)$0$INSUL; short insulation-fill segment.",
+  "rationale": {
+    "evidence": "entity_count=13, all LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, handles 51E7-51F3, each with 5 vertices — same structural signature as every other pure-INSUL definition in this shard, just a shorter run.",
+    "rule": "A material-named layer suffix (INSUL) with a small homogeneous run of same-shaped closed polylines indicates a short tiled fill segment rather than a wall boundary line.",
+    "counterfactual": "A pair of LINE entities at a wall-thickness-scale parallel offset, or a wall-specific layer tag, would make a direct wall reading far more plausible.",
+    "uncertainty": "No coordinates or bbox are given, so the real-world length this 13-unit segment spans, and thus whether it plausibly matches a short wall or jamb, cannot be determined."
+  }
+},
+{
+  "unit_id": "defannot-u167-174",
+  "def": "*U167",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.5,
+  "wall_line_handles": [],
+  "notes": "30 uniform 5-vertex LWPOLYLINE quads on X-평면도(기본형)$0$INSUL; recurring insulation-fill pattern.",
+  "rationale": {
+    "evidence": "entity_count=30, dxf_name histogram LWPOLYLINE=30, layer histogram entirely X-평면도(기본형)$0$INSUL, handles 51F9-5216, each 5-vertex — matches the same structural pattern as the other INSUL blocks in this shard.",
+    "rule": "A material-named layer suffix (INSUL) combined with a homogeneous set of small closed polylines indicates a tiled fill series for that material rather than the wall's own boundary line.",
+    "counterfactual": "A layer renamed to a wall-specific tag, or LINE entities at a fixed parallel offset, would raise wall_likelihood and populate wall_line_handles.",
+    "uncertainty": "No bbox or coordinate data is present, so the spatial layout and orientation of the 30 tiled units relative to any wall centerline cannot be verified."
+  }
+},
+{
+  "unit_id": "defannot-u168-175",
+  "def": "*U168",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.5,
+  "wall_line_handles": [],
+  "notes": "14 uniform 5-vertex LWPOLYLINE quads on X-평면도(기본형)$0$INSUL; short insulation-fill segment.",
+  "rationale": {
+    "evidence": "entity_count=14, all LWPOLYLINE on layer X-평면도(기본형)$0$INSUL, handles 521C-5229, each with 5 vertices — same signature as the rest of the shard's INSUL series.",
+    "rule": "A material-named layer suffix (INSUL) with a small homogeneous run of same-shaped closed polylines indicates a short tiled fill segment rather than a wall boundary line.",
+    "counterfactual": "A pair of LINE entities at a wall-thickness-scale parallel offset, or a wall-specific layer tag, would make a direct wall reading far more plausible.",
+    "uncertainty": "No coordinates or bbox are given, so the real-world length this 14-unit segment spans cannot be determined from this projection."
+  }
+},
+{
+  "unit_id": "defannot-u169-176",
+  "def": "*U169",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.5,
+  "wall_line_handles": [],
+  "notes": "106 LWPOLYLINE insulation-fill units (30 sampled, handles 522F-524C) on X-평면도(기본형)$0$INSUL; largest instance in this shard.",
+  "rationale": {
+    "evidence": "entity_count=106 with dxf_name histogram LWPOLYLINE=106 and layer histogram entirely X-평면도(기본형)$0$INSUL; the 30 sampled entities (522F-524C) all carry the same 5-vertex signature as every other pure-INSUL block in this shard.",
+    "rule": "A material-named layer suffix (INSUL) with a very large homogeneous run of identically-shaped closed polylines indicates a long tiled material-fill series rather than a set of wall boundary lines.",
+    "counterfactual": "A mixed dxf_name histogram including LINE pairs at a consistent wall-thickness offset, or a wall-specific layer rename, would shift this toward an explicit wall classification.",
+    "uncertainty": "Only 30 of 106 entities are sampled and no coordinates or bbox are given, so whether this large run is one continuous wall run or several disjoint runs cannot be determined."
+  }
+},
+{
+  "unit_id": "defannot-u170-177",
+  "def": "*U170",
+  "role": "심볼",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [
+    {"handle": "52A1", "reason": "long thin edge of a duplicate-traced band, y=-50.5"},
+    {"handle": "52A3", "reason": "parallel edge of same band, y=-100.5, offset 50u from 52A1"},
+    {"handle": "52A9", "reason": "coincident duplicate of 52A3 traced in reverse, double-line convention"},
+    {"handle": "52B1", "reason": "coincident duplicate of 52A1 traced in reverse, double-line convention"}
+  ],
+  "notes": "Flagpole-stand plan symbol (INSERT of X-평면도(기본형)$0$국기계양대 block) built from a 20-LINE curb/tab outline plus 2 WIPEOUT masks; named as equipment, not a building wall.",
+  "rationale": {
+    "evidence": "dxf_name histogram is INSERT=1, LINE=20, WIPEOUT=2; the INSERT (handle 52A0) explicitly references block X-평면도(기본형)$0$국기계양대 (flagpole hoisting platform), directly naming the object. The 20 LINE entities trace a frame within bbox [-610,-103.5]-[610,22.5], including a long 1176-unit band at y=-50.5/-100.5 (handles 52A1/52A3) that is re-traced by near-duplicate reversed segments (52A9/52B1) — a double-line drafting convention normally used for wall/curb thickness — plus short tab returns (e.g. 52A5, 52AD) forming two small wings, and 2 WIPEOUT entities used to mask overlapping symbol geometry.",
+    "rule": "When an INSERT directly names a specific equipment/fixture block, that explicit label takes priority over incidental resemblance of the surrounding LINE geometry to a double-line wall; WIPEOUT usage is also a strong tell for a graphic symbol rather than raw structural drafting.",
+    "counterfactual": "Without the self-naming INSERT (국기계양대) and the WIPEOUT masks, the duplicate-traced 1176x50 band and corner tabs would read far more plausibly as an actual small curb/plinth wall rather than a symbol's own base outline.",
+    "uncertainty": "Whether the duplicate-traced band represents a real physical curb/footing around the flagpole (and thus should itself count as a short wall) or is purely a stylized graphic border cannot be confirmed without seeing the referenced 국기계양대 block's own contents or a hatch/material tag."
+  }
+},
+{
+  "unit_id": "defannot-u171-178",
+  "def": "*U171",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.5,
+  "wall_line_handles": [],
+  "notes": "29 uniform 5-vertex LWPOLYLINE quads on X-평면도(기본형)$0$INSUL; recurring insulation-fill pattern.",
+  "rationale": {
+    "evidence": "entity_count=29, dxf_name histogram LWPOLYLINE=29, layer histogram entirely X-평면도(기본형)$0$INSUL, handles 52BA-52D6, each 5-vertex — same structural signature as the shard's other pure-INSUL blocks.",
+    "rule": "A material-named layer suffix (INSUL) combined with a homogeneous set of small closed polylines indicates a tiled fill series for that material rather than the wall's own boundary line.",
+    "counterfactual": "A layer renamed to a wall-specific tag, or LINE entities at a fixed parallel offset, would raise wall_likelihood and populate wall_line_handles.",
+    "uncertainty": "No bbox or coordinate data is present, so the spatial layout and orientation of the 29 tiled units relative to any wall centerline cannot be verified."
+  }
+},
+{
+  "unit_id": "defannot-u172-179",
+  "def": "*U172",
+  "role": "심볼",
+  "wall_likelihood": 0.3,
+  "wall_line_handles": [
+    {"handle": "52DF", "reason": "long thin edge of a duplicate-traced band, y=-50.5"},
+    {"handle": "52E1", "reason": "parallel edge of same band, y=-100.5, offset 50u from 52DF"},
+    {"handle": "52E7", "reason": "coincident duplicate of 52E1 traced in reverse, double-line convention"},
+    {"handle": "52EF", "reason": "coincident duplicate of 52DF traced in reverse, double-line convention"}
+  ],
+  "notes": "Larger variant of the flagpole-stand plan symbol (INSERT of X-평면도(기본형)$0$국기계양대 block); same 20-LINE curb/tab + 2-WIPEOUT structure as *U170, scaled to bbox [-810,-103.5]-[810,22.5].",
+  "rationale": {
+    "evidence": "dxf_name histogram is INSERT=1, LINE=20, WIPEOUT=2, identical composition to *U170. The INSERT (handle 52DE) again references X-평면도(기본형)$0$국기계양대. The LINE frame spans bbox [-810,-103.5,0,810,22.5,0] with a duplicate-traced 1576-unit band at y=-50.5/-100.5 (52DF/52E1, re-traced by 52E7/52EF) plus corner tabs, mirroring *U170's pattern but wider (788 vs 588 half-width), consistent with a larger flagpole-base size variant of the same symbol family.",
+    "rule": "When an INSERT directly names a specific equipment/fixture block, that explicit label takes priority over incidental resemblance of the surrounding LINE geometry to a double-line wall; a matching structural pattern to a sibling definition (*U170) with only the scale changed reinforces that this is a parametrized symbol variant, not an independent wall.",
+    "counterfactual": "Without the self-naming INSERT and WIPEOUT masks, and absent the match to *U170's identical topology, the duplicate-traced band and tabs could be read as a real curb/footing wall around the fixture.",
+    "uncertainty": "As with *U170, whether the duplicate-traced band corresponds to an actual physical curb wall or is purely the symbol's graphic border cannot be confirmed without the referenced 국기계양대 block's own contents or material/hatch data."
+  }
+},
+{
+  "unit_id": "defannot-u173-180",
+  "def": "*U173",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.5,
+  "wall_line_handles": [],
+  "notes": "18 uniform 5-vertex LWPOLYLINE quads on X-평면도(기본형)$0$INSUL; recurring insulation-fill pattern, closes out this shard's block series.",
+  "rationale": {
+    "evidence": "entity_count=18, dxf_name histogram LWPOLYLINE=18, layer histogram entirely X-평면도(기본형)$0$INSUL, handles 52F8-5309, each 5-vertex — same structural signature as *U159/*U169 and the rest of this shard's pure-INSUL family.",
+    "rule": "A material-named layer suffix (INSUL) combined with a homogeneous set of small closed polylines indicates a tiled fill series for that material rather than the wall's own boundary line.",
+    "counterfactual": "A layer renamed to a wall-specific tag, or LINE entities at a fixed parallel offset, would raise wall_likelihood and populate wall_line_handles.",
+    "uncertainty": "No bbox or coordinate data is present, so the spatial layout and orientation of the 18 tiled units relative to any wall centerline cannot be verified."
+  }
+}
+]

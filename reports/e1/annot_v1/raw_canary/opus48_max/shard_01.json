@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-d295-1",
+    "def": "*D295",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn dimension block; horizontal 3280mm dim on DIM layer with DIMDOT markers, no wall geometry.",
+    "rationale": {
+      "evidence": "Two vertical extension LINEs 8B52 and 8B53 sit 3280 units apart (47528.83-44248.83), a horizontal dimension LINE 8B54 runs between them, two DIMDOT INSERTs 8B55/8B56 mark the ends, and MTEXT 8B57 reads 3280 exactly matching that spacing. All geometry is on the DIM layer with three DEFPOINTS points (8B58-8B5A). This entity mix is a rendered dimension, not model geometry.",
+      "rule": "An anonymous block named *Dnnn that pairs two extension lines with an arrow/dot insert, a measurement MTEXT equal to the extension-line spacing, and DEFPOINTS points is a dimension cache; its lines are witness and dimension lines, never walls.",
+      "counterfactual": "If the two long parallel lines sat on a wall/architectural layer with no DIMDOT insert, no measurement MTEXT, and no DEFPOINTS, and held a constant plausible wall-thickness offset, they would read as a wall pair.",
+      "uncertainty": "From this projection I cannot confirm the block's insertion scale/rotation, layer plot state, or whether the dimension is still associative; the DEFPOINTS coordinates are not sampled, so the anchored source geometry is unseen."
+    }
+  },
+  {
+    "unit_id": "defannot-d296-2",
+    "def": "*D296",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn dimension block; horizontal 3105mm dim on DIM layer with DIMDOT markers, no wall geometry.",
+    "rationale": {
+      "evidence": "Extension LINEs 8B5B and 8B5C are 3105 units apart (50633.83-47528.83), dimension LINE 8B5D spans between them, DIMDOT INSERTs 8B5E/8B5F mark the ends, and MTEXT 8B60 reads 3105 matching the spacing. Everything is on DIM with three DEFPOINTS (8B61-8B63), the signature of a dimension.",
+      "rule": "A *Dnnn block whose MTEXT numeric value equals the gap between its two extension lines, ended by dimension markers on a DIM layer, is a dimension cache rather than architectural geometry.",
+      "counterfactual": "Had these parallel lines carried no dimension MTEXT or DIMDOT markers and instead lived on a wall layer at a fixed wall-thickness offset, a wall reading would be justified.",
+      "uncertainty": "The projection does not reveal the block's true placement, effective linetype/lineweight, or associativity state; DEFPOINTS positions are unsampled so the measured feature itself is not visible."
+    }
+  },
+  {
+    "unit_id": "defannot-d297-3",
+    "def": "*D297",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn dimension block; horizontal 4770mm dim on DIM layer with DIMDOT markers, no wall geometry.",
+    "rationale": {
+      "evidence": "Vertical extension LINEs 8B64 and 8B65 span 4770 units (55403.83-50633.83), dimension LINE 8B66 lies between, DIMDOT INSERTs 8B67/8B68 terminate the ends, and MTEXT 8B69 reads 4770, equal to the extension spacing. DIM layer plus three DEFPOINTS (8B6A-8B6C) confirm a dimension object.",
+      "rule": "When a *Dnnn block's dimension text equals the distance between its two extension lines and dot/tick markers cap the dimension line, the block is a cached dimension, not a wall assembly.",
+      "counterfactual": "If the same two lines appeared on a wall layer without markers, text, or DEFPOINTS and were offset by a typical wall thickness, they could plausibly be wall faces.",
+      "uncertainty": "Insertion transform, plot/visibility of the DIM layer, and whether the dimension remains associative cannot be judged here; the DEFPOINTS anchors are not in the sample."
+    }
+  },
+  {
+    "unit_id": "defannot-d298-4",
+    "def": "*D298",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn dimension block; horizontal 3945mm dim on DIM layer with DIMDOT markers, no wall geometry.",
+    "rationale": {
+      "evidence": "Extension LINEs 8B6D and 8B6E are 3945 units apart (59348.83-55403.83), dimension LINE 8B6F connects them, DIMDOT INSERTs 8B70/8B71 mark the terminals, and MTEXT 8B72 reads 3945, matching the span exactly. DIM layer plus three DEFPOINTS (8B73-8B75) are dimension-only entities.",
+      "rule": "A *Dnnn block combining two extension lines, a matching-value dimension MTEXT, dot/tick markers, and DEFPOINTS is a dimension cache; none of its lines are architectural walls.",
+      "counterfactual": "Absent the DIMDOT markers, measurement MTEXT, and DEFPOINTS, with the lines on a wall layer at a constant thickness offset, the pair would suggest a wall.",
+      "uncertainty": "Real-world scale, layer plotting, and associativity are indeterminate from the projection; DEFPOINTS coordinates were not sampled so the referenced geometry stays hidden."
+    }
+  },
+  {
+    "unit_id": "defannot-d299-5",
+    "def": "*D299",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn overall dimension; horizontal 15100mm total (sum of D295-D298) on DIM layer with DIMDOT markers.",
+    "rationale": {
+      "evidence": "Extension LINEs 8B77 and 8B76 span the full 15100 units (59348.83-44248.83), dimension LINE 8B78 runs the length, DIMDOT INSERTs 8B79/8B7A cap it, and MTEXT 8B7B reads 15100, which equals the sum of the four preceding segment dims (3280+3105+4770+3945). A slightly lower dimension-line offset (22680) stacks it below the chain. DIM layer with three DEFPOINTS confirms a dimension.",
+      "rule": "An overall/string dimension is still a *Dnnn cache: its value equals the total extension-line span and its lines are witness/dimension lines, so wall content is nil regardless of the large magnitude.",
+      "counterfactual": "If this long line pair carried no markers/MTEXT/DEFPOINTS and sat on a wall layer at a fixed offset, it could be misread as a long wall, but the exact-sum value and DIMDOT markers rule that out.",
+      "uncertainty": "The projection cannot show block placement, whether the chain and total are associative, or DIM-layer plot state; DEFPOINTS anchors are unsampled."
+    }
+  },
+  {
+    "unit_id": "defannot-d300-6",
+    "def": "*D300",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn axis dimension; tiny 70mm dim on AA-AXIS-DIM7 layer with _ArchTick marks, no wall geometry.",
+    "rationale": {
+      "evidence": "Extension LINEs 8B7F and 8B80 are 70 units apart (47528.83-47458.83), short dimension-line segments (8B81/8B82) and a between-ticks LINE 8B84 form the dimension bar, _ArchTick INSERTs 8B85/8B86 are architectural tick marks, and MTEXT 8B83 reads 70 matching the spacing. All on AA-AXIS-DIM7 with three DEFPOINTS (8B87-8B89).",
+      "rule": "A *Dnnn block on an axis/grid dimension layer (AA-AXIS-*) with _ArchTick markers and MTEXT equal to its extension spacing is a dimension cache; small magnitude does not make it a wall.",
+      "counterfactual": "A 70-unit offset numerically resembles a thin finish/furring line, so if these two short parallel lines were on a wall/finish layer with no ticks, MTEXT, or DEFPOINTS they might read as a thin wall face pair.",
+      "uncertainty": "Cannot confirm from the projection whether 70 dimensions a wall thickness, a gap, or an axis offset, nor the block's insertion context; the DEFPOINTS that anchor the measured feature are not sampled."
+    }
+  },
+  {
+    "unit_id": "defannot-d301-7",
+    "def": "*D301",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn axis dimension; 3000mm dim on AA-AXIS-DIM7 layer with _ArchTick marks, no wall geometry.",
+    "rationale": {
+      "evidence": "Extension LINEs 8B8A and 8B8B are 3000 units apart (47458.83-44458.83), dimension LINE 8B8C runs between them, _ArchTick INSERTs 8B8D/8B8E cap the ends, and MTEXT 8B8F reads 3000 matching the span. Layer AA-AXIS-DIM7 plus three DEFPOINTS (8B90-8B92) mark it as an axis dimension.",
+      "rule": "A *Dnnn block on a grid-axis dimension layer with tick markers and a value equal to its extension-line span is a cached axis dimension; its lines are witness/dimension lines, not walls.",
+      "counterfactual": "If these parallel lines had no _ArchTick markers, no measurement text, and no DEFPOINTS and sat on a wall layer at a plausible thickness offset, a wall interpretation would be warranted.",
+      "uncertainty": "The projection does not reveal insertion scale, whether the axis dimension is associative, or AA-AXIS-DIM7 plot state; DEFPOINTS coordinates are unsampled."
+    }
+  },
+  {
+    "unit_id": "defannot-d302-8",
+    "def": "*D302",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn axis dimension; small 210mm dim on AA-AXIS-DIM7 layer with _ArchTick marks, no wall geometry.",
+    "rationale": {
+      "evidence": "Extension LINEs 8B93 and 8B94 are 210 units apart (44458.83-44248.83), short dimension segments 8B95/8B96 and between-ticks LINE 8B97 form the bar, _ArchTick INSERTs 8B98/8B99 mark it, and MTEXT 8B9A reads 210 matching the spacing. All on AA-AXIS-DIM7 with three DEFPOINTS (8B9B-8B9D).",
+      "rule": "A *Dnnn axis-layer block whose MTEXT equals its extension-line spacing and is capped by _ArchTick marks is a dimension cache regardless of a wall-like magnitude such as 210.",
+      "counterfactual": "210 is a common wall thickness, so if these two short parallel lines were on a wall layer without ticks, MTEXT, or DEFPOINTS they could plausibly be the two faces of a wall.",
+      "uncertainty": "Whether 210 dimensions an actual wall thickness or merely an axis offset cannot be told from the projection; block placement and the DEFPOINTS anchors are not visible here."
+    }
+  },
+  {
+    "unit_id": "defannot-d303-9",
+    "def": "*D303",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn dimension block; tiny 70mm dim on DIM layer with _ArchTick marks, no wall geometry.",
+    "rationale": {
+      "evidence": "Extension LINEs 8B9E and 8B9F are 70 units apart (47598.83-47528.83), short dimension segments 8BA0/8BA1 and between-ticks LINE 8BA3 form the bar, _ArchTick INSERTs 8BA4/8BA5 mark the ends, and MTEXT 8BA2 reads 70 matching the spacing. DIM layer with three DEFPOINTS (8BA6-8BA8).",
+      "rule": "A *Dnnn block on the DIM layer with _ArchTick markers and a measurement equal to its extension-line gap is a dimension cache; the small value does not turn it into wall geometry.",
+      "counterfactual": "A 70-unit gap resembles a thin finish layer, so these two short parallel lines on a finish/wall layer without ticks, MTEXT, or DEFPOINTS could read as a thin wall/finish pair.",
+      "uncertainty": "The projection cannot establish what the 70 measures, the block's insertion transform, or DIM-layer plot state; the DEFPOINTS anchors are not sampled."
+    }
+  },
+  {
+    "unit_id": "defannot-d304-10",
+    "def": "*D304",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn dimension block; 2900mm dim on DIM layer with _ArchTick marks, no wall geometry.",
+    "rationale": {
+      "evidence": "Extension LINEs 8BA9 and 8BAA are 2900 units apart (50498.83-47598.83), dimension LINE 8BAB spans between them, _ArchTick INSERTs 8BAC/8BAD cap the ends, and MTEXT 8BAE reads 2900 matching the span. DIM layer plus three DEFPOINTS (8BAF-8BB1).",
+      "rule": "A *Dnnn block whose dimension text equals the extension-line span and whose dimension line is tick-terminated on a DIM layer is a dimension cache, not a wall.",
+      "counterfactual": "Without _ArchTick markers, measurement MTEXT, or DEFPOINTS, and on a wall layer at a constant thickness offset, the parallel lines could indicate a wall.",
+      "uncertainty": "Insertion scale, associativity, and layer plotting are indeterminate from the projection; DEFPOINTS coordinates that anchor the dimension are not in the sample."
+    }
+  },
+  {
+    "unit_id": "defannot-d305-11",
+    "def": "*D305",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn dimension block; small 135mm dim on DIM layer with _ArchTick marks, no wall geometry.",
+    "rationale": {
+      "evidence": "Extension LINEs 8BB2 and 8BB3 are 135 units apart (50633.83-50498.83), dimension LINE 8BB4 runs between them, _ArchTick INSERTs 8BB6/8BB7 mark the ends, and MTEXT 8BB5 reads 135 matching the spacing. DIM layer with three DEFPOINTS (8BB8-8BBA).",
+      "rule": "A *Dnnn DIM-layer block whose MTEXT equals its extension-line spacing and is capped by tick marks is a dimension cache even when the value (135) looks like a wall thickness.",
+      "counterfactual": "135 is a plausible partition thickness, so if these two short parallel lines were on a wall layer without ticks, MTEXT, or DEFPOINTS, they could be read as a wall's two faces.",
+      "uncertainty": "Whether 135 dimensions a real wall thickness or another small feature cannot be determined here; block placement and the DEFPOINTS anchors are not visible in the projection."
+    }
+  },
+  {
+    "unit_id": "defannot-d306-12",
+    "def": "*D306",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn dimension block; small 135mm dim on DIM layer with _ArchTick marks, no wall geometry.",
+    "rationale": {
+      "evidence": "Extension LINEs 8BBB and 8BBC are 135 units apart (50768.83-50633.83), dimension LINE 8BBD spans between them, _ArchTick INSERTs 8BBF/8BC0 cap the ends, and MTEXT 8BBE reads 135 matching the spacing. DIM layer with three DEFPOINTS (8BC1-8BC3).",
+      "rule": "A *Dnnn DIM-layer block with tick markers and a measurement equal to its extension-line gap is a dimension cache; a wall-thickness-sized value does not reclassify it.",
+      "counterfactual": "If this short parallel-line pair were on a wall/partition layer with no ticks, MTEXT, or DEFPOINTS and offset by 135, it would plausibly be a thin partition.",
+      "uncertainty": "The projection does not disclose what the 135 measures, the block's insertion context, or DIM-layer plot state; the DEFPOINTS anchors are unsampled."
+    }
+  },
+  {
+    "unit_id": "defannot-d307-13",
+    "def": "*D307",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn dimension block; 4500mm dim on DIM layer with _ArchTick marks, no wall geometry.",
+    "rationale": {
+      "evidence": "Extension LINEs 8BC4 and 8BC5 are 4500 units apart (55268.83-50768.83), dimension LINE 8BC6 runs between them, _ArchTick INSERTs 8BC7/8BC8 cap the ends, and MTEXT 8BC9 reads 4500 matching the span. DIM layer plus three DEFPOINTS (8BCA-8BCC).",
+      "rule": "A *Dnnn block whose dimension text equals its extension-line span, tick-terminated on a DIM layer, is a cached dimension whose lines are witness/dimension lines, not walls.",
+      "counterfactual": "Only if these parallel lines shed their ticks, MTEXT, and DEFPOINTS and moved to a wall layer at a fixed thickness offset would a wall reading apply.",
+      "uncertainty": "Real-world scale, associativity, and layer plotting cannot be judged from the projection; DEFPOINTS coordinates are not sampled so the measured feature is unseen."
+    }
+  },
+  {
+    "unit_id": "defannot-d308-14",
+    "def": "*D308",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn dimension block; small 135mm dim on DIM layer with _ArchTick marks, no wall geometry.",
+    "rationale": {
+      "evidence": "Extension LINEs 8BCD and 8BCE are 135 units apart (55403.83-55268.83), dimension LINE 8BCF spans between them, _ArchTick INSERTs 8BD1/8BD2 cap the ends, and MTEXT 8BD0 reads 135 matching the spacing. DIM layer with three DEFPOINTS (8BD3-8BD5).",
+      "rule": "A *Dnnn DIM-layer block with tick markers and MTEXT equal to its extension-line spacing is a dimension cache even when the value resembles a wall thickness.",
+      "counterfactual": "135 on a wall layer without ticks, MTEXT, or DEFPOINTS between two short parallel lines could read as a partition's two faces.",
+      "uncertainty": "Whether 135 dimensions an actual wall or another small gap is indeterminate from the projection; block placement and DEFPOINTS anchors are not visible."
+    }
+  },
+  {
+    "unit_id": "defannot-d309-15",
+    "def": "*D309",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn dimension block; small 135mm dim on DIM layer with _ArchTick marks, no wall geometry.",
+    "rationale": {
+      "evidence": "Extension LINEs 8BD6 and 8BD7 are 135 units apart (55538.83-55403.83), dimension LINE 8BD8 runs between them, _ArchTick INSERTs 8BDA/8BDB cap the ends, and MTEXT 8BD9 reads 135 matching the spacing. DIM layer with three DEFPOINTS (8BDC-8BDE).",
+      "rule": "A *Dnnn DIM-layer block whose measurement equals its extension-line gap and is tick-terminated is a dimension cache; the 135 value does not make it a wall.",
+      "counterfactual": "If these two short parallel lines were on a wall/partition layer without ticks, MTEXT, or DEFPOINTS and offset by 135, they would plausibly represent a thin wall.",
+      "uncertainty": "The projection cannot confirm what the 135 measures, the block's insertion transform, or plot state; the DEFPOINTS anchors are unsampled."
+    }
+  },
+  {
+    "unit_id": "defannot-d310-16",
+    "def": "*D310",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn dimension block; 3600mm dim on DIM layer with _ArchTick marks, no wall geometry.",
+    "rationale": {
+      "evidence": "Extension LINEs 8BDF and 8BE0 are 3600 units apart (59138.83-55538.83), dimension LINE 8BE1 spans between them, _ArchTick INSERTs 8BE2/8BE3 cap the ends, and MTEXT 8BE4 reads 3600 matching the span. DIM layer plus three DEFPOINTS (8BE5-8BE7).",
+      "rule": "A *Dnnn block whose dimension text equals its extension-line span, tick-terminated on the DIM layer, is a cached dimension rather than architectural wall geometry.",
+      "counterfactual": "Only if the parallel lines lost their ticks, MTEXT, and DEFPOINTS and lived on a wall layer at a constant offset would a wall interpretation hold.",
+      "uncertainty": "Insertion scale, associativity, and DIM-layer plotting are indeterminate here; DEFPOINTS coordinates anchoring the dimension are not in the sample."
+    }
+  },
+  {
+    "unit_id": "defannot-d311-17",
+    "def": "*D311",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn dimension block; small 210mm dim on DIM layer with _ArchTick marks, no wall geometry.",
+    "rationale": {
+      "evidence": "Extension LINEs 8BE8 and 8BE9 are 210 units apart (59348.83-59138.83), short dimension segments 8BEA/8BEB and between-ticks LINE 8BEC form the bar, _ArchTick INSERTs 8BED/8BEE mark it, and MTEXT 8BEF reads 210 matching the spacing. DIM layer with three DEFPOINTS (8BF0-8BF2).",
+      "rule": "A *Dnnn DIM-layer block with _ArchTick markers and MTEXT equal to its extension-line gap is a dimension cache even when the 210 value resembles a wall thickness.",
+      "counterfactual": "210 is a common wall thickness, so two short parallel lines on a wall layer without ticks, MTEXT, or DEFPOINTS could be read as a wall's faces.",
+      "uncertainty": "Whether 210 dimensions a real wall or an axis offset cannot be determined from the projection; block placement and DEFPOINTS anchors are not visible."
+    }
+  },
+  {
+    "unit_id": "defannot-d312-18",
+    "def": "*D312",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn dimension block; vertical 2665mm dim on DIM layer with DIMDOT markers, no wall geometry.",
+    "rationale": {
+      "evidence": "Two horizontal extension LINEs 8BF3 and 8BF4 are 2665 units apart in Y (30040.207-27375.207), a vertical dimension LINE 8BF5 runs between them, DIMDOT INSERTs 8BF6/8BF7 mark the ends, and MTEXT 8BF8 reads 2665 matching the spacing. DIM layer with three DEFPOINTS (8BF9-8BFB); this is a vertical dimension.",
+      "rule": "Orientation aside, a *Dnnn block whose MTEXT equals its extension-line spacing and is capped by dimension markers on a DIM layer is a dimension cache, not a wall.",
+      "counterfactual": "If the two horizontal lines carried no DIMDOT markers, no measurement text, and no DEFPOINTS and sat on a wall layer at a fixed thickness offset, they could read as a wall.",
+      "uncertainty": "The projection cannot show insertion transform, associativity, or DIM-layer plot state; DEFPOINTS coordinates are not sampled so the measured feature is unseen."
+    }
+  },
+  {
+    "unit_id": "defannot-d313-19",
+    "def": "*D313",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn dimension block; vertical 2350mm dim on DIM layer with DIMDOT markers, no wall geometry.",
+    "rationale": {
+      "evidence": "Horizontal extension LINEs 8BFC and 8BFD are 2350 units apart in Y (32390.207-30040.207), vertical dimension LINE 8BFE runs between them, DIMDOT INSERTs 8BFF/8C00 cap the ends, and MTEXT 8C01 reads 2350 matching the spacing. DIM layer with three DEFPOINTS (8C02-8C04).",
+      "rule": "A vertical *Dnnn block whose dimension text equals its extension-line span, dot-terminated on the DIM layer, is a cached dimension whose lines are witness/dimension lines, not walls.",
+      "counterfactual": "Only if these horizontal lines lost their markers, MTEXT, and DEFPOINTS and moved to a wall layer at a constant offset would a wall reading be justified.",
+      "uncertainty": "Insertion scale, associativity, and layer plotting are indeterminate from the projection; the DEFPOINTS anchors are not in the sample."
+    }
+  },
+  {
+    "unit_id": "defannot-d314-20",
+    "def": "*D314",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *Dnnn dimension block; vertical 780mm dim on DIM layer with DIMDOT markers, no wall geometry.",
+    "rationale": {
+      "evidence": "Horizontal extension LINEs 8C05 and 8C06 are 780 units apart in Y (33170.207-32390.207), vertical dimension LINE 8C07 runs between them, DIMDOT INSERTs 8C08/8C09 cap the ends, and MTEXT 8C0A reads 780 matching the spacing. DIM layer with three DEFPOINTS (8C0B-8C0D).",
+      "rule": "A *Dnnn block whose MTEXT equals its extension-line spacing and is capped by dot markers on a DIM layer is a dimension cache; the modest 780 value does not make it a wall.",
+      "counterfactual": "If the two horizontal lines had no DIMDOT markers, measurement text, or DEFPOINTS and lived on a wall layer at a plausible thickness offset, they could be misread as wall faces.",
+      "uncertainty": "The projection does not reveal what the 780 measures, the block's insertion context, or DIM-layer plot state; DEFPOINTS coordinates anchoring the dimension are unsampled."
+    }
+  }
+]

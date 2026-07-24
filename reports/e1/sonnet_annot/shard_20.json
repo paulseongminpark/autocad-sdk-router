@@ -1,0 +1,46 @@
+[
+  {
+    "unit_id": "defannot-x-0-0-59c-0-gasdfasdfs-0-cok3-381",
+    "answer": {
+      "def": "X-평면도(기본형)$0$씽크$0$59C$0$gasdfasdfs$0$COK3",
+      "role": "가구",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "3DFACE-dominated (34/38 entities) 3D solid model of a kitchen sink fixture (씽크=sink, layer suffix KIT=kitchen); the sole LINE (1DA3) runs diagonally through 3D space (z 10->30), a construction/reference edge rather than a plan-view wall segment."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-382",
+    "answer": {
+      "def": "X-평면도(기본형)$0$안전사다리",
+      "role": "심볼",
+      "wall_likelihood": 0.02,
+      "wall_line_handles": [],
+      "notes": "안전사다리 = safety ladder; tall narrow bbox (~800 x 1475) with 46 short LINE segments plus ARC/CIRCLE forming a symmetric rung/cage pattern typical of an equipment symbol block, not architectural walls."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-100a-383",
+    "answer": {
+      "def": "X-평면도(기본형)$0$우수관_100A",
+      "role": "심볼",
+      "wall_likelihood": 0.02,
+      "wall_line_handles": [],
+      "notes": "우수관_100A = rainwater drain pipe (100mm dia.); tiny symmetric bbox (~165 x 165) with two crosshair LINEs and TEXT labels 'RD' / 'ø100' — a plumbing/drain plan symbol, not walls."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-384",
+    "answer": {
+      "def": "X-평면도(기본형)$0$코너  선반",
+      "role": "가구",
+      "wall_likelihood": 0.12,
+      "wall_line_handles": [
+        {"handle": "59A9", "reason": "long vertical axis-aligned LINE (~116 units), outer edge of the unit"},
+        {"handle": "59AA", "reason": "long vertical axis-aligned LINE parallel to 59A9 on the opposite side"},
+        {"handle": "59AB", "reason": "long horizontal axis-aligned LINE (~293 units) spanning the top of the outline"}
+      ],
+      "notes": "코너 선반 = corner shelf; layer=FUR marks it as furniture, and the heavy ARC/CIRCLE content (16 ARC, 7 CIRCLE among 47 entities) points to curved shelf edges — the few long straight LINEs form the furniture outline rather than building walls."
+    }
+  }
+]

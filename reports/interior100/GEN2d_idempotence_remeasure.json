@@ -1,0 +1,28 @@
+{
+  "schema": "ariadne.interior100.idempotence_remeasure.v1",
+  "arc": "GEN2c/GEN2d idempotence repair: hatch pattern-scale double-division (patch_engine, commit b939f8d) + robust full-ellipse fold (blockdef_diff LEX-0009 extension). This artifact is a MEASUREMENT-ONLY canonical remeasure of the existing GEN2d flight IRs (the ellipse fix is a pure diff-oracle change; no reflight).",
+  "idempotence_gen1_vs_gen2": {
+    "run": "runs/e2e_1dwg_GEN2d_20260713",
+    "diff0_total": 27130,
+    "a_entity_total": 27130,
+    "interior_diff0_fraction": 1.0,
+    "dirty_defs": [],
+    "fixed_point": true,
+    "ladder": "GEN2c (pre-fix) 26,947/27,130=0.9933 -> GEN2d (pattern-scale fix) 27,129/27,130 -> +robust ellipse fold 27,130/27,130=1.0"
+  },
+  "forward_r4x_no_regression": {
+    "run": "runs/e2e_1dwg_R4x_ccw_20260711",
+    "diff0_total": 27128,
+    "a_entity_total": 27130,
+    "interior_diff0_fraction": 0.9999262808698858,
+    "residual_defs": [
+      [
+        "X-FORM_청주$0$dA로고",
+        2
+      ]
+    ],
+    "baseline_r4x": 27128,
+    "delta_vs_baseline": 0,
+    "note": "forward unchanged (2 spline Bezier notation pairs remain the accepted residue); the pattern-type gate only alters gen>=2 custom-hatch synthesis and the ellipse fold is symmetric."
+  }
+}

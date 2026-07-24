@@ -1,0 +1,555 @@
+[
+  {
+    "unit_id": "defannot-u88-261",
+    "def": "*U88",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "8 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment of the 평면도(기본형) plan, no wall face-lines in the block.",
+    "rationale": {
+      "evidence": "All 8 entities are LWPOLYLINE on the single bound layer 'X-평면도(기본형)$0$INSUL' (handles 4071..4078), each with exactly 5 vertices - the fingerprint of a repeated insulation-batting fill rather than long wall edges. There is no LINE, INSERT, TEXT, HATCH or dimension entity, and no bbox is derivable from LINE start/end. The '$0$' token marks the layer as bound from an xref of the 평면도(기본형) plan and 'INSUL' identifies it as insulation, i.e. wall-assembly material.",
+      "rule": "A block-table definition made entirely of uniform closed LWPOLYLINEs on a floor-plan INSUL/material sublayer is wall-cavity insulation fill: classify it as 평면 부분도 because it traces where walls run, but treat insulation as a wall-LOCATION indicator, not a container of extractable wall-FACE lines.",
+      "counterfactual": "If the block carried W1/CEN-layer long straight line pairs at wall thickness, or any INSERT/HATCH beyond insulation cells, it would be a wall-bearing plan fragment with a much higher wall_likelihood and populated handles.",
+      "uncertainty": "Without vertex coordinates or a bbox the exact run-length and placement of the insulation cannot be confirmed, so whether these cells line an exterior envelope or an interior partition is not resolvable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u89-262",
+    "def": "*U89",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "30 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment of the 평면도(기본형) plan, no wall face-lines in the block.",
+    "rationale": {
+      "evidence": "All 30 entities are LWPOLYLINE on the single bound layer 'X-평면도(기본형)$0$INSUL' (handles 407E..409B), each with exactly 5 vertices - the fingerprint of a repeated insulation-batting fill rather than long wall edges. There is no LINE, INSERT, TEXT, HATCH or dimension entity, and no bbox is derivable from LINE start/end. The '$0$' token marks the layer as bound from an xref of the 평면도(기본형) plan and 'INSUL' identifies it as insulation, i.e. wall-assembly material.",
+      "rule": "A block-table definition made entirely of uniform closed LWPOLYLINEs on a floor-plan INSUL/material sublayer is wall-cavity insulation fill: classify it as 평면 부분도 because it traces where walls run, but treat insulation as a wall-LOCATION indicator, not a container of extractable wall-FACE lines.",
+      "counterfactual": "If the block carried W1/CEN-layer long straight line pairs at wall thickness, or any INSERT/HATCH beyond insulation cells, it would be a wall-bearing plan fragment with a much higher wall_likelihood and populated handles.",
+      "uncertainty": "Without vertex coordinates or a bbox the exact run-length and placement of the insulation cannot be confirmed, so whether these cells line an exterior envelope or an interior partition is not resolvable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u90-263",
+    "def": "*U90",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "41 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment of the 평면도(기본형) plan, no wall face-lines in the block.",
+    "rationale": {
+      "evidence": "All 41 entities are LWPOLYLINE on the single bound layer 'X-평면도(기본형)$0$INSUL' (handles 40A1..40BE), each with exactly 5 vertices - the fingerprint of a repeated insulation-batting fill rather than long wall edges. There is no LINE, INSERT, TEXT, HATCH or dimension entity, and no bbox is derivable from LINE start/end. The '$0$' token marks the layer as bound from an xref of the 평면도(기본형) plan and 'INSUL' identifies it as insulation, i.e. wall-assembly material.",
+      "rule": "A block-table definition made entirely of uniform closed LWPOLYLINEs on a floor-plan INSUL/material sublayer is wall-cavity insulation fill: classify it as 평면 부분도 because it traces where walls run, but treat insulation as a wall-LOCATION indicator, not a container of extractable wall-FACE lines.",
+      "counterfactual": "If the block carried W1/CEN-layer long straight line pairs at wall thickness, or any INSERT/HATCH beyond insulation cells, it would be a wall-bearing plan fragment with a much higher wall_likelihood and populated handles.",
+      "uncertainty": "Without vertex coordinates or a bbox the exact run-length and placement of the insulation cannot be confirmed, so whether these cells line an exterior envelope or an interior partition is not resolvable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u91-264",
+    "def": "*U91",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "6 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment of the 평면도(기본형) plan, no wall face-lines in the block.",
+    "rationale": {
+      "evidence": "All 6 entities are LWPOLYLINE on the single bound layer 'X-평면도(기본형)$0$INSUL' (handles 40CF..40D4), each with exactly 5 vertices - the fingerprint of a repeated insulation-batting fill rather than long wall edges. There is no LINE, INSERT, TEXT, HATCH or dimension entity, and no bbox is derivable from LINE start/end. The '$0$' token marks the layer as bound from an xref of the 평면도(기본형) plan and 'INSUL' identifies it as insulation, i.e. wall-assembly material.",
+      "rule": "A block-table definition made entirely of uniform closed LWPOLYLINEs on a floor-plan INSUL/material sublayer is wall-cavity insulation fill: classify it as 평면 부분도 because it traces where walls run, but treat insulation as a wall-LOCATION indicator, not a container of extractable wall-FACE lines.",
+      "counterfactual": "If the block carried W1/CEN-layer long straight line pairs at wall thickness, or any INSERT/HATCH beyond insulation cells, it would be a wall-bearing plan fragment with a much higher wall_likelihood and populated handles.",
+      "uncertainty": "Without vertex coordinates or a bbox the exact run-length and placement of the insulation cannot be confirmed, so whether these cells line an exterior envelope or an interior partition is not resolvable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u92-265",
+    "def": "*U92",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "23 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment of the 평면도(기본형) plan, no wall face-lines in the block.",
+    "rationale": {
+      "evidence": "All 23 entities are LWPOLYLINE on the single bound layer 'X-평면도(기본형)$0$INSUL' (handles 40DA..40F0), each with exactly 5 vertices - the fingerprint of a repeated insulation-batting fill rather than long wall edges. There is no LINE, INSERT, TEXT, HATCH or dimension entity, and no bbox is derivable from LINE start/end. The '$0$' token marks the layer as bound from an xref of the 평면도(기본형) plan and 'INSUL' identifies it as insulation, i.e. wall-assembly material.",
+      "rule": "A block-table definition made entirely of uniform closed LWPOLYLINEs on a floor-plan INSUL/material sublayer is wall-cavity insulation fill: classify it as 평면 부분도 because it traces where walls run, but treat insulation as a wall-LOCATION indicator, not a container of extractable wall-FACE lines.",
+      "counterfactual": "If the block carried W1/CEN-layer long straight line pairs at wall thickness, or any INSERT/HATCH beyond insulation cells, it would be a wall-bearing plan fragment with a much higher wall_likelihood and populated handles.",
+      "uncertainty": "Without vertex coordinates or a bbox the exact run-length and placement of the insulation cannot be confirmed, so whether these cells line an exterior envelope or an interior partition is not resolvable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u93-266",
+    "def": "*U93",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.4,
+    "wall_line_handles": [],
+    "notes": "6 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment of the 평면도(기본형) plan, no wall face-lines in the block.",
+    "rationale": {
+      "evidence": "All 6 entities are LWPOLYLINE on the single bound layer 'X-평면도(기본형)$0$INSUL' (handles 40F6..40FB), each with exactly 5 vertices - the fingerprint of a repeated insulation-batting fill rather than long wall edges. There is no LINE, INSERT, TEXT, HATCH or dimension entity, and no bbox is derivable from LINE start/end. The '$0$' token marks the layer as bound from an xref of the 평면도(기본형) plan and 'INSUL' identifies it as insulation, i.e. wall-assembly material.",
+      "rule": "A block-table definition made entirely of uniform closed LWPOLYLINEs on a floor-plan INSUL/material sublayer is wall-cavity insulation fill: classify it as 평면 부분도 because it traces where walls run, but treat insulation as a wall-LOCATION indicator, not a container of extractable wall-FACE lines.",
+      "counterfactual": "If the block carried W1/CEN-layer long straight line pairs at wall thickness, or any INSERT/HATCH beyond insulation cells, it would be a wall-bearing plan fragment with a much higher wall_likelihood and populated handles.",
+      "uncertainty": "Without vertex coordinates or a bbox the exact run-length and placement of the insulation cannot be confirmed, so whether these cells line an exterior envelope or an interior partition is not resolvable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-form-267",
+    "def": "X-FORM_청주",
+    "role": "기타",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Cheongju drawing title-block/sheet form (border + right-side data table + 72 TEXT); a form template, no plan or wall geometry.",
+    "rationale": {
+      "evidence": "Every entity sits on sheet-form layers 0/A-SHEET/A-SHEET-DEF/A-SHEET-TEXT with TEXT=72 and LINE=105 that appear as short equal-length horizontals at x=820->758 (62-unit table rulings, e.g. handles 2EC-302) stacked as table rows. The bbox [27,22]-[820,572] is sheet/title-block sized, and INSERT=1 plus dense TEXT are form field labels, not room geometry.",
+      "rule": "An A-SHEET-family block dominated by TEXT and short equal-length ruling lines within a sheet-sized border is a drawing form (title block/frame): it belongs to none of plan/dimension/furniture/symbol and is therefore 기타.",
+      "counterfactual": "If W1/CEN wall and axis layers with room-scale orthogonal line pairs were present instead of A-SHEET table rulings, the block would read as a floor plan rather than a sheet form.",
+      "uncertainty": "The table's TEXT strings are not exposed in the projection, so the exact sheet metadata (project, scale, revision) and hence the precise document type cannot be determined here."
+    }
+  },
+  {
+    "unit_id": "defannot-x-form-0-block-5-268",
+    "def": "X-FORM_청주$0$Block_5",
+    "role": "심볼",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Logo graphic component (4 SPLINE + 2 SOLID HATCH) of the dA logo, on A-SHEET form layers; no wall geometry.",
+    "rationale": {
+      "evidence": "The 6 entities are SPLINE=4 and HATCH=2 (pattern=SOLID, handles 1BCE/1BD1) on layers X-FORM_청주$0$A-SHEET and $A-SHEET-DEF, i.e. curved outlines with solid fill inside the sheet-form area. There is no LINE, no orthogonal geometry and no bbox from LINE start/end, and definition 9 (dA로고) INSERTs this block, so it is a sub-part of the firm logo.",
+      "rule": "A small block built only from SPLINEs and SOLID hatches sitting in a title-block/form context is a graphic mark (logo element) and is classified 심볼, not architecture.",
+      "counterfactual": "If the same solid-filled splines appeared on a furniture layer inside a unit plan they would read as 가구, and orthogonal wall-layer line pairs would make it a plan fragment.",
+      "uncertainty": "Spline control points are not given, so which visual part of the logo (letterform vs emblem) this fragment draws cannot be identified from the histogram."
+    }
+  },
+  {
+    "unit_id": "defannot-x-form-0-da-269",
+    "def": "X-FORM_청주$0$dA로고",
+    "role": "심볼",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Firm logo 'dA로고' (24 SPLINE + 5 SOLID HATCH + 1 INSERT of Block_5) on the A-SHEET form layer; a brand mark, no walls.",
+    "rationale": {
+      "evidence": "All 30 entities are on X-FORM_청주$0$A-SHEET and comprise SPLINE=24, HATCH=5 (SOLID) and INSERT=1 (block=X-FORM_청주$0$Block_5, handle 1BF2) - curved outlines with solid fills plus a nested logo component. The definition name literally reads 'dA로고' (dA logo) and there is no straight/orthogonal or dimension geometry.",
+      "rule": "A block whose name and content (splines + solid hatch on a sheet-form layer, nesting other logo parts) identify it as a brand mark is a 심볼 (graphic symbol), independent of any drawing scale.",
+      "counterfactual": "Presence of W1/CEN wall or axis line pairs, or placement inside a unit plan, would move the block out of 심볼 toward a plan or furniture classification.",
+      "uncertainty": "Because only entity types (not coordinates) are shown, the judgment leans partly on the layer and the name 'dA로고'; the actual rendered logo form cannot be verified from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-270",
+    "def": "X-평면도(기본형)",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.55,
+    "wall_line_handles": [],
+    "notes": "Master basic-type floor plan: 6-dong site plan (471m x 320m) with structural GRID axes, unit-type labels and 133 unit-block INSERTs; walls mostly delegated to child inserts (W1=4/RW1=4 direct).",
+    "rationale": {
+      "evidence": "The bbox spans -275000..471137 x 0..320115 (about 471m x 320m), i.e. a whole-site plan, and DEFPOINTS TEXT carries dong labels '101 동'..'106 동' plus unit codes (84A/84B/84C/111A/111B). INSERT=133 place child unit blocks (e.g. handle 3BA block=...84c) while the sampled long LINEs are all GRID-layer axes such as 3BB (-250000,0)->(-250000,249000) spanning 249m. The layer histogram shows only W1=4 and RW1=4 direct wall entities out of 4723, none of them in the sample.",
+      "rule": "A large-bbox block that assembles dong/unit labels, structural GRID axes and many unit-plan INSERTs is the master floor plan and is classified 평면 부분도; its wall_likelihood is moderate because it represents walls but delegates most wall-face geometry to its child inserts.",
+      "counterfactual": "If this block directly contained the room-scale W1 double-line walls (rather than delegating them via INSERTs) the wall_likelihood would rise toward the co-plan level and handles would be populated; if it lacked GRID/labels/inserts it would not be a plan at all.",
+      "uncertainty": "The four W1 and four RW1 wall lines are not among the 30 sampled entities, so their positions cannot be cited, and the block's own direct wall content versus its inserted children cannot be separated from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-1000-271",
+    "def": "X-평면도(기본형)$0$1000",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [
+      {
+        "handle": "8218",
+        "reason": "920mm horizontal door-frame edge (960,-40)->(40,-40) (3mm pair, not wall)"
+      },
+      {
+        "handle": "8219",
+        "reason": "920mm horizontal door-frame edge (960,-43)->(40,-43) (3mm pair, not wall)"
+      }
+    ],
+    "notes": "Single door block on the plan DOOR layer: door leaf + swing ARC + 3mm-spaced frame lines; a standalone door, not a multi-element plan fragment.",
+    "rationale": {
+      "evidence": "All entities are on X-평면도(기본형)$0$DOOR: one ARC is the door swing, the LWPOLYLINEs (5-19 vtx) form the leaf and hardware, and the paired LINEs 8218 (960,-40)->(40,-40) and 8219 (960,-43)->(40,-43) run 920mm but only 3mm apart - the drawn door frame/leaf, far below wall thickness. The door width (~960 across the bbox) confirms a single ~1000mm door.",
+      "rule": "A DOOR-layer block of two closely spaced (~3mm) long lines plus a swing arc and leaf polylines is an architectural door; it is neither furniture, symbol, dimension nor a multi-element plan fragment, hence 기타.",
+      "counterfactual": "If the block also carried wall-thickness (100-500mm) parallel line pairs or reveals on a W1 layer flanking the opening, it would edge toward a wall-bearing plan fragment (평면 부분도).",
+      "uncertainty": "Swing hand/direction and whether this is a single or double leaf cannot be fully resolved from the entity histogram and the two sampled frame lines alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-100012-272",
+    "def": "X-평면도(기본형)$0$100012",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [
+      {
+        "handle": "822C",
+        "reason": "920mm horizontal door-frame edge (960,-40)->(40,-40) (3mm pair, not wall)"
+      },
+      {
+        "handle": "822D",
+        "reason": "920mm horizontal door-frame edge (960,-43)->(40,-43) (3mm pair, not wall)"
+      }
+    ],
+    "notes": "Single door block on the plan DOOR layer: door leaf + swing ARC + 3mm-spaced frame lines; a standalone door, not a multi-element plan fragment.",
+    "rationale": {
+      "evidence": "All entities are on X-평면도(기본형)$0$DOOR: one ARC is the door swing, the LWPOLYLINEs (5-19 vtx) form the leaf and hardware, and the paired LINEs 822C (960,-40)->(40,-40) and 822D (960,-43)->(40,-43) run 920mm but only 3mm apart - the drawn door frame/leaf, far below wall thickness. The door width (~960 across the bbox) confirms a single ~1000mm door.",
+      "rule": "A DOOR-layer block of two closely spaced (~3mm) long lines plus a swing arc and leaf polylines is an architectural door; it is neither furniture, symbol, dimension nor a multi-element plan fragment, hence 기타.",
+      "counterfactual": "If the block also carried wall-thickness (100-500mm) parallel line pairs or reveals on a W1 layer flanking the opening, it would edge toward a wall-bearing plan fragment (평면 부분도).",
+      "uncertainty": "Swing hand/direction and whether this is a single or double leaf cannot be fully resolved from the entity histogram and the two sampled frame lines alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-1000m-273",
+    "def": "X-평면도(기본형)$0$1000m",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [
+      {
+        "handle": "823F",
+        "reason": "920mm vertical door-frame edge (40,960)->(40,40) (3mm pair, not wall)"
+      },
+      {
+        "handle": "8240",
+        "reason": "920mm vertical door-frame edge (43,960)->(43,40) (3mm pair, not wall)"
+      }
+    ],
+    "notes": "Single door block on the plan DOOR layer: door leaf + swing ARC + 3mm-spaced frame lines; a standalone door, not a multi-element plan fragment.",
+    "rationale": {
+      "evidence": "All entities are on X-평면도(기본형)$0$DOOR: one ARC is the door swing, the LWPOLYLINEs (5-19 vtx) form the leaf and hardware, and the paired LINEs 823F (40,960)->(40,40) and 8240 (43,960)->(43,40) run 920mm but only 3mm apart - the drawn door frame/leaf, far below wall thickness. The door width (~960 across the bbox) confirms a single ~1000mm door.",
+      "rule": "A DOOR-layer block of two closely spaced (~3mm) long lines plus a swing arc and leaf polylines is an architectural door; it is neither furniture, symbol, dimension nor a multi-element plan fragment, hence 기타.",
+      "counterfactual": "If the block also carried wall-thickness (100-500mm) parallel line pairs or reveals on a W1 layer flanking the opening, it would edge toward a wall-bearing plan fragment (평면 부분도).",
+      "uncertainty": "Swing hand/direction and whether this is a single or double leaf cannot be fully resolved from the entity histogram and the two sampled frame lines alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-101co1-274",
+    "def": "X-평면도(기본형)$0$101co1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.92,
+    "wall_line_handles": [
+      {
+        "handle": "7A9D",
+        "reason": "vertical wall inner face x=-5020 (pairs 500mm with -5520)"
+      },
+      {
+        "handle": "7A9E",
+        "reason": "vertical wall inner face x=-5020, upper run"
+      },
+      {
+        "handle": "7A9F",
+        "reason": "vertical wall outer face x=-5520 (500mm party wall)"
+      },
+      {
+        "handle": "7AA0",
+        "reason": "vertical wall outer face x=-5520, upper run"
+      },
+      {
+        "handle": "7AA2",
+        "reason": "horizontal wall-end jamb linking -5020/-5520 faces"
+      },
+      {
+        "handle": "7AA3",
+        "reason": "horizontal wall-end jamb linking the two faces"
+      },
+      {
+        "handle": "7AA9",
+        "reason": "right exterior wall outer face x=7300"
+      },
+      {
+        "handle": "7AAB",
+        "reason": "right wall inner face x=6800 (500mm with 7300)"
+      },
+      {
+        "handle": "7AAC",
+        "reason": "horizontal wall face y=-1015"
+      },
+      {
+        "handle": "7AAD",
+        "reason": "horizontal wall face y=-765 (250mm parallel)"
+      }
+    ],
+    "notes": "101-dong co1 unit plan fragment: W1=54 wall lines (double-line 250/500mm walls) + CEN axes + DOOR + 설비OPEN; a multi-element plan with real, extractable walls.",
+    "rationale": {
+      "evidence": "Of 98 entities LINE=82 dominate, with layer W1=54 (walls), CEN=15 (axes), STL=8 and 설비OPEN=8. Sampled W1 lines form face pairs at wall thickness: x=-5020 (7A9D/7A9E) against x=-5520 (7A9F/7AA0) is a 500mm party wall closed by horizontal jambs 7AA2/7AA3, and x=6800 (7AAB) against x=7300 (7AA9) is a 500mm exterior wall. Bbox ~13m x 12m is a single-unit footprint.",
+      "rule": "A block with a populated W1 layer whose parallel LINE pairs are spaced at wall thickness (100-500mm) and closed by short jamb connectors is a wall-bearing unit plan: classify 평면 부분도 with high wall_likelihood and extractable wall-face handles.",
+      "counterfactual": "If the W1 layer were absent and only CEN axes plus fixtures remained (as in the RF3 roof variant), the block would drop to a low wall_likelihood plan fragment with empty handles.",
+      "uncertainty": "The full W1 set exceeds the 30 sampled entities, so the listed handles are a representative subset; whether STL (~30mm-spaced parallels) is a thin wall, steel member or shaft cannot be settled from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-101co1-rf-275",
+    "def": "X-평면도(기본형)$0$101co1-RF",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.9,
+    "wall_line_handles": [
+      {
+        "handle": "7C42",
+        "reason": "horizontal wall face y=-3045"
+      },
+      {
+        "handle": "7C43",
+        "reason": "horizontal wall face y=-6765 (right bay)"
+      },
+      {
+        "handle": "7C44",
+        "reason": "vertical wall face x=300"
+      },
+      {
+        "handle": "7C4B",
+        "reason": "vertical wall inner face x=-5020"
+      },
+      {
+        "handle": "7C4C",
+        "reason": "vertical wall inner face x=-5020, upper run"
+      },
+      {
+        "handle": "7C4D",
+        "reason": "vertical wall outer face x=-5520 (500mm party wall)"
+      },
+      {
+        "handle": "7C4E",
+        "reason": "vertical wall outer face x=-5520, upper run"
+      },
+      {
+        "handle": "7C54",
+        "reason": "right exterior wall outer face x=7300"
+      },
+      {
+        "handle": "7C56",
+        "reason": "right wall inner face x=6800 (500mm with 7300)"
+      },
+      {
+        "handle": "7C5A",
+        "reason": "central vertical wall face x=3870"
+      }
+    ],
+    "notes": "101co1 roof-level (RF) unit plan fragment: W1=52 + W3=9 wall lines + CEN axes; walled plan variant of the co1 unit.",
+    "rationale": {
+      "evidence": "Of 86 entities LINE=78 dominate, with W1=52 and W3=9 wall layers plus CEN=13. Sampled W1 pairs sit at wall thickness: x=-5020 (7C4B/7C4C) against x=-5520 (7C4D/7C4E) is a 500mm wall, and x=6800 (7C56) against x=7300 (7C54) is the 500mm right exterior wall; W3 short segments (e.g. 7C59 250mm) are sill/return pieces. Bbox matches the 101co1 footprint.",
+      "rule": "A co-unit block carrying a dense W1 layer with wall-thickness parallel pairs is a wall-bearing plan fragment (평면 부분도) with high wall_likelihood, even at a roof (RF) level, as long as the vertical wall faces are drawn.",
+      "counterfactual": "Were the W1/W3 layers replaced by CEN axes and roof-drainage inserts only, the block would fall to the low-wall RF3 pattern with empty handles.",
+      "uncertainty": "W1 count (52) exceeds the sample, so handles are a subset; whether the W3 short segments are window sills or wall returns is not decidable from lengths alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-101co1-rf2-276",
+    "def": "X-평면도(기본형)$0$101co1-RF2",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.88,
+    "wall_line_handles": [
+      {
+        "handle": "7D3A",
+        "reason": "horizontal wall face y=-3045"
+      },
+      {
+        "handle": "7D3B",
+        "reason": "horizontal wall face y=-6765 (right bay)"
+      },
+      {
+        "handle": "7D42",
+        "reason": "vertical wall inner face x=-5020"
+      },
+      {
+        "handle": "7D43",
+        "reason": "vertical wall inner face x=-5020, upper run"
+      },
+      {
+        "handle": "7D44",
+        "reason": "vertical wall outer face x=-5520 (500mm party wall)"
+      },
+      {
+        "handle": "7D45",
+        "reason": "vertical wall outer face x=-5520, upper run"
+      },
+      {
+        "handle": "7D4C",
+        "reason": "right exterior wall face x=7300"
+      },
+      {
+        "handle": "7D4E",
+        "reason": "horizontal wall face y=4020 (top run)"
+      },
+      {
+        "handle": "7D4F",
+        "reason": "right vertical wall face x=6800"
+      },
+      {
+        "handle": "7D50",
+        "reason": "right vertical wall face x=6800, lower run"
+      }
+    ],
+    "notes": "101co1 roof-level variant 2 (RF2) unit plan fragment: W1=34 wall lines + OPEN/WIN + CEN axes; walled plan with roof openings.",
+    "rationale": {
+      "evidence": "Of 60 entities LINE=50 dominate, with W1=34, CEN=9, OPEN=6 and WIN=2. Sampled W1 pairs are at wall thickness: x=-5020 (7D42/7D43) against x=-5520 (7D44/7D45) is a 500mm wall, and x=6800 (7D4F/7D50) against x=7300 (7D4C) is the right exterior wall; INSERTs include 안전사다리 (safety ladder) and CW900. The S4ELE lines (7D52/7D53) mirror wall faces for elevation and are not counted as plan walls.",
+      "rule": "A slightly sparser W1 layer (34 lines) with intact wall-thickness pairs still marks a wall-bearing plan fragment (평면 부분도) with high wall_likelihood; OPEN/WIN layers indicate roof openings within the walled envelope.",
+      "counterfactual": "If the W1 pairs collapsed to single unpaired edges or moved onto a furniture layer at 20mm spacing, the wall reading would drop sharply.",
+      "uncertainty": "Because only 30 of 60 entities are sampled, some W1 walls are unlisted; the exact function of the OPEN polylines (roof hatch vs void) is not determinable here."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-101co1-rf3-277",
+    "def": "X-평면도(기본형)$0$101co1-RF3",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "101co1 roof-level variant 3 (RF3): no W1 layer; CEN axes + 7RF roof polylines + rainwater-pipe and safety-ladder INSERTs; roof plan fragment with no wall-face lines.",
+    "rationale": {
+      "evidence": "Only 14 entities: no W1 layer at all, instead CEN=6 (axes), 7RF=2 (roof polylines), M_1=2, M_2=1, plus INSERTs 안전사다리 (safety ladder) and 우수관_100A (rainwater pipe, handles 7DC4/7DC6). Every sampled long LINE is CEN axis (e.g. 7DBD 7050,-7065->7050,5020), not a wall face; the M_1 pair (7DC7/7DC8) is a 120mm-spaced 370mm mark.",
+      "rule": "A co-unit block that carries only CEN axes plus roof/drainage elements and lacks any W1 wall layer is a low-wall roof plan fragment: still 평면 부분도 by family and geometry, but with low wall_likelihood and no extractable wall-face handles.",
+      "counterfactual": "Adding a populated W1 layer with wall-thickness line pairs would raise this to the high wall_likelihood of the co1/RF/RF2 variants.",
+      "uncertainty": "Whether the 120mm-spaced M_1 lines are a thin parapet/upstand or a finish mark cannot be decided from the layer name and length alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-101co2-278",
+    "def": "X-평면도(기본형)$0$101co2",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.92,
+    "wall_line_handles": [
+      {
+        "handle": "7A35",
+        "reason": "left exterior wall face x=-4070 (long vertical)"
+      },
+      {
+        "handle": "7A36",
+        "reason": "vertical wall face x=-3570, lower run"
+      },
+      {
+        "handle": "7A37",
+        "reason": "vertical wall face x=-3570, upper run"
+      },
+      {
+        "handle": "7A38",
+        "reason": "horizontal wall face y=2780"
+      },
+      {
+        "handle": "7A3A",
+        "reason": "horizontal wall face y=2530 (250mm parallel)"
+      },
+      {
+        "handle": "7A3B",
+        "reason": "horizontal wall face y=7580"
+      },
+      {
+        "handle": "7A3F",
+        "reason": "vertical wall face x=-510"
+      },
+      {
+        "handle": "7A42",
+        "reason": "vertical wall face x=-260 (250mm parallel to -510)"
+      },
+      {
+        "handle": "7A33",
+        "reason": "vertical wall face x=2930 (top jamb)"
+      },
+      {
+        "handle": "7A45",
+        "reason": "horizontal wall-end jamb linking x=-510/-260"
+      }
+    ],
+    "notes": "101-dong co2 unit plan fragment: W1=52 wall lines (250/500mm double-line walls) + CEN axes + STL + 설비OPEN; tall unit footprint with real walls.",
+    "rationale": {
+      "evidence": "Of 99 entities LINE=79 dominate, with W1=52 (walls), CEN=14, STL=8 and 설비OPEN=8. Sampled W1 lines form wall-thickness pairs: x=-510 (7A3F) against x=-260 (7A42) is a 250mm interior wall closed by jamb 7A45, and horizontals y=2780 (7A38) against y=2530 (7A3A) run parallel at 250mm. Bbox -4620..5690 x 0..11530 is a tall single unit.",
+      "rule": "A dense W1 layer whose parallel LINE pairs sit at 250-500mm (wall thickness) and are closed by short jambs is a wall-bearing unit plan (평면 부분도) with high wall_likelihood and extractable handles.",
+      "counterfactual": "If those parallels were 20mm apart on a furniture layer they would be cabinet carcasses, not walls, dropping the wall_likelihood to the furniture range.",
+      "uncertainty": "Only 30 of 99 entities are sampled, so the handle list is representative rather than exhaustive; the STL parallels' role (thin wall vs shaft/steel) is not resolvable here."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-103co1-279",
+    "def": "X-평면도(기본형)$0$103co1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.92,
+    "wall_line_handles": [
+      {
+        "handle": "7B04",
+        "reason": "left exterior wall face x=-4350 (long vertical)"
+      },
+      {
+        "handle": "7B05",
+        "reason": "vertical wall face x=-3570, lower run"
+      },
+      {
+        "handle": "7B06",
+        "reason": "vertical wall face x=-3850, upper run"
+      },
+      {
+        "handle": "7B07",
+        "reason": "horizontal wall face y=2780"
+      },
+      {
+        "handle": "7B09",
+        "reason": "horizontal wall face y=2530 (250mm parallel)"
+      },
+      {
+        "handle": "7B0A",
+        "reason": "horizontal wall face y=7580"
+      },
+      {
+        "handle": "7B0E",
+        "reason": "vertical wall face x=-1350"
+      },
+      {
+        "handle": "7B11",
+        "reason": "vertical wall face x=-1100 (250mm parallel to -1350)"
+      },
+      {
+        "handle": "7B02",
+        "reason": "vertical wall face x=2090 (top jamb)"
+      },
+      {
+        "handle": "7B14",
+        "reason": "horizontal wall-end jamb linking x=-1350/-1100"
+      }
+    ],
+    "notes": "103-dong co1 unit plan fragment: W1=56 wall lines (250mm double-line walls) + CEN axes + STL=10 + 설비OPEN; near-mirror of 101co2 with real walls.",
+    "rationale": {
+      "evidence": "Of 106 entities LINE=86 dominate, with W1=56 (walls), CEN=15, STL=10 and 설비OPEN=8. Sampled W1 pairs are at wall thickness: x=-1350 (7B0E) against x=-1100 (7B11) is a 250mm interior wall closed by jamb 7B14, and horizontals y=2780 (7B07) against y=2530 (7B09) are a 250mm parallel wall. Bbox -4850..4850 x 0..11530 is a tall unit like 101co2.",
+      "rule": "A block whose W1 layer supplies orthogonal parallel line pairs at 250-500mm thickness with jamb closers is a wall-bearing unit plan (평면 부분도), warranting high wall_likelihood and populated wall-face handles.",
+      "counterfactual": "Removing the W1 layer and leaving only CEN axes plus fixtures would reduce this to a low-wall plan fragment with empty handles.",
+      "uncertainty": "The 56 W1 lines exceed the sample, so listed handles are a subset; whether STL parallels are thin walls or shafts is not decidable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-104co1-280",
+    "def": "X-평면도(기본형)$0$104co1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.92,
+    "wall_line_handles": [
+      {
+        "handle": "809D",
+        "reason": "horizontal wall face y=410"
+      },
+      {
+        "handle": "809E",
+        "reason": "horizontal wall face y=3010 (left bay)"
+      },
+      {
+        "handle": "809F",
+        "reason": "horizontal wall face y=3010 (right run)"
+      },
+      {
+        "handle": "80A0",
+        "reason": "vertical wall face x=-5675"
+      },
+      {
+        "handle": "80A2",
+        "reason": "vertical wall face x=-5175 (500mm pair with -5675)"
+      },
+      {
+        "handle": "80AA",
+        "reason": "right exterior wall face x=6135 (long vertical)"
+      },
+      {
+        "handle": "80AC",
+        "reason": "vertical wall face x=5635"
+      },
+      {
+        "handle": "80AD",
+        "reason": "horizontal wall face y=2780"
+      },
+      {
+        "handle": "80B0",
+        "reason": "vertical wall face x=3035"
+      },
+      {
+        "handle": "80B6",
+        "reason": "horizontal wall-end jamb linking x=2785/3035"
+      }
+    ],
+    "notes": "104-dong co1 unit plan fragment: W1=55 wall lines (250/500mm double-line walls) + CEN=16 axes + STL=10 + 설비OPEN; L-shaped unit with real walls.",
+    "rationale": {
+      "evidence": "Of 106 entities LINE=86 dominate, with W1=55 (walls), CEN=16, STL=10 and 설비OPEN=8. Sampled W1 pairs sit at wall thickness: x=-5675 (80A0) against x=-5175 (80A2) is a 500mm wall, and x=2785 (80B3/80B5) against x=3035 (80B0) is a 250mm wall closed by jamb 80B6. Bbox -7600..6635 x -3230..8950 is an L-shaped unit footprint.",
+      "rule": "Orthogonal W1 parallel pairs at 250-500mm thickness with short jamb connectors mark a wall-bearing unit plan (평면 부분도) that earns high wall_likelihood and extractable wall-face handles.",
+      "counterfactual": "If the parallels were 20mm apart on a furniture layer, or single unpaired edges on an axis layer, the wall reading would fall away.",
+      "uncertainty": "Only 30 of 106 entities are sampled, so unlisted W1 walls remain; the STL parallels' precise role (thin wall vs steel/shaft) is not determinable from lengths alone."
+    }
+  }
+]

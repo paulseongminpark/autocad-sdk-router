@@ -1,0 +1,22 @@
+[
+  {"unit_id": "defannot-d295-1", "answer": {"def": "*D295", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "layer=DIM 전용, DEFPOINTS 3점 + DIMDOT INSERT 2개 + MTEXT '3280' 단일 치수값. 3개 LINE은 치수선/보조선(witness line) 구성이며 벽체 레이어/패턴이 아님."}},
+  {"unit_id": "defannot-d296-2", "answer": {"def": "*D296", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "D295와 동일 구조(layer=DIM, DIMDOT x2, DEFPOINTS x3), MTEXT '3105'. 인접 구간 치수 블록으로 벽체 아님."}},
+  {"unit_id": "defannot-d297-3", "answer": {"def": "*D297", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "동일 패턴, MTEXT '4770'. DIM 레이어의 개별 구간 치수 정의."}},
+  {"unit_id": "defannot-d298-4", "answer": {"def": "*D298", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "동일 패턴, MTEXT '3945'. 벽체 흔적 없음, 순수 치수 지오메트리."}},
+  {"unit_id": "defannot-d299-5", "answer": {"def": "*D299", "role": "치수캐시", "wall_likelihood": 0.02, "wall_line_handles": [], "notes": "bbox 폭 15100이 D295~D298 구간 합과 일치 — 전체 합산 치수(overall dimension) 캐시. layer=DIM, DIMDOT 터미네이터, 벽체 아님."}},
+  {"unit_id": "defannot-d300-6", "answer": {"def": "*D300", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "layer=AA-AXIS-DIM7 (통축 치수 레이어), _ArchTick INSERT 2개, 짧은 tick-stroke LINE 5개 + MTEXT '70'. 축선 치수 캐시이며 벽체 아님."}},
+  {"unit_id": "defannot-d301-7", "answer": {"def": "*D301", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "layer=AA-AXIS-DIM7, _ArchTick x2, MTEXT '3000'. 축 간 거리 치수 캐시."}},
+  {"unit_id": "defannot-d302-8", "answer": {"def": "*D302", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "D300과 동일 구조(entity_count=11, tick-stroke 5 LINE), MTEXT '210'. 축 치수 캐시, 벽체 아님."}},
+  {"unit_id": "defannot-d303-9", "answer": {"def": "*D303", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "layer=DIM, _ArchTick x2, MTEXT '70'. tick-stroke 포함 구조로 D300/D302와 동형, 벽체 아님."}},
+  {"unit_id": "defannot-d304-10", "answer": {"def": "*D304", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "layer=DIM, _ArchTick x2, MTEXT '2900'. 표준 3-LINE 치수 캐시."}},
+  {"unit_id": "defannot-d305-11", "answer": {"def": "*D305", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "layer=DIM, MTEXT '135' (소단위 구간), _ArchTick 터미네이터. 벽체 아님."}},
+  {"unit_id": "defannot-d306-12", "answer": {"def": "*D306", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "동일 패턴, MTEXT '135'. 연속 구간 치수 캐시."}},
+  {"unit_id": "defannot-d307-13", "answer": {"def": "*D307", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "layer=DIM, MTEXT '4500', _ArchTick x2. 벽체 지오메트리 없음."}},
+  {"unit_id": "defannot-d308-14", "answer": {"def": "*D308", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "동일 패턴, MTEXT '135'."}},
+  {"unit_id": "defannot-d309-15", "answer": {"def": "*D309", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "동일 패턴, MTEXT '135'."}},
+  {"unit_id": "defannot-d310-16", "answer": {"def": "*D310", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "layer=DIM, MTEXT '3600', _ArchTick x2. 벽체 아님."}},
+  {"unit_id": "defannot-d311-17", "answer": {"def": "*D311", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "entity_count=11(tick-stroke 5 LINE), MTEXT '210'. D300/D302와 동형 구조."}},
+  {"unit_id": "defannot-d312-18", "answer": {"def": "*D312", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "layer=DIM, DIMDOT x2, MTEXT '2665'. bbox가 세로 방향(Y축 치수)이나 여전히 치수선/보조선 구조."}},
+  {"unit_id": "defannot-d313-19", "answer": {"def": "*D313", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "동일 세로 치수 패턴, MTEXT '2350', DIMDOT 터미네이터."}},
+  {"unit_id": "defannot-d314-20", "answer": {"def": "*D314", "role": "치수캐시", "wall_likelihood": 0.03, "wall_line_handles": [], "notes": "동일 패턴, MTEXT '780'. 소구간 세로 치수 캐시."}}
+]

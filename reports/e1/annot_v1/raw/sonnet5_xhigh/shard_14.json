@@ -1,0 +1,348 @@
+[
+{
+"unit_id": "defannot-u88-261",
+"def": "*U88",
+"role": "기타",
+"wall_likelihood": 0.2,
+"wall_line_handles": [],
+"notes": "Anonymous block of 8 closed 5-vertex LWPOLYLINEs, all on the INSUL layer; reads as an insulation-fill group sized to one wall segment, not a wall line itself.",
+"rationale": {
+"evidence": "All 8 entities are LWPOLYLINE with exactly 5 vertices (a closed quadrilateral) and share the single layer X-평면도(기본형)$0$INSUL. No LINE, wall-named layer, HATCH, or any other entity type appears anywhere in the definition.",
+"rule": "An anonymous *U-prefixed block whose entire content sits on an INSUL(-ation) layer as a run of small closed quad polylines is almost always an auto-generated insulation-fill pattern keyed to a wall segment's length, not the wall boundary line itself.",
+"counterfactual": "If the layer were a structural wall layer (e.g. W1) or the entities were long thin open LINE/LWPOLYLINE segments spanning the block's extent rather than many small closed quads, this would read as an actual wall line rather than insulation fill.",
+"uncertainty": "No bbox or vertex coordinates are given, so the true shape and elongation of each polyline (and thus whether any segment coincides with a wall edge) cannot be confirmed from this projection alone."
+}
+},
+{
+"unit_id": "defannot-u89-262",
+"def": "*U89",
+"role": "기타",
+"wall_likelihood": 0.2,
+"wall_line_handles": [],
+"notes": "Anonymous block of 30 closed 5-vertex LWPOLYLINEs on the INSUL layer; same repeating insulation-fill pattern as sibling *U blocks, scaled to a longer wall run.",
+"rationale": {
+"evidence": "All 30 entities are LWPOLYLINE with 5 vertices each on the single layer X-평면도(기본형)$0$INSUL (handles 407E-409B), an identical structural signature to *U88 but with roughly 4x the repeat count.",
+"rule": "A family of *U-prefixed anonymous blocks that share the same INSUL-only, 5-vertex-quad structure but differ only in repeat count is consistent with per-wall insulation groups whose entity count scales with wall length, not with wall geometry itself.",
+"counterfactual": "A drop in repeat variance to a single large polyline outlining the whole wall footprint, or the appearance of a wall-named layer, would instead argue for wall-line content.",
+"uncertainty": "Without coordinates, whether the 30 quads are laid out in a single line (consistent with one wall) or scattered across multiple unrelated wall segments cannot be determined."
+}
+},
+{
+"unit_id": "defannot-u90-263",
+"def": "*U90",
+"role": "기타",
+"wall_likelihood": 0.2,
+"wall_line_handles": [],
+"notes": "Anonymous block of 41 closed 5-vertex LWPOLYLINEs on the INSUL layer; the largest of the *U88-*U93 insulation-fill siblings, implying the longest wall run.",
+"rationale": {
+"evidence": "41 LWPOLYLINE entities, each with 5 vertices, all on X-평면도(기본형)$0$INSUL (handles 40A1-40BE), with no other entity type or layer present.",
+"rule": "Within this *U-block family, entity count tracks wall-segment length rather than indicating structural wall geometry, so even the largest member should still be scored as insulation infill rather than a wall line.",
+"counterfactual": "If any of the 41 entities were instead on a W1/W3-style wall layer or formed one long open polyline rather than 41 small closed quads, wall likelihood would increase substantially.",
+"uncertainty": "The absence of coordinate data means the spatial arrangement (single contiguous run vs. disjoint clusters) of the 41 quads cannot be verified from this projection."
+}
+},
+{
+"unit_id": "defannot-u91-264",
+"def": "*U91",
+"role": "기타",
+"wall_likelihood": 0.2,
+"wall_line_handles": [],
+"notes": "Anonymous block of 6 closed 5-vertex LWPOLYLINEs on the INSUL layer; a short insulation-fill group, likely for a short wall segment.",
+"rationale": {
+"evidence": "6 LWPOLYLINE entities with 5 vertices each, all on X-평면도(기본형)$0$INSUL (handles 40CF-40D4), matching the same structural signature as the other *U siblings but with a smaller repeat count.",
+"rule": "Small repeat counts within this *U-block family still fit the per-wall insulation-fill pattern rather than indicating a different role, since the layer and per-entity vertex count remain identical to the larger siblings.",
+"counterfactual": "A change in layer to a wall-named layer, or a single elongated LWPOLYLINE outlining a wall face instead of 6 small quads, would flip this toward a wall-line judgment.",
+"uncertainty": "Without coordinates it is unclear whether the 6 quads sit along one short wall or are otherwise arranged, and no other entity type corroborates a specific wall segment."
+}
+},
+{
+"unit_id": "defannot-u92-265",
+"def": "*U92",
+"role": "기타",
+"wall_likelihood": 0.2,
+"wall_line_handles": [],
+"notes": "Anonymous block of 23 closed 5-vertex LWPOLYLINEs on the INSUL layer; a mid-length insulation-fill group within the *U88-*U93 family.",
+"rationale": {
+"evidence": "23 LWPOLYLINE entities, each with 5 vertices, all on X-평면도(기본형)$0$INSUL (handles 40DA-40F0), identical in structure to the other members of this block family.",
+"rule": "Consistent single-layer, single-shape-type membership across the whole *U family supports treating every member as insulation-fill infill rather than wall geometry, regardless of individual entity count.",
+"counterfactual": "The presence of any LINE/W1-layer entity or a bbox showing a single long thin shape would instead suggest this block encodes a wall line.",
+"uncertainty": "The lack of coordinate/bbox data prevents confirming whether the 23 quads run along a straight wall or a bent/L-shaped wall run."
+}
+},
+{
+"unit_id": "defannot-u93-266",
+"def": "*U93",
+"role": "기타",
+"wall_likelihood": 0.2,
+"wall_line_handles": [],
+"notes": "Anonymous block of 6 closed 5-vertex LWPOLYLINEs on the INSUL layer; the smallest sibling alongside *U91, likely for a short wall segment.",
+"rationale": {
+"evidence": "6 LWPOLYLINE entities with 5 vertices each, all on X-평면도(기본형)$0$INSUL (handles 40F6-40FB), matching the *U88-*U92 structural pattern exactly.",
+"rule": "A terminal member of a homogeneous *U-block insulation family should receive the same role/likelihood treatment as its siblings unless its layer or entity-type composition diverges, which it does not here.",
+"counterfactual": "If this block instead contained W1-layer LINE entities forming a long straight run, it would be reclassified as a wall line rather than insulation fill.",
+"uncertainty": "No coordinates are provided, so whether the 6 quads represent a full short wall or only part of a longer wall's insulation cannot be determined."
+}
+},
+{
+"unit_id": "defannot-x-form-267",
+"def": "X-FORM_청주",
+"role": "기타",
+"wall_likelihood": 0.03,
+"wall_line_handles": [],
+"notes": "196-entity drawing-sheet border/title-block frame (A-SHEET* layers) with a title-table LINE grid, LWPOLYLINE rectangles, and 72 TEXT labels; not building floor-plan content.",
+"rationale": {
+"evidence": "Entities are LINE=105, LWPOLYLINE=18, TEXT=72, INSERT=1, all confined to layers X-FORM_청주$0$A-SHEET / A-SHEET-DEF / A-SHEET-TEXT; the bbox [27,22]-[820,572] spans the full sheet extent, and sampled LINE pairs run parallel and hug the right/bottom edge (x=820, y stepping down in fixed increments) typical of a title-block table grid.",
+"rule": "A block whose layers are named *-SHEET / -SHEET-DEF / -SHEET-TEXT and whose geometry forms a rectangular grid pinned to the drawing's paper extents is a title-block/frame, and its LINE entities should never be scored as building wall lines regardless of count.",
+"counterfactual": "If the LINE layer were instead a wall layer (W1/RW1) and the lines formed a closed room-scale polygon rather than a table grid tied to the sheet border, this would read as wall geometry instead.",
+"uncertainty": "The projection lists only the first 30 of 196 entities, so unseen TEXT/LWPOLYLINE content elsewhere in the block cannot be fully characterized, though the visible pattern is unambiguous."
+}
+},
+{
+"unit_id": "defannot-x-form-0-block-5-268",
+"def": "X-FORM_청주$0$Block_5",
+"role": "기타",
+"wall_likelihood": 0.02,
+"wall_line_handles": [],
+"notes": "6-entity SPLINE+HATCH graphic (SOLID-fill hatches over spline outlines) nested under the title-block sheet layers; reads as a small logo/emblem shape, not a wall.",
+"rationale": {
+"evidence": "4 SPLINE entities plus 2 HATCH entities (pattern=SOLID, 2 loops each) on the A-SHEET / A-SHEET-DEF layers; no LINE, LWPOLYLINE, or wall-named layer appears anywhere in the definition.",
+"rule": "Blocks built from SPLINE outlines filled with SOLID HATCH and nested inside a title-block/sheet family are decorative graphics (logos/emblems), never structural wall geometry.",
+"counterfactual": "If straight LINE/LWPOLYLINE segments on a wall layer replaced the splines, or the block were referenced from inside a floor-plan block rather than the sheet family, wall likelihood would rise sharply.",
+"uncertainty": "The exact curve shape and closure of the splines are not given, so whether this specifically renders as a logo versus some other decorative mark cannot be visually confirmed from this projection."
+}
+},
+{
+"unit_id": "defannot-x-form-0-da-269",
+"def": "X-FORM_청주$0$dA로고",
+"role": "기타",
+"wall_likelihood": 0.02,
+"wall_line_handles": [],
+"notes": "30-entity SPLINE/HATCH group named 'dA로고' ('dA logo') on the A-SHEET layer, including a nested INSERT of Block_5; a company logo graphic inside the title block.",
+"rationale": {
+"evidence": "The definition name translates to 'dA logo'; content is SPLINE=24 plus HATCH=5 (pattern=SOLID, multiple loops) plus one INSERT referencing X-FORM_청주$0$Block_5, all confined to the single A-SHEET layer.",
+"rule": "A definition literally named '로고' (logo), composed of solid-filled splines and nested inside the sheet/title-block family, should be classified as a non-wall decorative graphic regardless of its entity count.",
+"counterfactual": "A wall-layer LINE/LWPOLYLINE skeleton, or placement inside a floor-plan block instead of the sheet frame, would instead suggest structural wall content.",
+"uncertainty": "The actual rendered appearance (i.e. that it visually resembles a logo mark) cannot be verified since only entity types, layers, and handles are given, not the real curve geometry."
+}
+},
+{
+"unit_id": "defannot-x-270",
+"def": "X-평면도(기본형)",
+"role": "평면 부분도",
+"wall_likelihood": 0.35,
+"wall_line_handles": [],
+"notes": "4723-entity composite site/floor plan spanning multiple named buildings (101-106동), GRID reference lines, and unit-type INSERTs; W1/RW1 wall layers exist by count but were not among the sampled entities, and FUR dominates entity volume.",
+"rationale": {
+"evidence": "Layer histogram shows X-평면도(기본형)$0$FUR=4238 (about 90% of all entities), while $0$W1=4 and $0$RW1=4 are present but tiny; sampled entities are DEFPOINTS building-name TEXT ('101 동' ... '106 동'), GRID-layer LINEs, and an INSERT of the unit block X-평면도(기본형)$0$84c.",
+"rule": "A top-level block literally named '평면도' (floor plan) that aggregates multiple named building/unit INSERTs plus GRID reference lines is the floor-plan container itself, so it should be scored as floor-plan content even when its own directly-owned entities are dominated by furniture rather than wall lines, since the actual walls typically live inside the nested unit blocks it references.",
+"counterfactual": "If the W1/RW1 layers had zero entities and no unit-type INSERTs were present anywhere in the block, this would instead read as a pure furniture/annotation container rather than a floor plan.",
+"uncertainty": "The sample (first 30 of 4723 entities) contains no W1/RW1-layer entities, so the actual wall-line handles, their shapes, and whether they form complete rooms cannot be determined from this projection alone."
+}
+},
+{
+"unit_id": "defannot-x-0-1000-271",
+"def": "X-평면도(기본형)$0$1000",
+"role": "심볼",
+"wall_likelihood": 0.08,
+"wall_line_handles": [],
+"notes": "16-entity DOOR-layer block (1 swing ARC + 12 LWPOLYLINE leaf/frame shapes + 3 LINE) named for a 1000-class door type; a door symbol, not a wall.",
+"rationale": {
+"evidence": "dxf histogram ARC=1, LINE=3, LWPOLYLINE=12, all on the single layer X-평면도(기본형)$0$DOOR; bbox [-20,-260,0,960,0,0] spans one door-leaf module (about 960 wide by 260 deep), and the sampled LINE pair (960,-40)->(40,-40) / (960,-43)->(40,-43) sits only 3 units apart, far thinner than a wall.",
+"rule": "A block confined to a DOOR layer containing exactly one ARC (the swing arc) plus a cluster of LWPOLYLINE leaf/frame outlines, with any LINE pairs spaced at door-frame scale rather than wall-thickness scale, is a standard door symbol and its LINEs should not be scored as wall lines.",
+"counterfactual": "If the ARC were absent, the layer were wall-named (W1), or the parallel LINE pair were spaced at typical wall thickness (100mm+) and ran the block's full extent, this would instead suggest a wall segment.",
+"uncertainty": "The exact swing direction and leaf thickness cannot be confirmed without full vertex coordinates for the 12 LWPOLYLINEs; only their vertex counts are given here."
+}
+},
+{
+"unit_id": "defannot-x-0-100012-272",
+"def": "X-평면도(기본형)$0$100012",
+"role": "심볼",
+"wall_likelihood": 0.08,
+"wall_line_handles": [],
+"notes": "16-entity DOOR-layer block (1 swing ARC + 12 LWPOLYLINE + 3 LINE), a shallower-jamb variant of the 1000-series door type; a door symbol, not a wall.",
+"rationale": {
+"evidence": "Identical entity mix to $0$1000 (ARC=1, LINE=3, LWPOLYLINE=12) on the same DOOR layer, but bbox [-20,-120,0,960,-0,0] shows a shallower jamb depth (120 vs 260), consistent with a different door-swing/frame variant of the same family.",
+"rule": "Multiple DOOR-layer blocks sharing the same entity-type signature but differing only in jamb-depth bbox are variant door symbols within one naming family, and none should be scored as wall geometry.",
+"counterfactual": "A wall-named layer or a LINE pair spaced at wall-thickness scale spanning the block's width would instead argue for wall-line content.",
+"uncertainty": "Without full vertex coordinates for the 12 LWPOLYLINEs, the precise leaf/frame shape and swing direction cannot be confirmed from this projection."
+}
+},
+{
+"unit_id": "defannot-x-0-1000m-273",
+"def": "X-평면도(기본형)$0$1000m",
+"role": "심볼",
+"wall_likelihood": 0.08,
+"wall_line_handles": [],
+"notes": "14-entity DOOR-layer block (1 swing ARC + 11 LWPOLYLINE + 2 LINE) with a rotated, narrower bbox than its 1000/100012 siblings; a mirrored/vertical door-symbol variant, not a wall.",
+"rationale": {
+"evidence": "dxf histogram ARC=1, LINE=2, LWPOLYLINE=11, all on X-평면도(기본형)$0$DOOR; bbox [40,40,0,43,960,0] is oriented tall-and-narrow (43 wide by 960 tall) compared to the wide-and-short bbox of $0$1000/$0$100012, and the two sampled LINEs (40,960)->(40,40) and (43,960)->(43,40) are only 3 units apart.",
+"rule": "Within a family of DOOR-layer variant blocks (base '1000', numeric suffix, 'm' suffix), orientation and jamb-offset differences in bbox reflect insertion/mirroring variants of the same door symbol, not a change in role toward wall geometry.",
+"counterfactual": "If the two close-spaced LINEs were instead spaced at wall-thickness scale and the layer were wall-named, this would flip the judgment toward a wall segment.",
+"uncertainty": "The 'm' suffix's meaning (e.g. mirrored) cannot be confirmed from entity data alone, and full vertex coordinates for the 11 LWPOLYLINEs are not available to verify exact leaf shape."
+}
+},
+{
+"unit_id": "defannot-x-0-101co1-274",
+"def": "X-평면도(기본형)$0$101co1",
+"role": "평면 부분도",
+"wall_likelihood": 0.92,
+"wall_line_handles": [
+{"handle": "7A9D", "reason": "axis-aligned W1-layer LINE, part of a parallel wall-face pair at x=-5020/-5520"},
+{"handle": "7A9E", "reason": "axis-aligned W1-layer LINE, continues the -5020 wall face"},
+{"handle": "7A9F", "reason": "axis-aligned W1-layer LINE, continues the -5520 wall face"},
+{"handle": "7AA0", "reason": "axis-aligned W1-layer LINE, continues the -5520 wall face"},
+{"handle": "7AA2", "reason": "W1-layer LINE closing the wall corner between the -5020/-5520 faces"},
+{"handle": "7AA3", "reason": "W1-layer LINE closing another wall corner between the -5020/-5520 faces"},
+{"handle": "7AA4", "reason": "axis-aligned W1-layer LINE forming a second wall face near x=50"},
+{"handle": "7AA5", "reason": "short W1-layer LINE, likely a wall-face jog/corner near x=300"},
+{"handle": "7AA8", "reason": "W1-layer LINE connecting the x=50 and x=300 wall faces"},
+{"handle": "7AA9", "reason": "long axis-aligned W1-layer LINE at x=7300, an exterior wall face"}
+],
+"notes": "98-entity unit floor plan ('101co1') dominated by the W1 wall layer (54 of 98 entities) plus centerline, door, and utility-opening layers; a clear wall-bearing floor-plan block.",
+"rationale": {
+"evidence": "Layer histogram shows X-평면도(기본형)$0$W1=54 out of 98 total entities (about 55%), plus CEN=15 (centerlines), STL=8, 설비OPEN=8 (utility openings), A-DOOR=3; sampled entities show many axis-aligned W1 LINE pairs at consistent offsets (e.g. x=-5020/-5520, a 500-unit gap) forming parallel wall-face pairs across a roughly 13320x12085-unit footprint.",
+"rule": "When more than half of a block's entities sit on a layer literally named W1 (wall) and those entities are axis-aligned LINE pairs separated by a plausible wall-thickness gap, the block should be scored as high wall-likelihood floor-plan content.",
+"counterfactual": "If the W1-layer count were near zero, or the paired lines were spaced at door/insulation scale (tens of units) rather than wall-thickness scale (hundreds of units), wall likelihood would drop sharply.",
+"uncertainty": "Only the first 30 of 98 entities are sampled, so the full wall network topology (closed loops, corners) cannot be fully verified, and the W1 vs. other wall-variant layer semantics are inferred from naming rather than confirmed."
+}
+},
+{
+"unit_id": "defannot-x-0-101co1-rf-275",
+"def": "X-평면도(기본형)$0$101co1-RF",
+"role": "평면 부분도",
+"wall_likelihood": 0.9,
+"wall_line_handles": [
+{"handle": "7C42", "reason": "axis-aligned W1-layer LINE, wall face near y=-3045"},
+{"handle": "7C43", "reason": "axis-aligned W1-layer LINE, wall face near y=-6765"},
+{"handle": "7C44", "reason": "axis-aligned W1-layer LINE, wall face near x=300"},
+{"handle": "7C4B", "reason": "axis-aligned W1-layer LINE, continues the x=-5020 wall face"},
+{"handle": "7C4C", "reason": "axis-aligned W1-layer LINE, continues the x=-5020 wall face"},
+{"handle": "7C4D", "reason": "axis-aligned W1-layer LINE, continues the x=-5520 wall face"},
+{"handle": "7C4E", "reason": "axis-aligned W1-layer LINE, continues the x=-5520 wall face"},
+{"handle": "7C50", "reason": "W1-layer LINE closing a wall corner between the -5020/-5520 faces"},
+{"handle": "7C51", "reason": "W1-layer LINE closing another wall corner between the -5020/-5520 faces"},
+{"handle": "7C52", "reason": "axis-aligned W1-layer LINE forming a second wall face near x=50"}
+],
+"notes": "86-entity roof-floor variant of 101co1, again W1-dominated (52 of 86 entities) with an additional W3 layer (9 entities, likely a parapet/secondary wall type); the same wall-bearing floor-plan pattern as its base unit.",
+"rationale": {
+"evidence": "Layer histogram shows W1=52 and W3=9 out of 86 entities, alongside CEN=13; the bbox [-5520,-7415]-[7800,5020] closely matches the base 101co1 unit's footprint, and sampled W1 LINEs reuse the same coordinates (e.g. -5020/-5520 face pair, x=50/300 face pair) seen in 101co1.",
+"rule": "A '-RF' roof-floor sibling of an already-confirmed wall-bearing unit that retains the same W1 layer and nearly identical wall coordinates should also be scored as high wall-likelihood floor-plan content, with the added W3 layer treated as a secondary wall variant.",
+"counterfactual": "If W1 entities were absent or the footprint no longer matched the base unit's wall coordinates, this would suggest a purely roof-equipment overlay rather than a wall-bearing plan.",
+"uncertainty": "The exact role of the W3 layer (parapet vs. a distinct wall type) cannot be confirmed from entity data alone, and only 30 of 86 entities are sampled."
+}
+},
+{
+"unit_id": "defannot-x-0-101co1-rf2-276",
+"def": "X-평면도(기본형)$0$101co1-RF2",
+"role": "평면 부분도",
+"wall_likelihood": 0.85,
+"wall_line_handles": [
+{"handle": "7D3A", "reason": "axis-aligned W1-layer LINE, wall face near y=-3045"},
+{"handle": "7D3B", "reason": "axis-aligned W1-layer LINE, wall face near y=-6765"},
+{"handle": "7D42", "reason": "axis-aligned W1-layer LINE, continues the x=-5020 wall face"},
+{"handle": "7D43", "reason": "axis-aligned W1-layer LINE, continues the x=-5020 wall face"},
+{"handle": "7D44", "reason": "axis-aligned W1-layer LINE, continues the x=-5520 wall face"},
+{"handle": "7D45", "reason": "axis-aligned W1-layer LINE, continues the x=-5520 wall face"},
+{"handle": "7D47", "reason": "W1-layer LINE closing a wall corner between the -5020/-5520 faces"},
+{"handle": "7D48", "reason": "W1-layer LINE closing another wall corner between the -5020/-5520 faces"},
+{"handle": "7D49", "reason": "axis-aligned W1-layer LINE forming a second wall face near x=50"},
+{"handle": "7D4A", "reason": "W1-layer LINE connecting the x=50 and x=300 wall faces"}
+],
+"notes": "60-entity RF2 roof variant with W1=34 dominant plus OPEN=6 and WIN=2 layers (openings/windows cut into the walls) and INSERTs for ladder/pipe roof equipment; still wall-bearing floor-plan content with added roof fixtures.",
+"rationale": {
+"evidence": "Layer histogram shows W1=34 out of 60 entities plus OPEN=6, WIN=2, CEN=9; sampled W1 LINEs reuse the same -5020/-5520 and x=50/300 wall-face coordinates as 101co1 and 101co1-RF, while an OPEN-layer LINE (3870,4020)->(6800,1620) is diagonal and clearly a cut/opening rather than a wall face.",
+"rule": "A roof variant that keeps the same W1 wall-face coordinates as its base unit but adds OPEN/WIN-layer entities for window or roof-access cuts should still be scored as high wall-likelihood, with the OPEN/WIN entities excluded from the wall-line list since they represent cuts through walls, not the walls themselves.",
+"counterfactual": "If the W1 entity share fell further (e.g. below 30%) or no wall-face coordinates matched the base unit, this would suggest the block is primarily a roof-opening overlay rather than a wall-bearing plan.",
+"uncertainty": "Only 30 of 60 entities are sampled, so it cannot be confirmed whether every wall face from the base unit is preserved here or whether some were removed to create the roof openings."
+}
+},
+{
+"unit_id": "defannot-x-0-101co1-rf3-277",
+"def": "X-평면도(기본형)$0$101co1-RF3",
+"role": "평면 부분도",
+"wall_likelihood": 0.08,
+"wall_line_handles": [],
+"notes": "14-entity RF3 roof-equipment sub-detail (rainwater-pipe and safety-ladder INSERTs plus CEN centerlines and small M_1/M_2 shapes); unlike its RF/RF2 siblings, no W1/wall layer is present at all.",
+"rationale": {
+"evidence": "The layer histogram has no W-prefixed wall layer; the dominant layer is CEN=6 (centerlines/reference grid) plus 7RF=2, M_1=2, M_2=1, A-ELE8=1; sampled entities include two 우수관_100A (rainwater-pipe) INSERTs and one 안전사다리 (safety-ladder) INSERT, both roof-equipment symbols rather than wall geometry.",
+"rule": "Within a family of same-named unit variants (101co1, -RF, -RF2, -RF3), the presence or absence of a W1/W3 wall layer, not the shared name prefix, should drive wall_likelihood; a sibling lacking any wall-named layer should score low even when its family members score high.",
+"counterfactual": "If a W1 or W3 layer with axis-aligned LINE entities appeared here as it does in -RF and -RF2, this would score as high wall-likelihood like its siblings.",
+"uncertainty": "Whether this sparse content is a genuinely wall-less roof-equipment detail or an under-sampled fragment of a larger roof plan cannot be fully confirmed, since all 14 entities are listed and none are wall-typed, but the family-relative sparsity is unusual and not fully explained by this projection alone."
+}
+},
+{
+"unit_id": "defannot-x-0-101co2-278",
+"def": "X-평면도(기본형)$0$101co2",
+"role": "평면 부분도",
+"wall_likelihood": 0.92,
+"wall_line_handles": [
+{"handle": "7A33", "reason": "axis-aligned W1-layer LINE, short wall-face segment near x=2930"},
+{"handle": "7A34", "reason": "axis-aligned W1-layer LINE, short wall-face segment near x=3850"},
+{"handle": "7A35", "reason": "long axis-aligned W1-layer LINE at x=-4070, an exterior wall face"},
+{"handle": "7A36", "reason": "axis-aligned W1-layer LINE, wall face near x=-3570"},
+{"handle": "7A37", "reason": "axis-aligned W1-layer LINE, continues the x=-3570 wall face"},
+{"handle": "7A38", "reason": "axis-aligned W1-layer LINE, wall face near y=2780"},
+{"handle": "7A3A", "reason": "axis-aligned W1-layer LINE, wall face near y=2530"},
+{"handle": "7A3B", "reason": "axis-aligned W1-layer LINE, wall face near y=7580"},
+{"handle": "7A3C", "reason": "axis-aligned W1-layer LINE, continues the y=7580 wall face"},
+{"handle": "7A3D", "reason": "axis-aligned W1-layer LINE, wall face near y=7830"}
+],
+"notes": "99-entity unit floor plan ('101co2') with W1=52 dominant wall layer plus CEN=14, STL=8, 설비OPEN=8; the same wall-bearing pattern as 101co1 for a different unit type in the same building.",
+"rationale": {
+"evidence": "Layer histogram shows W1=52 of 99 entities (about 53%), plus CEN=14, STL=8, 설비OPEN=8, A-DOOR=3; sampled W1 LINEs form multiple axis-aligned wall-face pairs across a bbox of roughly 10310x11530 units, structurally identical to the 101co1/103co1/104co1 family.",
+"rule": "Sibling unit-type blocks in the same building that share the same W1-dominant layer composition and axis-aligned wall-face pattern as an already-confirmed wall-bearing unit should be scored consistently as high wall-likelihood floor-plan content.",
+"counterfactual": "If the W1 layer were replaced by a non-wall layer or the LINE entities were diagonal/irregular rather than forming axis-aligned rectangular faces, wall likelihood would drop sharply.",
+"uncertainty": "Only the first 30 of 99 entities are sampled, so the complete wall loop topology and whether all rooms close fully cannot be verified from this projection alone."
+}
+},
+{
+"unit_id": "defannot-x-0-103co1-279",
+"def": "X-평면도(기본형)$0$103co1",
+"role": "평면 부분도",
+"wall_likelihood": 0.92,
+"wall_line_handles": [
+{"handle": "7B02", "reason": "axis-aligned W1-layer LINE, short wall-face segment near x=2090"},
+{"handle": "7B03", "reason": "axis-aligned W1-layer LINE, short wall-face segment near x=3010"},
+{"handle": "7B04", "reason": "long axis-aligned W1-layer LINE at x=-4350, an exterior wall face"},
+{"handle": "7B05", "reason": "axis-aligned W1-layer LINE, wall face near x=-3570"},
+{"handle": "7B06", "reason": "axis-aligned W1-layer LINE, wall face near x=-3850"},
+{"handle": "7B07", "reason": "axis-aligned W1-layer LINE, wall face near y=2780"},
+{"handle": "7B09", "reason": "axis-aligned W1-layer LINE, wall face near y=2530"},
+{"handle": "7B0A", "reason": "axis-aligned W1-layer LINE, wall face near y=7580"},
+{"handle": "7B0B", "reason": "axis-aligned W1-layer LINE, continues the y=7580 wall face"},
+{"handle": "7B0C", "reason": "axis-aligned W1-layer LINE, wall face near y=7830"}
+],
+"notes": "106-entity unit floor plan ('103co1') with W1=56 dominant wall layer, matching the co1/co2 family's wall-bearing pattern for building 103.",
+"rationale": {
+"evidence": "Layer histogram shows W1=56 of 106 entities (about 53%), plus CEN=15, STL=10, 설비OPEN=8, A-DOOR=3; sampled W1 LINEs reproduce the same axis-aligned wall-face pattern (parallel faces around y=2530/2780/7580/7830) seen in 101co2, only offset in x.",
+"rule": "A unit block that reproduces the same W1-dominant, axis-aligned wall-face signature as already-confirmed sibling units, differing only in position/offset, should receive the same high wall-likelihood classification.",
+"counterfactual": "A shift of the dominant layer away from W1, or LINE entities that no longer form axis-aligned rectangular room faces, would lower the wall likelihood.",
+"uncertainty": "Only 30 of 106 entities are sampled, so the full wall network for the entire unit (all rooms, all corners) cannot be confirmed from this projection."
+}
+},
+{
+"unit_id": "defannot-x-0-104co1-280",
+"def": "X-평면도(기본형)$0$104co1",
+"role": "평면 부분도",
+"wall_likelihood": 0.92,
+"wall_line_handles": [
+{"handle": "809D", "reason": "axis-aligned W1-layer LINE, wall face near y=410"},
+{"handle": "809E", "reason": "axis-aligned W1-layer LINE, wall face near y=3010"},
+{"handle": "809F", "reason": "axis-aligned W1-layer LINE, continues the y=3010 wall face"},
+{"handle": "80A0", "reason": "axis-aligned W1-layer LINE, wall face near x=-5675"},
+{"handle": "80A1", "reason": "axis-aligned W1-layer LINE, continues the x=-5675 wall face"},
+{"handle": "80A2", "reason": "axis-aligned W1-layer LINE, wall face near x=-5175"},
+{"handle": "80A3", "reason": "axis-aligned W1-layer LINE, continues the x=-5175 wall face"},
+{"handle": "80A4", "reason": "axis-aligned W1-layer LINE, short wall-face segment near x=-7600"},
+{"handle": "80AA", "reason": "long axis-aligned W1-layer LINE at x=6135, an exterior wall face"},
+{"handle": "80AB", "reason": "axis-aligned W1-layer LINE, continues the x=6135 wall face"}
+],
+"notes": "106-entity unit floor plan ('104co1') with W1=55 dominant wall layer, the same wall-bearing pattern as sibling co1 units across buildings 101/103/104.",
+"rationale": {
+"evidence": "Layer histogram shows W1=55 of 106 entities (about 52%), plus CEN=16, STL=10, 설비OPEN=8, A-DOOR=3; sampled W1 LINEs form multiple axis-aligned wall-face pairs (e.g. x=-5675/-5175, x=6135) across a bbox of roughly 14235x12180 units, structurally identical to the other co1/co2 units in this shard.",
+"rule": "A unit block whose W1-layer share, axis-aligned LINE structure, and supporting layer set (CEN/STL/설비OPEN/A-DOOR) match an already-confirmed wall-bearing family member should be scored with the same high wall-likelihood, regardless of the specific building/unit number in its name.",
+"counterfactual": "If the W1 entity share dropped sharply or the LINE entities became diagonal/irregular rather than axis-aligned rectangular faces, the wall likelihood would fall well below this estimate.",
+"uncertainty": "Only the first 30 of 106 entities are sampled, so the complete wall loop topology for the full unit footprint cannot be verified from this projection alone."
+}
+}
+]

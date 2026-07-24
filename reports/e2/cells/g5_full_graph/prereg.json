@@ -1,0 +1,229 @@
+{
+  "schema": "e2.g5_full_graph.prereg.v1",
+  "sealed_utc": "2026-07-19T00:20:03.923Z",
+  "cell_id": "g5_full_graph",
+  "execution_kind": "inference_and_scale_measurement_only",
+  "judgment_policy": "numeric_measurements_only_no_envelope_or_equivalence_verdict",
+  "claim_policy": "휘발 필드(runtime·타임스탬프) 제외 수치 전 필드 동일",
+  "target": {
+    "definition": "X-평면도(기본형)",
+    "segment_count": 412775,
+    "preserved_typo_not_adopted": 412965,
+    "units": "mm",
+    "source_kind": "existing_staged_DXF_copy_only",
+    "staged_relative_path": "runs/e2_b3_dxfout_20260717/1_export.dxf",
+    "staged_sha256": "5a6035721630cddc6d753b1b97b898e7a4ce4d5988342ce85e2c465cdb81deff",
+    "census_relative_path": "reports/e2/s4/real_defs_v1.json",
+    "census_sha256": "ce818843d0f6f0f0e9fd1f393762d641c427e0868b9103ce3ed1b703744907ce"
+  },
+  "graph": {
+    "builder_relative_path": "tools/e2/cells/graph_builder.py",
+    "builder_sha256": "c95d4a30d30e0db157fe56102053a7884902b7749464f7f4cb8852c0819321f6",
+    "config_sha256": "56911f4633979a3fe00fd56be2d0a39ac06757ed255ed49ed18ca20ba9d4ac49",
+    "config": {
+      "angle_parallel_deg": 6.0,
+      "angle_collinear_deg": 2.0,
+      "junction_snap_norm": 0.01,
+      "proximity_radius_norm": 0.5,
+      "parallel_offset_norm": 0.5,
+      "parallel_min_overlap": 0.2,
+      "collinear_offset_norm": 0.3,
+      "collinear_gap_norm": 2.0,
+      "topk_parallel": 12,
+      "topk_proximity": 12,
+      "topk_collinear": 8,
+      "max_candidate_scan": 96,
+      "max_candidate_collect": 256,
+      "max_index_cells_per_segment": 512,
+      "max_core_nodes_per_shard": 16384,
+      "containment_entity_cap": 16,
+      "geometry_round_digits": 9
+    },
+    "feature_names": [
+      "log1p_length_norm",
+      "midpoint_x_drawing_norm",
+      "midpoint_y_drawing_norm",
+      "bbox_width_norm",
+      "bbox_height_norm",
+      "sin_2theta",
+      "cos_2theta",
+      "sagitta_norm",
+      "closed_geometry",
+      "kind_line",
+      "kind_poly_edge",
+      "kind_arc_chord",
+      "log1p_endpoint_degree",
+      "log1p_junction_count",
+      "log1p_parallel_count",
+      "log1p_collinear_count",
+      "block_depth_norm"
+    ],
+    "feature_count": 17,
+    "edge_type_names": [
+      "parallel_band",
+      "intersection_junction",
+      "proximity",
+      "collinearity",
+      "containment",
+      "instancing"
+    ],
+    "all_pairs_allowed": false,
+    "sampling_allowed": false
+  },
+  "model": {
+    "arm": "GNN_A_no_pretrain",
+    "inference_only": true,
+    "retraining_allowed": false,
+    "architecture_source_sha256": "895249f0b6c77ac8f8a7cfb73e859a0882681ad6bba6e337480b55db269ce120",
+    "formal_driver_sha256": "0413f1035de76ab8a175c37c291c3fca634a2f1effb8135b5371aa357d5a94c0",
+    "hidden_dim": 64,
+    "dropout_at_eval": 0.0,
+    "relation_count": 6,
+    "threshold": 0.5,
+    "seeds": [17, 29, 43],
+    "checkpoints": [
+      {
+        "seed": 17,
+        "name": "GNN_A_no_pretrain_seed_17.pt",
+        "bytes": 256627,
+        "sha256": "612e4bf954ff5967853f7a08e66195b79dfa15250d6e9d42f88a877c92a3952c"
+      },
+      {
+        "seed": 29,
+        "name": "GNN_A_no_pretrain_seed_29.pt",
+        "bytes": 256627,
+        "sha256": "1b4bbd004491609cfe8cfc217d18b0ec5ff344f8fee43c67b392a4c37dbc6877"
+      },
+      {
+        "seed": 43,
+        "name": "GNN_A_no_pretrain_seed_43.pt",
+        "bytes": 256627,
+        "sha256": "ab37cf25894e8ed7f2e96ca287a21da961c68d37bcf2bd9633ae1cb9b663e2a3"
+      }
+    ]
+  },
+  "cross_device_reference": {
+    "selection_rule": "minimum SEG-IR byte length among split=A records in sealed W2-09 manifest, stable drawing_id tie-break",
+    "split_manifest_sha256": "8aad64eeda77df55296fc711c21d7befdeada7fe379aeafec81fd1691aea044f",
+    "drawing_id": "high_quality_architectural_6347",
+    "family_id": "0eb060c9bd798071dee0bf7f5ff8cdc5bc1cf9102ba3781c16dfc570c37971f5",
+    "seg_ir_bytes": 21181,
+    "seg_ir_sha256": "decbb00686815ff8d3426e3b38cbdb499a1edc8d77784f93b649b295eab22565",
+    "truth_access_allowed": false,
+    "repeat_count_per_device": 2
+  },
+  "equivalence_bands_sealed": {
+    "rule": "abs≤max(1e-4, 5×p99_within) ∧ rel≤max(1e-3, 5×p99_within)",
+    "absolute_floor": 0.0001,
+    "relative_floor": 0.001,
+    "within_multiplier": 5.0,
+    "cross_device_promotion": "ALLOWED_FOR_MATCHING_HASHED_CONFIG",
+    "verdict_emission_allowed": false
+  },
+  "measurements": {
+    "graph_build": [
+      "node_count",
+      "directed_edge_count",
+      "build_wall_seconds",
+      "peak_host_rss_bytes"
+    ],
+    "full_graph_inference_per_seed": [
+      "single_forward_wall_seconds",
+      "nodes_per_second",
+      "single_sample_empirical_p95_seconds",
+      "peak_cuda_allocated_bytes",
+      "peak_cuda_reserved_bytes",
+      "peak_host_rss_bytes"
+    ],
+    "cross_device_reference": [
+      "local_within_max_abs",
+      "local_within_p99_abs",
+      "local_within_max_rel",
+      "local_within_p99_rel",
+      "dgx_within_max_abs",
+      "dgx_within_p99_abs",
+      "dgx_within_max_rel",
+      "dgx_within_p99_rel",
+      "cross_device_max_abs",
+      "cross_device_p99_abs",
+      "cross_device_max_rel",
+      "cross_device_p99_rel",
+      "sealed_absolute_limit",
+      "sealed_relative_limit"
+    ],
+    "output_distribution": [
+      "histogram_bin_edges",
+      "histogram_counts",
+      "min",
+      "p01",
+      "p05",
+      "p25",
+      "p50",
+      "p75",
+      "p95",
+      "p99",
+      "max",
+      "mean",
+      "std_population",
+      "positive_ratio_at_0_5"
+    ],
+    "seed_agreement": [
+      "pairwise_binary_agreement",
+      "three_seed_unanimous_ratio",
+      "per_node_score_std_summary"
+    ]
+  },
+  "resource_cap": {
+    "device": "NVIDIA_GB10_128GB_unified",
+    "cap_hours": 36.0,
+    "cap_outcome": "BUDGET_KILL",
+    "oom_downgrade_allowed": false
+  },
+  "dgx_occupancy_protocol": {
+    "pre_job_measurement_required": true,
+    "coexist_if_possible": true,
+    "stop_vllm_only_after_oom": true,
+    "restore_vllm_if_stopped": true,
+    "restore_http_probe": "http://127.0.0.1:8000/v1/models",
+    "record_commands_and_times": true
+  },
+  "access_policy": {
+    "allowed_inputs": [
+      "existing_staged_DXF_copy",
+      "frozen_graph_builder",
+      "GNN_A_checkpoints",
+      "one_sealed_val_A_SEG_IR",
+      "sealed_preregistration_and_preflight_artifacts"
+    ],
+    "forbidden_inputs": [
+      "original_CAD",
+      "test",
+      "val_B",
+      "val_A_truth"
+    ],
+    "forbidden_access_must_be_blocked_before_filesystem": true
+  },
+  "output_policy": {
+    "local_root": "D:/runs/e2_program/cells/g5_full_graph",
+    "repo_writes_allowed": false,
+    "remote_residue_allowed_after_closeout": false,
+    "required_final_files": [
+      "prereg.json",
+      "PREREG.csv",
+      "g5_full_graph.py",
+      "results.json",
+      "evidence.xlsx",
+      "REPORT.md"
+    ]
+  },
+  "input_hashes": {
+    "packet": "ed6caa93028a4aa4c083cd0412ebd613b8f9f7dbe1604303611716917165fa2a",
+    "amendment1_text": "30f752db803f7f589d1a8d1f1a2d8557364ae2d624f76a639533161f552b8283",
+    "amendment2": "6e29bbd5f8c502a1bc36277a535521c117408b2460e80511907d610321dd442a",
+    "w2_00_throughput": "88198f7e9e4a0b75a6d281ef74724b0616ed4ba51a11203d9aee8ecca7c111d9",
+    "w2_00_report": "9d5f2a723fd58f5c38e64f782041aaa3dc72e69258e6d629448f1babe05c5b34",
+    "gnn_formal_results": "fe4a52c4799c61f9c5cc620331801c55bfe420cd18595a0f924e13cda03a2b16",
+    "gnn_formal_prereg": "53d10948a0e56f98cab77dfb962d8db5b6ccdbc639a962ff7327bbe4878bcaca",
+    "gnn_formal_prereg_csv": "34dfdd6ec179d8fabfd211d3c78c1c67bbb5e45b1ca483fa69c2190a201ce476"
+  }
+}

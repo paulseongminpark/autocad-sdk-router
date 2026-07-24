@@ -1,0 +1,58 @@
+[
+  {
+    "unit_id": "defannot-x-0-0-59c-0-gasdfasdfs-0-cok3-381",
+    "def": "X-평면도(기본형)$0$씽크$0$59C$0$gasdfasdfs$0$COK3",
+    "role": "가구",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Kitchen sink/cooktop 3D fixture block: 34 of 38 entities are 3DFACE on the KIT layer, a furnishing model rather than a wall.",
+    "rationale": {
+      "evidence": "All 38 entities sit on layer X-평면도(기본형)$0$KIT (KIT=kitchen) and 34 of them are 3DFACE, with the bbox spanning Z from 10 to 30 — a solid 3D surface model, not a flat 2D plan chunk. The block name carries 씽크 (sink) and COK3 (cooktop), naming a kitchen appliance/fixture. The single LINE (handle 1DA3) runs diagonally (15.737,3.57)->(49.089,25.652) across the Z-extruded body, i.e. a mesh edge, not an orthogonal plan wall.",
+      "rule": "A block dominated by 3DFACE surfaces on a kitchen/fixture layer and named after an appliance is a furniture/fixture model; 3D-surface density plus an appliance name governs the role over any stray line.",
+      "counterfactual": "If the geometry were instead long orthogonal LINE/LWPOLYLINE pairs at a single Z on an architectural/wall layer, the role would move to a plan partial view carrying real wall lines.",
+      "uncertainty": "The 34 3DFACE handles expose no coordinates in this projection, so the exact fixture outline — and whether one face doubles as a counter edge butting a wall — cannot be confirmed here."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-382",
+    "def": "X-평면도(기본형)$0$안전사다리",
+    "role": "심볼",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Fire-escape safety-ladder (안전사다리) schematic on the 8ELE notation layer: 46 short mirror-symmetric line segments plus 2 circles and 2 arcs, no wall geometry.",
+    "rationale": {
+      "evidence": "The block is named 안전사다리 (fire-escape safety ladder) and all 50 entities are on layer X-평면도(기본형)$0$8ELE, an element/notation layer rather than a furniture (FUR) layer. The geometry is 46 LINEs forming small mirror-symmetric diamond/box clusters (e.g. 7CE4-7CE7, 7CE8-7CEB and their +/-x mirrors) with 2 CIRCLE and 2 ARC at Z=0 — a standardized schematic mark. The longest segments are only ~20-30 units, far too short to be wall runs.",
+      "rule": "A named safety/service device rendered as small mirror-symmetric primitives (diamonds, circle pairs, arcs) on a notation/element layer, not a furniture or architectural layer, reads as a plan symbol rather than furniture or structure.",
+      "counterfactual": "The same block on a FUR layer with one large rectangular outline would read as equipment/furniture; carrying long orthogonal edges instead of tiny mirrored ones would raise its wall likelihood.",
+      "uncertainty": "Whether an escape ladder is catalogued as a pure symbol or as fixed equipment is a labeling convention this projection cannot settle, so a 기타 (other) reading cannot be fully excluded from geometry alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-100a-383",
+    "def": "X-평면도(기본형)$0$우수관_100A",
+    "role": "심볼",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Rainwater downpipe / roof-drain marker (우수관 100A): a tiny origin-centered crosshair of two crossing lines with TEXT 'RD' and 'ø100', a plumbing symbol.",
+    "rationale": {
+      "evidence": "Only 6 entities, all within a small 165x165 bbox centered on (0,0): two crossing LINEs through the origin (7BD2 horizontal 82.5->-82.5, 7BD3 vertical -82.5->82.5), two 2-vertex LWPOLYLINEs, and two TEXT strings 'RD' and 'ø100' on a DEFPOINTS layer. 우수관 (rainwater pipe) in the name, plus 'RD' (roof/rain drain) and 'ø100' (100mm diameter) labels, identify a drainage callout.",
+      "rule": "A tiny origin-centered crosshair paired with diameter/service TEXT labels is a plumbing/drainage symbol; a centered marker glyph plus annotation TEXT is the signature of a symbol block.",
+      "counterfactual": "Strip the 'RD'/'ø100' TEXT and scale the crossing lines up to room size and the same cross could read as grid or structural geometry; the labels are what fix it as a symbol.",
+      "uncertainty": "The two LWPOLYLINEs give only a vertex count (2) with no coordinates, so whether they draw a pipe circle or short ticks is unknown, though it does not change the symbol classification."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-384",
+    "def": "X-평면도(기본형)$0$코너  선반",
+    "role": "가구",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Corner shelf (코너 선반) furniture outline on the FUR layer: a ~300x127 rounded box (24 lines, 16 arcs, 7 circles); the straight edges are shelf outlines, not walls.",
+    "rationale": {
+      "evidence": "All 47 entities are on layer X-평면도(기본형)$0$FUR (FUR=furniture) and the name 코너 선반 means 'corner shelf'. The mix of 24 LINE, 16 ARC and 7 CIRCLE inside a ~300x127 bbox describes a rounded, detailed furnishing; the long orthogonal LINEs (59A9/59AA verticals ~116, 59AB horizontal ~293) are the shelf's outer edges, and the arcs are its rounded corners. The very large world coordinates (~506869,180294) show the block was captured in place, not normalized to a local origin.",
+      "rule": "Entities on a FUR layer under a furniture name define furniture even when their outer edges are long straight orthogonal lines; layer plus name govern the role over raw line geometry.",
+      "counterfactual": "If these same long orthogonal lines appeared on a wall/architectural layer with no accompanying arcs, circles or furniture name, they would be strong wall-line candidates and the role would become a plan partial view.",
+      "uncertainty": "The ARC/CIRCLE handles carry no coordinates here, so it cannot be confirmed whether they are shelf corner radii or decorative detail, and a furniture edge abutting a wall cannot be geometrically separated from a partition without the layer cue."
+    }
+  }
+]

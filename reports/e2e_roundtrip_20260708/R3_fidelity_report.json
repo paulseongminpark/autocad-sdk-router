@@ -1,0 +1,4053 @@
+{
+  "schema": "ariadne.roundtrip_report.v1",
+  "run_dir": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R3b_full_20260708",
+  "source": {
+    "ok": true,
+    "staged_path": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R3b_full_20260708\\census_stage\\staged_input.dwg",
+    "original_path": "D:\\dev\\.build\\1.dwg",
+    "original_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+    "original_byte_size": 2368524,
+    "staged_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+    "staged_byte_size": 2368524,
+    "staged_at": "2026-07-08T12:04:02.102662+00:00"
+  },
+  "ceiling": {
+    "modelspace_entity_total": 375,
+    "certified_total": 375,
+    "out_of_class_total": 0,
+    "deferred_count": 7187,
+    "def_entity_budget": {
+      "max_def_entities_per_block": 25000,
+      "dropped_def_count": 0,
+      "dropped_def_entity_total": 0,
+      "dropped_defs": [],
+      "dropped_pct_of_block_def_entities": 0.0
+    }
+  },
+  "kind_buckets": {
+    "ARC": {
+      "status": "VACUOUS",
+      "certified": true,
+      "label": null,
+      "kind": null,
+      "census_count": 0,
+      "attempted_count": 0,
+      "attempted_live_count": 0,
+      "deferred_count": 0,
+      "diff0_count": 0,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0,
+      "absent_from_drawing": true
+    },
+    "CIRCLE": {
+      "status": "PASS",
+      "certified": true,
+      "label": "circle",
+      "kind": "circle",
+      "census_count": 1,
+      "attempted_count": 1,
+      "attempted_live_count": 1,
+      "deferred_count": 0,
+      "diff0_count": 1,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0
+    },
+    "DIMENSION": {
+      "status": "PASS",
+      "certified": true,
+      "label": "dimension_all_subtypes",
+      "kind": "dimension",
+      "census_count": 113,
+      "attempted_count": 113,
+      "attempted_live_count": 113,
+      "deferred_count": 0,
+      "diff0_count": 113,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0
+    },
+    "ELLIPSE": {
+      "status": "VACUOUS",
+      "certified": true,
+      "label": null,
+      "kind": null,
+      "census_count": 0,
+      "attempted_count": 0,
+      "attempted_live_count": 0,
+      "deferred_count": 0,
+      "diff0_count": 0,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0,
+      "absent_from_drawing": true
+    },
+    "INSERT": {
+      "status": "PASS",
+      "certified": true,
+      "label": "insert",
+      "kind": "block_reference",
+      "census_count": 50,
+      "attempted_count": 50,
+      "attempted_live_count": 50,
+      "deferred_count": 1263,
+      "diff0_count": 50,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0
+    },
+    "LEADER": {
+      "status": "VACUOUS",
+      "certified": true,
+      "label": null,
+      "kind": null,
+      "census_count": 0,
+      "attempted_count": 0,
+      "attempted_live_count": 0,
+      "deferred_count": 0,
+      "diff0_count": 0,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0,
+      "absent_from_drawing": true
+    },
+    "LINE": {
+      "status": "PASS",
+      "certified": true,
+      "label": "line",
+      "kind": "line",
+      "census_count": 21,
+      "attempted_count": 21,
+      "attempted_live_count": 21,
+      "deferred_count": 0,
+      "diff0_count": 21,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0
+    },
+    "LWPOLYLINE": {
+      "status": "PASS",
+      "certified": true,
+      "label": "lwpolyline",
+      "kind": "lwpolyline",
+      "census_count": 73,
+      "attempted_count": 73,
+      "attempted_live_count": 73,
+      "deferred_count": 1443,
+      "diff0_count": 73,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0
+    },
+    "MLINE": {
+      "status": "VACUOUS",
+      "certified": true,
+      "label": null,
+      "kind": null,
+      "census_count": 0,
+      "attempted_count": 0,
+      "attempted_live_count": 0,
+      "deferred_count": 0,
+      "diff0_count": 0,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0,
+      "absent_from_drawing": true
+    },
+    "MTEXT": {
+      "status": "VACUOUS",
+      "certified": true,
+      "label": null,
+      "kind": null,
+      "census_count": 0,
+      "attempted_count": 0,
+      "attempted_live_count": 0,
+      "deferred_count": 0,
+      "diff0_count": 0,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0,
+      "absent_from_drawing": true
+    },
+    "MULTILEADER": {
+      "status": "VACUOUS",
+      "certified": true,
+      "label": null,
+      "kind": null,
+      "census_count": 0,
+      "attempted_count": 0,
+      "attempted_live_count": 0,
+      "deferred_count": 0,
+      "diff0_count": 0,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0,
+      "absent_from_drawing": true
+    },
+    "POLYLINE": {
+      "status": "VACUOUS",
+      "certified": true,
+      "label": null,
+      "kind": null,
+      "census_count": 0,
+      "attempted_count": 0,
+      "attempted_live_count": 0,
+      "deferred_count": 0,
+      "diff0_count": 0,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0,
+      "absent_from_drawing": true
+    },
+    "SPLINE": {
+      "status": "VACUOUS",
+      "certified": true,
+      "label": null,
+      "kind": null,
+      "census_count": 0,
+      "attempted_count": 0,
+      "attempted_live_count": 0,
+      "deferred_count": 0,
+      "diff0_count": 0,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0,
+      "absent_from_drawing": true
+    },
+    "TEXT": {
+      "status": "PASS",
+      "certified": true,
+      "label": "text",
+      "kind": "text",
+      "census_count": 117,
+      "attempted_count": 117,
+      "attempted_live_count": 117,
+      "deferred_count": 0,
+      "diff0_count": 117,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0
+    }
+  },
+  "per_layer": {},
+  "patterns": [
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:def_entity kind unsupported by write.block.append_entity"
+      },
+      "count": 943,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$A$C059766AB",
+          "def_entity_index": 307,
+          "handle": "33B0",
+          "kind": "block_reference",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$A$C019C01BD",
+          "def_entity_index": 116,
+          "handle": "6345",
+          "kind": "block_reference",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$ba15001400",
+          "def_entity_index": 15,
+          "handle": "6444",
+          "kind": "block_reference",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        }
+      ],
+      "judgment": "unreviewed",
+      "rule_id": null,
+      "note": ""
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U103'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 20,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U103'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U104'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 80,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U104'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 88,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U104'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U105'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84b",
+          "def_entity_index": 60,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U105'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U106'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 13,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U106'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U107'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 16,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U107'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U108'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 17,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U108'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U109'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 3,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U109'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U110'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 19,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U110'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U111'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 22,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U111'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 36,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U111'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U112'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 4,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U112'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 388,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U112'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U113'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 7,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U113'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U114'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 16,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U114'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 31,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U114'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U115'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 219,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U115'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 31,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U115'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U116'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 220,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U116'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 32,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U116'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U117'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 36,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U117'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U118'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 8,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U118'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 24,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U118'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U119'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 10,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U119'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 26,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U119'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U120'"
+      },
+      "count": 4,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 417,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U120'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 412,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U120'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84b",
+          "def_entity_index": 61,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U120'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U121'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 8,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U121'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U122'"
+      },
+      "count": 4,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 418,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U122'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 413,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U122'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84b",
+          "def_entity_index": 62,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U122'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U123'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 427,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U123'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U124'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 413,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U124'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 21,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U124'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U125'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 9,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U125'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 25,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U125'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U126'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 17,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U126'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 32,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U126'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U127'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84b",
+          "def_entity_index": 63,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U127'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84b1",
+          "def_entity_index": 12,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U127'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U128'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 416,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U128'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 411,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U128'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U129'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 336,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U129'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U130'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 78,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U130'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 86,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U130'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U131'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 82,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U131'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 90,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U131'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U132'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 424,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U132'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U133'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 18,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U133'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U134'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 43,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U134'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U135'"
+      },
+      "count": 3,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 41,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U135'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 404,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U135'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 72,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U135'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U136'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 87,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U136'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U137'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 2,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U137'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U138'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 5,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U138'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U139'"
+      },
+      "count": 4,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 391,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U139'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 419,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U139'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 411,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U139'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U140'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 395,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U140'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U141'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 0,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U141'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U142'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 1,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U142'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U144'"
+      },
+      "count": 18,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 12,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U144'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 13,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U144'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 222,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U144'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U145'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 17,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U145'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 402,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U145'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U146'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 320,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U146'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U147'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 6,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U147'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 391,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U147'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U148'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 8,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U148'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 393,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U148'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U149'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 7,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U149'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 392,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U149'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U150'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 403,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U150'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 71,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U150'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U151'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 405,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U151'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 73,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U151'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U152'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 449,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U152'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 116,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U152'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U155'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 7,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U155'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 373,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U155'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U156'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 4,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U156'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U157'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 3,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U157'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U158'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 3,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U158'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 159,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U158'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U159'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 482,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U159'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 381,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U159'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U160'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 12,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U160'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U161'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 429,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U161'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U162'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 224,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U162'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U163'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84b",
+          "def_entity_index": 56,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U163'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84b1",
+          "def_entity_index": 273,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U163'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U164'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84b",
+          "def_entity_index": 59,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U164'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84b1",
+          "def_entity_index": 276,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U164'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U165'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 6,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U165'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U166'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 5,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U166'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U167'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 86,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U167'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U168'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 88,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U168'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U169'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 15,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U169'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U170'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 450,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U170'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 416,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U170'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U171'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 12,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U171'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U172'"
+      },
+      "count": 26,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 442,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U172'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 445,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U172'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 447,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U172'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U173'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 3,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U173'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U174'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 486,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U174'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 141,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U174'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U175'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 487,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U175'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 160,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U175'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U176'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 488,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U176'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 161,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U176'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U177'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 410,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U177'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 77,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U177'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U179'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 324,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U179'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 688,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U179'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U180'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 323,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U180'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U181'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 413,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U181'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U183'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 15,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U183'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U184'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 2,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U184'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U185'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 14,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U185'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U186'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 5,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U186'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U187'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 16,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U187'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U188'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 6,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U188'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U189'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 9,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U189'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U191'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 12,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U191'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U192'"
+      },
+      "count": 4,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 415,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U192'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 423,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U192'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84b",
+          "def_entity_index": 51,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U192'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U193'"
+      },
+      "count": 4,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 414,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U193'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 422,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U193'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84b",
+          "def_entity_index": 50,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U193'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U194'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 152,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U194'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U195'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 151,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U195'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U196'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 1,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U196'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U197'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 420,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U197'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U199'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 90,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U199'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U200'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 154,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U200'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U201'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 17,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U201'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U202'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 5,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U202'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U232'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 18,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U232'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U236'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 687,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U236'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U237'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 148,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U237'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U238'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84b1",
+          "def_entity_index": 133,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U238'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U239'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 3,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U239'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U240'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 1,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U240'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U241'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 0,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U241'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U272'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 377,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U272'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U273'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 364,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U273'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U274'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 406,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U274'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 74,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U274'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U275'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 407,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U275'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U278'"
+      },
+      "count": 4,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 505,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U278'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 500,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U278'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84b",
+          "def_entity_index": 496,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U278'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U279'"
+      },
+      "count": 4,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 504,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U279'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 499,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U279'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84b",
+          "def_entity_index": 497,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U279'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U280'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 523,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U280'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 529,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U280'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U281'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 524,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U281'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 530,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U281'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U282'"
+      },
+      "count": 3,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 605,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U282'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 747,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U282'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 750,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U282'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U283'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 518,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U283'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U290'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 221,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U290'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 33,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U290'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U45'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 218,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U45'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 30,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U45'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U47'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84b",
+          "def_entity_index": 55,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U47'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84b1",
+          "def_entity_index": 272,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U47'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U48'"
+      },
+      "count": 4,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84b",
+          "def_entity_index": 57,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U48'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84b",
+          "def_entity_index": 58,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U48'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84b1",
+          "def_entity_index": 274,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U48'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U49'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 14,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U49'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U50'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 11,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U50'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 27,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U50'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U51'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 15,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U51'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 30,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U51'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U52'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 9,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U52'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U53'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 7,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U53'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 23,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U53'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U54'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 8,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U54'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U55'"
+      },
+      "count": 3,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 6,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U55'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 9,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U55'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 22,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U55'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U56'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 10,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U56'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U57'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 11,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U57'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U58'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 335,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U58'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 59,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U58'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U59'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 16,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U59'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 401,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U59'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U60'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 325,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U60'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a",
+          "def_entity_index": 689,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U60'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U61'"
+      },
+      "count": 6,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 19,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U61'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 60,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U61'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 485,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U61'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U62'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 79,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U62'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 87,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U62'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U63'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 13,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U63'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U64'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84b",
+          "def_entity_index": 52,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U64'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84b1",
+          "def_entity_index": 60,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U64'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U67'"
+      },
+      "count": 6,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 446,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U67'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 400,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U67'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 408,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U67'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U68'"
+      },
+      "count": 6,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 448,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U68'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 403,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U68'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 11,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U68'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U70'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 4,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U70'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 21,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U70'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U71'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 81,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U71'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 89,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U71'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U72'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 83,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U72'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 91,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U72'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U73'"
+      },
+      "count": 6,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 417,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U73'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 418,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U73'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130a1",
+          "def_entity_index": 470,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U73'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U74'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 4,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U74'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U75'"
+      },
+      "count": 5,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 422,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U75'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 392,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U75'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 414,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U75'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U76'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 415,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U76'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U77'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 8,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U77'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U79'"
+      },
+      "count": 7,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 19,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U79'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 337,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U79'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$130b",
+          "def_entity_index": 0,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U79'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U81'"
+      },
+      "count": 6,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 20,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U81'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 338,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U81'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 62,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U81'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U82'"
+      },
+      "count": 3,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 89,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U82'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84b",
+          "def_entity_index": 426,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U82'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84b1",
+          "def_entity_index": 92,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U82'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U83'"
+      },
+      "count": 4,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84a1",
+          "def_entity_index": 217,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U83'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84a",
+          "def_entity_index": 29,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U83'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84b",
+          "def_entity_index": 54,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U83'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U84'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84b",
+          "def_entity_index": 53,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U84'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84b1",
+          "def_entity_index": 61,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U84'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U85'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 21,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U85'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c1",
+          "def_entity_index": 35,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U85'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U86'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 18,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U86'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 7,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U86'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U87'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 58,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U87'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U88'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 85,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U88'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U89'"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 40,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U89'"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 17,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U89'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U90'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111a",
+          "def_entity_index": 42,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U90'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U91'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 16,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U91'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U92'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 4,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U92'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for nested block_name '*U93'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$111b",
+          "def_entity_index": 6,
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for nested block_name '*U93'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "ellipse",
+        "change": "deferred",
+        "context": "reason:def_entity kind unsupported by write.block.append_entity"
+      },
+      "count": 201,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$hd1050",
+          "def_entity_index": 84,
+          "handle": "1C64",
+          "kind": "ellipse",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$hd1050",
+          "def_entity_index": 86,
+          "handle": "1C66",
+          "kind": "ellipse",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$hd1050",
+          "def_entity_index": 87,
+          "handle": "1C67",
+          "kind": "ellipse",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        }
+      ],
+      "judgment": "unreviewed",
+      "rule_id": null,
+      "note": ""
+    },
+    {
+      "signature": {
+        "dxf_name": "face3d",
+        "change": "deferred",
+        "context": "reason:def_entity kind unsupported by write.block.append_entity"
+      },
+      "count": 34,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$씽크$0$59C$0$gasdfasdfs$0$COK3",
+          "def_entity_index": 0,
+          "handle": "1DA2",
+          "kind": "face3d",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$씽크$0$59C$0$gasdfasdfs$0$COK3",
+          "def_entity_index": 2,
+          "handle": "1DA4",
+          "kind": "face3d",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$씽크$0$59C$0$gasdfasdfs$0$COK3",
+          "def_entity_index": 3,
+          "handle": "1DA5",
+          "kind": "face3d",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        }
+      ],
+      "judgment": "unreviewed",
+      "rule_id": null,
+      "note": ""
+    },
+    {
+      "signature": {
+        "dxf_name": "hatch",
+        "change": "deferred",
+        "context": "reason:def_entity kind unsupported by write.block.append_entity"
+      },
+      "count": 265,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$A$C019C01BD",
+          "def_entity_index": 9,
+          "handle": "62DA",
+          "kind": "hatch",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$A$C019C01BD",
+          "def_entity_index": 29,
+          "handle": "62EE",
+          "kind": "hatch",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$84c",
+          "def_entity_index": 0,
+          "handle": "24C4",
+          "kind": "hatch",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        }
+      ],
+      "judgment": "unreviewed",
+      "rule_id": null,
+      "note": ""
+    },
+    {
+      "signature": {
+        "dxf_name": "lwpolyline",
+        "change": "deferred",
+        "context": "reason:def_entity kind unsupported by write.block.append_entity"
+      },
+      "count": 1443,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$is2",
+          "def_entity_index": 0,
+          "handle": "382C",
+          "kind": "lwpolyline",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$is2",
+          "def_entity_index": 1,
+          "handle": "382D",
+          "kind": "lwpolyline",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$is2",
+          "def_entity_index": 2,
+          "handle": "382E",
+          "kind": "lwpolyline",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        }
+      ],
+      "judgment": "unreviewed",
+      "rule_id": null,
+      "note": ""
+    },
+    {
+      "signature": {
+        "dxf_name": "point",
+        "change": "deferred",
+        "context": "reason:def_entity kind unsupported by write.block.append_entity"
+      },
+      "count": 2,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$수전",
+          "def_entity_index": 31,
+          "handle": "6950",
+          "kind": "point",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$수전",
+          "def_entity_index": 32,
+          "handle": "6951",
+          "kind": "point",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        }
+      ],
+      "judgment": "unreviewed",
+      "rule_id": null,
+      "note": ""
+    },
+    {
+      "signature": {
+        "dxf_name": "polyline",
+        "change": "deferred",
+        "context": "reason:def_entity kind unsupported by write.block.append_entity"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$IW990",
+          "def_entity_index": 430,
+          "handle": "61A1",
+          "kind": "polyline",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        }
+      ],
+      "judgment": "unreviewed",
+      "rule_id": null,
+      "note": ""
+    },
+    {
+      "signature": {
+        "dxf_name": "spline",
+        "change": "deferred",
+        "context": "reason:def_entity kind unsupported by write.block.append_entity"
+      },
+      "count": 3973,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)$0$FU1",
+          "def_entity_index": 70,
+          "handle": "5898",
+          "kind": "spline",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$FU1",
+          "def_entity_index": 71,
+          "handle": "5899",
+          "kind": "spline",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        },
+        {
+          "block_name": "X-평면도(기본형)$0$FU1",
+          "def_entity_index": 72,
+          "handle": "589A",
+          "kind": "spline",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        }
+      ],
+      "judgment": "unreviewed",
+      "rule_id": null,
+      "note": ""
+    },
+    {
+      "signature": {
+        "dxf_name": "wipeout",
+        "change": "deferred",
+        "context": "reason:def_entity kind unsupported by write.block.append_entity"
+      },
+      "count": 5,
+      "examples": [
+        {
+          "block_name": "X-평면도(기본형)",
+          "def_entity_index": 163,
+          "handle": "46C",
+          "kind": "wipeout",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        },
+        {
+          "block_name": "X-평면도(기본형)",
+          "def_entity_index": 164,
+          "handle": "46D",
+          "kind": "wipeout",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        },
+        {
+          "block_name": "X-평면도(기본형)",
+          "def_entity_index": 167,
+          "handle": "470",
+          "kind": "wipeout",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        }
+      ],
+      "judgment": "unreviewed",
+      "rule_id": null,
+      "note": ""
+    }
+  ],
+  "naive_vs_smart": {
+    "naive_pass": true,
+    "smart_all_diff0": true,
+    "contrast_note": "Naive foil and smart diff0 gate both pass on this run."
+  },
+  "totals": {
+    "regen_attempted_count": 375,
+    "diff0_count": 375,
+    "modified_count": 0,
+    "removed_count": 0,
+    "added_count": 0,
+    "deferred_count": 7187,
+    "attempted_live_count": 252,
+    "pattern_count": 163,
+    "harmful_pattern_count": 154,
+    "harmless_pattern_count": 0,
+    "unreviewed_pattern_count": 9
+  }
+}

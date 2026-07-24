@@ -1,489 +1,464 @@
-﻿{
-    "timestamp":  "2026-07-15T22:08:57.9526520+09:00",
-    "schema":  "ariadne.autocad_router_status.v2",
-    "status":  "PARTIAL",
-    "router_home":  "C:\\Users\\Sohn\\autocad-sdk-router",
-    "python_exe":  "C:\\Users\\Sohn\\miniconda3\\python.exe",
-    "route_count":  11,
-    "available_count":  1,
-    "unavailable":  [
-                        "dxf_fast_secondary",
-                        "ifc_bim_semantic",
-                        "solid_brep_occ",
-                        "parametric_rebuild",
-                        "dwg_libredwg_sidecar",
-                        "mesh_analysis",
-                        "pointcloud_route",
-                        "geo_vector_route",
-                        "pdf_svg_vector_route",
-                        "raster_compare_route"
-                    ],
-    "native_modules":  {
-                           "status":  "PRESENT",
-                           "modules":  [
-                                           {
-                                               "path":  "C:\\Users\\Sohn\\autocad-sdk-router\\prebuilt\\2027\\Ariadne.AcadNativeDbx.dbx",
-                                               "exists":  true,
-                                               "bytes":  54784
-                                           },
-                                           {
-                                               "path":  "C:\\Users\\Sohn\\autocad-sdk-router\\prebuilt\\2027\\Ariadne.AcadNative.crx",
-                                               "exists":  true,
-                                               "bytes":  1008640
-                                           },
-                                           {
-                                               "path":  "C:\\Users\\Sohn\\autocad-sdk-router\\prebuilt\\2027\\Ariadne.AcadNative.arx",
-                                               "exists":  true,
-                                               "bytes":  1016832
-                                           }
-                                       ],
-                           "coreconsole_load":  {
-                                                    "status":  "NOT_RUN",
-                                                    "detail":  "Core Console native module load probe runs only for -Action status."
-                                                }
-                       },
-    "routes":  [
-                   {
-                       "route":  "dwg_truth_autocad",
-                       "priority":  10,
-                       "engine":  "native_objectarx_objectdbx_first",
-                       "available":  true,
-                       "can_do":  "DWG authoritative control plane: full official AutoCAD/ObjectARX/ObjectDBX SDK family access, native ARX/DBX-first DB/graphics/geometry/runtime/custom-object work, active-document write_original live edits, dynamic blocks, xdata/xrecords, layouts/plot/publish, xrefs, reactors, overrules, jigs, custom entities/object enablers, CoreConsole batch execution, and managed/AutoLISP/COM adapters where they are the correct host surface. RealDWG is excluded.",
-                       "entrypoint":  "tools/autocad-router.ps1 -Action run -Intent dwg_truth_autocad -InputPath \u003cdwg\u003e [-Script \u003cscr\u003e] [-WriteMode write_original|live_edit|read] [-HostMode auto|coreconsole|full_autocad] [-Operation \u003csdk-op\u003e]",
-                       "tools":  [
-                                     "Native ObjectARX/ObjectDBX modules",
-                                     "AutoCAD 2027 Core Console (accoreconsole.exe)",
-                                     "Full AutoCAD active-document host",
-                                     "Managed .NET host SDKs",
-                                     "AutoLISP/.scr command automation",
-                                     "COM/ActiveX where session-bound"
-                                 ],
-                       "required":  {
-                                        "name":  "accoreconsole",
-                                        "path":  "C:\\Program Files\\Autodesk\\AutoCAD 2027\\accoreconsole.exe",
-                                        "present":  true,
-                                        "kind":  "cli"
-                                    },
-                       "intents":  [
-                                       "dwg_truth_autocad",
-                                       "dwg",
-                                       "autocad",
-                                       "official_sdk",
-                                       "sdk_control",
-                                       "arx",
-                                       "objectarx",
-                                       "native_arx",
-                                       "dbx",
-                                       "objectdbx",
-                                       "write_original",
-                                       "live_autocad",
-                                       "active_document",
-                                       "dynamic_block",
-                                       "xdata",
-                                       "layout",
-                                       "xref",
-                                       "block",
-                                       "plot",
-                                       "publish",
-                                       "custom_entity",
-                                       "object_enabler",
-                                       "protocol_extension",
-                                       "overrule",
-                                       "reactor",
-                                       "jig",
-                                       "batch_extract"
-                                   ],
-                       "fallback_to":  [
-                                           "dxf_fast_secondary",
-                                           "dwg_libredwg_sidecar"
-                                       ]
-                   },
-                   {
-                       "route":  "dxf_fast_secondary",
-                       "priority":  20,
-                       "engine":  "python:ezdxf+shapely",
-                       "available":  false,
-                       "can_do":  "Read DXF without AutoCAD; entity inventory, layer enumeration, polyline/line analysis, 2D geometry compare/align via shapely.",
-                       "entrypoint":  "tools/run_route.py --route dxf_fast_secondary --input \u003cdxf\u003e",
-                       "tools":  [
-                                     "ezdxf",
-                                     "shapely"
-                                 ],
-                       "required":  [
-                                        {
-                                            "import":  "ezdxf",
-                                            "dist":  "ezdxf",
-                                            "importable":  true,
-                                            "version":  "1.4.4",
-                                            "note":  null,
-                                            "kind":  "module"
-                                        },
-                                        {
-                                            "import":  "shapely",
-                                            "dist":  "shapely",
-                                            "importable":  false,
-                                            "version":  null,
-                                            "note":  "import_error",
-                                            "kind":  "module"
-                                        }
-                                    ],
-                       "intents":  [
-                                       "dxf_fast_secondary",
-                                       "dxf",
-                                       "polyline",
-                                       "2d_geometry"
-                                   ],
-                       "fallback_to":  [
-                                           "dwg_truth_autocad"
-                                       ]
-                   },
-                   {
-                       "route":  "ifc_bim_semantic",
-                       "priority":  20,
-                       "engine":  "python:ifcopenshell",
-                       "available":  false,
-                       "can_do":  "IFC BIM semantics: wall/slab/space/storey/door/window counts, schema, property sets, GUID/placement reads.",
-                       "entrypoint":  "tools/run_route.py --route ifc_bim_semantic --input \u003cifc\u003e",
-                       "tools":  [
-                                     "ifcopenshell"
-                                 ],
-                       "required":  {
-                                        "import":  "ifcopenshell",
-                                        "dist":  "ifcopenshell",
-                                        "importable":  false,
-                                        "version":  null,
-                                        "note":  "import_error",
-                                        "kind":  "module"
-                                    },
-                       "intents":  [
-                                       "ifc_bim_semantic",
-                                       "ifc",
-                                       "bim",
-                                       "wall",
-                                       "storey",
-                                       "property_set"
-                                   ],
-                       "fallback_to":  [
-
-                                       ]
-                   },
-                   {
-                       "route":  "solid_brep_occ",
-                       "priority":  30,
-                       "engine":  "python:cadquery+OCP",
-                       "available":  false,
-                       "can_do":  "STEP/IGES/BRep solids: solid/face/edge topology, volume, bounding box, shape validation, boolean ops.",
-                       "entrypoint":  "tools/run_route.py --route solid_brep_occ --input \u003cstep|brep\u003e",
-                       "tools":  [
-                                     "cadquery",
-                                     "cadquery-ocp (OCP / OCCT 7.8)",
-                                     "pythonocc-core (optional alt binding)",
-                                     "freecadcmd (optional alt kernel)"
-                                 ],
-                       "required":  [
-                                        {
-                                            "import":  "OCP",
-                                            "dist":  "cadquery-ocp",
-                                            "importable":  false,
-                                            "version":  null,
-                                            "note":  "import_error",
-                                            "kind":  "module"
-                                        },
-                                        {
-                                            "import":  "cadquery",
-                                            "dist":  "cadquery",
-                                            "importable":  false,
-                                            "version":  null,
-                                            "note":  "import_error",
-                                            "kind":  "module"
-                                        }
-                                    ],
-                       "intents":  [
-                                       "solid_brep_occ",
-                                       "step",
-                                       "brep",
-                                       "solid",
-                                       "iges",
-                                       "topology",
-                                       "boolean"
-                                   ],
-                       "fallback_to":  [
-                                           "parametric_rebuild"
-                                       ]
-                   },
-                   {
-                       "route":  "parametric_rebuild",
-                       "priority":  40,
-                       "engine":  "python:cadquery",
-                       "available":  false,
-                       "can_do":  "Generate NEW CAD models from rules/IR in Python; export STEP/STL/SVG. The only generative route.",
-                       "entrypoint":  "tools/run_route.py --route parametric_rebuild --out \u003cfile.step|.stl|.svg\u003e [--p-len --p-wid --p-hgt]",
-                       "tools":  [
-                                     "cadquery",
-                                     "cadquery-ocp"
-                                 ],
-                       "required":  [
-                                        {
-                                            "import":  "cadquery",
-                                            "dist":  "cadquery",
-                                            "importable":  false,
-                                            "version":  null,
-                                            "note":  "import_error",
-                                            "kind":  "module"
-                                        },
-                                        {
-                                            "import":  "OCP",
-                                            "dist":  "cadquery-ocp",
-                                            "importable":  false,
-                                            "version":  null,
-                                            "note":  "import_error",
-                                            "kind":  "module"
-                                        }
-                                    ],
-                       "intents":  [
-                                       "parametric_rebuild",
-                                       "rebuild",
-                                       "generate",
-                                       "parametric",
-                                       "export_step"
-                                   ],
-                       "fallback_to":  [
-
-                                       ]
-                   },
-                   {
-                       "route":  "dwg_libredwg_sidecar",
-                       "priority":  50,
-                       "engine":  "cli:libredwg",
-                       "available":  false,
-                       "can_do":  "AutoCAD-free DWG cross-check (read DWG, convert DWG-\u003eDXF). GPL -\u003e SIDECAR ONLY, must NOT be linked/bundled into production.",
-                       "entrypoint":  "tools/autocad-router.ps1 -Action run -Intent libredwg -InputPath \u003cdwg\u003e",
-                       "tools":  [
-                                     "LibreDWG CLI (dwgread / dwg2dxf)"
-                                 ],
-                       "required":  {
-                                        "name":  "libredwg(dwgread/dwg2dxf)",
-                                        "path":  null,
-                                        "present":  false,
-                                        "kind":  "cli"
-                                    },
-                       "intents":  [
-                                       "dwg_libredwg_sidecar",
-                                       "libredwg",
-                                       "dwg_no_autocad",
-                                       "dwg_crosscheck"
-                                   ],
-                       "fallback_to":  [
-                                           "dwg_truth_autocad",
-                                           "dxf_fast_secondary"
-                                       ]
-                   },
-                   {
-                       "route":  "mesh_analysis",
-                       "priority":  30,
-                       "engine":  "python:trimesh+meshio+open3d",
-                       "available":  false,
-                       "can_do":  "STL/OBJ/PLY mesh: watertightness, volume, surface area, bounds, euler number, registration (open3d).",
-                       "entrypoint":  "tools/run_route.py --route mesh_analysis --input \u003cstl|obj|ply\u003e",
-                       "tools":  [
-                                     "trimesh",
-                                     "meshio",
-                                     "open3d"
-                                 ],
-                       "required":  [
-                                        {
-                                            "import":  "trimesh",
-                                            "dist":  "trimesh",
-                                            "importable":  false,
-                                            "version":  null,
-                                            "note":  "import_error",
-                                            "kind":  "module"
-                                        },
-                                        {
-                                            "import":  "meshio",
-                                            "dist":  "meshio",
-                                            "importable":  false,
-                                            "version":  null,
-                                            "note":  "import_error",
-                                            "kind":  "module"
-                                        }
-                                    ],
-                       "intents":  [
-                                       "mesh_analysis",
-                                       "mesh",
-                                       "stl",
-                                       "watertight",
-                                       "obj",
-                                       "ply"
-                                   ],
-                       "fallback_to":  [
-
-                                       ]
-                   },
-                   {
-                       "route":  "pointcloud_route",
-                       "priority":  30,
-                       "engine":  "python:open3d+laspy",
-                       "available":  false,
-                       "can_do":  "RCS/RCP/LAS/LAZ point cloud preprocessing: read, count, bbox, thinning, ICP, distance (open3d); LAS/LAZ headers (laspy).",
-                       "entrypoint":  "tools/run_route.py --route pointcloud_route --input \u003clas|laz|pcd|ply\u003e",
-                       "tools":  [
-                                     "open3d",
-                                     "laspy",
-                                     "PDAL (optional)"
-                                 ],
-                       "required":  [
-                                        {
-                                            "import":  "open3d",
-                                            "dist":  "open3d",
-                                            "importable":  false,
-                                            "version":  null,
-                                            "note":  "import_error",
-                                            "kind":  "module"
-                                        },
-                                        {
-                                            "import":  "laspy",
-                                            "dist":  "laspy",
-                                            "importable":  false,
-                                            "version":  null,
-                                            "note":  "import_error",
-                                            "kind":  "module"
-                                        }
-                                    ],
-                       "intents":  [
-                                       "pointcloud_route",
-                                       "pointcloud",
-                                       "las",
-                                       "laz",
-                                       "rcs",
-                                       "icp"
-                                   ],
-                       "fallback_to":  [
-
-                                       ]
-                   },
-                   {
-                       "route":  "geo_vector_route",
-                       "priority":  30,
-                       "engine":  "python:pyogrio(bundled GDAL)+pyproj",
-                       "available":  false,
-                       "can_do":  "DXF/DGN/SHP/GeoJSON/GPKG vector IO + conversion; CRS/coordinate-system reprojection (pyproj).",
-                       "entrypoint":  "tools/run_route.py --route geo_vector_route --input \u003cshp|geojson|dxf|dgn|gpkg\u003e",
-                       "tools":  [
-                                     "GDAL/OGR (native osgeo if present, else pyogrio bundled GDAL 3.11.4)",
-                                     "pyproj"
-                                 ],
-                       "required":  [
-                                        {
-                                            "import":  "pyogrio",
-                                            "dist":  "pyogrio",
-                                            "importable":  false,
-                                            "version":  null,
-                                            "note":  "import_error",
-                                            "kind":  "module"
-                                        },
-                                        {
-                                            "import":  "pyproj",
-                                            "dist":  "pyproj",
-                                            "importable":  false,
-                                            "version":  null,
-                                            "note":  "import_error",
-                                            "kind":  "module"
-                                        }
-                                    ],
-                       "intents":  [
-                                       "geo_vector_route",
-                                       "geo",
-                                       "shp",
-                                       "geojson",
-                                       "crs",
-                                       "dgn"
-                                   ],
-                       "fallback_to":  [
-
-                                       ]
-                   },
-                   {
-                       "route":  "pdf_svg_vector_route",
-                       "priority":  30,
-                       "engine":  "python:svgpathtools+svgelements (PyMuPDF optional)",
-                       "available":  false,
-                       "can_do":  "Extract vector paths from PDF/SVG references; path length/segment counts; CAD/PDF overlay compare.",
-                       "entrypoint":  "tools/run_route.py --route pdf_svg_vector_route --input \u003csvg|pdf\u003e",
-                       "tools":  [
-                                     "svgpathtools",
-                                     "svgelements",
-                                     "PyMuPDF/fitz (optional, currently shared not isolated)"
-                                 ],
-                       "required":  [
-                                        {
-                                            "import":  "svgpathtools",
-                                            "dist":  "svgpathtools",
-                                            "importable":  false,
-                                            "version":  null,
-                                            "note":  "import_error",
-                                            "kind":  "module"
-                                        },
-                                        {
-                                            "import":  "svgelements",
-                                            "dist":  "svgelements",
-                                            "importable":  false,
-                                            "version":  null,
-                                            "note":  "import_error",
-                                            "kind":  "module"
-                                        }
-                                    ],
-                       "intents":  [
-                                       "pdf_svg_vector_route",
-                                       "pdf",
-                                       "svg",
-                                       "vector_path",
-                                       "overlay"
-                                   ],
-                       "fallback_to":  [
-
-                                       ]
-                   },
-                   {
-                       "route":  "raster_compare_route",
-                       "priority":  30,
-                       "engine":  "python:opencv-headless+skimage",
-                       "available":  false,
-                       "can_do":  "Compare PDF/DWG render images: intensity stats, SSIM, alignment, feature matching, visual QA.",
-                       "entrypoint":  "tools/run_route.py --route raster_compare_route --input \u003cimg\u003e [--input2 \u003cimg\u003e]",
-                       "tools":  [
-                                     "opencv-python-headless",
-                                     "scikit-image"
-                                 ],
-                       "required":  [
-                                        {
-                                            "import":  "cv2",
-                                            "dist":  "opencv-python-headless",
-                                            "importable":  false,
-                                            "version":  null,
-                                            "note":  "import_error",
-                                            "kind":  "module"
-                                        },
-                                        {
-                                            "import":  "skimage",
-                                            "dist":  "scikit-image",
-                                            "importable":  false,
-                                            "version":  null,
-                                            "note":  "import_error",
-                                            "kind":  "module"
-                                        }
-                                    ],
-                       "intents":  [
-                                       "raster_compare_route",
-                                       "raster",
-                                       "image_compare",
-                                       "ssim",
-                                       "visual_qa",
-                                       "feature_match"
-                                   ],
-                       "fallback_to":  [
-
-                                       ]
-                   }
-               ]
+{
+  "timestamp": "2026-07-17T08:09:28.6936722+09:00",
+  "schema": "ariadne.autocad_router_status.v2",
+  "status": "ALL_AVAILABLE",
+  "router_home": "D:\\dev\\99_tools\\autocad-sdk-router",
+  "python_exe": "C:\\Users\\PAUL\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+  "route_count": 11,
+  "available_count": 11,
+  "unavailable": [],
+  "native_modules": {
+    "status": "PRESENT",
+    "modules": [
+      {
+        "path": "D:\\dev\\99_tools\\autocad-sdk-router\\prebuilt\\2027\\Ariadne.AcadNativeDbx.dbx",
+        "exists": true,
+        "bytes": 54272
+      },
+      {
+        "path": "D:\\dev\\99_tools\\autocad-sdk-router\\prebuilt\\2027\\Ariadne.AcadNative.crx",
+        "exists": true,
+        "bytes": 1082368
+      },
+      {
+        "path": "D:\\dev\\99_tools\\autocad-sdk-router\\prebuilt\\2027\\Ariadne.AcadNative.arx",
+        "exists": true,
+        "bytes": 1091072
+      }
+    ],
+    "coreconsole_load": {
+      "status": "NOT_RUN",
+      "detail": "Core Console native module load probe runs only for -Action status."
+    }
+  },
+  "routes": [
+    {
+      "route": "dwg_truth_autocad",
+      "priority": 10,
+      "engine": "native_objectarx_objectdbx_first",
+      "available": true,
+      "can_do": "DWG authoritative control plane: full official AutoCAD/ObjectARX/ObjectDBX SDK family access, native ARX/DBX-first DB/graphics/geometry/runtime/custom-object work, active-document write_original live edits, dynamic blocks, xdata/xrecords, layouts/plot/publish, xrefs, reactors, overrules, jigs, custom entities/object enablers, CoreConsole batch execution, and managed/AutoLISP/COM adapters where they are the correct host surface. RealDWG is excluded.",
+      "entrypoint": "tools/autocad-router.ps1 -Action run -Intent dwg_truth_autocad -InputPath <dwg> [-Script <scr>] [-WriteMode write_original|live_edit|read] [-HostMode auto|coreconsole|full_autocad] [-Operation <sdk-op>]",
+      "tools": [
+        "Native ObjectARX/ObjectDBX modules",
+        "AutoCAD 2027 Core Console (accoreconsole.exe)",
+        "Full AutoCAD active-document host",
+        "Managed .NET host SDKs",
+        "AutoLISP/.scr command automation",
+        "COM/ActiveX where session-bound"
+      ],
+      "required": {
+        "name": "accoreconsole",
+        "path": "C:\\Program Files\\Autodesk\\AutoCAD 2027\\accoreconsole.exe",
+        "present": true,
+        "kind": "cli"
+      },
+      "intents": [
+        "dwg_truth_autocad",
+        "dwg",
+        "autocad",
+        "official_sdk",
+        "sdk_control",
+        "arx",
+        "objectarx",
+        "native_arx",
+        "dbx",
+        "objectdbx",
+        "write_original",
+        "live_autocad",
+        "active_document",
+        "dynamic_block",
+        "xdata",
+        "layout",
+        "xref",
+        "block",
+        "plot",
+        "publish",
+        "custom_entity",
+        "object_enabler",
+        "protocol_extension",
+        "overrule",
+        "reactor",
+        "jig",
+        "batch_extract"
+      ],
+      "fallback_to": [
+        "dxf_fast_secondary",
+        "dwg_libredwg_sidecar"
+      ]
+    },
+    {
+      "route": "dxf_fast_secondary",
+      "priority": 20,
+      "engine": "python:ezdxf+shapely",
+      "available": true,
+      "can_do": "Read DXF without AutoCAD; entity inventory, layer enumeration, polyline/line analysis, 2D geometry compare/align via shapely.",
+      "entrypoint": "tools/run_route.py --route dxf_fast_secondary --input <dxf>",
+      "tools": [
+        "ezdxf",
+        "shapely"
+      ],
+      "required": [
+        {
+          "import": "ezdxf",
+          "dist": "ezdxf",
+          "importable": true,
+          "version": "1.4.3",
+          "note": null,
+          "kind": "module"
+        },
+        {
+          "import": "shapely",
+          "dist": "shapely",
+          "importable": true,
+          "version": "2.1.2",
+          "note": null,
+          "kind": "module"
+        }
+      ],
+      "intents": [
+        "dxf_fast_secondary",
+        "dxf",
+        "polyline",
+        "2d_geometry"
+      ],
+      "fallback_to": [
+        "dwg_truth_autocad"
+      ]
+    },
+    {
+      "route": "ifc_bim_semantic",
+      "priority": 20,
+      "engine": "python:ifcopenshell",
+      "available": true,
+      "can_do": "IFC BIM semantics: wall/slab/space/storey/door/window counts, schema, property sets, GUID/placement reads.",
+      "entrypoint": "tools/run_route.py --route ifc_bim_semantic --input <ifc>",
+      "tools": [
+        "ifcopenshell"
+      ],
+      "required": {
+        "import": "ifcopenshell",
+        "dist": "ifcopenshell",
+        "importable": true,
+        "version": "0.8.5",
+        "note": null,
+        "kind": "module"
+      },
+      "intents": [
+        "ifc_bim_semantic",
+        "ifc",
+        "bim",
+        "wall",
+        "storey",
+        "property_set"
+      ],
+      "fallback_to": []
+    },
+    {
+      "route": "solid_brep_occ",
+      "priority": 30,
+      "engine": "python:cadquery+OCP",
+      "available": true,
+      "can_do": "STEP/IGES/BRep solids: solid/face/edge topology, volume, bounding box, shape validation, boolean ops.",
+      "entrypoint": "tools/run_route.py --route solid_brep_occ --input <step|brep>",
+      "tools": [
+        "cadquery",
+        "cadquery-ocp (OCP / OCCT 7.8)",
+        "pythonocc-core (optional alt binding)",
+        "freecadcmd (optional alt kernel)"
+      ],
+      "required": [
+        {
+          "import": "OCP",
+          "dist": "cadquery-ocp",
+          "importable": true,
+          "version": "7.8.1.1.post1",
+          "note": null,
+          "kind": "module"
+        },
+        {
+          "import": "cadquery",
+          "dist": "cadquery",
+          "importable": true,
+          "version": "2.7.0",
+          "note": null,
+          "kind": "module"
+        }
+      ],
+      "intents": [
+        "solid_brep_occ",
+        "step",
+        "brep",
+        "solid",
+        "iges",
+        "topology",
+        "boolean"
+      ],
+      "fallback_to": [
+        "parametric_rebuild"
+      ]
+    },
+    {
+      "route": "parametric_rebuild",
+      "priority": 40,
+      "engine": "python:cadquery",
+      "available": true,
+      "can_do": "Generate NEW CAD models from rules/IR in Python; export STEP/STL/SVG. The only generative route.",
+      "entrypoint": "tools/run_route.py --route parametric_rebuild --out <file.step|.stl|.svg> [--p-len --p-wid --p-hgt]",
+      "tools": [
+        "cadquery",
+        "cadquery-ocp"
+      ],
+      "required": [
+        {
+          "import": "cadquery",
+          "dist": "cadquery",
+          "importable": true,
+          "version": "2.7.0",
+          "note": null,
+          "kind": "module"
+        },
+        {
+          "import": "OCP",
+          "dist": "cadquery-ocp",
+          "importable": true,
+          "version": "7.8.1.1.post1",
+          "note": null,
+          "kind": "module"
+        }
+      ],
+      "intents": [
+        "parametric_rebuild",
+        "rebuild",
+        "generate",
+        "parametric",
+        "export_step"
+      ],
+      "fallback_to": []
+    },
+    {
+      "route": "dwg_libredwg_sidecar",
+      "priority": 50,
+      "engine": "cli:libredwg",
+      "available": true,
+      "can_do": "AutoCAD-free DWG cross-check (read DWG, convert DWG->DXF). GPL -> SIDECAR ONLY, must NOT be linked/bundled into production.",
+      "entrypoint": "tools/autocad-router.ps1 -Action run -Intent libredwg -InputPath <dwg>",
+      "tools": [
+        "LibreDWG CLI (dwgread / dwg2dxf)"
+      ],
+      "required": {
+        "name": "libredwg(dwgread/dwg2dxf)",
+        "path": "D:\\dev\\99_tools\\libredwg\\bin\\dwgread.exe",
+        "present": true,
+        "kind": "cli"
+      },
+      "intents": [
+        "dwg_libredwg_sidecar",
+        "libredwg",
+        "dwg_no_autocad",
+        "dwg_crosscheck"
+      ],
+      "fallback_to": [
+        "dwg_truth_autocad",
+        "dxf_fast_secondary"
+      ]
+    },
+    {
+      "route": "mesh_analysis",
+      "priority": 30,
+      "engine": "python:trimesh+meshio+open3d",
+      "available": true,
+      "can_do": "STL/OBJ/PLY mesh: watertightness, volume, surface area, bounds, euler number, registration (open3d).",
+      "entrypoint": "tools/run_route.py --route mesh_analysis --input <stl|obj|ply>",
+      "tools": [
+        "trimesh",
+        "meshio",
+        "open3d"
+      ],
+      "required": [
+        {
+          "import": "trimesh",
+          "dist": "trimesh",
+          "importable": true,
+          "version": "4.12.2",
+          "note": null,
+          "kind": "module"
+        },
+        {
+          "import": "meshio",
+          "dist": "meshio",
+          "importable": true,
+          "version": "5.3.5",
+          "note": null,
+          "kind": "module"
+        }
+      ],
+      "intents": [
+        "mesh_analysis",
+        "mesh",
+        "stl",
+        "watertight",
+        "obj",
+        "ply"
+      ],
+      "fallback_to": []
+    },
+    {
+      "route": "pointcloud_route",
+      "priority": 30,
+      "engine": "python:open3d+laspy",
+      "available": true,
+      "can_do": "RCS/RCP/LAS/LAZ point cloud preprocessing: read, count, bbox, thinning, ICP, distance (open3d); LAS/LAZ headers (laspy).",
+      "entrypoint": "tools/run_route.py --route pointcloud_route --input <las|laz|pcd|ply>",
+      "tools": [
+        "open3d",
+        "laspy",
+        "PDAL (optional)"
+      ],
+      "required": [
+        {
+          "import": "open3d",
+          "dist": "open3d",
+          "importable": true,
+          "version": "0.19.0",
+          "note": null,
+          "kind": "module"
+        },
+        {
+          "import": "laspy",
+          "dist": "laspy",
+          "importable": true,
+          "version": "2.7.0",
+          "note": null,
+          "kind": "module"
+        }
+      ],
+      "intents": [
+        "pointcloud_route",
+        "pointcloud",
+        "las",
+        "laz",
+        "rcs",
+        "icp"
+      ],
+      "fallback_to": []
+    },
+    {
+      "route": "geo_vector_route",
+      "priority": 30,
+      "engine": "python:pyogrio(bundled GDAL)+pyproj",
+      "available": true,
+      "can_do": "DXF/DGN/SHP/GeoJSON/GPKG vector IO + conversion; CRS/coordinate-system reprojection (pyproj).",
+      "entrypoint": "tools/run_route.py --route geo_vector_route --input <shp|geojson|dxf|dgn|gpkg>",
+      "tools": [
+        "GDAL/OGR (native osgeo if present, else pyogrio bundled GDAL 3.11.4)",
+        "pyproj"
+      ],
+      "required": [
+        {
+          "import": "pyogrio",
+          "dist": "pyogrio",
+          "importable": true,
+          "version": "0.12.1",
+          "note": null,
+          "kind": "module"
+        },
+        {
+          "import": "pyproj",
+          "dist": "pyproj",
+          "importable": true,
+          "version": "3.7.2",
+          "note": null,
+          "kind": "module"
+        }
+      ],
+      "intents": [
+        "geo_vector_route",
+        "geo",
+        "shp",
+        "geojson",
+        "crs",
+        "dgn"
+      ],
+      "fallback_to": []
+    },
+    {
+      "route": "pdf_svg_vector_route",
+      "priority": 30,
+      "engine": "python:svgpathtools+svgelements (PyMuPDF optional)",
+      "available": true,
+      "can_do": "Extract vector paths from PDF/SVG references; path length/segment counts; CAD/PDF overlay compare.",
+      "entrypoint": "tools/run_route.py --route pdf_svg_vector_route --input <svg|pdf>",
+      "tools": [
+        "svgpathtools",
+        "svgelements",
+        "PyMuPDF/fitz (optional, currently shared not isolated)"
+      ],
+      "required": [
+        {
+          "import": "svgpathtools",
+          "dist": "svgpathtools",
+          "importable": true,
+          "version": "1.7.2",
+          "note": null,
+          "kind": "module"
+        },
+        {
+          "import": "svgelements",
+          "dist": "svgelements",
+          "importable": true,
+          "version": "1.9.6",
+          "note": null,
+          "kind": "module"
+        }
+      ],
+      "intents": [
+        "pdf_svg_vector_route",
+        "pdf",
+        "svg",
+        "vector_path",
+        "overlay"
+      ],
+      "fallback_to": []
+    },
+    {
+      "route": "raster_compare_route",
+      "priority": 30,
+      "engine": "python:opencv-headless+skimage",
+      "available": true,
+      "can_do": "Compare PDF/DWG render images: intensity stats, SSIM, alignment, feature matching, visual QA.",
+      "entrypoint": "tools/run_route.py --route raster_compare_route --input <img> [--input2 <img>]",
+      "tools": [
+        "opencv-python-headless",
+        "scikit-image"
+      ],
+      "required": [
+        {
+          "import": "cv2",
+          "dist": "opencv-python-headless",
+          "importable": true,
+          "version": "4.13.0.92",
+          "note": null,
+          "kind": "module"
+        },
+        {
+          "import": "skimage",
+          "dist": "scikit-image",
+          "importable": true,
+          "version": "0.26.0",
+          "note": null,
+          "kind": "module"
+        }
+      ],
+      "intents": [
+        "raster_compare_route",
+        "raster",
+        "image_compare",
+        "ssim",
+        "visual_qa",
+        "feature_match"
+      ],
+      "fallback_to": []
+    }
+  ]
 }

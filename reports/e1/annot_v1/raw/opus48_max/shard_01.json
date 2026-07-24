@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-d295-1",
+    "def": "*D295",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous horizontal linear dimension: 3280mm span, DIMDOT terminators + DEFPOINTS defpoints + measurement MTEXT on DIM; a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D295 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the DIMDOT arrowhead/tick symbol, and one MTEXT '\\A1;3280' whose value equals the geometric span (3280mm) between the extension-line handles (entities 8B52..8B5A). The two long parallel extension LINEs are vertical and the dimension LINE is horizontal, all on the annotation layer DIM.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 3280mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d296-2",
+    "def": "*D296",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous horizontal linear dimension: 3105mm span, DIMDOT terminators + DEFPOINTS defpoints + measurement MTEXT on DIM; a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D296 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the DIMDOT arrowhead/tick symbol, and one MTEXT '\\A1;3105' whose value equals the geometric span (3105mm) between the extension-line handles (entities 8B5B..8B63). The two long parallel extension LINEs are vertical and the dimension LINE is horizontal, all on the annotation layer DIM.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 3105mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d297-3",
+    "def": "*D297",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous horizontal linear dimension: 4770mm span, DIMDOT terminators + DEFPOINTS defpoints + measurement MTEXT on DIM; a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D297 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the DIMDOT arrowhead/tick symbol, and one MTEXT '\\A1;4770' whose value equals the geometric span (4770mm) between the extension-line handles (entities 8B64..8B6C). The two long parallel extension LINEs are vertical and the dimension LINE is horizontal, all on the annotation layer DIM.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 4770mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d298-4",
+    "def": "*D298",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous horizontal linear dimension: 3945mm span, DIMDOT terminators + DEFPOINTS defpoints + measurement MTEXT on DIM; a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D298 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the DIMDOT arrowhead/tick symbol, and one MTEXT '\\A1;3945' whose value equals the geometric span (3945mm) between the extension-line handles (entities 8B6D..8B75). The two long parallel extension LINEs are vertical and the dimension LINE is horizontal, all on the annotation layer DIM.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 3945mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d299-5",
+    "def": "*D299",
+    "role": "치수캐시",
+    "wall_likelihood": 0.04,
+    "wall_line_handles": [],
+    "notes": "Anonymous horizontal overall/chain linear dimension: 15100mm span, DIMDOT terminators + DEFPOINTS defpoints + measurement MTEXT on DIM; a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D299 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the DIMDOT arrowhead/tick symbol, and one MTEXT '\\A1;15100' whose value equals the geometric span (15100mm) between the extension-line handles (entities 8B76..8B7E). The two long parallel extension LINEs are vertical and the dimension LINE is horizontal, all on the annotation layer DIM. Its bbox drops to a lower offset row than the segment dimensions above it, the hallmark of the summing/overall run of a dimension chain.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 15100mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d300-6",
+    "def": "*D300",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous horizontal axis-grid linear dimension: 70mm span, _ArchTick terminators + DEFPOINTS defpoints + measurement MTEXT on AA-AXIS-DIM7 (small span, terminators flipped outside); a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D300 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the _ArchTick arrowhead/tick symbol, and one MTEXT '\\A1;70' whose value equals the geometric span (70mm) between the extension-line handles (entities 8B7F..8B89). The two long parallel extension LINEs are vertical and the dimension LINE is horizontal, all on the annotation layer AA-AXIS-DIM7. Because the span is tiny the block carries 5 LINEs — the dimension line plus two short outboard stubs so the terminators sit outside the extension lines.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges. Axis-grid dimensions on AA-AXIS-* layers follow the same rule.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 70mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d301-7",
+    "def": "*D301",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous horizontal axis-grid linear dimension: 3000mm span, _ArchTick terminators + DEFPOINTS defpoints + measurement MTEXT on AA-AXIS-DIM7; a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D301 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the _ArchTick arrowhead/tick symbol, and one MTEXT '\\A1;3000' whose value equals the geometric span (3000mm) between the extension-line handles (entities 8B8A..8B92). The two long parallel extension LINEs are vertical and the dimension LINE is horizontal, all on the annotation layer AA-AXIS-DIM7.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges. Axis-grid dimensions on AA-AXIS-* layers follow the same rule.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 3000mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d302-8",
+    "def": "*D302",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous horizontal axis-grid linear dimension: 210mm span, _ArchTick terminators + DEFPOINTS defpoints + measurement MTEXT on AA-AXIS-DIM7 (small span, terminators flipped outside); a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D302 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the _ArchTick arrowhead/tick symbol, and one MTEXT '\\A1;210' whose value equals the geometric span (210mm) between the extension-line handles (entities 8B93..8B9D). The two long parallel extension LINEs are vertical and the dimension LINE is horizontal, all on the annotation layer AA-AXIS-DIM7. Because the span is tiny the block carries 5 LINEs — the dimension line plus two short outboard stubs so the terminators sit outside the extension lines.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges. Axis-grid dimensions on AA-AXIS-* layers follow the same rule.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 210mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d303-9",
+    "def": "*D303",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous horizontal linear dimension: 70mm span, _ArchTick terminators + DEFPOINTS defpoints + measurement MTEXT on DIM (small span, terminators flipped outside); a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D303 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the _ArchTick arrowhead/tick symbol, and one MTEXT '\\A1;70' whose value equals the geometric span (70mm) between the extension-line handles (entities 8B9E..8BA8). The two long parallel extension LINEs are vertical and the dimension LINE is horizontal, all on the annotation layer DIM. Because the span is tiny the block carries 5 LINEs — the dimension line plus two short outboard stubs so the terminators sit outside the extension lines.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 70mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d304-10",
+    "def": "*D304",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous horizontal linear dimension: 2900mm span, _ArchTick terminators + DEFPOINTS defpoints + measurement MTEXT on DIM; a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D304 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the _ArchTick arrowhead/tick symbol, and one MTEXT '\\A1;2900' whose value equals the geometric span (2900mm) between the extension-line handles (entities 8BA9..8BB1). The two long parallel extension LINEs are vertical and the dimension LINE is horizontal, all on the annotation layer DIM.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 2900mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d305-11",
+    "def": "*D305",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous horizontal linear dimension: 135mm span, _ArchTick terminators + DEFPOINTS defpoints + measurement MTEXT on DIM (small span); a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D305 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the _ArchTick arrowhead/tick symbol, and one MTEXT '\\A1;135' whose value equals the geometric span (135mm) between the extension-line handles (entities 8BB2..8BBA). The two long parallel extension LINEs are vertical and the dimension LINE is horizontal, all on the annotation layer DIM.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 135mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d306-12",
+    "def": "*D306",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous horizontal linear dimension: 135mm span, _ArchTick terminators + DEFPOINTS defpoints + measurement MTEXT on DIM (small span); a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D306 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the _ArchTick arrowhead/tick symbol, and one MTEXT '\\A1;135' whose value equals the geometric span (135mm) between the extension-line handles (entities 8BBB..8BC3). The two long parallel extension LINEs are vertical and the dimension LINE is horizontal, all on the annotation layer DIM.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 135mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d307-13",
+    "def": "*D307",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous horizontal linear dimension: 4500mm span, _ArchTick terminators + DEFPOINTS defpoints + measurement MTEXT on DIM; a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D307 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the _ArchTick arrowhead/tick symbol, and one MTEXT '\\A1;4500' whose value equals the geometric span (4500mm) between the extension-line handles (entities 8BC4..8BCC). The two long parallel extension LINEs are vertical and the dimension LINE is horizontal, all on the annotation layer DIM.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 4500mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d308-14",
+    "def": "*D308",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous horizontal linear dimension: 135mm span, _ArchTick terminators + DEFPOINTS defpoints + measurement MTEXT on DIM (small span); a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D308 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the _ArchTick arrowhead/tick symbol, and one MTEXT '\\A1;135' whose value equals the geometric span (135mm) between the extension-line handles (entities 8BCD..8BD5). The two long parallel extension LINEs are vertical and the dimension LINE is horizontal, all on the annotation layer DIM.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 135mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d309-15",
+    "def": "*D309",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous horizontal linear dimension: 135mm span, _ArchTick terminators + DEFPOINTS defpoints + measurement MTEXT on DIM (small span); a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D309 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the _ArchTick arrowhead/tick symbol, and one MTEXT '\\A1;135' whose value equals the geometric span (135mm) between the extension-line handles (entities 8BD6..8BDE). The two long parallel extension LINEs are vertical and the dimension LINE is horizontal, all on the annotation layer DIM.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 135mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d310-16",
+    "def": "*D310",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous horizontal linear dimension: 3600mm span, _ArchTick terminators + DEFPOINTS defpoints + measurement MTEXT on DIM; a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D310 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the _ArchTick arrowhead/tick symbol, and one MTEXT '\\A1;3600' whose value equals the geometric span (3600mm) between the extension-line handles (entities 8BDF..8BE7). The two long parallel extension LINEs are vertical and the dimension LINE is horizontal, all on the annotation layer DIM.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 3600mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d311-17",
+    "def": "*D311",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous horizontal linear dimension: 210mm span, _ArchTick terminators + DEFPOINTS defpoints + measurement MTEXT on DIM (small span, terminators flipped outside); a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D311 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the _ArchTick arrowhead/tick symbol, and one MTEXT '\\A1;210' whose value equals the geometric span (210mm) between the extension-line handles (entities 8BE8..8BF2). The two long parallel extension LINEs are vertical and the dimension LINE is horizontal, all on the annotation layer DIM. Because the span is tiny the block carries 5 LINEs — the dimension line plus two short outboard stubs so the terminators sit outside the extension lines.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 210mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d312-18",
+    "def": "*D312",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous vertical linear dimension: 2665mm span, DIMDOT terminators + DEFPOINTS defpoints + measurement MTEXT on DIM; a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D312 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the DIMDOT arrowhead/tick symbol, and one MTEXT '\\A1;2665' whose value equals the geometric span (2665mm) between the extension-line handles (entities 8BF3..8BFB). The two long parallel extension LINEs are horizontal and the dimension LINE is vertical, all on the annotation layer DIM.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 2665mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d313-19",
+    "def": "*D313",
+    "role": "치수캐시",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Anonymous vertical linear dimension: 2350mm span, DIMDOT terminators + DEFPOINTS defpoints + measurement MTEXT on DIM; a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D313 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the DIMDOT arrowhead/tick symbol, and one MTEXT '\\A1;2350' whose value equals the geometric span (2350mm) between the extension-line handles (entities 8BFC..8C04). The two long parallel extension LINEs are horizontal and the dimension LINE is vertical, all on the annotation layer DIM.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 2350mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  },
+  {
+    "unit_id": "defannot-d314-20",
+    "def": "*D314",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous vertical linear dimension: 780mm span, DIMDOT terminators + DEFPOINTS defpoints + measurement MTEXT on DIM; a dimension cache, contains no wall geometry.",
+    "rationale": {
+      "evidence": "Block *D314 carries the exact AutoCAD anonymous-dimension signature: 3 POINTs on DEFPOINTS (non-plotting dimension defpoints), 2 INSERTs of the DIMDOT arrowhead/tick symbol, and one MTEXT '\\A1;780' whose value equals the geometric span (780mm) between the extension-line handles (entities 8C05..8C0D). The two long parallel extension LINEs are horizontal and the dimension LINE is vertical, all on the annotation layer DIM.",
+      "rule": "A '*D' anonymous block whose members are DEFPOINTS defpoints + dimension-terminator INSERTs (DIMDOT/_ArchTick) + a '\\A1;' measurement MTEXT is the cached graphics of a dimension entity, so it is a dimension cache and its extension/dimension LINEs are annotation, never physical wall edges.",
+      "counterfactual": "Had these LINEs sat on an architectural wall layer (e.g. A-WALL) as offset parallel pairs WITHOUT the DEFPOINTS defpoints, terminator INSERTs and measurement MTEXT, the block would read as plan/wall geometry and both role and wall_likelihood would flip upward; the DIM/AXIS layer plus the '\\A1;' value here rules that out.",
+      "uncertainty": "The projection cannot reveal WHICH physical edge this dimension measures — whether the 780mm spans a wall thickness, an opening, or an axis gap — because an anonymous dimension block caches only its own graphics, not a back-reference to the host object it annotates."
+    }
+  }
+]

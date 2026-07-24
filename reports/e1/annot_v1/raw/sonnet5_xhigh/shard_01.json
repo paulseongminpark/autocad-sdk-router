@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-d295-1",
+    "def": "*D295",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block; MTEXT '3280' equals the exact span between the two DIM-layer extension LINEs.",
+    "rationale": {
+      "evidence": "The block name '*D295' carries AutoCAD's reserved anonymous-dimension prefix. LINEs 8B52 and 8B53 sit on layer DIM at x=44248.83 and x=47528.83, a separation of exactly 3280 units, and MTEXT 8B57 reads '3280', matching that separation exactly. Two DIMDOT INSERTs (8B55, 8B56) act as terminator dots at the line ends, and three DEFPOINTS POINTs (8B58-8B5A) complete the standard dimension-definition-point set.",
+      "rule": "A block whose name begins with '*D', paired with a DEFPOINTS point cluster and an MTEXT whose numeric value equals the perpendicular distance between two flanking extension LINEs, is AutoCAD's auto-generated anonymous dimension block, not modeled building geometry, regardless of discipline or drawing.",
+      "counterfactual": "If the MTEXT value did not equal the LINE separation, or the layer were an architectural wall layer (e.g. A-WALL) rather than DIM, the dimension-block classification would be undermined.",
+      "uncertainty": "The projection does not show which real-world feature (wall face, axis grid, opening) this dimension measures, nor where in the drawing this block is inserted."
+    }
+  },
+  {
+    "unit_id": "defannot-d296-2",
+    "def": "*D296",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block; MTEXT '3105' equals the exact span between the two DIM-layer extension LINEs.",
+    "rationale": {
+      "evidence": "LINEs 8B5B and 8B5C on layer DIM run at x=47528.83 and x=50633.83, a 3105-unit separation, and MTEXT 8B60 reads '3105', an exact match. DIMDOT INSERTs 8B5E/8B5F terminate the dimension line, and three DEFPOINTS POINTs (8B61-8B63) round out the fixed dimension anatomy, identical in structure to the adjoining *D295.",
+      "rule": "Same transferable rule as other *D-prefixed blocks in this shard: name prefix + DEFPOINTS points + MTEXT-equals-LINE-gap is the signature of an auto-generated dimension object, never a drawn wall.",
+      "counterfactual": "Absent the '*D' name prefix or with the MTEXT value diverging from the LINE separation, this would need re-examination as possibly non-dimension geometry.",
+      "uncertainty": "It is unclear from the projection which physical span (e.g. a column grid bay) 3105 units corresponds to, since no adjacent wall/grid layer data is included."
+    }
+  },
+  {
+    "unit_id": "defannot-d297-3",
+    "def": "*D297",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block; MTEXT '4770' equals the exact span between the two DIM-layer extension LINEs.",
+    "rationale": {
+      "evidence": "LINEs 8B64 and 8B65 on layer DIM sit at x=50633.83 and x=55403.83, a 4770-unit gap, and MTEXT 8B69 reads '4770', matching exactly. DIMDOT INSERTs 8B67/8B68 and three DEFPOINTS POINTs (8B6A-8B6C) complete the same nine-entity dimension anatomy seen in *D295/*D296.",
+      "rule": "Name prefix '*D' plus DEFPOINTS points plus an MTEXT value equal to the flanking LINE separation identifies an anonymous AutoCAD dimension block irrespective of the specific numeric span involved.",
+      "counterfactual": "If this LINE pair instead sat on a wall or partition layer with no matching MTEXT value, it would look like real wall geometry rather than a dimension.",
+      "uncertainty": "The projection does not reveal what building feature spans 4770 units here, nor whether this dimension is part of a larger chain beyond what is shown."
+    }
+  },
+  {
+    "unit_id": "defannot-d298-4",
+    "def": "*D298",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block; MTEXT '3945' equals the exact span between the two DIM-layer extension LINEs.",
+    "rationale": {
+      "evidence": "LINEs 8B6D and 8B6E on layer DIM run at x=55403.83 and x=59348.83, a 3945-unit gap; MTEXT 8B72 reads '3945', an exact match. DIMDOT INSERTs 8B70/8B71 and three DEFPOINTS POINTs (8B73-8B75) complete the anatomy, and this block's start x (55403.83) equals *D297's end x, showing it continues the same horizontal dimension chain.",
+      "rule": "Chained *D dimension blocks whose endpoints abut (this block's start = the previous block's end) form a contiguous linear-dimension run; each individual block is still identified by the *D-prefix + DEFPOINTS + matching-MTEXT signature.",
+      "counterfactual": "If the endpoints did not abut the neighboring block, this would just be an isolated dimension rather than part of a chain, though the core dimension classification would be unaffected.",
+      "uncertainty": "Whether this chain segment corresponds to a room, bay, or facade module cannot be determined without the surrounding model-space geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d299-5",
+    "def": "*D299",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block; MTEXT '15100' is the overall span, exactly the sum of *D295-*D298's sub-spans.",
+    "rationale": {
+      "evidence": "LINEs 8B76 and 8B77 on layer DIM run at x=44248.83 and x=59348.83, a 15100-unit gap, and MTEXT 8B7B reads '15100'. This exactly equals 3280+3105+4770+3945, the sum of *D295 through *D298, indicating this block is the overall/master dimension spanning the same run as the preceding four sub-dimensions combined.",
+      "rule": "An anonymous *D dimension block whose MTEXT value equals the sum of several adjacent *D blocks' values is an overall dimension in a chain-plus-overall annotation scheme; the sum relationship itself is strong corroborating evidence of the dimension role, on top of the standard prefix/DEFPOINTS/MTEXT signature.",
+      "counterfactual": "If the value 15100 did not equal the sum of the neighboring sub-dimensions, it would still likely be a dimension block from the *D prefix and anatomy alone, just not demonstrably an 'overall' one.",
+      "uncertainty": "The projection does not show whether this overall dimension sits on a different offset row than the sub-dimensions in the actual drawing, only that they share the same x-extent."
+    }
+  },
+  {
+    "unit_id": "defannot-d300-6",
+    "def": "*D300",
+    "role": "치수캐시",
+    "wall_likelihood": 0.06,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block on AA-AXIS-DIM7 (gridline) layer; MTEXT '70' equals a small extension-line gap, plus two extra jog/tick LINEs.",
+    "rationale": {
+      "evidence": "LINEs 8B7F (x=47528.83) and 8B80 (x=47458.83) on layer AA-AXIS-DIM7 are 70 units apart, matching MTEXT 8B83's '70' exactly. The extra entity_count (11 vs the usual 9) comes from two short jog LINEs (8B81, 8B82, 8B84) forming tick marks at the ends, plus _ArchTick INSERTs (8B85, 8B86) as terminators, and three DEFPOINTS POINTs (8B87-8B89).",
+      "rule": "The *D-prefix/DEFPOINTS/matching-MTEXT signature holds even when the layer is a gridline-dimension layer (AA-AXIS-DIM7) rather than DIM, and even when extra jog LINEs inflate the entity count for tick-mark rendering.",
+      "counterfactual": "Because the two flanking LINEs are only 70 units apart, a viewer ignoring layer and MTEXT context could mistake this narrow LINE pair for a thin wall's two face lines; the DIM-family layer, tick INSERTs, and matching MTEXT rule that out.",
+      "uncertainty": "It cannot be determined from this projection whether the 70-unit value corresponds to a structural grid offset, a wall thickness being called out, or another architectural increment."
+    }
+  },
+  {
+    "unit_id": "defannot-d301-7",
+    "def": "*D301",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block on AA-AXIS-DIM7 layer; MTEXT '3000' equals the exact extension-line span.",
+    "rationale": {
+      "evidence": "LINEs 8B8A (x=44458.83) and 8B8B (x=47458.83) on layer AA-AXIS-DIM7 are 3000 units apart, and MTEXT 8B8F reads '3000', an exact match. _ArchTick INSERTs (8B8D, 8B8E) terminate the line, and three DEFPOINTS POINTs (8B90-8B92) complete the standard nine-entity dimension anatomy.",
+      "rule": "Same *D-prefix + DEFPOINTS + MTEXT-equals-gap signature applies on the AA-AXIS-DIM7 gridline-dimension layer as on the DIM layer; the layer name identifies the annotation subsystem, not a different entity role.",
+      "counterfactual": "If the terminators were DIMDOT INSERTs instead of _ArchTick, this would simply indicate a different dimension style preference, not a different role.",
+      "uncertainty": "Whether 3000 units marks a column-grid bay or a wall-to-wall clear span cannot be resolved from the projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d302-8",
+    "def": "*D302",
+    "role": "치수캐시",
+    "wall_likelihood": 0.06,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block on AA-AXIS-DIM7 layer; MTEXT '210' equals a small extension-line gap, completing the 70+3000+210=3280 breakdown of *D295's span.",
+    "rationale": {
+      "evidence": "LINEs 8B93 (x=44458.83) and 8B94 (x=44248.83) on layer AA-AXIS-DIM7 are 210 units apart, matching MTEXT 8B9A's '210'. Notably, 70 (*D300) + 3000 (*D301) + 210 (*D302) = 3280, exactly *D295's overall span, showing this AA-AXIS-DIM7 trio is a gridline-based breakdown of the same run *D295 dimensions as a single span on the DIM layer.",
+      "rule": "When several *D blocks on a secondary annotation layer sum to the same value as one *D block on a primary layer covering the same extent, they represent parallel dimensioning schemes (overall vs. gridline breakdown) of a single physical span — a useful transferable check for validating dimension-chain consistency.",
+      "counterfactual": "A LINE pair 210 units apart, absent the DIM-family layer and matching MTEXT, could visually resemble a wall's two face lines; here the layer, tick INSERTs, and the chain-sum consistency rule that out.",
+      "uncertainty": "The projection does not indicate which physical feature (e.g. a column or pier) the 210-unit increment isolates within the larger 3280-unit run."
+    }
+  },
+  {
+    "unit_id": "defannot-d303-9",
+    "def": "*D303",
+    "role": "치수캐시",
+    "wall_likelihood": 0.06,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block on DIM layer with jog ticks; MTEXT '70' equals a small extension-line gap.",
+    "rationale": {
+      "evidence": "LINEs 8B9E (x=47528.83) and 8B9F (x=47598.83) on layer DIM are 70 units apart, matching MTEXT 8BA2's '70'. Two short jog LINEs (8BA0, 8BA1, 8BA3) form tick marks and _ArchTick INSERTs (8BA4, 8BA5) terminate the ends, with three DEFPOINTS POINTs (8BA6-8BA8), giving the same 11-entity structure seen in *D300.",
+      "rule": "A small (e.g. sub-300-unit) MTEXT value on a *D-prefixed, DEFPOINTS-backed dimension block is still a dimension, not a wall, even though the numeric magnitude coincides with typical wall-thickness values.",
+      "counterfactual": "If this 70-unit gap sat on a wall layer with parallel LINEs lacking any MTEXT or tick INSERTs, it would read as an actual wall-thickness pair rather than a dimension.",
+      "uncertainty": "Whether the 70-unit value is annotating a wall thickness, a reveal, or a structural offset is not determinable from the projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d304-10",
+    "def": "*D304",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block on DIM layer; MTEXT '2900' equals the exact extension-line span.",
+    "rationale": {
+      "evidence": "LINEs 8BA9 (x=47598.83) and 8BAA (x=50498.83) on layer DIM are 2900 units apart, and MTEXT 8BAE reads '2900', an exact match. _ArchTick INSERTs (8BAC, 8BAD) terminate the line and three DEFPOINTS POINTs (8BAF-8BB1) complete the standard nine-entity anatomy; this block's start x equals *D303's end x, continuing the same chain.",
+      "rule": "Contiguous *D blocks whose start/end x-coordinates abut form one continuous dimension chain along the DIM layer, each independently verifiable via the prefix/DEFPOINTS/matching-MTEXT signature.",
+      "counterfactual": "If the endpoints did not abut *D303's, this would be a standalone dimension rather than a chain continuation, without changing its dimension classification.",
+      "uncertainty": "The physical feature spanning 2900 units cannot be identified from the projection without the surrounding drawing context."
+    }
+  },
+  {
+    "unit_id": "defannot-d305-11",
+    "def": "*D305",
+    "role": "치수캐시",
+    "wall_likelihood": 0.06,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block on DIM layer; MTEXT '135' equals a small extension-line gap.",
+    "rationale": {
+      "evidence": "LINEs 8BB2 (x=50498.83) and 8BB3 (x=50633.83) on layer DIM are 135 units apart, matching MTEXT 8BB5's '135'. _ArchTick INSERTs (8BB6, 8BB7) and three DEFPOINTS POINTs (8BB8-8BBA) complete the standard nine-entity anatomy, with entity order here showing MTEXT before the INSERTs, a harmless ordering variation within the same schema.",
+      "rule": "Entity listing order within a *D block (MTEXT before or after the terminator INSERTs) does not affect the classification; the prefix/DEFPOINTS/matching-MTEXT signature is order-independent.",
+      "counterfactual": "135 units is in the range of a typical partition-wall thickness, so absent the DIM layer and matching MTEXT, a naive reading could mistake this LINE pair for a wall's two faces.",
+      "uncertainty": "Whether 135 units here annotates a partition thickness, a jamb reveal, or another small architectural increment cannot be settled from the projection."
+    }
+  },
+  {
+    "unit_id": "defannot-d306-12",
+    "def": "*D306",
+    "role": "치수캐시",
+    "wall_likelihood": 0.06,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block on DIM layer; MTEXT '135' equals a small extension-line gap, chained after *D305.",
+    "rationale": {
+      "evidence": "LINEs 8BBB (x=50633.83) and 8BBC (x=50768.83) on layer DIM are 135 units apart, matching MTEXT 8BBE's '135'. This block's start x (50633.83) equals *D305's end x, showing a second consecutive 135-unit segment in the chain. _ArchTick INSERTs (8BBF, 8BC0) and three DEFPOINTS POINTs (8BC1-8BC3) complete the anatomy.",
+      "rule": "Repeated identical MTEXT values (135, 135) across adjacent chained *D blocks typically indicate repeated identical structural bays or symmetric elements, still each individually verified as a dimension via the prefix/DEFPOINTS/matching-MTEXT signature.",
+      "counterfactual": "If the two adjacent 135-unit blocks (*D305, *D306) had different values despite abutting endpoints, that would suggest asymmetry in the underlying structure rather than a data anomaly.",
+      "uncertainty": "The projection does not indicate why two consecutive 135-unit dimensions exist back-to-back, e.g. whether they flank a single narrow element or are independent bays."
+    }
+  },
+  {
+    "unit_id": "defannot-d307-13",
+    "def": "*D307",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block on DIM layer; MTEXT '4500' equals the exact extension-line span, chained after *D306.",
+    "rationale": {
+      "evidence": "LINEs 8BC4 (x=50768.83) and 8BC5 (x=55268.83) on layer DIM are 4500 units apart, matching MTEXT 8BC9's '4500' exactly. _ArchTick INSERTs (8BC7, 8BC8) and three DEFPOINTS POINTs (8BCA-8BCC) complete the standard nine-entity anatomy; the start x equals *D306's end x, continuing the chain.",
+      "rule": "Long-span *D blocks (thousands of units) within the same chain as short-span *D blocks (hundreds of units) are equally dimensions; magnitude alone is not diagnostic, only the prefix/DEFPOINTS/matching-MTEXT signature is.",
+      "counterfactual": "If this 4500-unit LINE pair sat on a wall layer without a matching MTEXT, it would be implausible as a single wall face given the length, but the DIM layer and MTEXT match already confirm it as a dimension.",
+      "uncertainty": "Which room or bay this 4500-unit span corresponds to is not recoverable from the projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d308-14",
+    "def": "*D308",
+    "role": "치수캐시",
+    "wall_likelihood": 0.06,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block on DIM layer; MTEXT '135' equals a small extension-line gap, chained after *D307.",
+    "rationale": {
+      "evidence": "LINEs 8BCD (x=55268.83) and 8BCE (x=55403.83) on layer DIM are 135 units apart, matching MTEXT 8BD0's '135'. _ArchTick INSERTs (8BD1, 8BD2) and three DEFPOINTS POINTs (8BD3-8BD5) complete the anatomy; the start x equals *D307's end x, continuing the chain, and the 135-unit value recurs a third time in this shard (after *D305, *D306).",
+      "rule": "A recurring exact MTEXT value (135) across multiple non-adjacent *D blocks in the same drawing suggests a repeated standard element (e.g. a fixed partition thickness or mullion width); each instance is still verified individually as a dimension via its own LINE-gap/MTEXT match.",
+      "counterfactual": "If the recurring 135-unit value instead varied slightly (e.g. 134, 136) across instances, that would suggest independent measured features rather than one repeated standard dimension.",
+      "uncertainty": "Whether 135 is a project-standard constant (e.g. a mullion or partition module) cannot be confirmed without cross-referencing other parts of the drawing not included in this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-d309-15",
+    "def": "*D309",
+    "role": "치수캐시",
+    "wall_likelihood": 0.06,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block on DIM layer; MTEXT '135' equals a small extension-line gap, chained after *D308.",
+    "rationale": {
+      "evidence": "LINEs 8BD6 (x=55403.83) and 8BD7 (x=55538.83) on layer DIM are 135 units apart, matching MTEXT 8BD9's '135'. _ArchTick INSERTs (8BDA, 8BDB) and three DEFPOINTS POINTs (8BDC-8BDE) complete the anatomy; the start x equals *D308's end x, continuing the chain, making this the fourth 135-unit dimension in the shard.",
+      "rule": "Same prefix/DEFPOINTS/matching-MTEXT signature applies regardless of how many times an identical value repeats across the shard; repetition strengthens the inference of a standard module but is not required for the base classification.",
+      "counterfactual": "If the LINE pair here were on a different, non-DIM-family layer despite the same 135-unit gap, the dimension classification would need re-examination.",
+      "uncertainty": "The projection alone cannot confirm whether all four 135-unit dimensions in this shard reference the same type of physical element."
+    }
+  },
+  {
+    "unit_id": "defannot-d310-16",
+    "def": "*D310",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block on DIM layer; MTEXT '3600' equals the exact extension-line span, chained after *D309.",
+    "rationale": {
+      "evidence": "LINEs 8BDF (x=55538.83) and 8BE0 (x=59138.83) on layer DIM are 3600 units apart, matching MTEXT 8BE4's '3600' exactly. DIMDOT-style INSERTs (8BE2, 8BE3, labeled '_ArchTick' per the projection) and three DEFPOINTS POINTs (8BE5-8BE7) complete the standard nine-entity anatomy; the start x equals *D309's end x, continuing the chain.",
+      "rule": "The same *D-prefix/DEFPOINTS/matching-MTEXT signature holds for this large-span chain member exactly as for its small-span neighbors, confirming the chain is internally consistent dimension annotation throughout.",
+      "counterfactual": "A 3600-unit gap between two LINEs without any matching MTEXT nearby would be too long to plausibly read as a wall face pair, but here the MTEXT match is the decisive evidence regardless of length.",
+      "uncertainty": "The specific room or facade bay this 3600-unit span measures is not shown in the projection."
+    }
+  },
+  {
+    "unit_id": "defannot-d311-17",
+    "def": "*D311",
+    "role": "치수캐시",
+    "wall_likelihood": 0.06,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block on DIM layer with jog ticks; MTEXT '210' equals a small extension-line gap, closing the D303-D311 sub-chain.",
+    "rationale": {
+      "evidence": "LINEs 8BE8 (x=59138.83) and 8BE9 (x=59348.83) on layer DIM are 210 units apart, matching MTEXT 8BEF's '210'. Two short jog LINEs (8BEA, 8BEB, 8BEC) form tick marks and _ArchTick INSERTs (8BED, 8BEE) terminate the ends, with three DEFPOINTS POINTs (8BF0-8BF2), giving the same 11-entity structure as *D300/*D302; the start x equals *D310's end x, closing out this chain segment.",
+      "rule": "A jog-tick 11-entity *D block recurs at both ends of this shard's DIM-layer chain (D303 and D311), mirroring the AA-AXIS-DIM7 pattern (D300, D302); this bracketing pattern is a transferable cue that gridline/opening breakouts are being annotated at chain boundaries.",
+      "counterfactual": "As with the other 210-unit block (*D302), the small gap could superficially resemble a wall thickness pair, but the DIM layer, jog-tick INSERTs, and matching MTEXT confirm dimension annotation, not wall geometry.",
+      "uncertainty": "Whether 210 units marks the same type of feature here as in *D302 (a different part of the drawing) cannot be confirmed from the projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d312-18",
+    "def": "*D312",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block; MTEXT '2665' equals the exact span between two horizontal DIM-layer LINEs, starting a vertically-oriented chain distinct from D295-D311.",
+    "rationale": {
+      "evidence": "LINEs 8BF3 and 8BF4 on layer DIM run horizontally at y=27375.207 and y=30040.207, a 2665-unit vertical separation, and MTEXT 8BF8 reads '2665', an exact match. A third LINE (8BF5) runs vertically between them as the dimension line itself, DIMDOT INSERTs (8BF6, 8BF7) terminate it, and three DEFPOINTS POINTs (8BF9-8BFB) complete the anatomy — the same signature as D295-D299 but rotated 90 degrees, indicating a separate vertical dimension chain.",
+      "rule": "The *D-prefix/DEFPOINTS/matching-MTEXT signature is orientation-independent: whether the flanking LINEs run vertically (measuring a horizontal span) or horizontally (measuring a vertical span), the same dimension-block anatomy applies.",
+      "counterfactual": "If the flanking LINEs' coordinate spacing did not equal the MTEXT numeral, or DEFPOINTS were absent, this would not read as a dimension block despite the *D name.",
+      "uncertainty": "The projection does not indicate what physical vertical extent (e.g. a building depth or room height in plan) 2665 units corresponds to."
+    }
+  },
+  {
+    "unit_id": "defannot-d313-19",
+    "def": "*D313",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block; MTEXT '2350' equals the exact span between two horizontal DIM-layer LINEs, chained after *D312.",
+    "rationale": {
+      "evidence": "LINEs 8BFC and 8BFD on layer DIM run horizontally at y=30040.207 and y=32390.207, a 2350-unit vertical separation, matching MTEXT 8C01's '2350' exactly. A vertical dimension LINE (8BFE), DIMDOT INSERTs (8BFF, 8C00), and three DEFPOINTS POINTs (8C02-8C04) complete the anatomy; the start y equals *D312's end y, continuing the vertical chain.",
+      "rule": "Vertical *D chains are validated the same way as horizontal ones: consecutive blocks whose y-extents abut form a continuous chain, each verified via the prefix/DEFPOINTS/matching-MTEXT signature.",
+      "counterfactual": "If the y-extents did not abut *D312's, this would be an isolated vertical dimension rather than a chain continuation.",
+      "uncertainty": "The physical feature spanning 2350 units in this vertical run cannot be identified from the projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d314-20",
+    "def": "*D314",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D dimension block; MTEXT '780' equals the exact span between two horizontal DIM-layer LINEs, closing the D312-D314 vertical chain.",
+    "rationale": {
+      "evidence": "LINEs 8C05 and 8C06 on layer DIM run horizontally at y=32390.207 and y=33170.207, a 780-unit vertical separation, matching MTEXT 8C0A's '780' exactly. A vertical dimension LINE (8C07), DIMDOT INSERTs (8C08, 8C09), and three DEFPOINTS POINTs (8C0B-8C0D) complete the anatomy; the start y equals *D313's end y, closing out the three-block vertical chain (2665+2350+780=5795 total).",
+      "rule": "The final block of a chain is identified the same way as any interior member: prefix/DEFPOINTS/matching-MTEXT signature, with its abutting endpoint against the previous block confirming chain membership rather than an isolated dimension.",
+      "counterfactual": "If this block's y-extent did not abut *D313's, it would still be classified as a dimension block on its own merits, just not confirmed as part of this specific chain.",
+      "uncertainty": "What building feature the overall 5795-unit vertical run (D312+D313+D314) measures is not shown in the projection."
+    }
+  }
+]

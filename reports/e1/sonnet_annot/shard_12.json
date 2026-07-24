@@ -1,0 +1,202 @@
+[
+  {
+    "unit_id": "defannot-u282-221",
+    "answer": {
+      "def": "*U282",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U282, entity_count=42) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5, 즉 폐곡선 사각형)만으로 구성됨. 레이어명이 명시적으로 INSUL(단열재)이며 별도 WALL류 레이어와 구분되어 있어, 벽체 중심선이라기보다 단열재 표현/해치 경계 지오메트리로 추정. bbox 미상이라 개별 폴리라인의 실제 크기(벽 길이 수준 vs 얇은 패치)를 판단할 수 없고, 샘플된 엔티티들이 레이어/형상 상 서로 구분되지 않아 특정 핸들을 '벽선'으로 지목할 근거가 없음."
+    }
+  },
+  {
+    "unit_id": "defannot-u283-222",
+    "answer": {
+      "def": "*U283",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U283, entity_count=70) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. INSUL 레이어 전용 폐곡선 패턴으로 단열재 표현/해치 경계로 추정되며 벽체 자체는 아닐 가능성이 큼. 엔티티 간 구분 정보 부재로 특정 핸들을 벽선으로 지목할 근거 없음."
+    }
+  },
+  {
+    "unit_id": "defannot-u290-223",
+    "answer": {
+      "def": "*U290",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U290, entity_count=30) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. INSUL 전용 레이어의 반복 폐곡선으로 단열재 표현으로 추정, 벽선 근거 약함. 엔티티 간 구분 불가로 특정 핸들 지목 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u45-224",
+    "answer": {
+      "def": "*U45",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U45, entity_count=38) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. INSUL 전용 레이어의 반복 폐곡선 패턴으로 단열재 표현/해치 경계로 추정, 벽체 중심선일 근거 약함. 개별 엔티티 구분 정보 없어 벽선 핸들 지목 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u47-225",
+    "answer": {
+      "def": "*U47",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U47, entity_count=38) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. 단열재 전용 레이어의 반복 폐곡선으로 추정, 벽선 근거 약함. 엔티티 간 구분 불가로 특정 핸들 지목 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u48-226",
+    "answer": {
+      "def": "*U48",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U48, entity_count=12, 전량 샘플됨) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. 소규모 단열재 패치 세트로 추정되며 벽체 중심선으로 볼 근거 약함. 엔티티 간 구분 불가로 특정 핸들 지목 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u49-227",
+    "answer": {
+      "def": "*U49",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U49, entity_count=105) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. 다량의 균일한 폐곡선 반복 패턴은 단열재 해치/패턴 경계에 부합, 벽선 자체일 근거는 약함. 엔티티 간 구분 불가로 특정 핸들 지목 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u50-228",
+    "answer": {
+      "def": "*U50",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U50, entity_count=41) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. INSUL 전용 레이어 반복 폐곡선으로 단열재 표현 추정, 벽선 근거 약함. 엔티티 간 구분 불가로 특정 핸들 지목 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u51-229",
+    "answer": {
+      "def": "*U51",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U51, entity_count=101) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. 다량의 균일 폐곡선 반복은 단열재 해치 경계 패턴에 부합, 벽선 근거는 약함. 엔티티 간 구분 불가로 특정 핸들 지목 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u52-230",
+    "answer": {
+      "def": "*U52",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U52, entity_count=102) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. 다량의 균일 폐곡선 반복은 단열재 해치 경계 패턴에 부합, 벽선 근거는 약함. 엔티티 간 구분 불가로 특정 핸들 지목 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u53-231",
+    "answer": {
+      "def": "*U53",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U53, entity_count=19, 전량 샘플됨) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. 단열재 표현으로 추정되며 벽선 근거 약함. 엔티티 간 구분 불가로 특정 핸들 지목 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u54-232",
+    "answer": {
+      "def": "*U54",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U54, entity_count=68) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. INSUL 전용 레이어 반복 폐곡선으로 단열재 표현 추정, 벽선 근거 약함. 엔티티 간 구분 불가로 특정 핸들 지목 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u55-233",
+    "answer": {
+      "def": "*U55",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U55, entity_count=23, 전량 샘플됨) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. 단열재 표현으로 추정되며 벽선 근거 약함. 엔티티 간 구분 불가로 특정 핸들 지목 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u56-234",
+    "answer": {
+      "def": "*U56",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U56, entity_count=130, 20개 유닛 중 최다) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. 대량의 균일 폐곡선 반복은 단열재 해치 경계 패턴에 부합, 벽선 근거는 약함. 엔티티 간 구분 불가로 특정 핸들 지목 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u57-235",
+    "answer": {
+      "def": "*U57",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U57, entity_count=112) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. 다량의 균일 폐곡선 반복은 단열재 해치 경계 패턴에 부합, 벽선 근거는 약함. 엔티티 간 구분 불가로 특정 핸들 지목 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u58-236",
+    "answer": {
+      "def": "*U58",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U58, entity_count=19, 전량 샘플됨) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. 단열재 표현으로 추정되며 벽선 근거 약함. 엔티티 간 구분 불가로 특정 핸들 지목 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u59-237",
+    "answer": {
+      "def": "*U59",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U59, entity_count=63) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. INSUL 전용 레이어 반복 폐곡선으로 단열재 표현 추정, 벽선 근거 약함. 엔티티 간 구분 불가로 특정 핸들 지목 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u60-238",
+    "answer": {
+      "def": "*U60",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U60, entity_count=18, 전량 샘플됨) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. 단열재 표현으로 추정되며 벽선 근거 약함. 엔티티 간 구분 불가로 특정 핸들 지목 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u61-239",
+    "answer": {
+      "def": "*U61",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U61, entity_count=16, 전량 샘플됨) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. 단열재 표현으로 추정되며 벽선 근거 약함. 엔티티 간 구분 불가로 특정 핸들 지목 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u62-240",
+    "answer": {
+      "def": "*U62",
+      "role": "기타",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "익명 블록(*U62, entity_count=23, 전량 샘플됨) 전체가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE(정점 5)만으로 구성됨. 단열재 표현으로 추정되며 벽선 근거 약함. 엔티티 간 구분 불가로 특정 핸들 지목 불가."
+    }
+  }
+]

@@ -1,0 +1,8 @@
+evidence.xlsx was not created.
+
+Reason: the required load_workspace_dependencies/@oai/artifact-tool runtime is not exposed in this session. The Spreadsheets skill forbids substituting openpyxl, xlsxwriter, pandas.ExcelWriter, or other alternate XLSX libraries. The packet explicitly permits CSV plus a reason file when XLSX creation is impossible.
+
+Machine-readable fallback: D:\dev\99_tools\autocad-sdk-router\reports\e2\cells\c70_pid_lexicon\evidence.csv
+Detailed raw tables: D:\runs\e2_program\cells\c70_pid_lexicon
+PREREG SHA-256: bc5a463340cdbad858bf54104e377cc945894404dc4672e0acddbca9488f7f4d
+Schema amendment SHA-256: 7e2c0885456cc27790ae200b8f2fe37b3515edd6ac0994b1ad55e45833be9d1e

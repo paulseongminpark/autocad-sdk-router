@@ -1,0 +1,42 @@
+{
+  "family": "constraints_associativity_1",
+  "fixtures": {},
+  "needs_state": [
+    {
+      "op": "define.assocaction.addDependency",
+      "reason": "Handler requires 'action_handle' (or 'handle') resolving via m08kcOpenObject/AcDbAssocAction::cast to a pre-existing AcDbAssocAction, AND 'dependency_handle' resolving via resolveHandle to a pre-existing AcDbAssocDependency (m08kc_handlers.inc lines 461-470: m08kcFindHandle 'action_handle'/'handle', m08kcFindHandle 'dependency_handle', resolveHandle(depHex)). Neither object type exists in a freshly-staged sample DWG; a single stateless args-only call has no prior step to create and hand back those two handles."
+    },
+    {
+      "op": "define.assocaction.valueParam",
+      "reason": "Handler requires 'action_handle' (or 'handle') opened via m08kcOpenObject and cast to AcDbAssocAction before setValueParam runs (m08kc_handlers.inc lines 489-498: m08kcFindHandle 'action_handle'/'handle', jsonFindString 'name', jsonFindNumber 'value'). No AcDbAssocAction object pre-exists in a freshly-staged sample DWG for a stateless single-call probe to reference."
+    },
+    {
+      "op": "define.assocdependency.attach",
+      "reason": "Handler requires 'action_handle' resolving to a pre-existing AcDbAssocAction (opened for write, cast via AcDbAssocAction::cast) plus 'target_handle' resolving to a pre-existing target object (m08kc_handlers.inc lines 730-737: m08kcFindHandle 'action_handle', m08kcFindHandle 'target_handle', resolveHandle(targetId)). The action_handle precondition cannot be satisfied by args alone in a single stateless call."
+    },
+    {
+      "op": "define.assocgeomdependency.subent",
+      "reason": "Handler requires 'action_handle' (pre-existing AcDbAssocAction) and 'target_handle' (pre-existing entity with a resolvable subentity), plus optional 'subent_type'/'subent_index' (m08kc_handlers.inc lines 776-786: m08kcFindHandle 'action_handle', m08kcFindHandle 'target_handle', jsonFindNumber 'subent_type', jsonFindNumber 'subent_index'). No pre-existing AcDbAssocAction is available to a stateless single-call probe."
+    },
+    {
+      "op": "define.assocnetwork.addAction",
+      "reason": "Handler requires 'action_handle' (or 'handle') resolving via resolveHandle to a pre-existing AcDbAssocAction object to add to the top-level network (m08kc_handlers.inc lines 515-519: m08kcFindHandle 'action_handle'/'handle', resolveHandle(actionId)). No such object exists in a freshly-staged sample DWG without a prior create call the stateless fixture cannot perform."
+    },
+    {
+      "op": "define.assocvaluedependency.value",
+      "reason": "Handler requires 'action_handle' resolving to a pre-existing AcDbAssocAction (opened for write, cast via AcDbAssocAction::cast) before it can add the value dependency; 'value_name' is optional (m08kc_handlers.inc lines 830-833: m08kcFindHandle 'action_handle', jsonFindString 'value_name'). The action_handle precondition cannot be met by args alone."
+    },
+    {
+      "op": "define.constraint.addGeometry",
+      "reason": "Handler requires 'target_handle' (or 'handle') resolving via resolveHandle to a pre-existing entity to add as constrained geometry (m08kc_handlers.inc line 313: m08kcFindHandle 'target_handle'/'handle'; consumed by m08kcAddGeometryForHandle -> m08kcMakeFullSubentPath -> resolveHandle). 'group_handle'/'constraint_group_handle' is optional (auto-created), but no entity handle is documented to pre-exist in the staged fixture DWG for a stateless single-call probe to reference."
+    },
+    {
+      "op": "define.constraint.autoConstrain",
+      "reason": "Handler requires 'target_handle' (or 'handle') resolving to a pre-existing entity, with optional 'target_handle2' for a second entity (m08kc_handlers.inc lines 333-334: m08kcFindHandle 'target_handle'/'handle', m08kcFindHandle 'target_handle2'; both feed m08kcMakeFullSubentPath -> resolveHandle). No pre-existing target entity handle is available to a stateless single-call probe."
+    },
+    {
+      "op": "define.constraint.dimensional.angle",
+      "reason": "Handler requires 'target_handle' (or 'handle') AND 'target_handle2', both of which must resolve to pre-existing entities that additionally cast successfully to AcConstrainedLine (m08kc_handlers.inc lines 369-370, 384-387: m08kcFindHandle 'target_handle'/'handle', m08kcFindHandle 'target_handle2', AcConstrainedLine::cast(g1)/(g2) else Acad::eInvalidInput). This needs two pre-existing LINE entities already in the DB, which a single stateless args-only call cannot supply."
+    }
+  ]
+}

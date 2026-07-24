@@ -1,0 +1,78 @@
+section,key,value
+identity,schema,e2.gnn_formal.prereg.v1
+identity,cell,gnn_formal
+identity,sealed_at_utc,2026-07-18T20:05:14.8711970Z
+scope,execution_surface,local NVIDIA RTX only
+scope,write_root,D:\runs\e2_program\cells\gnn_formal
+scope,repository_mutation,forbidden
+scope,subagents,forbidden
+scope,git,forbidden
+access,train,4200 CubiCasa SEG-IR plus train truth allowed for fitting
+access,val_A,only 198 W2-09 manifest-listed drawings
+access,val_B,reject before filesystem call
+access,test,reject before filesystem call
+access,original_CAD,forbidden
+universe,train_drawings,4200
+universe,train_rows,3862317
+universe,val_A_drawings,198
+universe,val_A_rows,167556
+universe,val_A_families,198
+universe,split_manifest_content_hash,5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b
+universe,val_A_drawing_ids_sha256,4905890378c4dc3958bcd04876dd4e78f9c8cba0d1511b7c23117b8f12f6a6f7
+universe,val_A_family_ids_sha256,ce0bd39ee0902bd1182e5c5aab86a7c8c5e11944c614bbd24a4f4d98e204a3ba
+universe,family_crossing_count,0
+graph,builder_sha256,c95d4a30d30e0db157fe56102053a7884902b7749464f7f4cb8852c0819321f6
+graph,config_sha256,56911f4633979a3fe00fd56be2d0a39ac06757ed255ed49ed18ca20ba9d4ac49
+graph,topology,one graph per drawing with segment nodes and frozen typed directed edges
+graph,feature_count,17
+graph,identifier_name_layer_text_label_feature_count,0
+arms,GNN_A_no_pretrain,seed-specific random init then train-only supervised fine-tune
+arms,GNN_B_SSL_pretrain,masked plus contrastive SSL on all 4200 unlabeled train graphs then identical train-only fine-tune
+arms,control_twohop_GBDT_full,W2-02 full 30-feature HistGradientBoosting fresh train-only refit
+seeds,model_seeds,17|29|43
+gnn,hidden_dim,64
+gnn,message_passing_layers,2
+gnn,dropout,0.1
+gnn,learning_rate,0.003
+gnn,weight_decay,0.0001
+gnn,fine_tune_epochs,16
+gnn,ssl_epochs,20
+gnn,fine_tune_graph_batch_size,4
+gnn,ssl_graph_batch_size,5
+gnn,minimum_graph_batch_size,1
+gnn,mask_probability,0.15
+gnn,edge_keep_probability,0.85
+gnn,contrastive_temperature,0.2
+gnn,gradient_clip_norm,5.0
+metrics,primary,val-A pooled per-handle AUPRC and F1 at threshold 0.5
+metrics,seed_aggregation,arithmetic mean and population SD across 3 seeds
+metrics,comparisons,GNN_A-control|GNN_B-control|GNN_B-GNN_A for AUPRC and F1
+metrics,calibration,ECE 10 equal-width bins without refitting
+metrics,lowest_family_slice,W2-01 frozen bottom-20 families pooled and per-family AUPRC
+bootstrap,replicates,10000
+bootstrap,confidence,0.95
+bootstrap,seed,43
+bootstrap,unit,W2-09 geometry family cluster
+bootstrap,pairing,identical family multiplicities across arms and matched seeds
+ablations,NoMessage,inference-time message_mode none
+ablations,edge_type_shuffle,inference-time deterministic within-drawing edge-type permutation
+resources,G5_RTX_hours_total,132.0
+resources,prior_G5_screen_charge_hours,0.4481405555555563
+resources,formal_available_RTX_hours,131.55185944444445
+resources,peak_RAM_GiB,48.0
+oom,stage_1,halve graph batch size to 1 and record every CUDA OOM
+oom,stage_2,deterministic induced-node sample cap 4096 preserving positives and seed-hash filling negatives
+oom,stage_3,persistent sampled-training or full-val-A OOM means BLOCKED
+output,judgment_output,forbidden metrics and unresolved items only
+output,report_last_line,CELL_COMPLETE: gnn_formal
+input_hash,packet,499e27629cc9391f14a222257e4b114c26d14b77874537d293073a87ee66d682
+input_hash,split_manifest,8aad64eeda77df55296fc711c21d7befdeada7fe379aeafec81fd1691aea044f
+input_hash,graph_builder,c95d4a30d30e0db157fe56102053a7884902b7749464f7f4cb8852c0819321f6
+input_hash,screen_v2,895249f0b6c77ac8f8a7cfb73e859a0882681ad6bba6e337480b55db269ce120
+input_hash,w2_02_source,ae81bf8c5311fc19c8ad38f7feca5d1c15bf39a71d41a1fb925775d6e63aafe6
+input_hash,w2_02_results,391aedddf26c0b44116de89bcb27b1b3a6fed07aa1ae8b9dcae9d8b71995bbfb
+input_hash,w2_01_results,251f01eb6a3f3e59c85ab12dcbb3a1c05a173cf2647c26508ab8bc6c7d316fd2
+input_hash,train_npz,8f72d8931c6e08927bf027ee87f1bc5362ab1a85217862e09a0cddd6b0b0d5aa
+input_hash,baseline_design_full_train,8e2ca80cc52ab9ebcbb9f8f60fb1d4177186cd1e7fafcfee486cfcbc40335a11
+input_hash,baseline_context_val_A,b568bb4c3dffce46629355bf7670cf00f6c86ecbfe14b5feb87f4e6103449a91
+input_hash,baseline_twohop_val_A,ef0febd1d6da09a2a129c26dcc19028828e80bb4fa19c9db2b3eb5b423cef1df

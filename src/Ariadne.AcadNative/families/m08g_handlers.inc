@@ -136,15 +136,18 @@ static Acad::ErrorStatus m08gAppendEntityToBlock(AcDbBlockTableRecord* pBlock,
 // both this same wave): without this, AcDbDictionary::setAt / AcDbBlockTable
 // Record::appendAcDbEntity on these classes fails Acad::eNoClassId (409) even
 // inside a full, attended acad.exe session -- not just headless
-// accoreconsole. AcRxDynamicLinker::loadModule is idempotent (returns eOk if
-// the module is already loaded), so calling this unconditionally at the top
-// of every handler that needs the class is safe and cheap.
+// accoreconsole. AcRxDynamicLinker::loadModule is idempotent (returns bool
+// true if the module is loaded OR already was), so calling this
+// unconditionally at the top of every handler that needs the class is safe
+// and cheap. NOTE: the return type is bool, NOT Acad::ErrorStatus — the old
+// `== Acad::eOk`(=0) comparison inverted the flag, so every
+// engine_module_loaded= diagnostic emitted before this fix is inverted too.
 static bool m08gLoadEngineModule(const wchar_t* moduleFileName)
 {
     AcRxDynamicLinker* linker = acrxDynamicLinker;
     if (linker == nullptr)
         return false;
-    return linker->loadModule(moduleFileName, /*printit*/ false) == Acad::eOk;
+    return linker->loadModule(moduleFileName, /*printit*/ false);
 }
 
 // Standard create envelope: "result":{created,handle,layer,modelspace_entities_after},"status".

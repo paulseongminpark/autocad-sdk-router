@@ -1,0 +1,4027 @@
+{
+  "schema": "e2.w2_09.val_split_manifest.v1",
+  "created_at": "2026-07-19T02:52:08+09:00",
+  "frozen": {
+    "schema": "e2.w2_09.val_split_manifest.v1",
+    "amendment_to": {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\prereg_r2_v1.json",
+      "sha256": "fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2"
+    },
+    "parent_repaired_split": {
+      "schema": "e2.bstar_repair.results.v2",
+      "repaired_split_hash": "7e34d7301d888c822861cf1dfa1c5ee13e95b451824175cae563fd2a7c215db5",
+      "results_sha256": "e6f8d17cfa94346ca0443649f1b327bd6982893522fc3f5b50e95bbad8f38643",
+      "excluded_val_drawing_ids": [
+        "high_quality_3750",
+        "high_quality_architectural_1186",
+        "high_quality_architectural_575",
+        "high_quality_architectural_642"
+      ],
+      "excluded_val_drawing_ids_sha256": "780041ed6e2f21fd2c8e052e772733e52942fff44045417c5d6d26ba7f96cfd3"
+    },
+    "source": {
+      "val_npz_sha256": "5f15eefada2103a55f602473b7a467b72aa0390d84a2ed204a03f65b4a3dacef",
+      "val_ir_aggregate_sha256": "c37084b9f46c28e80761b481fab5fc5926bbf9392245adb4bd23c649d220c660",
+      "original_val_drawing_count": 400,
+      "original_val_row_count": 353953,
+      "repaired_val_drawing_count": 396,
+      "repaired_val_row_count": 349100
+    },
+    "family_definition": "drawing_id OR SHA-256 of endpoint-order-invariant segment geometry normalized for translation, global scale, rotation, and reflection; coordinates quantized to 1/1000 max-bbox span",
+    "procedure": {
+      "name": "salted-family-hash balanced greedy v1",
+      "salt": "e2.w2_09.valab.family_hash.v1",
+      "family_component_rule": "drawing_id OR geometry_fingerprint",
+      "order": "ascending SHA-256(salt + NUL + family_id)",
+      "assignment": "assign to lower drawing-count side; on ties use assignment-hash leading-nibble parity",
+      "labels_used": 0
+    },
+    "splits": {
+      "A": {
+        "state": "DEV",
+        "drawing_count": 198,
+        "family_count": 198,
+        "row_count": 167556,
+        "drawing_ids": [
+          "colorful_1261",
+          "colorful_13804",
+          "colorful_13824",
+          "colorful_13826",
+          "colorful_14036",
+          "colorful_14126",
+          "colorful_14147",
+          "colorful_14175",
+          "colorful_14418",
+          "colorful_14599",
+          "colorful_14660",
+          "colorful_14887",
+          "colorful_14923",
+          "colorful_14926",
+          "colorful_14927",
+          "colorful_14928",
+          "colorful_14935",
+          "colorful_1554",
+          "colorful_1603",
+          "colorful_3068",
+          "colorful_3182",
+          "colorful_3821",
+          "colorful_6628",
+          "colorful_9245",
+          "colorful_9300",
+          "high_quality_13847",
+          "high_quality_14017",
+          "high_quality_14030",
+          "high_quality_14040",
+          "high_quality_14061",
+          "high_quality_14094",
+          "high_quality_14127",
+          "high_quality_14157",
+          "high_quality_14178",
+          "high_quality_14242",
+          "high_quality_14250",
+          "high_quality_14252",
+          "high_quality_1547",
+          "high_quality_1647",
+          "high_quality_17",
+          "high_quality_1885",
+          "high_quality_1942",
+          "high_quality_1950",
+          "high_quality_2554",
+          "high_quality_3191",
+          "high_quality_3503",
+          "high_quality_3522",
+          "high_quality_3566",
+          "high_quality_3650",
+          "high_quality_4026",
+          "high_quality_4542",
+          "high_quality_4548",
+          "high_quality_4773",
+          "high_quality_4893",
+          "high_quality_5011",
+          "high_quality_5080",
+          "high_quality_5133",
+          "high_quality_5668",
+          "high_quality_5682",
+          "high_quality_5690",
+          "high_quality_5767",
+          "high_quality_5773",
+          "high_quality_5968",
+          "high_quality_5984",
+          "high_quality_6388",
+          "high_quality_665",
+          "high_quality_6702",
+          "high_quality_7082",
+          "high_quality_729",
+          "high_quality_751",
+          "high_quality_7523",
+          "high_quality_7767",
+          "high_quality_8079",
+          "high_quality_8151",
+          "high_quality_8661",
+          "high_quality_9002",
+          "high_quality_9619",
+          "high_quality_9920",
+          "high_quality_9939",
+          "high_quality_architectural_1066",
+          "high_quality_architectural_1075",
+          "high_quality_architectural_1089",
+          "high_quality_architectural_1101",
+          "high_quality_architectural_1162",
+          "high_quality_architectural_1220",
+          "high_quality_architectural_1231",
+          "high_quality_architectural_1361",
+          "high_quality_architectural_1425",
+          "high_quality_architectural_1539",
+          "high_quality_architectural_1611",
+          "high_quality_architectural_163",
+          "high_quality_architectural_1632",
+          "high_quality_architectural_1654",
+          "high_quality_architectural_1660",
+          "high_quality_architectural_1691",
+          "high_quality_architectural_1699",
+          "high_quality_architectural_1717",
+          "high_quality_architectural_1848",
+          "high_quality_architectural_1916",
+          "high_quality_architectural_1967",
+          "high_quality_architectural_20026",
+          "high_quality_architectural_2069",
+          "high_quality_architectural_2080",
+          "high_quality_architectural_24",
+          "high_quality_architectural_2528",
+          "high_quality_architectural_2567",
+          "high_quality_architectural_2572",
+          "high_quality_architectural_2575",
+          "high_quality_architectural_303",
+          "high_quality_architectural_3096",
+          "high_quality_architectural_3164",
+          "high_quality_architectural_3207",
+          "high_quality_architectural_3209",
+          "high_quality_architectural_333",
+          "high_quality_architectural_3541",
+          "high_quality_architectural_361",
+          "high_quality_architectural_3838",
+          "high_quality_architectural_3872",
+          "high_quality_architectural_3927",
+          "high_quality_architectural_393",
+          "high_quality_architectural_3961",
+          "high_quality_architectural_4677",
+          "high_quality_architectural_4820",
+          "high_quality_architectural_4842",
+          "high_quality_architectural_4972",
+          "high_quality_architectural_5138",
+          "high_quality_architectural_5521",
+          "high_quality_architectural_5559",
+          "high_quality_architectural_562",
+          "high_quality_architectural_5640",
+          "high_quality_architectural_5679",
+          "high_quality_architectural_5701",
+          "high_quality_architectural_5734",
+          "high_quality_architectural_5814",
+          "high_quality_architectural_590",
+          "high_quality_architectural_5996",
+          "high_quality_architectural_6121",
+          "high_quality_architectural_6244",
+          "high_quality_architectural_6257",
+          "high_quality_architectural_6274",
+          "high_quality_architectural_6301",
+          "high_quality_architectural_6302",
+          "high_quality_architectural_6320",
+          "high_quality_architectural_6339",
+          "high_quality_architectural_6347",
+          "high_quality_architectural_638",
+          "high_quality_architectural_6389",
+          "high_quality_architectural_6514",
+          "high_quality_architectural_6552",
+          "high_quality_architectural_6602",
+          "high_quality_architectural_6655",
+          "high_quality_architectural_702",
+          "high_quality_architectural_756",
+          "high_quality_architectural_7570",
+          "high_quality_architectural_7677",
+          "high_quality_architectural_7712",
+          "high_quality_architectural_7740",
+          "high_quality_architectural_7752",
+          "high_quality_architectural_7842",
+          "high_quality_architectural_7880",
+          "high_quality_architectural_801",
+          "high_quality_architectural_8049",
+          "high_quality_architectural_8154",
+          "high_quality_architectural_8160",
+          "high_quality_architectural_8299",
+          "high_quality_architectural_834",
+          "high_quality_architectural_8515",
+          "high_quality_architectural_8532",
+          "high_quality_architectural_8628",
+          "high_quality_architectural_8675",
+          "high_quality_architectural_8702",
+          "high_quality_architectural_8750",
+          "high_quality_architectural_9001",
+          "high_quality_architectural_9005",
+          "high_quality_architectural_9035",
+          "high_quality_architectural_9055",
+          "high_quality_architectural_9066",
+          "high_quality_architectural_9096",
+          "high_quality_architectural_9157",
+          "high_quality_architectural_9180",
+          "high_quality_architectural_9237",
+          "high_quality_architectural_9296",
+          "high_quality_architectural_938",
+          "high_quality_architectural_9438",
+          "high_quality_architectural_9483",
+          "high_quality_architectural_9491",
+          "high_quality_architectural_9556",
+          "high_quality_architectural_9603",
+          "high_quality_architectural_9604",
+          "high_quality_architectural_9630",
+          "high_quality_architectural_9639",
+          "high_quality_architectural_9730",
+          "high_quality_architectural_9795",
+          "high_quality_architectural_9860",
+          "high_quality_architectural_9905",
+          "high_quality_architectural_9925",
+          "high_quality_architectural_9935",
+          "high_quality_architectural_9936"
+        ],
+        "drawing_ids_sha256": "4905890378c4dc3958bcd04876dd4e78f9c8cba0d1511b7c23117b8f12f6a6f7",
+        "family_ids_sha256": "ce0bd39ee0902bd1182e5c5aab86a7c8c5e11944c614bbd24a4f4d98e204a3ba"
+      },
+      "B": {
+        "state": "ADJ",
+        "drawing_count": 198,
+        "family_count": 198,
+        "row_count": 181544,
+        "drawing_ids": [
+          "colorful_11261",
+          "colorful_1148",
+          "colorful_13513",
+          "colorful_13689",
+          "colorful_13820",
+          "colorful_14251",
+          "colorful_14328",
+          "colorful_14565",
+          "colorful_14616",
+          "colorful_14807",
+          "colorful_14888",
+          "colorful_14929",
+          "colorful_14931",
+          "colorful_14936",
+          "colorful_14937",
+          "colorful_14938",
+          "colorful_1530",
+          "colorful_1697",
+          "colorful_3134",
+          "colorful_444",
+          "colorful_4719",
+          "colorful_6082",
+          "colorful_6226",
+          "colorful_8064",
+          "colorful_8396",
+          "colorful_9395",
+          "high_quality_1034",
+          "high_quality_1208",
+          "high_quality_1212",
+          "high_quality_1354",
+          "high_quality_13812",
+          "high_quality_13852",
+          "high_quality_1401",
+          "high_quality_14026",
+          "high_quality_14027",
+          "high_quality_14033",
+          "high_quality_14041",
+          "high_quality_14054",
+          "high_quality_14240",
+          "high_quality_14245",
+          "high_quality_14255",
+          "high_quality_14267",
+          "high_quality_14270",
+          "high_quality_1500",
+          "high_quality_1681",
+          "high_quality_177",
+          "high_quality_1797",
+          "high_quality_20149",
+          "high_quality_3535",
+          "high_quality_3574",
+          "high_quality_3828",
+          "high_quality_3935",
+          "high_quality_4021",
+          "high_quality_4550",
+          "high_quality_4708",
+          "high_quality_473",
+          "high_quality_4835",
+          "high_quality_4860",
+          "high_quality_4871",
+          "high_quality_5587",
+          "high_quality_5753",
+          "high_quality_6079",
+          "high_quality_6141",
+          "high_quality_6243",
+          "high_quality_6256",
+          "high_quality_6367",
+          "high_quality_6632",
+          "high_quality_6732",
+          "high_quality_7008",
+          "high_quality_7046",
+          "high_quality_7520",
+          "high_quality_8781",
+          "high_quality_929",
+          "high_quality_9770",
+          "high_quality_9975",
+          "high_quality_architectural_1052",
+          "high_quality_architectural_1061",
+          "high_quality_architectural_1067",
+          "high_quality_architectural_1107",
+          "high_quality_architectural_1168",
+          "high_quality_architectural_1241",
+          "high_quality_architectural_1324",
+          "high_quality_architectural_1328",
+          "high_quality_architectural_1331",
+          "high_quality_architectural_1359",
+          "high_quality_architectural_1376",
+          "high_quality_architectural_1423",
+          "high_quality_architectural_154",
+          "high_quality_architectural_1646",
+          "high_quality_architectural_1696",
+          "high_quality_architectural_174",
+          "high_quality_architectural_1783",
+          "high_quality_architectural_1846",
+          "high_quality_architectural_1883",
+          "high_quality_architectural_20001",
+          "high_quality_architectural_20014",
+          "high_quality_architectural_20018",
+          "high_quality_architectural_2039",
+          "high_quality_architectural_2148",
+          "high_quality_architectural_242",
+          "high_quality_architectural_259",
+          "high_quality_architectural_282",
+          "high_quality_architectural_3015",
+          "high_quality_architectural_313",
+          "high_quality_architectural_3195",
+          "high_quality_architectural_3210",
+          "high_quality_architectural_3256",
+          "high_quality_architectural_3519",
+          "high_quality_architectural_3528",
+          "high_quality_architectural_3546",
+          "high_quality_architectural_3612",
+          "high_quality_architectural_3629",
+          "high_quality_architectural_3691",
+          "high_quality_architectural_375",
+          "high_quality_architectural_3782",
+          "high_quality_architectural_3794",
+          "high_quality_architectural_3886",
+          "high_quality_architectural_4032",
+          "high_quality_architectural_4524",
+          "high_quality_architectural_4552",
+          "high_quality_architectural_4667",
+          "high_quality_architectural_4706",
+          "high_quality_architectural_4721",
+          "high_quality_architectural_4788",
+          "high_quality_architectural_4794",
+          "high_quality_architectural_4801",
+          "high_quality_architectural_4850",
+          "high_quality_architectural_4864",
+          "high_quality_architectural_4900",
+          "high_quality_architectural_555",
+          "high_quality_architectural_5566",
+          "high_quality_architectural_5579",
+          "high_quality_architectural_5599",
+          "high_quality_architectural_5625",
+          "high_quality_architectural_566",
+          "high_quality_architectural_5672",
+          "high_quality_architectural_5698",
+          "high_quality_architectural_5741",
+          "high_quality_architectural_5742",
+          "high_quality_architectural_5747",
+          "high_quality_architectural_5748",
+          "high_quality_architectural_5927",
+          "high_quality_architectural_5942",
+          "high_quality_architectural_5981",
+          "high_quality_architectural_6022",
+          "high_quality_architectural_6033",
+          "high_quality_architectural_6038",
+          "high_quality_architectural_6135",
+          "high_quality_architectural_6136",
+          "high_quality_architectural_6183",
+          "high_quality_architectural_6272",
+          "high_quality_architectural_6286",
+          "high_quality_architectural_6290",
+          "high_quality_architectural_6379",
+          "high_quality_architectural_6387",
+          "high_quality_architectural_651",
+          "high_quality_architectural_6537",
+          "high_quality_architectural_6551",
+          "high_quality_architectural_6644",
+          "high_quality_architectural_6675",
+          "high_quality_architectural_7519",
+          "high_quality_architectural_7550",
+          "high_quality_architectural_7671",
+          "high_quality_architectural_7777",
+          "high_quality_architectural_7799",
+          "high_quality_architectural_7813",
+          "high_quality_architectural_7820",
+          "high_quality_architectural_7864",
+          "high_quality_architectural_8029",
+          "high_quality_architectural_8090",
+          "high_quality_architectural_8117",
+          "high_quality_architectural_8159",
+          "high_quality_architectural_8207",
+          "high_quality_architectural_8344",
+          "high_quality_architectural_8388",
+          "high_quality_architectural_8413",
+          "high_quality_architectural_8425",
+          "high_quality_architectural_8486",
+          "high_quality_architectural_8545",
+          "high_quality_architectural_858",
+          "high_quality_architectural_865",
+          "high_quality_architectural_8681",
+          "high_quality_architectural_8690",
+          "high_quality_architectural_8786",
+          "high_quality_architectural_8796",
+          "high_quality_architectural_9031",
+          "high_quality_architectural_9038",
+          "high_quality_architectural_9088",
+          "high_quality_architectural_9282",
+          "high_quality_architectural_9347",
+          "high_quality_architectural_9361",
+          "high_quality_architectural_9436",
+          "high_quality_architectural_9461",
+          "high_quality_architectural_9516",
+          "high_quality_architectural_9661",
+          "high_quality_architectural_9787",
+          "high_quality_architectural_9885",
+          "high_quality_architectural_9985"
+        ],
+        "drawing_ids_sha256": "69df162feaab7012b1705e948c535c5a5dc90a4198965b9595c0c155295f45fb",
+        "family_ids_sha256": "82e1a825206d4a3090904342d1975b198f60ce50bafb9b857a6aee0c0a466cb6"
+      }
+    },
+    "drawing_records": [
+      {
+        "source_gid": 0,
+        "drawing_id": "colorful_11261",
+        "family_fingerprint": "0033c348f2f8dcfded0f561d424061772a8678b71c050e899f3677f347dbdcbc",
+        "row_count": 627,
+        "family_id": "0033c348f2f8dcfded0f561d424061772a8678b71c050e899f3677f347dbdcbc",
+        "family_assignment_hash": "d001b8a522231ae7634c14367b08ba00efd8395017426cc57f41e49042858ce6",
+        "split": "B"
+      },
+      {
+        "source_gid": 1,
+        "drawing_id": "colorful_1148",
+        "family_fingerprint": "01ed360f7cc5a5e1acfcb2a7c624b48557b2f4a897e29859b8d88e6c49812294",
+        "row_count": 1187,
+        "family_id": "01ed360f7cc5a5e1acfcb2a7c624b48557b2f4a897e29859b8d88e6c49812294",
+        "family_assignment_hash": "e6f09bb0edd0a9ee2720d2c7b7aaa90ca8968719b4d67e4227b239f7b0521138",
+        "split": "B"
+      },
+      {
+        "source_gid": 2,
+        "drawing_id": "colorful_1261",
+        "family_fingerprint": "3f871fa51c90144b62939fc88260ac22ac788ed891589142ebfc498833488d82",
+        "row_count": 1909,
+        "family_id": "3f871fa51c90144b62939fc88260ac22ac788ed891589142ebfc498833488d82",
+        "family_assignment_hash": "60e9c4ba0b8b5a8851d8f2b7a4ed2892157f860177bcbeb5a844d14f646f58cb",
+        "split": "A"
+      },
+      {
+        "source_gid": 3,
+        "drawing_id": "colorful_13513",
+        "family_fingerprint": "0991d3ac1ae07c8e069f8dd863edb7a2b3872f15541320472a9d8e25d4e4752c",
+        "row_count": 1029,
+        "family_id": "0991d3ac1ae07c8e069f8dd863edb7a2b3872f15541320472a9d8e25d4e4752c",
+        "family_assignment_hash": "9d605a88d6eb8d3966086edf400f8c03ca5c004901a68db3199e03178fe61dfb",
+        "split": "B"
+      },
+      {
+        "source_gid": 4,
+        "drawing_id": "colorful_13689",
+        "family_fingerprint": "02047682725e4c791b15068baa7d63ea6d0da0ec26e1dc38586d222e9ac8076a",
+        "row_count": 525,
+        "family_id": "02047682725e4c791b15068baa7d63ea6d0da0ec26e1dc38586d222e9ac8076a",
+        "family_assignment_hash": "1d70f1855076dfd0ca91702ba956ec70de75f4996710242f31a6ed172233f02d",
+        "split": "B"
+      },
+      {
+        "source_gid": 5,
+        "drawing_id": "colorful_13804",
+        "family_fingerprint": "0e3d5654285155c5b97cae9111c1588a9486efd8e9fa1d2b0fac9e8a4b221546",
+        "row_count": 875,
+        "family_id": "0e3d5654285155c5b97cae9111c1588a9486efd8e9fa1d2b0fac9e8a4b221546",
+        "family_assignment_hash": "1b40d1ab8583e3f3081a39827fddd8cac5139e51e35fc42d746dda03207fd1cc",
+        "split": "A"
+      },
+      {
+        "source_gid": 6,
+        "drawing_id": "colorful_13820",
+        "family_fingerprint": "0047094c964691a9d6e2cbaff106c0e2f5b8c7f5edb1a65bf2f0b9846d2432da",
+        "row_count": 1005,
+        "family_id": "0047094c964691a9d6e2cbaff106c0e2f5b8c7f5edb1a65bf2f0b9846d2432da",
+        "family_assignment_hash": "445742f4d9673aff16c67bf53467a5287ea22af3be675e65d68d398559ee91ba",
+        "split": "B"
+      },
+      {
+        "source_gid": 7,
+        "drawing_id": "colorful_13824",
+        "family_fingerprint": "0bd75bcf23bf3958934b6eeef32c7d9486ee949bf187d06fb89b633f0f6f19d8",
+        "row_count": 1672,
+        "family_id": "0bd75bcf23bf3958934b6eeef32c7d9486ee949bf187d06fb89b633f0f6f19d8",
+        "family_assignment_hash": "acb09e57ee5cf7f4870fc5db32911151f9464a01d0ab2348280d717c41f83bb7",
+        "split": "A"
+      },
+      {
+        "source_gid": 8,
+        "drawing_id": "colorful_13826",
+        "family_fingerprint": "00d8efb3222e57752922735e7e7a78247b58f1a4d742c439345dc78958d4def1",
+        "row_count": 1370,
+        "family_id": "00d8efb3222e57752922735e7e7a78247b58f1a4d742c439345dc78958d4def1",
+        "family_assignment_hash": "93e28d3daaed91fed68031504adcfaeb2d524598480851da02925b34df6d6037",
+        "split": "A"
+      },
+      {
+        "source_gid": 9,
+        "drawing_id": "colorful_14036",
+        "family_fingerprint": "15e1406f6799a922a4a17f801b22e7c5ff4b09a2ee82a72532e7bbea7511bd59",
+        "row_count": 518,
+        "family_id": "15e1406f6799a922a4a17f801b22e7c5ff4b09a2ee82a72532e7bbea7511bd59",
+        "family_assignment_hash": "5730588e92187972938bcb033980c6ee56cc117c427c5b47265226f1f8cab96f",
+        "split": "A"
+      },
+      {
+        "source_gid": 10,
+        "drawing_id": "colorful_14126",
+        "family_fingerprint": "529d465201e5ce85a1facbabda881af3915ecc7d560bee9264ea646676ff269b",
+        "row_count": 1007,
+        "family_id": "529d465201e5ce85a1facbabda881af3915ecc7d560bee9264ea646676ff269b",
+        "family_assignment_hash": "8bc388e8fa0765a7753861b11585a68e044f6400c9c58fe6fc99a80b3267a132",
+        "split": "A"
+      },
+      {
+        "source_gid": 11,
+        "drawing_id": "colorful_14147",
+        "family_fingerprint": "2045b99cd34555c2bfa344d121044e78d43229a51f88c15b1f5e4c90f1d9c60b",
+        "row_count": 792,
+        "family_id": "2045b99cd34555c2bfa344d121044e78d43229a51f88c15b1f5e4c90f1d9c60b",
+        "family_assignment_hash": "f4fd44abb4a491d83cef05f319cae97aa22fcec5ad9b5fdf3df56dc3c09ab24c",
+        "split": "A"
+      },
+      {
+        "source_gid": 12,
+        "drawing_id": "colorful_14175",
+        "family_fingerprint": "0ebb13eebd7e782f425fe3fa9916968de03990e89ae062bf752c8c933a41ef80",
+        "row_count": 528,
+        "family_id": "0ebb13eebd7e782f425fe3fa9916968de03990e89ae062bf752c8c933a41ef80",
+        "family_assignment_hash": "fbf5d1f193391decaf22423ef8e9bf401e389e0809a0add36c23f907a26614df",
+        "split": "A"
+      },
+      {
+        "source_gid": 13,
+        "drawing_id": "colorful_14251",
+        "family_fingerprint": "22e567bd3a9a087dd95c532d4046739e37ddc756e81608c8ac9088f88e9c1aad",
+        "row_count": 1411,
+        "family_id": "22e567bd3a9a087dd95c532d4046739e37ddc756e81608c8ac9088f88e9c1aad",
+        "family_assignment_hash": "ae85c2c622acfbac18a53ed6c3c775fd34d0c776e51905798bb610cf285ca829",
+        "split": "B"
+      },
+      {
+        "source_gid": 14,
+        "drawing_id": "colorful_14328",
+        "family_fingerprint": "04ed4dc89e04dff3d9f118ca55139e6a1afccd10f6543e49569b0e84b54193f1",
+        "row_count": 665,
+        "family_id": "04ed4dc89e04dff3d9f118ca55139e6a1afccd10f6543e49569b0e84b54193f1",
+        "family_assignment_hash": "e98edf551d09f685054a63eb926d05b009f757ac7e91b2b198d5e4247a59aff1",
+        "split": "B"
+      },
+      {
+        "source_gid": 15,
+        "drawing_id": "colorful_14418",
+        "family_fingerprint": "2dbcb5b42dc08d8fd4cf282aa217b89780141083aa2981ddd946ab9717307544",
+        "row_count": 1529,
+        "family_id": "2dbcb5b42dc08d8fd4cf282aa217b89780141083aa2981ddd946ab9717307544",
+        "family_assignment_hash": "049a9997f3507ffa93d11d1a57776da04eb6eef04d2846fc555b9e6896dfeb15",
+        "split": "A"
+      },
+      {
+        "source_gid": 16,
+        "drawing_id": "colorful_14565",
+        "family_fingerprint": "175a70cb6bea4d843f57f0a3a9786c708b36967ff39f1d427e870d1818f52637",
+        "row_count": 748,
+        "family_id": "175a70cb6bea4d843f57f0a3a9786c708b36967ff39f1d427e870d1818f52637",
+        "family_assignment_hash": "7342c6707ab800d6c7991adde9b4c091ed775c7d6e0367f21d9eded4ced88dd5",
+        "split": "B"
+      },
+      {
+        "source_gid": 17,
+        "drawing_id": "colorful_14599",
+        "family_fingerprint": "77848ac8ef8f5a8190d399ecb57a917aeed1354d75be0e6f9c8df10f607b8c54",
+        "row_count": 597,
+        "family_id": "77848ac8ef8f5a8190d399ecb57a917aeed1354d75be0e6f9c8df10f607b8c54",
+        "family_assignment_hash": "e0361f4bec66bb7b4dcc8d64660f07662ce9078f0931ddec5a8bf78e4266ad98",
+        "split": "A"
+      },
+      {
+        "source_gid": 18,
+        "drawing_id": "colorful_14616",
+        "family_fingerprint": "4bee92d2fa218f390a62bcf765537374f434ba7d084da8674a5f7ee4ca1ce68d",
+        "row_count": 851,
+        "family_id": "4bee92d2fa218f390a62bcf765537374f434ba7d084da8674a5f7ee4ca1ce68d",
+        "family_assignment_hash": "30f2c2671aa04f7cbf195b8f7c8c3fa73dcc6d3ad402e4e9006c94afd139e5e6",
+        "split": "B"
+      },
+      {
+        "source_gid": 19,
+        "drawing_id": "colorful_14660",
+        "family_fingerprint": "19e1ffa1d2f21180c2a230b6f2c1e7970701bb584267568df326a793e5ab14f1",
+        "row_count": 866,
+        "family_id": "19e1ffa1d2f21180c2a230b6f2c1e7970701bb584267568df326a793e5ab14f1",
+        "family_assignment_hash": "a3bbfa1ca3c5f4047b83ec734befb1b2ff723e7f342c5b3c82206baf085377ed",
+        "split": "A"
+      },
+      {
+        "source_gid": 20,
+        "drawing_id": "colorful_14807",
+        "family_fingerprint": "0cc155aa682909db855487e4ca098ddffd3162fc8d034f90d090b3cdfbe425b5",
+        "row_count": 940,
+        "family_id": "0cc155aa682909db855487e4ca098ddffd3162fc8d034f90d090b3cdfbe425b5",
+        "family_assignment_hash": "2f01ff36f51b7363431af08ae67e83cf9ae2c38e357f6fe2237ab6573705372c",
+        "split": "B"
+      },
+      {
+        "source_gid": 21,
+        "drawing_id": "colorful_14887",
+        "family_fingerprint": "0b1de63214759f86bb1ace266e092fe407a3a780adf1eebbd03ed68e96941913",
+        "row_count": 545,
+        "family_id": "0b1de63214759f86bb1ace266e092fe407a3a780adf1eebbd03ed68e96941913",
+        "family_assignment_hash": "e71b2a663e7b0daf9102346cb12cdcc1bca56f5915d58f3222465f7138e15297",
+        "split": "A"
+      },
+      {
+        "source_gid": 22,
+        "drawing_id": "colorful_14888",
+        "family_fingerprint": "0191573f8ca88a14dfa4bb5d3fe4b974b31d31f998aa0279f0d7fbed2114516c",
+        "row_count": 520,
+        "family_id": "0191573f8ca88a14dfa4bb5d3fe4b974b31d31f998aa0279f0d7fbed2114516c",
+        "family_assignment_hash": "294b74285c62895c551784251e4825e070cda44590324615ef9021acee504c1f",
+        "split": "B"
+      },
+      {
+        "source_gid": 23,
+        "drawing_id": "colorful_14923",
+        "family_fingerprint": "133d806991f1761dcc2bea6d26c5c9a490bff0182b341519ef777b0a204c360e",
+        "row_count": 779,
+        "family_id": "133d806991f1761dcc2bea6d26c5c9a490bff0182b341519ef777b0a204c360e",
+        "family_assignment_hash": "a2c9bc3df3c2b8804bb75b293441750aa920431ebfc58e303423f7bf7636dca8",
+        "split": "A"
+      },
+      {
+        "source_gid": 24,
+        "drawing_id": "colorful_14926",
+        "family_fingerprint": "07e7ed13731900cab90154a599d1b8585580a3c91433c3b91b683414611be45e",
+        "row_count": 368,
+        "family_id": "07e7ed13731900cab90154a599d1b8585580a3c91433c3b91b683414611be45e",
+        "family_assignment_hash": "82ea8d3a5d6e31ff1f01658bd72cf8c150831cd2758baf736bbe166006db9b32",
+        "split": "A"
+      },
+      {
+        "source_gid": 25,
+        "drawing_id": "colorful_14927",
+        "family_fingerprint": "0418f9c883b77999e9ee31a6c802ddc23eb96c15a214223dd2c777682ecf9407",
+        "row_count": 398,
+        "family_id": "0418f9c883b77999e9ee31a6c802ddc23eb96c15a214223dd2c777682ecf9407",
+        "family_assignment_hash": "2e0bc7299b4dcc687f3d51ff77c4b9dd4865e5ccb93a46443727afb88bac595d",
+        "split": "A"
+      },
+      {
+        "source_gid": 26,
+        "drawing_id": "colorful_14928",
+        "family_fingerprint": "1ab858ea0af88be21fab72d5397ef20503c2d0cc9312f7f3e42be39a6815544d",
+        "row_count": 386,
+        "family_id": "1ab858ea0af88be21fab72d5397ef20503c2d0cc9312f7f3e42be39a6815544d",
+        "family_assignment_hash": "bc8f527a75658cb3be93711d1c28a46505d9f6889803550cb7ddc2959c2232cd",
+        "split": "A"
+      },
+      {
+        "source_gid": 27,
+        "drawing_id": "colorful_14929",
+        "family_fingerprint": "3921d03d542062684c1d2f12e8ec10d0d4fb1cdab51d1d18210a2d197563241a",
+        "row_count": 384,
+        "family_id": "3921d03d542062684c1d2f12e8ec10d0d4fb1cdab51d1d18210a2d197563241a",
+        "family_assignment_hash": "bf2493634a589dabdf386b25ea9db3cfb019961bc6a7528f30d5aae3f23134c4",
+        "split": "B"
+      },
+      {
+        "source_gid": 28,
+        "drawing_id": "colorful_14931",
+        "family_fingerprint": "445e29b268324cfbfd57d5feec13eecdf4c9a24c8eeb69f4c4a9c2d9ef897a14",
+        "row_count": 438,
+        "family_id": "445e29b268324cfbfd57d5feec13eecdf4c9a24c8eeb69f4c4a9c2d9ef897a14",
+        "family_assignment_hash": "63f8d81360ee24f27f751614a73b253c7353ead9d6feb18b162be8d0bacd6cc1",
+        "split": "B"
+      },
+      {
+        "source_gid": 29,
+        "drawing_id": "colorful_14935",
+        "family_fingerprint": "0a996a14658674a3add78900322c4069f1e0b0857540a3fc4d5a64c5ae65e20b",
+        "row_count": 644,
+        "family_id": "0a996a14658674a3add78900322c4069f1e0b0857540a3fc4d5a64c5ae65e20b",
+        "family_assignment_hash": "0688a279a44839ef255ec7c5bee2150feac0bb0f958c8a68b7fee645dc5983a1",
+        "split": "A"
+      },
+      {
+        "source_gid": 30,
+        "drawing_id": "colorful_14936",
+        "family_fingerprint": "3f33b2101dea003ee9a9b64524b3263d1b0ab05d58a5dc0f9c09e8343d0c37fe",
+        "row_count": 396,
+        "family_id": "3f33b2101dea003ee9a9b64524b3263d1b0ab05d58a5dc0f9c09e8343d0c37fe",
+        "family_assignment_hash": "7cf88ddb0953b50a2d356e5c081a22a2b306799a28431fc4d3b0ba2ee936f53e",
+        "split": "B"
+      },
+      {
+        "source_gid": 31,
+        "drawing_id": "colorful_14937",
+        "family_fingerprint": "22449af1481f6063df1955f5c87e21da34d2c50d85a67e3d6f103a6083692e4f",
+        "row_count": 389,
+        "family_id": "22449af1481f6063df1955f5c87e21da34d2c50d85a67e3d6f103a6083692e4f",
+        "family_assignment_hash": "d9ed334f0a10fbc7c9017a2f58ff4814c71da78abad3794b208f83d9fc77fc6f",
+        "split": "B"
+      },
+      {
+        "source_gid": 32,
+        "drawing_id": "colorful_14938",
+        "family_fingerprint": "11705b0151997f8dead0914ba4712b1c411f149822e91724051dd8e18b501128",
+        "row_count": 579,
+        "family_id": "11705b0151997f8dead0914ba4712b1c411f149822e91724051dd8e18b501128",
+        "family_assignment_hash": "551480b257ac98971fb05641af44ff816c44f5a3ec621909a99dff50d77689ea",
+        "split": "B"
+      },
+      {
+        "source_gid": 33,
+        "drawing_id": "colorful_1530",
+        "family_fingerprint": "21ca849efd49ba9b12283e687f6f996aee9b95794e5999a17b827d3787d1fb00",
+        "row_count": 852,
+        "family_id": "21ca849efd49ba9b12283e687f6f996aee9b95794e5999a17b827d3787d1fb00",
+        "family_assignment_hash": "7d93e3115d02e0f4457ad5cf378c8d2894763832237ab749bed946676c864332",
+        "split": "B"
+      },
+      {
+        "source_gid": 34,
+        "drawing_id": "colorful_1554",
+        "family_fingerprint": "07f42498675a60474971b8a9558fff02823e5ea40f4a0890d45b55bfd19a9039",
+        "row_count": 561,
+        "family_id": "07f42498675a60474971b8a9558fff02823e5ea40f4a0890d45b55bfd19a9039",
+        "family_assignment_hash": "cf332c52c49542aca046d2221b6deaac9253ff49969229e6c405a876aa716058",
+        "split": "A"
+      },
+      {
+        "source_gid": 35,
+        "drawing_id": "colorful_1603",
+        "family_fingerprint": "167540e1e72f449137dc1bf94aa0035d773c86ac14cf2445828aa24c18b3873d",
+        "row_count": 628,
+        "family_id": "167540e1e72f449137dc1bf94aa0035d773c86ac14cf2445828aa24c18b3873d",
+        "family_assignment_hash": "ed7b50cc619bb6d49a3f41241a0483bcaacabcf383cf0d3672e91ecf81163a3c",
+        "split": "A"
+      },
+      {
+        "source_gid": 36,
+        "drawing_id": "colorful_1697",
+        "family_fingerprint": "097f4d452bd0f5ec1fcbbbb38241b10263408847d8de33013bd79dc291be2436",
+        "row_count": 615,
+        "family_id": "097f4d452bd0f5ec1fcbbbb38241b10263408847d8de33013bd79dc291be2436",
+        "family_assignment_hash": "158494d6c439533956e97ddcd9a6bc10fee7649b1f87d6f133f25d7aabdeaa6a",
+        "split": "B"
+      },
+      {
+        "source_gid": 37,
+        "drawing_id": "colorful_3068",
+        "family_fingerprint": "08210475b2869bcb144f174e54fb86c68f9df27ba9a058586bc5f95ef01ed566",
+        "row_count": 1019,
+        "family_id": "08210475b2869bcb144f174e54fb86c68f9df27ba9a058586bc5f95ef01ed566",
+        "family_assignment_hash": "9601021b25c57d216c6e663a228a1916187c93e81a7fb525163cc489acff3147",
+        "split": "A"
+      },
+      {
+        "source_gid": 38,
+        "drawing_id": "colorful_3134",
+        "family_fingerprint": "0330daf29c4c78ecfa59bd9dae94f19850b4410f5edaddfce029868bbd434186",
+        "row_count": 712,
+        "family_id": "0330daf29c4c78ecfa59bd9dae94f19850b4410f5edaddfce029868bbd434186",
+        "family_assignment_hash": "a2a917442e3e14fcf9d5741fd11086e8943128a40e24a7e59d3f3de0a8215ee0",
+        "split": "B"
+      },
+      {
+        "source_gid": 39,
+        "drawing_id": "colorful_3182",
+        "family_fingerprint": "39e272c0644bca05ef9a1072d6fddfceb26fef2f89d2d7a5fbf9e77ab301ca71",
+        "row_count": 536,
+        "family_id": "39e272c0644bca05ef9a1072d6fddfceb26fef2f89d2d7a5fbf9e77ab301ca71",
+        "family_assignment_hash": "8676d17bc91a0f82f39372a3d37ea85388f54e919b58b81ffffbdc669d4189f2",
+        "split": "A"
+      },
+      {
+        "source_gid": 40,
+        "drawing_id": "colorful_3821",
+        "family_fingerprint": "351c781718e29229f61275b745e88aee4617cd1320704d826822780f024535e2",
+        "row_count": 454,
+        "family_id": "351c781718e29229f61275b745e88aee4617cd1320704d826822780f024535e2",
+        "family_assignment_hash": "679e1ab512dd56e6237cc3b169699f2abcca4a3bf309b7a22190755d88464940",
+        "split": "A"
+      },
+      {
+        "source_gid": 41,
+        "drawing_id": "colorful_444",
+        "family_fingerprint": "1401a0cfd8369ffff1e0478a8c2802c000a76efabe3b2d3e5e7a8fd04786b092",
+        "row_count": 1829,
+        "family_id": "1401a0cfd8369ffff1e0478a8c2802c000a76efabe3b2d3e5e7a8fd04786b092",
+        "family_assignment_hash": "2eadddf0ea20db47e3991cbc25e174a457996581392d4fc0b43f56365080dc02",
+        "split": "B"
+      },
+      {
+        "source_gid": 42,
+        "drawing_id": "colorful_4719",
+        "family_fingerprint": "265b7efa31b68dd1bfe8306b564d5effa274ef92f2f69a429c8b95df75bc5765",
+        "row_count": 704,
+        "family_id": "265b7efa31b68dd1bfe8306b564d5effa274ef92f2f69a429c8b95df75bc5765",
+        "family_assignment_hash": "17fc5797d05f0413c54899e038051bef89cb9334dfd0ef120fc53ddc2c65761f",
+        "split": "B"
+      },
+      {
+        "source_gid": 43,
+        "drawing_id": "colorful_6082",
+        "family_fingerprint": "1cc46adead7f1f893772fae594399658834d2c2907a3b975d95e66e22deb5b84",
+        "row_count": 531,
+        "family_id": "1cc46adead7f1f893772fae594399658834d2c2907a3b975d95e66e22deb5b84",
+        "family_assignment_hash": "b350ae2f277bd8584ae14aebbbdc7ec5d37bc2cca939af36ea22b0194ff718c3",
+        "split": "B"
+      },
+      {
+        "source_gid": 44,
+        "drawing_id": "colorful_6226",
+        "family_fingerprint": "014e39c840333471dd5f8e100575c3af42a1d8fcf01f6250c54d5d92ad85c07d",
+        "row_count": 860,
+        "family_id": "014e39c840333471dd5f8e100575c3af42a1d8fcf01f6250c54d5d92ad85c07d",
+        "family_assignment_hash": "5d496bd7edd6e45552c7308554a6cb28cde889c8e296c15bfcdaee5eb869e1bb",
+        "split": "B"
+      },
+      {
+        "source_gid": 45,
+        "drawing_id": "colorful_6628",
+        "family_fingerprint": "1616c72d982ebe71cda5883ad29c16e0cf0c8602513f1c43ff7b4d4ae58ebc0e",
+        "row_count": 997,
+        "family_id": "1616c72d982ebe71cda5883ad29c16e0cf0c8602513f1c43ff7b4d4ae58ebc0e",
+        "family_assignment_hash": "34c4b535780151e916215a8d013e690f9ae24d17bdfd585e92c7d5b4659db3b3",
+        "split": "A"
+      },
+      {
+        "source_gid": 46,
+        "drawing_id": "colorful_8064",
+        "family_fingerprint": "1c96d706f9810c9dd7560e29809a48c1e0e163994c14a10e61bbc99cfea9ac0e",
+        "row_count": 1352,
+        "family_id": "1c96d706f9810c9dd7560e29809a48c1e0e163994c14a10e61bbc99cfea9ac0e",
+        "family_assignment_hash": "0b7f53405aca23c88a5bec1076bdceb0a5963de9499c297cde07fa544cfb1c73",
+        "split": "B"
+      },
+      {
+        "source_gid": 47,
+        "drawing_id": "colorful_8396",
+        "family_fingerprint": "345e3e80baad92523c4edbc52924a935c4e68aed0f8088e42775f7f624ff9f12",
+        "row_count": 326,
+        "family_id": "345e3e80baad92523c4edbc52924a935c4e68aed0f8088e42775f7f624ff9f12",
+        "family_assignment_hash": "acf0aaecb86cb9480919416017df02549c9699502c334a2091569c81792a10f2",
+        "split": "B"
+      },
+      {
+        "source_gid": 48,
+        "drawing_id": "colorful_9245",
+        "family_fingerprint": "1beaab4ca845e75c7806be945198df540e6be915889864ff066ba5279c6ec042",
+        "row_count": 703,
+        "family_id": "1beaab4ca845e75c7806be945198df540e6be915889864ff066ba5279c6ec042",
+        "family_assignment_hash": "f0a05e3bd898d09a914dbb600d3736caca21ac79c184ebf403b34db72bb79e6b",
+        "split": "A"
+      },
+      {
+        "source_gid": 49,
+        "drawing_id": "colorful_9300",
+        "family_fingerprint": "33cb37871aba4a8a752b8447a6477d5c673b9d12323b2248f387e3081d6df02e",
+        "row_count": 491,
+        "family_id": "33cb37871aba4a8a752b8447a6477d5c673b9d12323b2248f387e3081d6df02e",
+        "family_assignment_hash": "17938b6f41d64b0501c0ee39c4b2b592c0b0c4a14e0c16fe5a8ff9db78376186",
+        "split": "A"
+      },
+      {
+        "source_gid": 50,
+        "drawing_id": "colorful_9395",
+        "family_fingerprint": "03d732e93772a236e8c4f05a2260df13f4bbbf6c7ac0ec4d97769a4cb556c163",
+        "row_count": 811,
+        "family_id": "03d732e93772a236e8c4f05a2260df13f4bbbf6c7ac0ec4d97769a4cb556c163",
+        "family_assignment_hash": "4b7f10e7cb3266ca8fe1c2c7a2f40b6506e8dc50af67b4944795094146081cd1",
+        "split": "B"
+      },
+      {
+        "source_gid": 51,
+        "drawing_id": "high_quality_1034",
+        "family_fingerprint": "3b844f4fb21f9efe4f44c68c00ed43ef1a7adf4ef4b900cc337a28c98367dee6",
+        "row_count": 1860,
+        "family_id": "3b844f4fb21f9efe4f44c68c00ed43ef1a7adf4ef4b900cc337a28c98367dee6",
+        "family_assignment_hash": "c0cb163bd79e1e00a3dc0605be13b3e14daff7d3d6fd89a9b0393f0f3cc3f059",
+        "split": "B"
+      },
+      {
+        "source_gid": 52,
+        "drawing_id": "high_quality_1208",
+        "family_fingerprint": "1155387e2b98cd316f8bbd9290f7e7b2d2b7229818d13457ec5a266687ae6c32",
+        "row_count": 543,
+        "family_id": "1155387e2b98cd316f8bbd9290f7e7b2d2b7229818d13457ec5a266687ae6c32",
+        "family_assignment_hash": "9ccf0971b6631d7173257f398dac2ca491548f447102e941196a1b646ceb6bc0",
+        "split": "B"
+      },
+      {
+        "source_gid": 53,
+        "drawing_id": "high_quality_1212",
+        "family_fingerprint": "61e913b0c486f5488c1bf95adf38963faff4df7e611bcf4627fea34cab7a68b6",
+        "row_count": 604,
+        "family_id": "61e913b0c486f5488c1bf95adf38963faff4df7e611bcf4627fea34cab7a68b6",
+        "family_assignment_hash": "bb11c4510da3fd8568be8267e2d8e713929408ce70d6ef9b90474c45f1c42152",
+        "split": "B"
+      },
+      {
+        "source_gid": 54,
+        "drawing_id": "high_quality_1354",
+        "family_fingerprint": "47d4743a5e86c65e621b791ec8208ff90291d1e08fd06931e8292ca8c637745f",
+        "row_count": 810,
+        "family_id": "47d4743a5e86c65e621b791ec8208ff90291d1e08fd06931e8292ca8c637745f",
+        "family_assignment_hash": "73cb827a9bddb976c56f8579dad1352fa0478e11c5dff42a1230c01b7d5f1de8",
+        "split": "B"
+      },
+      {
+        "source_gid": 55,
+        "drawing_id": "high_quality_13812",
+        "family_fingerprint": "050839bbe0a40ad0d3d703cb9b86a1482d7f7a2cfb6f586d688ca6f870af618e",
+        "row_count": 602,
+        "family_id": "050839bbe0a40ad0d3d703cb9b86a1482d7f7a2cfb6f586d688ca6f870af618e",
+        "family_assignment_hash": "6d0a5f9258970c07c675677d2ee60262ff37df862aca5573621f49d1511a804d",
+        "split": "B"
+      },
+      {
+        "source_gid": 56,
+        "drawing_id": "high_quality_13847",
+        "family_fingerprint": "150899fae16ac641dcd6cefa5aa8f57437d373e7e3524063042a009e72c918e8",
+        "row_count": 612,
+        "family_id": "150899fae16ac641dcd6cefa5aa8f57437d373e7e3524063042a009e72c918e8",
+        "family_assignment_hash": "d4dca260ca945fee43eacaaecb6ebad9cdf9bbe37f2c5cea664795f9c27327fb",
+        "split": "A"
+      },
+      {
+        "source_gid": 57,
+        "drawing_id": "high_quality_13852",
+        "family_fingerprint": "0aed6365e373a7f262c559948df879260bf7ae966abf7609d3758951db7067f8",
+        "row_count": 443,
+        "family_id": "0aed6365e373a7f262c559948df879260bf7ae966abf7609d3758951db7067f8",
+        "family_assignment_hash": "d511103c177a2f7090ad2c6eb92011c610f473d6610f0e5aab7be7fddb3cd0cd",
+        "split": "B"
+      },
+      {
+        "source_gid": 58,
+        "drawing_id": "high_quality_1401",
+        "family_fingerprint": "284db8f8074e776c1e107c6391f3ad995ae33891799acbb5fd573672daee1ea5",
+        "row_count": 594,
+        "family_id": "284db8f8074e776c1e107c6391f3ad995ae33891799acbb5fd573672daee1ea5",
+        "family_assignment_hash": "251ea764177bac0f5bcb6925b97ebb49d71ce99ffc02384e52566ee402a95a23",
+        "split": "B"
+      },
+      {
+        "source_gid": 59,
+        "drawing_id": "high_quality_14017",
+        "family_fingerprint": "030c936c92171195f57faa7c4044f4109f266b79f172ca61c7ca28d053425388",
+        "row_count": 723,
+        "family_id": "030c936c92171195f57faa7c4044f4109f266b79f172ca61c7ca28d053425388",
+        "family_assignment_hash": "1cd39f2e7092d7b795a372049fec313e3e4de012cadca35bfbf2664f037b4308",
+        "split": "A"
+      },
+      {
+        "source_gid": 60,
+        "drawing_id": "high_quality_14026",
+        "family_fingerprint": "102b1d352844e81bd5e5bb9c7f20a0532b3c8168328551d26796f0d828fa0b2d",
+        "row_count": 600,
+        "family_id": "102b1d352844e81bd5e5bb9c7f20a0532b3c8168328551d26796f0d828fa0b2d",
+        "family_assignment_hash": "87c155472ab4ed9c3578913f79177c5188da4c0c2c4db3158667552932af5526",
+        "split": "B"
+      },
+      {
+        "source_gid": 61,
+        "drawing_id": "high_quality_14027",
+        "family_fingerprint": "12fa735343b8794f2b73bccbf984619bb84bb458f1da04e31f5ed1ea05dd3f32",
+        "row_count": 696,
+        "family_id": "12fa735343b8794f2b73bccbf984619bb84bb458f1da04e31f5ed1ea05dd3f32",
+        "family_assignment_hash": "7a2a2fe94a2eeb02d1cb26a7b5b392c9688f38e107009623c76c3ea25f3f6cda",
+        "split": "B"
+      },
+      {
+        "source_gid": 62,
+        "drawing_id": "high_quality_14030",
+        "family_fingerprint": "05431248013e44f72501902918663c3fe7c88933d0d5225b081ddabf089aa692",
+        "row_count": 464,
+        "family_id": "05431248013e44f72501902918663c3fe7c88933d0d5225b081ddabf089aa692",
+        "family_assignment_hash": "87bf4a972a4f4bcd10bc0eb259ac4a2331ec3fa19d420fb4bc6f39e21334c7a3",
+        "split": "A"
+      },
+      {
+        "source_gid": 63,
+        "drawing_id": "high_quality_14033",
+        "family_fingerprint": "00a80a7feddcc058fedd7ac9ff654268f6a5235ea54e2efe48a42002248dd502",
+        "row_count": 554,
+        "family_id": "00a80a7feddcc058fedd7ac9ff654268f6a5235ea54e2efe48a42002248dd502",
+        "family_assignment_hash": "a3ac993aac3692ba094f76187fea1b8bc1a131ae40fbd27949dd7876d7b3639d",
+        "split": "B"
+      },
+      {
+        "source_gid": 64,
+        "drawing_id": "high_quality_14040",
+        "family_fingerprint": "4e3e9652da17e1f72f457de2b10f1b0a5110a27f11c41f67cb0ca98c74e7df85",
+        "row_count": 467,
+        "family_id": "4e3e9652da17e1f72f457de2b10f1b0a5110a27f11c41f67cb0ca98c74e7df85",
+        "family_assignment_hash": "3ca37ae647b0339cba0b28f75486ec7d5b66dbc734de609bcb40933d5deeb9a7",
+        "split": "A"
+      },
+      {
+        "source_gid": 65,
+        "drawing_id": "high_quality_14041",
+        "family_fingerprint": "13323b5ae4552b5aabdfca57295c63fc9fab341f5f33ec751e63815aede97085",
+        "row_count": 625,
+        "family_id": "13323b5ae4552b5aabdfca57295c63fc9fab341f5f33ec751e63815aede97085",
+        "family_assignment_hash": "8235457b40ed0e14fed624e555dd5adb3ed8ba2e064d10acde320d4e0517cf7d",
+        "split": "B"
+      },
+      {
+        "source_gid": 66,
+        "drawing_id": "high_quality_14054",
+        "family_fingerprint": "00319535898751501ffabab3e14a632b83c3565b6c5924e1cf6c67249227837a",
+        "row_count": 1123,
+        "family_id": "00319535898751501ffabab3e14a632b83c3565b6c5924e1cf6c67249227837a",
+        "family_assignment_hash": "ea2118fcdb63a6aa8836acbdcbb6fb6742c55fcb375d28993ce7f3b9f32327a8",
+        "split": "B"
+      },
+      {
+        "source_gid": 67,
+        "drawing_id": "high_quality_14061",
+        "family_fingerprint": "270e07c65920c06c0ef0bf957744085bfdcbbd4c56142187cd517b426895ef5c",
+        "row_count": 787,
+        "family_id": "270e07c65920c06c0ef0bf957744085bfdcbbd4c56142187cd517b426895ef5c",
+        "family_assignment_hash": "f3dbbf50c84154db4f03a3003fcd5f544843e9afe7305e2b1d13ed72ce2ec076",
+        "split": "A"
+      },
+      {
+        "source_gid": 68,
+        "drawing_id": "high_quality_14094",
+        "family_fingerprint": "046dde80d948c76e4f1790eddf9941d154b46d17414f2ab0f43c5656264a9ef2",
+        "row_count": 2861,
+        "family_id": "046dde80d948c76e4f1790eddf9941d154b46d17414f2ab0f43c5656264a9ef2",
+        "family_assignment_hash": "2106c1741560c0e854d676d99238c564e7616423710200a1bbe30b66f48ce54a",
+        "split": "A"
+      },
+      {
+        "source_gid": 69,
+        "drawing_id": "high_quality_14127",
+        "family_fingerprint": "0bf6a11ecf1c0bb73e7f9e74ec6211b3a29a2411e4ce86e84e998782616be011",
+        "row_count": 405,
+        "family_id": "0bf6a11ecf1c0bb73e7f9e74ec6211b3a29a2411e4ce86e84e998782616be011",
+        "family_assignment_hash": "7d4cc25561260f2b5004e3d57b3fb272a9b77477b7233d8fb6f4e55439e15622",
+        "split": "A"
+      },
+      {
+        "source_gid": 70,
+        "drawing_id": "high_quality_14157",
+        "family_fingerprint": "02609d7b3ecba0d1afa76895628d2ef9a6126814dd320c62f7b6ca30ff1cb9a9",
+        "row_count": 729,
+        "family_id": "02609d7b3ecba0d1afa76895628d2ef9a6126814dd320c62f7b6ca30ff1cb9a9",
+        "family_assignment_hash": "5e327664b63860494f43374cef4b91e35d905d3a7b8e442dbe5b7515d3e4bcd6",
+        "split": "A"
+      },
+      {
+        "source_gid": 71,
+        "drawing_id": "high_quality_14178",
+        "family_fingerprint": "0fc20c845e2cf16524fdca911d2a29754c3288c1ce4908505ec4bb49646c5956",
+        "row_count": 978,
+        "family_id": "0fc20c845e2cf16524fdca911d2a29754c3288c1ce4908505ec4bb49646c5956",
+        "family_assignment_hash": "ca829016d7cf2b3f6c1653d1dbf26a6108511ffa6a9970b2ae2cf9264a9f447b",
+        "split": "A"
+      },
+      {
+        "source_gid": 72,
+        "drawing_id": "high_quality_14240",
+        "family_fingerprint": "3ba0a8c6493e1c25a910647a8c2f27a1d53907c2e44fee63be8fbdd6d017b269",
+        "row_count": 762,
+        "family_id": "3ba0a8c6493e1c25a910647a8c2f27a1d53907c2e44fee63be8fbdd6d017b269",
+        "family_assignment_hash": "fbfc7adb2211cf3026fad24cf290b30d01596153e91223932725bf97e7019ae2",
+        "split": "B"
+      },
+      {
+        "source_gid": 73,
+        "drawing_id": "high_quality_14242",
+        "family_fingerprint": "126d329628a96b61d6796af8e4f7de3cd8a66c153ba2385eeedad398e6208901",
+        "row_count": 487,
+        "family_id": "126d329628a96b61d6796af8e4f7de3cd8a66c153ba2385eeedad398e6208901",
+        "family_assignment_hash": "29be27a7c38a4e7ae8ab7c417b67afa6bd5068364ac93762103920a0c990c84a",
+        "split": "A"
+      },
+      {
+        "source_gid": 74,
+        "drawing_id": "high_quality_14245",
+        "family_fingerprint": "3178f32f19df32a07f16743099be1cddd021d75e754c270269be5131bbf719b6",
+        "row_count": 816,
+        "family_id": "3178f32f19df32a07f16743099be1cddd021d75e754c270269be5131bbf719b6",
+        "family_assignment_hash": "e7508561459577c79ab41e15543ae287de6f42648495f93c46ffce8228e05cc4",
+        "split": "B"
+      },
+      {
+        "source_gid": 75,
+        "drawing_id": "high_quality_14250",
+        "family_fingerprint": "1b2876feaf97137e4f98959e7f88c7dc01ce29ccff6ca677942e5c24cd6a1974",
+        "row_count": 1098,
+        "family_id": "1b2876feaf97137e4f98959e7f88c7dc01ce29ccff6ca677942e5c24cd6a1974",
+        "family_assignment_hash": "21d0aefd9701a6fb5940be55dbfd31f780d454843b07d12b26825995ef1459a6",
+        "split": "A"
+      },
+      {
+        "source_gid": 76,
+        "drawing_id": "high_quality_14252",
+        "family_fingerprint": "18627bdd447fa6af4ba6a64a2fb81a3cac850f5803799b2277826c1295eef345",
+        "row_count": 688,
+        "family_id": "18627bdd447fa6af4ba6a64a2fb81a3cac850f5803799b2277826c1295eef345",
+        "family_assignment_hash": "285210da8a0f5887c148e9b025339fe9e7d86c411be9608030c3b008e2228f39",
+        "split": "A"
+      },
+      {
+        "source_gid": 77,
+        "drawing_id": "high_quality_14255",
+        "family_fingerprint": "0856fc9816752be1038524a0917099078b8bbe1f501b3e9fd1dfb651aef4d855",
+        "row_count": 533,
+        "family_id": "0856fc9816752be1038524a0917099078b8bbe1f501b3e9fd1dfb651aef4d855",
+        "family_assignment_hash": "a657d60f7dc54a2478d478b54e83bf918c483a2f459bb90881dc45a09aa77ec7",
+        "split": "B"
+      },
+      {
+        "source_gid": 78,
+        "drawing_id": "high_quality_14267",
+        "family_fingerprint": "29e96b2fbc5d22d78e63b6587f53180409bda3f0f9793bed8e2224ee726d4a0a",
+        "row_count": 418,
+        "family_id": "29e96b2fbc5d22d78e63b6587f53180409bda3f0f9793bed8e2224ee726d4a0a",
+        "family_assignment_hash": "2a812f8644cf1aa5210bfcccfa05476ae4177295ebaccaf4e4ae47b3d0024a4a",
+        "split": "B"
+      },
+      {
+        "source_gid": 79,
+        "drawing_id": "high_quality_14270",
+        "family_fingerprint": "601d80b0df1416f0331be3ccc88ea853a0123b77caee2ec5f8f849c503c874bf",
+        "row_count": 458,
+        "family_id": "601d80b0df1416f0331be3ccc88ea853a0123b77caee2ec5f8f849c503c874bf",
+        "family_assignment_hash": "cd297429794345ef5961104e52723b476d225879611f584313686b7eb3e53f00",
+        "split": "B"
+      },
+      {
+        "source_gid": 80,
+        "drawing_id": "high_quality_1500",
+        "family_fingerprint": "84f06e005fe972f8210f67719697a4dd7e0c3305ae647d14ddfdf38201722a7b",
+        "row_count": 386,
+        "family_id": "84f06e005fe972f8210f67719697a4dd7e0c3305ae647d14ddfdf38201722a7b",
+        "family_assignment_hash": "ef54e73ff0c098d0c993911df4430ab470d68633475765dca3af216bb486aeec",
+        "split": "B"
+      },
+      {
+        "source_gid": 81,
+        "drawing_id": "high_quality_1547",
+        "family_fingerprint": "164d3fe2890aa3de89c7db7370060483a33387159b5849a85af9fece45502853",
+        "row_count": 345,
+        "family_id": "164d3fe2890aa3de89c7db7370060483a33387159b5849a85af9fece45502853",
+        "family_assignment_hash": "5b5e04281172a8ecf628de61e5ad49da0da9a4979b91c5e3f9b57ff858d1d4d5",
+        "split": "A"
+      },
+      {
+        "source_gid": 82,
+        "drawing_id": "high_quality_1647",
+        "family_fingerprint": "0c8fc0d8c868b83c6f23f3845b3f0f7de4a7e49f9c1e3476f53e4d7b08ad2934",
+        "row_count": 461,
+        "family_id": "0c8fc0d8c868b83c6f23f3845b3f0f7de4a7e49f9c1e3476f53e4d7b08ad2934",
+        "family_assignment_hash": "f98256c899784643dade5f21ace24680121c09f908e31e37697f35757c14d9b3",
+        "split": "A"
+      },
+      {
+        "source_gid": 83,
+        "drawing_id": "high_quality_1681",
+        "family_fingerprint": "20d1bef7b403d27248c5488c7c7ed15695334d3dfd502b04f5a2f319d9bdce2b",
+        "row_count": 702,
+        "family_id": "20d1bef7b403d27248c5488c7c7ed15695334d3dfd502b04f5a2f319d9bdce2b",
+        "family_assignment_hash": "3df5faf5507c558a051224efce4c593b47f61c695ddd8c4a687c95def04f40c1",
+        "split": "B"
+      },
+      {
+        "source_gid": 84,
+        "drawing_id": "high_quality_17",
+        "family_fingerprint": "0696c31527887399d9cb82e08749c65575c26e64d5bee036a0356bb2b713d7fe",
+        "row_count": 664,
+        "family_id": "0696c31527887399d9cb82e08749c65575c26e64d5bee036a0356bb2b713d7fe",
+        "family_assignment_hash": "a04d7d1fd240107ead297dc135d4c8aeffbea39936f3b02b01830523c997b427",
+        "split": "A"
+      },
+      {
+        "source_gid": 85,
+        "drawing_id": "high_quality_177",
+        "family_fingerprint": "4d14d0b668a375dab5a359b1317c8125c8f5512b1d6851262159562681cf90b3",
+        "row_count": 1101,
+        "family_id": "4d14d0b668a375dab5a359b1317c8125c8f5512b1d6851262159562681cf90b3",
+        "family_assignment_hash": "1c67d1a945f91f1822ec20fc5ef578de7749d142a6e04726b1807930d77ee8ca",
+        "split": "B"
+      },
+      {
+        "source_gid": 86,
+        "drawing_id": "high_quality_1797",
+        "family_fingerprint": "0274a67616f31c5947bbcb23e3199aa9321df67036b74d9c68ebe5f2a7d2f684",
+        "row_count": 574,
+        "family_id": "0274a67616f31c5947bbcb23e3199aa9321df67036b74d9c68ebe5f2a7d2f684",
+        "family_assignment_hash": "aa2fbedde77de6f34e2c785a4093559fc055bb8783c41d0bb1b2bcc6b610b2bb",
+        "split": "B"
+      },
+      {
+        "source_gid": 87,
+        "drawing_id": "high_quality_1885",
+        "family_fingerprint": "277bdea6ba577a643e17d00c97ab9e3e0d808c6ad51c986a1f89ed8f6f504673",
+        "row_count": 661,
+        "family_id": "277bdea6ba577a643e17d00c97ab9e3e0d808c6ad51c986a1f89ed8f6f504673",
+        "family_assignment_hash": "5ace9d6166649f906e6171edb5075199a4ab363a631f17e1d7117c4cfc091b29",
+        "split": "A"
+      },
+      {
+        "source_gid": 88,
+        "drawing_id": "high_quality_1942",
+        "family_fingerprint": "1d74da0213fdb1c714ca3b6cf5af34dfa0402c098981874bc257712f0ad6aa64",
+        "row_count": 590,
+        "family_id": "1d74da0213fdb1c714ca3b6cf5af34dfa0402c098981874bc257712f0ad6aa64",
+        "family_assignment_hash": "e1b32165d673ca755c7c0fb7947f12793f938fa825af600628287a99e105ba14",
+        "split": "A"
+      },
+      {
+        "source_gid": 89,
+        "drawing_id": "high_quality_1950",
+        "family_fingerprint": "32cef9993e7f545169472ca6fd67fb91ca4bbcdd0343bcd1220ba9e08d7498b3",
+        "row_count": 1282,
+        "family_id": "32cef9993e7f545169472ca6fd67fb91ca4bbcdd0343bcd1220ba9e08d7498b3",
+        "family_assignment_hash": "0e1fd70c5d97aadb91a5affd781d17367958078ab938c190953a407e47e324ab",
+        "split": "A"
+      },
+      {
+        "source_gid": 90,
+        "drawing_id": "high_quality_20149",
+        "family_fingerprint": "34a3c0f7c3eeef9c06b8719e45c4f27256b647869ed4bb520a749b4f8bf7fb1e",
+        "row_count": 1413,
+        "family_id": "34a3c0f7c3eeef9c06b8719e45c4f27256b647869ed4bb520a749b4f8bf7fb1e",
+        "family_assignment_hash": "2d2f17544f2100de5e7c2c018bbb55362ada02020a7d77803ce49aca99285bb7",
+        "split": "B"
+      },
+      {
+        "source_gid": 91,
+        "drawing_id": "high_quality_2554",
+        "family_fingerprint": "063fb31c5764f3360cb79f270f04dbcbba72f0107a94cc06015ab19c54697bef",
+        "row_count": 739,
+        "family_id": "063fb31c5764f3360cb79f270f04dbcbba72f0107a94cc06015ab19c54697bef",
+        "family_assignment_hash": "a5881abb566f7e1a74917952032d010d1f4f28815851d5269ce88bf3997d94d6",
+        "split": "A"
+      },
+      {
+        "source_gid": 92,
+        "drawing_id": "high_quality_3191",
+        "family_fingerprint": "1c6ca7116e799b7e6d609268b9bbf1ed4856a820824535afa8cecde017cb7ed8",
+        "row_count": 643,
+        "family_id": "1c6ca7116e799b7e6d609268b9bbf1ed4856a820824535afa8cecde017cb7ed8",
+        "family_assignment_hash": "0af5617004049ca31102d1e7cc5f9b5b1071ed126397f9902a62f440d189c0a0",
+        "split": "A"
+      },
+      {
+        "source_gid": 93,
+        "drawing_id": "high_quality_3503",
+        "family_fingerprint": "0c7145a1eed7e92bc4c36e6fe4d0d27f0b6a7456b486cab4a540754402815f87",
+        "row_count": 343,
+        "family_id": "0c7145a1eed7e92bc4c36e6fe4d0d27f0b6a7456b486cab4a540754402815f87",
+        "family_assignment_hash": "34cd138f0ab4883b2aeedcd644220464d4779cb6da149b59bf6ad0c4ac382787",
+        "split": "A"
+      },
+      {
+        "source_gid": 94,
+        "drawing_id": "high_quality_3522",
+        "family_fingerprint": "29e579bc8362999f219c0374014e9a74f58add90bc690f3a77b8e7979d33a0d1",
+        "row_count": 748,
+        "family_id": "29e579bc8362999f219c0374014e9a74f58add90bc690f3a77b8e7979d33a0d1",
+        "family_assignment_hash": "baa12945cc78d235954a66e1422880e9d45c6b4c0a14ab2b1ea9f110e821fef6",
+        "split": "A"
+      },
+      {
+        "source_gid": 95,
+        "drawing_id": "high_quality_3535",
+        "family_fingerprint": "0bcb0f13566b7b03c48e17bcb1f8e845999f2ec39d142012df11193ecb86ac42",
+        "row_count": 1083,
+        "family_id": "0bcb0f13566b7b03c48e17bcb1f8e845999f2ec39d142012df11193ecb86ac42",
+        "family_assignment_hash": "78574d2a5a451c9c9e92dc5612714f0000c5d5f29a79b5ad29b375875bfdc81d",
+        "split": "B"
+      },
+      {
+        "source_gid": 96,
+        "drawing_id": "high_quality_3566",
+        "family_fingerprint": "35721d4759c56e800fc9f3e1f6c1fb56f04ed59151c164496be031bddf61ac67",
+        "row_count": 533,
+        "family_id": "35721d4759c56e800fc9f3e1f6c1fb56f04ed59151c164496be031bddf61ac67",
+        "family_assignment_hash": "a98f5792f5b967d3aad218a237498c6806dcfccf5ce8a66addff7b4866b43d6b",
+        "split": "A"
+      },
+      {
+        "source_gid": 97,
+        "drawing_id": "high_quality_3574",
+        "family_fingerprint": "11ce629fa7429d96b8210578cf9b02ce85c26625b14ae7090e2ed6f400f4eec1",
+        "row_count": 499,
+        "family_id": "11ce629fa7429d96b8210578cf9b02ce85c26625b14ae7090e2ed6f400f4eec1",
+        "family_assignment_hash": "0e0824edfc0e3a150524156f36db02908e355aac01df73041e5781d538f0c062",
+        "split": "B"
+      },
+      {
+        "source_gid": 98,
+        "drawing_id": "high_quality_3650",
+        "family_fingerprint": "159f56a5b2cf61fc943f21107dd3f9495c891e303f09ba8733d432fceb707160",
+        "row_count": 603,
+        "family_id": "159f56a5b2cf61fc943f21107dd3f9495c891e303f09ba8733d432fceb707160",
+        "family_assignment_hash": "27bc6f82df6e37b42f4287c30b3b24dd7ac63101ae0da582f581fe8f61a57e10",
+        "split": "A"
+      },
+      {
+        "source_gid": 100,
+        "drawing_id": "high_quality_3828",
+        "family_fingerprint": "079576adbe66d2df1b960c51af412f7a30cf457b0e708ab78466f98cfd1cab17",
+        "row_count": 593,
+        "family_id": "079576adbe66d2df1b960c51af412f7a30cf457b0e708ab78466f98cfd1cab17",
+        "family_assignment_hash": "62a471d56f5511f74cafdcbcfb7922db815f1a0c1916f347bd4d22abebc410f1",
+        "split": "B"
+      },
+      {
+        "source_gid": 101,
+        "drawing_id": "high_quality_3935",
+        "family_fingerprint": "3b2b5af1a2111bf7d6e967ad6c15aec70ef1462e6ec12140ecc1a2c1cc06904f",
+        "row_count": 1149,
+        "family_id": "3b2b5af1a2111bf7d6e967ad6c15aec70ef1462e6ec12140ecc1a2c1cc06904f",
+        "family_assignment_hash": "3d452373a678e6775975777212c88d119ef1bc4cb1508cf7d637b0b37718ea2c",
+        "split": "B"
+      },
+      {
+        "source_gid": 102,
+        "drawing_id": "high_quality_4021",
+        "family_fingerprint": "02935cf73c30cec81048a4bc065c1013507c969c1d126aba4589c82fe6fbab41",
+        "row_count": 725,
+        "family_id": "02935cf73c30cec81048a4bc065c1013507c969c1d126aba4589c82fe6fbab41",
+        "family_assignment_hash": "c4467e706a9d32e682ce5c5782fceac665dd83a670b98f6d765e8c5307c34b5a",
+        "split": "B"
+      },
+      {
+        "source_gid": 103,
+        "drawing_id": "high_quality_4026",
+        "family_fingerprint": "06131951ff12f5e9db1585fd26c2984f429e5c7350fc284fc985a6051fc04592",
+        "row_count": 366,
+        "family_id": "06131951ff12f5e9db1585fd26c2984f429e5c7350fc284fc985a6051fc04592",
+        "family_assignment_hash": "395d184cf261ac6ba556dff9ab642f3752cd604963e1bf725c200c8b84a026d3",
+        "split": "A"
+      },
+      {
+        "source_gid": 104,
+        "drawing_id": "high_quality_4542",
+        "family_fingerprint": "0531c79f911243081b709ce9fdfe4dbfb3ed636cbd3b38d0f2f116f485d252f3",
+        "row_count": 373,
+        "family_id": "0531c79f911243081b709ce9fdfe4dbfb3ed636cbd3b38d0f2f116f485d252f3",
+        "family_assignment_hash": "32229c0fde02d969f62d8063fe454f7b384a8edf2b696ef2dd42db41ec71bd0f",
+        "split": "A"
+      },
+      {
+        "source_gid": 105,
+        "drawing_id": "high_quality_4548",
+        "family_fingerprint": "3aa0b6927f6a2bcb36e568af1f29d57266250ce97adfae2bafa4ab93cbe8164c",
+        "row_count": 1325,
+        "family_id": "3aa0b6927f6a2bcb36e568af1f29d57266250ce97adfae2bafa4ab93cbe8164c",
+        "family_assignment_hash": "a7ed86aed560992b51a7d5028f7d21214d45fbe7be6c5b86ab9f4aa3f7d90b79",
+        "split": "A"
+      },
+      {
+        "source_gid": 106,
+        "drawing_id": "high_quality_4550",
+        "family_fingerprint": "245b89d009ce97a8ba1974d95ed8372a62d1021f4235f3b372f1afa756cec6e2",
+        "row_count": 881,
+        "family_id": "245b89d009ce97a8ba1974d95ed8372a62d1021f4235f3b372f1afa756cec6e2",
+        "family_assignment_hash": "4840d71000760e0fd5ada6b562c0e16b9c635a9ec74b84edcab2d0790ca98d91",
+        "split": "B"
+      },
+      {
+        "source_gid": 107,
+        "drawing_id": "high_quality_4708",
+        "family_fingerprint": "4582a049f111d481a19b1e989924978524accec48fc4f6ec28bb62ab59c82dc5",
+        "row_count": 1597,
+        "family_id": "4582a049f111d481a19b1e989924978524accec48fc4f6ec28bb62ab59c82dc5",
+        "family_assignment_hash": "065ee1f49485e1bad121bd0aa3ff7363e7beea07fab7cec29820971d855a0dcd",
+        "split": "B"
+      },
+      {
+        "source_gid": 108,
+        "drawing_id": "high_quality_473",
+        "family_fingerprint": "14717a2a78138ba2a803ee7896b6e1f740f083700d74bbf99c5ab8c19893f68f",
+        "row_count": 671,
+        "family_id": "14717a2a78138ba2a803ee7896b6e1f740f083700d74bbf99c5ab8c19893f68f",
+        "family_assignment_hash": "901543928b837b4c157b615321fcac7a22c919bd839b70ffbabf81057e730136",
+        "split": "B"
+      },
+      {
+        "source_gid": 109,
+        "drawing_id": "high_quality_4773",
+        "family_fingerprint": "01af6af2e4c67685f146571ccffc3a13d1597b6f76ab26a7317647a16abad1e9",
+        "row_count": 1202,
+        "family_id": "01af6af2e4c67685f146571ccffc3a13d1597b6f76ab26a7317647a16abad1e9",
+        "family_assignment_hash": "c4ad5f8400ffb92446c59d44593faae2120227213271ecc7193a19a693926dfa",
+        "split": "A"
+      },
+      {
+        "source_gid": 110,
+        "drawing_id": "high_quality_4835",
+        "family_fingerprint": "322600c7ddf5fe2f236a5d0fa390e4d397ea0c30d01a3e3453a36b9e07ef3a3a",
+        "row_count": 1154,
+        "family_id": "322600c7ddf5fe2f236a5d0fa390e4d397ea0c30d01a3e3453a36b9e07ef3a3a",
+        "family_assignment_hash": "4dbfe865911fd94d9c1d45d597895c992c8d4300c580fe488c0e0a72b3907c58",
+        "split": "B"
+      },
+      {
+        "source_gid": 111,
+        "drawing_id": "high_quality_4860",
+        "family_fingerprint": "38a9ed2e9c473dd8195c5ac3b3e80fa146ee23fdcc9ffb3a54db50ef30312645",
+        "row_count": 479,
+        "family_id": "38a9ed2e9c473dd8195c5ac3b3e80fa146ee23fdcc9ffb3a54db50ef30312645",
+        "family_assignment_hash": "f06d4b836f6cdf150e24f4a3d940f8def21a09f92d537cff98d28f39e27eb92c",
+        "split": "B"
+      },
+      {
+        "source_gid": 112,
+        "drawing_id": "high_quality_4871",
+        "family_fingerprint": "0a2c61c2dd8d78bfd1711af707847b537ba88f7c7adf02ae2e71e894b1103616",
+        "row_count": 593,
+        "family_id": "0a2c61c2dd8d78bfd1711af707847b537ba88f7c7adf02ae2e71e894b1103616",
+        "family_assignment_hash": "5e77325909b95ca46df1a0ef74ef9318782cfa620adab6c37b389a889376a6bd",
+        "split": "B"
+      },
+      {
+        "source_gid": 113,
+        "drawing_id": "high_quality_4893",
+        "family_fingerprint": "317b2e11f27d53753ef4214e3e5873b4e0ce164b675e3928a9ff790000370e6e",
+        "row_count": 601,
+        "family_id": "317b2e11f27d53753ef4214e3e5873b4e0ce164b675e3928a9ff790000370e6e",
+        "family_assignment_hash": "fc38f5a55de9a52a6b081463ade7a3aac0306a893e0c55bcd63eff0cd92b301e",
+        "split": "A"
+      },
+      {
+        "source_gid": 114,
+        "drawing_id": "high_quality_5011",
+        "family_fingerprint": "074af0350c6d7b9b507033ae155d6d211a48053f72c27d29bb05768cb9d2b53d",
+        "row_count": 766,
+        "family_id": "074af0350c6d7b9b507033ae155d6d211a48053f72c27d29bb05768cb9d2b53d",
+        "family_assignment_hash": "915efa8bf9ed7d2be2dffb4c95b1c135c946650a8a31e9a1f97cdbb24f7f596b",
+        "split": "A"
+      },
+      {
+        "source_gid": 115,
+        "drawing_id": "high_quality_5080",
+        "family_fingerprint": "3256a2c2abedff1228c741d5b510a898976df5ce2a3057b6d289e97ca140a821",
+        "row_count": 620,
+        "family_id": "3256a2c2abedff1228c741d5b510a898976df5ce2a3057b6d289e97ca140a821",
+        "family_assignment_hash": "00739a05a297103cfddf99514a29e47b66352c9f21a31534cc3250218dbd6177",
+        "split": "A"
+      },
+      {
+        "source_gid": 116,
+        "drawing_id": "high_quality_5133",
+        "family_fingerprint": "09abcac73f68779bbcfd91761b12abbb71790967ec62efe14a53b8e6543f0c53",
+        "row_count": 297,
+        "family_id": "09abcac73f68779bbcfd91761b12abbb71790967ec62efe14a53b8e6543f0c53",
+        "family_assignment_hash": "7dfcafac80d5f92ad85f0db0c3eab55451f0cc58dfe23c4123dc1d4abcbf7c3a",
+        "split": "A"
+      },
+      {
+        "source_gid": 117,
+        "drawing_id": "high_quality_5587",
+        "family_fingerprint": "3da975cedfbc00312279ae5789d4e785059ad0d011085a6a4f7bf9086c98457e",
+        "row_count": 833,
+        "family_id": "3da975cedfbc00312279ae5789d4e785059ad0d011085a6a4f7bf9086c98457e",
+        "family_assignment_hash": "b90a992b07883fd9716904dbb75994613e948d1c8689a199638a5987036e3ce8",
+        "split": "B"
+      },
+      {
+        "source_gid": 118,
+        "drawing_id": "high_quality_5668",
+        "family_fingerprint": "0415a01192747917149918924e69b475c9682846e22ab481aa2353c94f8d992a",
+        "row_count": 341,
+        "family_id": "0415a01192747917149918924e69b475c9682846e22ab481aa2353c94f8d992a",
+        "family_assignment_hash": "c064687b1fb046ca06f18d74205a245e315f109fae5257dd0e4aef5455499dc5",
+        "split": "A"
+      },
+      {
+        "source_gid": 119,
+        "drawing_id": "high_quality_5682",
+        "family_fingerprint": "28d1112649d3be3e1579b88a67f4e3e99a7a3e84d9a9d8a77048cc3cab2947f0",
+        "row_count": 581,
+        "family_id": "28d1112649d3be3e1579b88a67f4e3e99a7a3e84d9a9d8a77048cc3cab2947f0",
+        "family_assignment_hash": "6431e59e93f91a5d02fbb405f64fc332962739d3854265e3eccdd16b27a70791",
+        "split": "A"
+      },
+      {
+        "source_gid": 120,
+        "drawing_id": "high_quality_5690",
+        "family_fingerprint": "0a59a10950ff8892913239d60aeb63756ac1141da0452ad5276c2974e5984b59",
+        "row_count": 1060,
+        "family_id": "0a59a10950ff8892913239d60aeb63756ac1141da0452ad5276c2974e5984b59",
+        "family_assignment_hash": "5cbdd6eb125ba8b9295aa8ee808f67f32b0f62538fc59783c2503e8f21ee946f",
+        "split": "A"
+      },
+      {
+        "source_gid": 121,
+        "drawing_id": "high_quality_5753",
+        "family_fingerprint": "219be406bc486d5c14b7522e030b5f6b4dc2a4774de5d63b544f97660e8d218a",
+        "row_count": 464,
+        "family_id": "219be406bc486d5c14b7522e030b5f6b4dc2a4774de5d63b544f97660e8d218a",
+        "family_assignment_hash": "ac7a4df80610a50413532517b006e1a37ac4d157876c26504e28bd699790ebcf",
+        "split": "B"
+      },
+      {
+        "source_gid": 122,
+        "drawing_id": "high_quality_5767",
+        "family_fingerprint": "654c5d45300226dff50cdd43efc92570c892694b2b3c734fcada5d149b0ac9bf",
+        "row_count": 586,
+        "family_id": "654c5d45300226dff50cdd43efc92570c892694b2b3c734fcada5d149b0ac9bf",
+        "family_assignment_hash": "7785bc23ee2d3b171816cf2184a89fd90c29e415c2af6fa251e559a057329862",
+        "split": "A"
+      },
+      {
+        "source_gid": 123,
+        "drawing_id": "high_quality_5773",
+        "family_fingerprint": "01f96de4fb2d49be169161f3b5a093b3b7bd8e53116c99b27f55fc4dc1dc3462",
+        "row_count": 604,
+        "family_id": "01f96de4fb2d49be169161f3b5a093b3b7bd8e53116c99b27f55fc4dc1dc3462",
+        "family_assignment_hash": "7397609b852f4e746357cf858338cfe8ac08cc184a26b88e77b2ae8ecbe3e06d",
+        "split": "A"
+      },
+      {
+        "source_gid": 124,
+        "drawing_id": "high_quality_5968",
+        "family_fingerprint": "1e6d4dfc3fdf17e0de02270b0c2f1950af02d3bdb714a8cb3106f719f765a325",
+        "row_count": 547,
+        "family_id": "1e6d4dfc3fdf17e0de02270b0c2f1950af02d3bdb714a8cb3106f719f765a325",
+        "family_assignment_hash": "a509de2d12c0fdb63bb564eeb1feb15657535c22b82a21d701c121f9264831c7",
+        "split": "A"
+      },
+      {
+        "source_gid": 125,
+        "drawing_id": "high_quality_5984",
+        "family_fingerprint": "0790c38f724df2b9f857a8bca6fcac5df104d00c79cdb9b5b58ce4657b7e6d2e",
+        "row_count": 612,
+        "family_id": "0790c38f724df2b9f857a8bca6fcac5df104d00c79cdb9b5b58ce4657b7e6d2e",
+        "family_assignment_hash": "f88fbe59f2e15a03fc307b6738168061f4c17d7bb1c311e3f0171a654e5c2afd",
+        "split": "A"
+      },
+      {
+        "source_gid": 126,
+        "drawing_id": "high_quality_6079",
+        "family_fingerprint": "0f629aa297b05e2024f0e5f9ecd021cee13f08d9d696e2275e6947f4bdb72a1e",
+        "row_count": 1069,
+        "family_id": "0f629aa297b05e2024f0e5f9ecd021cee13f08d9d696e2275e6947f4bdb72a1e",
+        "family_assignment_hash": "3484a28afc67b7c2d33eefdfd5ac5a5289944d32d8c7beb571a1b1a766643db0",
+        "split": "B"
+      },
+      {
+        "source_gid": 127,
+        "drawing_id": "high_quality_6141",
+        "family_fingerprint": "00236538f5b5d8a7dcd28aa2c6d1d263634178ac9b4e4fbe12bc7be5b0a5ea8b",
+        "row_count": 1048,
+        "family_id": "00236538f5b5d8a7dcd28aa2c6d1d263634178ac9b4e4fbe12bc7be5b0a5ea8b",
+        "family_assignment_hash": "e895294928eb883ae2129cec57677edc46e946d48ecd05facffdb35e9f16f292",
+        "split": "B"
+      },
+      {
+        "source_gid": 128,
+        "drawing_id": "high_quality_6243",
+        "family_fingerprint": "47c346ec12c9a15067eff13e5723021d1b1a86983225bbe28a970fb15a19150c",
+        "row_count": 929,
+        "family_id": "47c346ec12c9a15067eff13e5723021d1b1a86983225bbe28a970fb15a19150c",
+        "family_assignment_hash": "ee03deb3316485236e4ef907303a8787c2a44b2d190bcf0bb449bb15138d7a6f",
+        "split": "B"
+      },
+      {
+        "source_gid": 129,
+        "drawing_id": "high_quality_6256",
+        "family_fingerprint": "017a766593da42a3c5da23977ee647a0a7c0d60f705978aa3dfafce0093580c4",
+        "row_count": 555,
+        "family_id": "017a766593da42a3c5da23977ee647a0a7c0d60f705978aa3dfafce0093580c4",
+        "family_assignment_hash": "bb987680c40744f32fb3749a03dc6784b1b892fa6750b12a0e0313e46dd60c21",
+        "split": "B"
+      },
+      {
+        "source_gid": 130,
+        "drawing_id": "high_quality_6367",
+        "family_fingerprint": "090c3f15d038ffb8ada6c3bbe65c7c362074b73980a000ada82b80d68392feec",
+        "row_count": 353,
+        "family_id": "090c3f15d038ffb8ada6c3bbe65c7c362074b73980a000ada82b80d68392feec",
+        "family_assignment_hash": "6b73a1e6da55abdf8d991dcedd3e1232e8c3d9bd31ae392316d430371d3b942f",
+        "split": "B"
+      },
+      {
+        "source_gid": 131,
+        "drawing_id": "high_quality_6388",
+        "family_fingerprint": "0b0411fa55ae7a1fe6b0caae2db5aa22f8326a5ff30681473c5ff25c5546170a",
+        "row_count": 500,
+        "family_id": "0b0411fa55ae7a1fe6b0caae2db5aa22f8326a5ff30681473c5ff25c5546170a",
+        "family_assignment_hash": "f2b0e35dd9705847ad53b53e5829e79fb0483a7fb435519a52e51bf65aedc39b",
+        "split": "A"
+      },
+      {
+        "source_gid": 132,
+        "drawing_id": "high_quality_6632",
+        "family_fingerprint": "3e2c6d4d5c419d664c70a7bb1a93172dc9b87ff0069b3da89c6d92352666c041",
+        "row_count": 552,
+        "family_id": "3e2c6d4d5c419d664c70a7bb1a93172dc9b87ff0069b3da89c6d92352666c041",
+        "family_assignment_hash": "5bfe4a0496136d36804711e5967ff71cd8ff07bf685fe511887b6410bedc0b95",
+        "split": "B"
+      },
+      {
+        "source_gid": 133,
+        "drawing_id": "high_quality_665",
+        "family_fingerprint": "2c61bdb357fa283f182b5d16aebb5e3b5792c9163b3d398871ab1c1765bf6073",
+        "row_count": 1180,
+        "family_id": "2c61bdb357fa283f182b5d16aebb5e3b5792c9163b3d398871ab1c1765bf6073",
+        "family_assignment_hash": "c1ad8c7a424184b8532637232d5678b9a661321c68b047ac322fad902874b688",
+        "split": "A"
+      },
+      {
+        "source_gid": 134,
+        "drawing_id": "high_quality_6702",
+        "family_fingerprint": "4310cce77edc11aa5f10e8ec02d1907ba9bc8170b4a12633cb4fbd716b8f3384",
+        "row_count": 482,
+        "family_id": "4310cce77edc11aa5f10e8ec02d1907ba9bc8170b4a12633cb4fbd716b8f3384",
+        "family_assignment_hash": "e431f04a2eae84af7955691167d72947bc6adb21f090232a077e4ce236817fb9",
+        "split": "A"
+      },
+      {
+        "source_gid": 135,
+        "drawing_id": "high_quality_6732",
+        "family_fingerprint": "22f0220bd737b0042842cfc33632e6f8b764583fc22ce8881e53813957572bf7",
+        "row_count": 569,
+        "family_id": "22f0220bd737b0042842cfc33632e6f8b764583fc22ce8881e53813957572bf7",
+        "family_assignment_hash": "0d29ea7f26cd7019ea14dafc38a64fec212bd12952b269a76cf58850b93ba4ac",
+        "split": "B"
+      },
+      {
+        "source_gid": 136,
+        "drawing_id": "high_quality_7008",
+        "family_fingerprint": "48d33347610ab236816f5eb592a4259cef9adf47cb41371fc6c8dcf6ed03af13",
+        "row_count": 594,
+        "family_id": "48d33347610ab236816f5eb592a4259cef9adf47cb41371fc6c8dcf6ed03af13",
+        "family_assignment_hash": "27bc7194e5830181a253fa589b47a92ad1e414cd7d3a3d039f4717346b1b5b18",
+        "split": "B"
+      },
+      {
+        "source_gid": 137,
+        "drawing_id": "high_quality_7046",
+        "family_fingerprint": "0e5628411f29029c755616a621b78ded8daa5adcd10e4529c8fb5b120c6bdd23",
+        "row_count": 681,
+        "family_id": "0e5628411f29029c755616a621b78ded8daa5adcd10e4529c8fb5b120c6bdd23",
+        "family_assignment_hash": "3927a4b8c8d89b1a1f82c5f9c07086a409a3a7a14fb5fb571c391dcee32c60ec",
+        "split": "B"
+      },
+      {
+        "source_gid": 138,
+        "drawing_id": "high_quality_7082",
+        "family_fingerprint": "0e61185b384cb7e4a71c6c7ee9822532e43d8828e9ba85b86704fdcb49106335",
+        "row_count": 1302,
+        "family_id": "0e61185b384cb7e4a71c6c7ee9822532e43d8828e9ba85b86704fdcb49106335",
+        "family_assignment_hash": "63235fc568fc3aa27b1cc23a43196cfadc0882a61d370f26a6e0fedc2c16e795",
+        "split": "A"
+      },
+      {
+        "source_gid": 139,
+        "drawing_id": "high_quality_729",
+        "family_fingerprint": "1775e001e594de41734a0568b523b839904a4143c9e91711f2f5212c31b1cc21",
+        "row_count": 775,
+        "family_id": "1775e001e594de41734a0568b523b839904a4143c9e91711f2f5212c31b1cc21",
+        "family_assignment_hash": "6c3c84b58a776b66082ce58099ab8ebc3e56a4c018670941fd77c04fa580dd1a",
+        "split": "A"
+      },
+      {
+        "source_gid": 140,
+        "drawing_id": "high_quality_751",
+        "family_fingerprint": "055841f8f7e426648ef98511af5d03f21924a3081d8c61b1a7adc50efa39afa6",
+        "row_count": 742,
+        "family_id": "055841f8f7e426648ef98511af5d03f21924a3081d8c61b1a7adc50efa39afa6",
+        "family_assignment_hash": "9b4ad6797d23f351ee63571263803c29ffc71aecf126a1c7280c92397fa08ae3",
+        "split": "A"
+      },
+      {
+        "source_gid": 141,
+        "drawing_id": "high_quality_7520",
+        "family_fingerprint": "664ee2587c9b2902a8c408158cd66c9af42546a848b8f79d50cf9cd0b69fc10c",
+        "row_count": 1184,
+        "family_id": "664ee2587c9b2902a8c408158cd66c9af42546a848b8f79d50cf9cd0b69fc10c",
+        "family_assignment_hash": "8b857bc6c6dc728c80191f41e5e057958f0519c57933a71f8b5d6d135554392e",
+        "split": "B"
+      },
+      {
+        "source_gid": 142,
+        "drawing_id": "high_quality_7523",
+        "family_fingerprint": "16562a44cac666c304ee9875072a33f223e934e63d7f2a7d707c817408de5e45",
+        "row_count": 360,
+        "family_id": "16562a44cac666c304ee9875072a33f223e934e63d7f2a7d707c817408de5e45",
+        "family_assignment_hash": "b59263c1f6bca2454eec38f33841da6ac057175d2031cb327caeef9c15283e3b",
+        "split": "A"
+      },
+      {
+        "source_gid": 143,
+        "drawing_id": "high_quality_7767",
+        "family_fingerprint": "1995ec9899f068d50aa4bbf26065d423ba51dfb9d1afc1ff0e065ae00d352261",
+        "row_count": 472,
+        "family_id": "1995ec9899f068d50aa4bbf26065d423ba51dfb9d1afc1ff0e065ae00d352261",
+        "family_assignment_hash": "3689d754c68c918f66a7e0afed08894680030e299c4b197be0635de4c8210d28",
+        "split": "A"
+      },
+      {
+        "source_gid": 144,
+        "drawing_id": "high_quality_8079",
+        "family_fingerprint": "34501b672af8af6172374bb873b3f2d37bad2beafe13cd8ba3773309e9f491ef",
+        "row_count": 432,
+        "family_id": "34501b672af8af6172374bb873b3f2d37bad2beafe13cd8ba3773309e9f491ef",
+        "family_assignment_hash": "1e8dd0a112f589e552273beb4ca2216ccf2d5c3fd4db488a0ccdd51b52fdc188",
+        "split": "A"
+      },
+      {
+        "source_gid": 145,
+        "drawing_id": "high_quality_8151",
+        "family_fingerprint": "324d2d0b843d067c07e30e0c62bc85ccfca11476e90a1087401c692762c89e29",
+        "row_count": 389,
+        "family_id": "324d2d0b843d067c07e30e0c62bc85ccfca11476e90a1087401c692762c89e29",
+        "family_assignment_hash": "6e2b890df0cb6a0406a7cfa4503c551768b6ea72cafc67afbf132b9a107dfdb2",
+        "split": "A"
+      },
+      {
+        "source_gid": 146,
+        "drawing_id": "high_quality_8661",
+        "family_fingerprint": "00081b18fda2edc6737a89f6bb938ddbeff8cfad068fb9e153192d8b118db168",
+        "row_count": 809,
+        "family_id": "00081b18fda2edc6737a89f6bb938ddbeff8cfad068fb9e153192d8b118db168",
+        "family_assignment_hash": "86c4b5afc9f6774c0ea8fa5a293df04ccabae35b88b1d9978ae1a15d54ded9bc",
+        "split": "A"
+      },
+      {
+        "source_gid": 147,
+        "drawing_id": "high_quality_8781",
+        "family_fingerprint": "1a90f6d255ac85c72a8e75dd295ede8bc689019cf071924dc16d62589d135f5d",
+        "row_count": 596,
+        "family_id": "1a90f6d255ac85c72a8e75dd295ede8bc689019cf071924dc16d62589d135f5d",
+        "family_assignment_hash": "f95ed785eca3e04b11f61f339b7170de7f0f591b7059e5b20566209a245d3851",
+        "split": "B"
+      },
+      {
+        "source_gid": 148,
+        "drawing_id": "high_quality_9002",
+        "family_fingerprint": "28875d1e3f37c4ce0c65bfd218ebc972b7a6d7a59fe88a601235d5b29650497f",
+        "row_count": 679,
+        "family_id": "28875d1e3f37c4ce0c65bfd218ebc972b7a6d7a59fe88a601235d5b29650497f",
+        "family_assignment_hash": "075361ab71fdcedeb59243371bd25508f588545ff8aecb62506172b1ab3a9d44",
+        "split": "A"
+      },
+      {
+        "source_gid": 149,
+        "drawing_id": "high_quality_929",
+        "family_fingerprint": "153da25f6d11f1c3ac3b786f37fde39c8602ff1e9f5712d92d30f806fcfddb9f",
+        "row_count": 338,
+        "family_id": "153da25f6d11f1c3ac3b786f37fde39c8602ff1e9f5712d92d30f806fcfddb9f",
+        "family_assignment_hash": "c592bef65f51037bac1966b0786c8f5ad269180643b6c2f36775b05a41e13ea5",
+        "split": "B"
+      },
+      {
+        "source_gid": 150,
+        "drawing_id": "high_quality_9619",
+        "family_fingerprint": "09188e26e4e7cd65daada32a1189978177cd1cbc27c1484ba37df378639bbe79",
+        "row_count": 370,
+        "family_id": "09188e26e4e7cd65daada32a1189978177cd1cbc27c1484ba37df378639bbe79",
+        "family_assignment_hash": "8ba93f3d55c6e32ce2cb940a7840efe0011613eba92d0a436675b29906444798",
+        "split": "A"
+      },
+      {
+        "source_gid": 151,
+        "drawing_id": "high_quality_9770",
+        "family_fingerprint": "40ec1515094a6e72040f0061ed69b4f8e1cbec833acc8fb612cb959bda07f71b",
+        "row_count": 1485,
+        "family_id": "40ec1515094a6e72040f0061ed69b4f8e1cbec833acc8fb612cb959bda07f71b",
+        "family_assignment_hash": "357c7c0cfe9737ed8072b8e24868ce8832ad255a8c1e981c59434cb33efbd19d",
+        "split": "B"
+      },
+      {
+        "source_gid": 152,
+        "drawing_id": "high_quality_9920",
+        "family_fingerprint": "52edf2f8d5b7054c732481c47867a0fa3204dd9fe4c11bf5c89d2182ec6cd41b",
+        "row_count": 611,
+        "family_id": "52edf2f8d5b7054c732481c47867a0fa3204dd9fe4c11bf5c89d2182ec6cd41b",
+        "family_assignment_hash": "4c202d2241fb4ce8ca7d5a002d2989d8a56a56e392805ce7429376c089f57efa",
+        "split": "A"
+      },
+      {
+        "source_gid": 153,
+        "drawing_id": "high_quality_9939",
+        "family_fingerprint": "36b9699015d73f14739cf0984f428f2ba2745127d3ff8ccca83edcf8c9710922",
+        "row_count": 672,
+        "family_id": "36b9699015d73f14739cf0984f428f2ba2745127d3ff8ccca83edcf8c9710922",
+        "family_assignment_hash": "bc0963012389f896c14091421f2eb53f84987a910b7f64c1adc3e931fc4bbda3",
+        "split": "A"
+      },
+      {
+        "source_gid": 154,
+        "drawing_id": "high_quality_9975",
+        "family_fingerprint": "13b9362c25397853b8b7d75a592bf8d6bff3ffaf3259bf290ea1bd438ba7ced1",
+        "row_count": 586,
+        "family_id": "13b9362c25397853b8b7d75a592bf8d6bff3ffaf3259bf290ea1bd438ba7ced1",
+        "family_assignment_hash": "1e8e443d81b9eefca780488b760e26aa01c294fc8765f328afd7a8e1ba21f79b",
+        "split": "B"
+      },
+      {
+        "source_gid": 155,
+        "drawing_id": "high_quality_architectural_1052",
+        "family_fingerprint": "0c6f5ad473ab5af02a855bf4867d7e85be03ed473ffc212e421654824396920d",
+        "row_count": 1779,
+        "family_id": "0c6f5ad473ab5af02a855bf4867d7e85be03ed473ffc212e421654824396920d",
+        "family_assignment_hash": "22bc6d7111f519f195336dafd9121c476581f0fe9d3ffcaeba51bd08eede422c",
+        "split": "B"
+      },
+      {
+        "source_gid": 156,
+        "drawing_id": "high_quality_architectural_1061",
+        "family_fingerprint": "11fb4f64c9a1dc1db52b242bfae07e8dcf55a6ba8269ec6c24b8ae824f5f0fad",
+        "row_count": 1266,
+        "family_id": "11fb4f64c9a1dc1db52b242bfae07e8dcf55a6ba8269ec6c24b8ae824f5f0fad",
+        "family_assignment_hash": "7fe066fbb2770865a7129686342723e394e7d3ec3ad45e21390606ce57e9060a",
+        "split": "B"
+      },
+      {
+        "source_gid": 157,
+        "drawing_id": "high_quality_architectural_1066",
+        "family_fingerprint": "1a114271b515dc44fe1b4795b549e43fd98f8a26c9264eb16618936a559bf6d5",
+        "row_count": 863,
+        "family_id": "1a114271b515dc44fe1b4795b549e43fd98f8a26c9264eb16618936a559bf6d5",
+        "family_assignment_hash": "aaacaa4056bb2d82e54d44e9e8eeef39c8f22edf9125519e38b4afa7d39fa948",
+        "split": "A"
+      },
+      {
+        "source_gid": 158,
+        "drawing_id": "high_quality_architectural_1067",
+        "family_fingerprint": "107de74c0e5a88b03601f46edaf64a70b2b3d47a83bb61a7308f9a38094e986d",
+        "row_count": 593,
+        "family_id": "107de74c0e5a88b03601f46edaf64a70b2b3d47a83bb61a7308f9a38094e986d",
+        "family_assignment_hash": "e576c53d364a86550d94da5dd27a26e0737f7a10abf5cd3005903ff60d927c35",
+        "split": "B"
+      },
+      {
+        "source_gid": 159,
+        "drawing_id": "high_quality_architectural_1075",
+        "family_fingerprint": "1394ce8e13e6aa38502a53bd763ad9016c145076bfce18ff33b928e9bc53b547",
+        "row_count": 1709,
+        "family_id": "1394ce8e13e6aa38502a53bd763ad9016c145076bfce18ff33b928e9bc53b547",
+        "family_assignment_hash": "a3195e74137d34158a942d1736737cfa311a6a392bd9e5096a7cd53dc10337e9",
+        "split": "A"
+      },
+      {
+        "source_gid": 160,
+        "drawing_id": "high_quality_architectural_1089",
+        "family_fingerprint": "3f2553bd1ad7a413d3e82f808063b7bbf1416d6f816cc7ac2670b825d3442716",
+        "row_count": 687,
+        "family_id": "3f2553bd1ad7a413d3e82f808063b7bbf1416d6f816cc7ac2670b825d3442716",
+        "family_assignment_hash": "8804f9ea15b815960f8b1eb06a6cfa01e75c4942f5c1008fd0331112f8892fcd",
+        "split": "A"
+      },
+      {
+        "source_gid": 161,
+        "drawing_id": "high_quality_architectural_1101",
+        "family_fingerprint": "70b404b73e714294392950844418c235f3fbc8a7d0331899cec6df51a03f80f7",
+        "row_count": 705,
+        "family_id": "70b404b73e714294392950844418c235f3fbc8a7d0331899cec6df51a03f80f7",
+        "family_assignment_hash": "497a279118b92d2b87ebda4d1f4489ac7456465336ea077320d1e9e67b3b1afc",
+        "split": "A"
+      },
+      {
+        "source_gid": 162,
+        "drawing_id": "high_quality_architectural_1107",
+        "family_fingerprint": "0984bf15776cc4651adbf243392681140333b3b8c60fe6b17c638d14a8403a06",
+        "row_count": 1968,
+        "family_id": "0984bf15776cc4651adbf243392681140333b3b8c60fe6b17c638d14a8403a06",
+        "family_assignment_hash": "ca0b621bf9a434e9e9be134d0d5fca0ceffa2508b259045e1ec6c011ce7f44e5",
+        "split": "B"
+      },
+      {
+        "source_gid": 163,
+        "drawing_id": "high_quality_architectural_1162",
+        "family_fingerprint": "121932c818f33c3a3a4c283e62de38acd6c75b6d4cbbc4a1e434d4126179cabe",
+        "row_count": 1229,
+        "family_id": "121932c818f33c3a3a4c283e62de38acd6c75b6d4cbbc4a1e434d4126179cabe",
+        "family_assignment_hash": "01f7b00070e142146b849f0ae61f37c8f9f7e67a8aa3bb217847063adf80ff31",
+        "split": "A"
+      },
+      {
+        "source_gid": 164,
+        "drawing_id": "high_quality_architectural_1168",
+        "family_fingerprint": "296a7f23620ede44a40ece1e9612c27bbc5c68dd6e8716d2e1c5720dfb9ebeb7",
+        "row_count": 483,
+        "family_id": "296a7f23620ede44a40ece1e9612c27bbc5c68dd6e8716d2e1c5720dfb9ebeb7",
+        "family_assignment_hash": "3e612d5135865f4c5aa17a9acd04013ded7af69958cc2cf022a84a366b4d07ab",
+        "split": "B"
+      },
+      {
+        "source_gid": 166,
+        "drawing_id": "high_quality_architectural_1220",
+        "family_fingerprint": "23bb6dea19c526e54d9741710d4eb4e176c4b6f739b9f65fd6c2d99eb938a54a",
+        "row_count": 1210,
+        "family_id": "23bb6dea19c526e54d9741710d4eb4e176c4b6f739b9f65fd6c2d99eb938a54a",
+        "family_assignment_hash": "588d4d3bc94bc9da3f9d11e2d996eb87650477b079bdb48fa9789c511e205f6c",
+        "split": "A"
+      },
+      {
+        "source_gid": 167,
+        "drawing_id": "high_quality_architectural_1231",
+        "family_fingerprint": "2edae1deb63feaf7df495340771a69bd92e8ed7628c0b584514944a3a31f0f21",
+        "row_count": 720,
+        "family_id": "2edae1deb63feaf7df495340771a69bd92e8ed7628c0b584514944a3a31f0f21",
+        "family_assignment_hash": "15bc7c9fdd8529eedcb8b758139c025d03cd69d2edcfb80fedbeb68353362e41",
+        "split": "A"
+      },
+      {
+        "source_gid": 168,
+        "drawing_id": "high_quality_architectural_1241",
+        "family_fingerprint": "173e649e5101186fc00dda18e62cd6edde8962e798e0ac5ad7425da110ed8f1b",
+        "row_count": 704,
+        "family_id": "173e649e5101186fc00dda18e62cd6edde8962e798e0ac5ad7425da110ed8f1b",
+        "family_assignment_hash": "710ed4d73b4f20f43850d2e20b4ca0d016da2df6dbdb4be3a051675e71670606",
+        "split": "B"
+      },
+      {
+        "source_gid": 169,
+        "drawing_id": "high_quality_architectural_1324",
+        "family_fingerprint": "7c36dc509b8f16518458d7e556cd6f5a9b517d20ea9e36c239f5aef62173a97d",
+        "row_count": 842,
+        "family_id": "7c36dc509b8f16518458d7e556cd6f5a9b517d20ea9e36c239f5aef62173a97d",
+        "family_assignment_hash": "a8d0367f70c833043a16172d10ff55e8e7298b25f66dad60f199a7e7bf03bbee",
+        "split": "B"
+      },
+      {
+        "source_gid": 170,
+        "drawing_id": "high_quality_architectural_1328",
+        "family_fingerprint": "0ee96bbffeab355d857e3d68a81ecb6d7491df1556982c14c18123f189d69a50",
+        "row_count": 1951,
+        "family_id": "0ee96bbffeab355d857e3d68a81ecb6d7491df1556982c14c18123f189d69a50",
+        "family_assignment_hash": "578b2e696477c48012e9635d571013a1dc49285496456a9ee166c0afdf300618",
+        "split": "B"
+      },
+      {
+        "source_gid": 171,
+        "drawing_id": "high_quality_architectural_1331",
+        "family_fingerprint": "0596963bdc8360caa950185032ba96e828508cc783766c0cc2db0a982c204f72",
+        "row_count": 416,
+        "family_id": "0596963bdc8360caa950185032ba96e828508cc783766c0cc2db0a982c204f72",
+        "family_assignment_hash": "264b7f9d6a946a87dd353d1b50dbe4e226a7ea8e077c549c544670c139b780fb",
+        "split": "B"
+      },
+      {
+        "source_gid": 172,
+        "drawing_id": "high_quality_architectural_1359",
+        "family_fingerprint": "30b5897716e63322d873b1f30403d60b35dd66e56c51329a3e963a77b6717361",
+        "row_count": 1508,
+        "family_id": "30b5897716e63322d873b1f30403d60b35dd66e56c51329a3e963a77b6717361",
+        "family_assignment_hash": "c2a32c4b5721e21bee426618bd1d013c17b8bef721e4cdfd2483954a78134924",
+        "split": "B"
+      },
+      {
+        "source_gid": 173,
+        "drawing_id": "high_quality_architectural_1361",
+        "family_fingerprint": "048b91d655e7e366e7a6f7e97c49b14c91d0c5c214dce1f4180c525428b89323",
+        "row_count": 552,
+        "family_id": "048b91d655e7e366e7a6f7e97c49b14c91d0c5c214dce1f4180c525428b89323",
+        "family_assignment_hash": "5ee1c9b8653ecda48d792cdadeb95fa1d428a5cab2e29def74fb084f1a87bf92",
+        "split": "A"
+      },
+      {
+        "source_gid": 174,
+        "drawing_id": "high_quality_architectural_1376",
+        "family_fingerprint": "0d9e838cab10feaae4012bcc55db38195ab5551048cd08f6022c8cd0f5d5b25b",
+        "row_count": 712,
+        "family_id": "0d9e838cab10feaae4012bcc55db38195ab5551048cd08f6022c8cd0f5d5b25b",
+        "family_assignment_hash": "035b2d5091bb08cea49502db0d362cfb7782ebefc4341598c1ca5f9c881fc736",
+        "split": "B"
+      },
+      {
+        "source_gid": 175,
+        "drawing_id": "high_quality_architectural_1423",
+        "family_fingerprint": "339ddcfb782b753e5ba7dcd24c0d4ccd7885bc20f189a14867c041f135b3e073",
+        "row_count": 720,
+        "family_id": "339ddcfb782b753e5ba7dcd24c0d4ccd7885bc20f189a14867c041f135b3e073",
+        "family_assignment_hash": "259e07105a215f8fece0d7137917263b29a0dc579751da7a01d789592eb37c3d",
+        "split": "B"
+      },
+      {
+        "source_gid": 176,
+        "drawing_id": "high_quality_architectural_1425",
+        "family_fingerprint": "3d00de647586dd74fb4eb5bf7d285f81cd223a1dc1e4199d25c25b41b3b97394",
+        "row_count": 920,
+        "family_id": "3d00de647586dd74fb4eb5bf7d285f81cd223a1dc1e4199d25c25b41b3b97394",
+        "family_assignment_hash": "d3d47d82663d4193348308ea85e47ec60c2047d6057f24588dfb349b23735fed",
+        "split": "A"
+      },
+      {
+        "source_gid": 177,
+        "drawing_id": "high_quality_architectural_1539",
+        "family_fingerprint": "2de62a954c1032fa712682c331340e91ec6038ca1af2d7e2252802a1dcdb2c72",
+        "row_count": 1001,
+        "family_id": "2de62a954c1032fa712682c331340e91ec6038ca1af2d7e2252802a1dcdb2c72",
+        "family_assignment_hash": "2491fde7ede4ff19b90bec62a541b40c3492c3fbfba9184ef6e6027bfdefd16e",
+        "split": "A"
+      },
+      {
+        "source_gid": 178,
+        "drawing_id": "high_quality_architectural_154",
+        "family_fingerprint": "1aec56167d6bd41e65e14bb21b3db9f02a82ccb658a8b25664807a25401faa56",
+        "row_count": 1071,
+        "family_id": "1aec56167d6bd41e65e14bb21b3db9f02a82ccb658a8b25664807a25401faa56",
+        "family_assignment_hash": "25643366e263dc3f8bddb1183e80e0f398a80a9d4bd9e3e24108d5f1ce9a1294",
+        "split": "B"
+      },
+      {
+        "source_gid": 179,
+        "drawing_id": "high_quality_architectural_1611",
+        "family_fingerprint": "105162a1b03e80558a7a5cf03de556579fd71a6e1ab624ecc44252775452c540",
+        "row_count": 371,
+        "family_id": "105162a1b03e80558a7a5cf03de556579fd71a6e1ab624ecc44252775452c540",
+        "family_assignment_hash": "b832988bf0d55c0230d0be2c70ad9e2c8bd4038117ddf079ba36daedeadbd787",
+        "split": "A"
+      },
+      {
+        "source_gid": 180,
+        "drawing_id": "high_quality_architectural_163",
+        "family_fingerprint": "19287a9b5180de0db982dfa4fa21763fd348c90d04275f3c0c19f6b5f815dc8a",
+        "row_count": 1338,
+        "family_id": "19287a9b5180de0db982dfa4fa21763fd348c90d04275f3c0c19f6b5f815dc8a",
+        "family_assignment_hash": "29498f1f49b606a25330bc99e44f98c93d1ee400d622d4df9aa43bcfbea13a00",
+        "split": "A"
+      },
+      {
+        "source_gid": 181,
+        "drawing_id": "high_quality_architectural_1632",
+        "family_fingerprint": "016c4ea8198abb342c165573d04fe0ea4023d73ab8e6dd891f4e50bfa89f2869",
+        "row_count": 656,
+        "family_id": "016c4ea8198abb342c165573d04fe0ea4023d73ab8e6dd891f4e50bfa89f2869",
+        "family_assignment_hash": "107bea127252ab8f457ade13b3c07b089d8c4af6b3a7a26af1056b21f9815bc1",
+        "split": "A"
+      },
+      {
+        "source_gid": 182,
+        "drawing_id": "high_quality_architectural_1646",
+        "family_fingerprint": "179d551d40e9e87e79bb2f2fc13956c029dee61b1a147bf29e0b19b4173aa927",
+        "row_count": 1364,
+        "family_id": "179d551d40e9e87e79bb2f2fc13956c029dee61b1a147bf29e0b19b4173aa927",
+        "family_assignment_hash": "64f7da7895aa365abad7942d76240ddf2a09f6c126cf18147406506fbdc2ee8f",
+        "split": "B"
+      },
+      {
+        "source_gid": 183,
+        "drawing_id": "high_quality_architectural_1654",
+        "family_fingerprint": "0ddbf196891181e5c20f9b2ad4ddf5a9c30b8d96a35ce2e830d309e9cf06ed97",
+        "row_count": 422,
+        "family_id": "0ddbf196891181e5c20f9b2ad4ddf5a9c30b8d96a35ce2e830d309e9cf06ed97",
+        "family_assignment_hash": "2ee0a1a255cb5befa6c86d2ccad46a0d8d4e7a0c794393bb4d0be03d55230ae2",
+        "split": "A"
+      },
+      {
+        "source_gid": 184,
+        "drawing_id": "high_quality_architectural_1660",
+        "family_fingerprint": "076ab399f815915353253119ac6f5d59fa5780da26c2d2c0486c97b05e505932",
+        "row_count": 450,
+        "family_id": "076ab399f815915353253119ac6f5d59fa5780da26c2d2c0486c97b05e505932",
+        "family_assignment_hash": "6b25ccd6eb632a0c11daebff47bd6d157d162c7e59614a13d6697818e2f4c8dd",
+        "split": "A"
+      },
+      {
+        "source_gid": 185,
+        "drawing_id": "high_quality_architectural_1691",
+        "family_fingerprint": "5e42e9c415f0d6b2ced6832ce5908a8f3f15640f4c14db0575849f131b5f9de6",
+        "row_count": 633,
+        "family_id": "5e42e9c415f0d6b2ced6832ce5908a8f3f15640f4c14db0575849f131b5f9de6",
+        "family_assignment_hash": "1dce939d038cd14a64959dac0d253701b994dc1c222c0c7ad845e9ff190bbb6d",
+        "split": "A"
+      },
+      {
+        "source_gid": 186,
+        "drawing_id": "high_quality_architectural_1696",
+        "family_fingerprint": "014b8acd469612b7b58ad0f1f6972800d984f27a9b922bc6bcb9a522f5642973",
+        "row_count": 1484,
+        "family_id": "014b8acd469612b7b58ad0f1f6972800d984f27a9b922bc6bcb9a522f5642973",
+        "family_assignment_hash": "a57435eb086b1a80e3dea023756bec2c51b16099a1905112d171d93a32df032b",
+        "split": "B"
+      },
+      {
+        "source_gid": 187,
+        "drawing_id": "high_quality_architectural_1699",
+        "family_fingerprint": "0ecfa816ece37498705ddac4fdf59f3c741bae1cd14852b3b9080fa1e01bed41",
+        "row_count": 1230,
+        "family_id": "0ecfa816ece37498705ddac4fdf59f3c741bae1cd14852b3b9080fa1e01bed41",
+        "family_assignment_hash": "9d2badb76e0316192ac8a71678f9445e16aa47c55a2ed699ffb5d820c97ff5bb",
+        "split": "A"
+      },
+      {
+        "source_gid": 188,
+        "drawing_id": "high_quality_architectural_1717",
+        "family_fingerprint": "1b2a2eedcc2def4357aefe74ad1434d80da472983fa4de8e2fddd52de2ec0ceb",
+        "row_count": 748,
+        "family_id": "1b2a2eedcc2def4357aefe74ad1434d80da472983fa4de8e2fddd52de2ec0ceb",
+        "family_assignment_hash": "d06d0c4f170d7fa95b851ecfae8427f2d2092dd5b2d8ad14d3dec653374aabef",
+        "split": "A"
+      },
+      {
+        "source_gid": 189,
+        "drawing_id": "high_quality_architectural_174",
+        "family_fingerprint": "1ab7d87e5d7f49cbb1dbf9e6dd30e7dcb470ce9ebda1d60596b22d731dddf043",
+        "row_count": 1429,
+        "family_id": "1ab7d87e5d7f49cbb1dbf9e6dd30e7dcb470ce9ebda1d60596b22d731dddf043",
+        "family_assignment_hash": "f5e7b6896b3b62656b5263940ef22e756b21088e2bbba2bbf2d01e6ab29ec7c3",
+        "split": "B"
+      },
+      {
+        "source_gid": 190,
+        "drawing_id": "high_quality_architectural_1783",
+        "family_fingerprint": "0824e5d36ba16a28bf95479d1a21258321f1b0edb1e11315bda80f73259afc47",
+        "row_count": 1374,
+        "family_id": "0824e5d36ba16a28bf95479d1a21258321f1b0edb1e11315bda80f73259afc47",
+        "family_assignment_hash": "569b8a427524be0252be2935c642da07a1f6716f5985140d4cd221c8311b348a",
+        "split": "B"
+      },
+      {
+        "source_gid": 191,
+        "drawing_id": "high_quality_architectural_1846",
+        "family_fingerprint": "626d39c1b4ba8793a9def67046d639cb72b9d01996284d750fa9d9f705815fd1",
+        "row_count": 695,
+        "family_id": "626d39c1b4ba8793a9def67046d639cb72b9d01996284d750fa9d9f705815fd1",
+        "family_assignment_hash": "23f4bdd72f9417fd50a08f8f49d91c99b3d7740e3b67b4ff7cd611e12cb185c7",
+        "split": "B"
+      },
+      {
+        "source_gid": 192,
+        "drawing_id": "high_quality_architectural_1848",
+        "family_fingerprint": "58a285ef0d642ccb640d31e7b035fc38d36a5577b83f827c69b462b2f20f0041",
+        "row_count": 411,
+        "family_id": "58a285ef0d642ccb640d31e7b035fc38d36a5577b83f827c69b462b2f20f0041",
+        "family_assignment_hash": "f95bb0b7066b15c184c1fee31f2a6d77fceedc415fedb5b507ef2287dbf161fc",
+        "split": "A"
+      },
+      {
+        "source_gid": 193,
+        "drawing_id": "high_quality_architectural_1883",
+        "family_fingerprint": "38efb29c1dc4a66817be0f06c1ed1f944454f39deb7afdad1eefb10758407a05",
+        "row_count": 2254,
+        "family_id": "38efb29c1dc4a66817be0f06c1ed1f944454f39deb7afdad1eefb10758407a05",
+        "family_assignment_hash": "5c9e0f86dbcf90648b66166fd77932808cfe2320d39ad19168f4806cd76b02b9",
+        "split": "B"
+      },
+      {
+        "source_gid": 194,
+        "drawing_id": "high_quality_architectural_1916",
+        "family_fingerprint": "036f1b80f590cce8a3fe07971872c7f6cd5f1d443a21c5d1397540a6799d869f",
+        "row_count": 447,
+        "family_id": "036f1b80f590cce8a3fe07971872c7f6cd5f1d443a21c5d1397540a6799d869f",
+        "family_assignment_hash": "8da9fe819fe40796176374d93156ac8abf257ec293e777e75ed3164741a1b05c",
+        "split": "A"
+      },
+      {
+        "source_gid": 195,
+        "drawing_id": "high_quality_architectural_1967",
+        "family_fingerprint": "132b4ab859803cd775275dd79942b9b81c0048137c1c2f24482e830f2c2acbc3",
+        "row_count": 1118,
+        "family_id": "132b4ab859803cd775275dd79942b9b81c0048137c1c2f24482e830f2c2acbc3",
+        "family_assignment_hash": "55c11eaf7b50d77978a6ad45d632e94425d4d8d3bdffe70859a3e0475de8a2d8",
+        "split": "A"
+      },
+      {
+        "source_gid": 196,
+        "drawing_id": "high_quality_architectural_20001",
+        "family_fingerprint": "177c031487917ca5c2af436bd70d130df15abf420b63a25caf9e1f11d89d7d80",
+        "row_count": 499,
+        "family_id": "177c031487917ca5c2af436bd70d130df15abf420b63a25caf9e1f11d89d7d80",
+        "family_assignment_hash": "1b297cd7608571a7586720eb7a42b8d2019afed0eec26655b06fc9bbf2146743",
+        "split": "B"
+      },
+      {
+        "source_gid": 197,
+        "drawing_id": "high_quality_architectural_20014",
+        "family_fingerprint": "0ae2716776698230151d299b39d21d5a481f6e9d9bbc430c0028b6fc6d269629",
+        "row_count": 849,
+        "family_id": "0ae2716776698230151d299b39d21d5a481f6e9d9bbc430c0028b6fc6d269629",
+        "family_assignment_hash": "80f3ce308eadcf18567b875eb2502bd92e9ea1b1e24fd50ba5f2624526408d4f",
+        "split": "B"
+      },
+      {
+        "source_gid": 198,
+        "drawing_id": "high_quality_architectural_20018",
+        "family_fingerprint": "12c9662b2ca7d3e2f859eed843c26941e9eeb9dabccff2b717ad4b6f8c413739",
+        "row_count": 1130,
+        "family_id": "12c9662b2ca7d3e2f859eed843c26941e9eeb9dabccff2b717ad4b6f8c413739",
+        "family_assignment_hash": "afc0cbdd63dabccbed5539543570cfdf206aacd96b1dd36c4baa2264d97fb96e",
+        "split": "B"
+      },
+      {
+        "source_gid": 199,
+        "drawing_id": "high_quality_architectural_20026",
+        "family_fingerprint": "2ee8113d9d887cca2505ef72fa71ea4ce6e5a5f8f2dc0f9de9ae4ad275d195b9",
+        "row_count": 553,
+        "family_id": "2ee8113d9d887cca2505ef72fa71ea4ce6e5a5f8f2dc0f9de9ae4ad275d195b9",
+        "family_assignment_hash": "30e34cd7aa548975a61e3d33c92d620d097659795da736319843a608918e324a",
+        "split": "A"
+      },
+      {
+        "source_gid": 200,
+        "drawing_id": "high_quality_architectural_2039",
+        "family_fingerprint": "108d7f7a238c09bb1196ed8a72c1395c7d0b4358df98d2ad993e844c2067d924",
+        "row_count": 711,
+        "family_id": "108d7f7a238c09bb1196ed8a72c1395c7d0b4358df98d2ad993e844c2067d924",
+        "family_assignment_hash": "b8244bb24a0a2e31f0487900a6e7906fa528b40c7fdcba988b095f72e138c2d7",
+        "split": "B"
+      },
+      {
+        "source_gid": 201,
+        "drawing_id": "high_quality_architectural_2069",
+        "family_fingerprint": "0a12308499e8c66a1487834d20f50c891b1498a51eef05fcb74e26573258f195",
+        "row_count": 484,
+        "family_id": "0a12308499e8c66a1487834d20f50c891b1498a51eef05fcb74e26573258f195",
+        "family_assignment_hash": "f614dddb019b87d00c57e03898dc8a33511e109bee9b2074fe39ce02923d0ba9",
+        "split": "A"
+      },
+      {
+        "source_gid": 202,
+        "drawing_id": "high_quality_architectural_2080",
+        "family_fingerprint": "29ab1279ad150138abbe454b57e7f496e9a746725f2c2a4fb826de49c719e45c",
+        "row_count": 1386,
+        "family_id": "29ab1279ad150138abbe454b57e7f496e9a746725f2c2a4fb826de49c719e45c",
+        "family_assignment_hash": "2f7e6df04faddb5bcfdc1ef590cabb9419c0973965c6c5e4d52c6b4ef26e8c93",
+        "split": "A"
+      },
+      {
+        "source_gid": 203,
+        "drawing_id": "high_quality_architectural_2148",
+        "family_fingerprint": "1981e88cd5164c0babcceebe74110a5c314659e6bd1d09b8db22ef0f2ce3f0ee",
+        "row_count": 407,
+        "family_id": "1981e88cd5164c0babcceebe74110a5c314659e6bd1d09b8db22ef0f2ce3f0ee",
+        "family_assignment_hash": "8304d63ceb181be96c0758120184ba064dbe26cbc36853c5a290ba80bb7f1196",
+        "split": "B"
+      },
+      {
+        "source_gid": 204,
+        "drawing_id": "high_quality_architectural_24",
+        "family_fingerprint": "0f038a101cedcce4664ffeb8a82f2f8ddd3629ac9b4414e0d85ec9e08a8bdee9",
+        "row_count": 2308,
+        "family_id": "0f038a101cedcce4664ffeb8a82f2f8ddd3629ac9b4414e0d85ec9e08a8bdee9",
+        "family_assignment_hash": "5d40181201c1012228df86e9d27f1d0b49236317c45e0a6103e6d389f281fb5d",
+        "split": "A"
+      },
+      {
+        "source_gid": 205,
+        "drawing_id": "high_quality_architectural_242",
+        "family_fingerprint": "56f297a3f442d026416bc0eb70426eade291f833e256ec77f099032bcddb62a8",
+        "row_count": 466,
+        "family_id": "56f297a3f442d026416bc0eb70426eade291f833e256ec77f099032bcddb62a8",
+        "family_assignment_hash": "1b753fe19cf57d28a10b1f4c5a1f3f7ff959213870d3a8a82b89705e1c636b16",
+        "split": "B"
+      },
+      {
+        "source_gid": 206,
+        "drawing_id": "high_quality_architectural_2528",
+        "family_fingerprint": "0a6a92ef63dc02ffc3ebeb8a9305fef81411f2bc89dec426bb23d1b7b0a8b34f",
+        "row_count": 507,
+        "family_id": "0a6a92ef63dc02ffc3ebeb8a9305fef81411f2bc89dec426bb23d1b7b0a8b34f",
+        "family_assignment_hash": "7b6d960422d98c56e4ae2ab1e50b6c35900b0febdaee1528dd69086df443b11f",
+        "split": "A"
+      },
+      {
+        "source_gid": 207,
+        "drawing_id": "high_quality_architectural_2567",
+        "family_fingerprint": "05fd5528495ba6f286708aa2b6e489f7b492d705775408f278bb8cb20c13738e",
+        "row_count": 2035,
+        "family_id": "05fd5528495ba6f286708aa2b6e489f7b492d705775408f278bb8cb20c13738e",
+        "family_assignment_hash": "1ac94662ca6662e24ed8bb363cb79aa649237167471126cce35669ea6432851c",
+        "split": "A"
+      },
+      {
+        "source_gid": 208,
+        "drawing_id": "high_quality_architectural_2572",
+        "family_fingerprint": "0c0a1f024abd46804b0f2594723bfaa1650eba457fc9359d83cf54387d2e6661",
+        "row_count": 2139,
+        "family_id": "0c0a1f024abd46804b0f2594723bfaa1650eba457fc9359d83cf54387d2e6661",
+        "family_assignment_hash": "25e5518bc7e652b33e2fae2118e5ab3b18fbcd2ee61076a9529f6f0a295beede",
+        "split": "A"
+      },
+      {
+        "source_gid": 209,
+        "drawing_id": "high_quality_architectural_2575",
+        "family_fingerprint": "202d94e93e71064515cdf59ce2acab89bfee773a60fb6a0445bdbc1aa6c58313",
+        "row_count": 1322,
+        "family_id": "202d94e93e71064515cdf59ce2acab89bfee773a60fb6a0445bdbc1aa6c58313",
+        "family_assignment_hash": "c8c1c3996508ab8a22a2df482a7d432942fbe38854f88aa118448de00c44302a",
+        "split": "A"
+      },
+      {
+        "source_gid": 210,
+        "drawing_id": "high_quality_architectural_259",
+        "family_fingerprint": "1f367b7ddc0996ef8a65675d84a118316ba0f7c229a0dda552fbe719cb79874f",
+        "row_count": 1780,
+        "family_id": "1f367b7ddc0996ef8a65675d84a118316ba0f7c229a0dda552fbe719cb79874f",
+        "family_assignment_hash": "67ab320d528b01ee1af0509b18ca7f80330a3f7cc9ca16633b4edadc0b98d15a",
+        "split": "B"
+      },
+      {
+        "source_gid": 211,
+        "drawing_id": "high_quality_architectural_282",
+        "family_fingerprint": "0869e460f5e826bd327944703872ca1c9ae699549fa86faeed310621b099dca8",
+        "row_count": 861,
+        "family_id": "0869e460f5e826bd327944703872ca1c9ae699549fa86faeed310621b099dca8",
+        "family_assignment_hash": "d37e30730c47fce8cb442f02b321ca111acca8a9ce71e8057f7008363a0b2b8a",
+        "split": "B"
+      },
+      {
+        "source_gid": 212,
+        "drawing_id": "high_quality_architectural_3015",
+        "family_fingerprint": "1324a87d202a5b360c99b9cc7a5d3aee7731acccc9140c9033926c3fd62f51aa",
+        "row_count": 1648,
+        "family_id": "1324a87d202a5b360c99b9cc7a5d3aee7731acccc9140c9033926c3fd62f51aa",
+        "family_assignment_hash": "b311a7597e6d5a18fe20f22eaa321eeba0871c7f1e0e7e99be8d72f6e91ca120",
+        "split": "B"
+      },
+      {
+        "source_gid": 213,
+        "drawing_id": "high_quality_architectural_303",
+        "family_fingerprint": "2ba77719e3d4b0b9e332bde463adf5aaa35ae76a935bd206fa12677c77627462",
+        "row_count": 842,
+        "family_id": "2ba77719e3d4b0b9e332bde463adf5aaa35ae76a935bd206fa12677c77627462",
+        "family_assignment_hash": "0bedcdd0376b5c160d3cf04649424e98ff1e040c8a5344bca06999b294fcb52d",
+        "split": "A"
+      },
+      {
+        "source_gid": 214,
+        "drawing_id": "high_quality_architectural_3096",
+        "family_fingerprint": "2808f0f233d7c083a8054adb7e6cc600c2d594a11cc766eeced103ff3eacf6c8",
+        "row_count": 1184,
+        "family_id": "2808f0f233d7c083a8054adb7e6cc600c2d594a11cc766eeced103ff3eacf6c8",
+        "family_assignment_hash": "20044c5577e9fef8e24a7916553fe4850ff5eebf9020bd5471f5b89a108e7cbf",
+        "split": "A"
+      },
+      {
+        "source_gid": 215,
+        "drawing_id": "high_quality_architectural_313",
+        "family_fingerprint": "012de5060e55296c43a346a6c99dc40ea88b72ff2b834ccc982296fbf16d4a92",
+        "row_count": 584,
+        "family_id": "012de5060e55296c43a346a6c99dc40ea88b72ff2b834ccc982296fbf16d4a92",
+        "family_assignment_hash": "86bfe4d05af4ade08d49860f5c2a2e18621eba0cebf9611a5416e40b8743ea4a",
+        "split": "B"
+      },
+      {
+        "source_gid": 216,
+        "drawing_id": "high_quality_architectural_3164",
+        "family_fingerprint": "499668cbc158605b3e6789dce4c8325a6301e08f67451f90f2b814c0b6576050",
+        "row_count": 1243,
+        "family_id": "499668cbc158605b3e6789dce4c8325a6301e08f67451f90f2b814c0b6576050",
+        "family_assignment_hash": "8edb9710a6d308c5f364e71052f35dc597993f6701985c2c2d29afe63f0fdc2c",
+        "split": "A"
+      },
+      {
+        "source_gid": 217,
+        "drawing_id": "high_quality_architectural_3195",
+        "family_fingerprint": "2106c7e860eab7257640d07ee0eadbd74e2ee34311ceda358652cb16df85a51f",
+        "row_count": 1301,
+        "family_id": "2106c7e860eab7257640d07ee0eadbd74e2ee34311ceda358652cb16df85a51f",
+        "family_assignment_hash": "2f613702a91560ee3c0bcfe0cfe5cdba438605ef05a08caf05c0d8f5d0368a28",
+        "split": "B"
+      },
+      {
+        "source_gid": 218,
+        "drawing_id": "high_quality_architectural_3207",
+        "family_fingerprint": "060e4d8d973fce58cc44603f516ed71212b38e8de6300c29fd2c721b113c557a",
+        "row_count": 1129,
+        "family_id": "060e4d8d973fce58cc44603f516ed71212b38e8de6300c29fd2c721b113c557a",
+        "family_assignment_hash": "b79e6f3c35debf3691913c058c1d10bd402a50c19bc067c6364390c5e170e133",
+        "split": "A"
+      },
+      {
+        "source_gid": 219,
+        "drawing_id": "high_quality_architectural_3209",
+        "family_fingerprint": "28cf9ab3ebcd8be4044fe216758ad8ef8b15ea3eb84ea0f3270d68e7e1558c65",
+        "row_count": 969,
+        "family_id": "28cf9ab3ebcd8be4044fe216758ad8ef8b15ea3eb84ea0f3270d68e7e1558c65",
+        "family_assignment_hash": "ef4bdce069e1367372525750ea6b796f51480ef15fc8b4d06907c7d75271eb9c",
+        "split": "A"
+      },
+      {
+        "source_gid": 220,
+        "drawing_id": "high_quality_architectural_3210",
+        "family_fingerprint": "00ba9f9dc1a0742047706d676b574f22ebd03e27a8074675a76db69066c50751",
+        "row_count": 470,
+        "family_id": "00ba9f9dc1a0742047706d676b574f22ebd03e27a8074675a76db69066c50751",
+        "family_assignment_hash": "ed12a708b9aa96d489a3b89b4f1b7e270ab5b4990ca7b347317c4ad7389b7569",
+        "split": "B"
+      },
+      {
+        "source_gid": 221,
+        "drawing_id": "high_quality_architectural_3256",
+        "family_fingerprint": "09afe3a77322d1cceea10aac4665cf68dba8a5e53f42f4405c6ccdc0888c7da1",
+        "row_count": 638,
+        "family_id": "09afe3a77322d1cceea10aac4665cf68dba8a5e53f42f4405c6ccdc0888c7da1",
+        "family_assignment_hash": "6f603933713ebf475e70366fb34e71a43ad8e786b54f9fa720f8befa702031d5",
+        "split": "B"
+      },
+      {
+        "source_gid": 222,
+        "drawing_id": "high_quality_architectural_333",
+        "family_fingerprint": "08f881fa95a6b21f77c6cad2dad3d5299d361e160421b2d73a3f19a13b62d195",
+        "row_count": 649,
+        "family_id": "08f881fa95a6b21f77c6cad2dad3d5299d361e160421b2d73a3f19a13b62d195",
+        "family_assignment_hash": "4e29827972a8f6cf784a2fd5ae7bc6a7977ff83b11b61f9db4efc281420d96cd",
+        "split": "A"
+      },
+      {
+        "source_gid": 223,
+        "drawing_id": "high_quality_architectural_3519",
+        "family_fingerprint": "01b52c21b076b3cf98136a0e7c6e18b8bb7d1a1800e639f68c704c52770b81f3",
+        "row_count": 784,
+        "family_id": "01b52c21b076b3cf98136a0e7c6e18b8bb7d1a1800e639f68c704c52770b81f3",
+        "family_assignment_hash": "5d1fbbc7ff5cd1a66804301e3f5489a645e7c597f4aae96978a06ebf7e61d6bf",
+        "split": "B"
+      },
+      {
+        "source_gid": 224,
+        "drawing_id": "high_quality_architectural_3528",
+        "family_fingerprint": "59cfc6787a7fbf370d045f7f902d6dce98dac9e48c5d4722df4cdbd3a07909b3",
+        "row_count": 587,
+        "family_id": "59cfc6787a7fbf370d045f7f902d6dce98dac9e48c5d4722df4cdbd3a07909b3",
+        "family_assignment_hash": "098bd41b129192919113bbfe1c253e659d475d927f880e9e03e477901c96ee45",
+        "split": "B"
+      },
+      {
+        "source_gid": 225,
+        "drawing_id": "high_quality_architectural_3541",
+        "family_fingerprint": "364dae9ed53879b197f984afc18cd607b5cc7452f06ca82e7043e7dcc6a009e9",
+        "row_count": 983,
+        "family_id": "364dae9ed53879b197f984afc18cd607b5cc7452f06ca82e7043e7dcc6a009e9",
+        "family_assignment_hash": "4fc1ee76836b86030fe5d82b779c605ceba3927f244a9fe52a4236a2ca693850",
+        "split": "A"
+      },
+      {
+        "source_gid": 226,
+        "drawing_id": "high_quality_architectural_3546",
+        "family_fingerprint": "0302d289491acb10888643995dd1d82330348d479ce657586f974eebd320d68b",
+        "row_count": 680,
+        "family_id": "0302d289491acb10888643995dd1d82330348d479ce657586f974eebd320d68b",
+        "family_assignment_hash": "88fcfb1625213741617cdede04df8245081711274ef5c545c0714d8cf4ae17c3",
+        "split": "B"
+      },
+      {
+        "source_gid": 227,
+        "drawing_id": "high_quality_architectural_361",
+        "family_fingerprint": "0cb8481e1f7b7b0d56b15e7bf4455eff5d52d2a2bf93d8e19046e3f769a9792b",
+        "row_count": 1875,
+        "family_id": "0cb8481e1f7b7b0d56b15e7bf4455eff5d52d2a2bf93d8e19046e3f769a9792b",
+        "family_assignment_hash": "75904fc086fb33294123ab9202d87be7d759c7aca657a62c0386ef5200892fe2",
+        "split": "A"
+      },
+      {
+        "source_gid": 228,
+        "drawing_id": "high_quality_architectural_3612",
+        "family_fingerprint": "1da967fa5fcc70ba6c9e1cd6f0e0a7e83e9abc7c932d9302a22ca0700a9bb374",
+        "row_count": 1602,
+        "family_id": "1da967fa5fcc70ba6c9e1cd6f0e0a7e83e9abc7c932d9302a22ca0700a9bb374",
+        "family_assignment_hash": "20121eaa757eb148aee9c037a0dfc91988f03df356f954986e6b75d4a4880e49",
+        "split": "B"
+      },
+      {
+        "source_gid": 229,
+        "drawing_id": "high_quality_architectural_3629",
+        "family_fingerprint": "0025d78288941d2feb9d8f7bdb7b90fb4827102771da3ee3dc4643cc587f6967",
+        "row_count": 966,
+        "family_id": "0025d78288941d2feb9d8f7bdb7b90fb4827102771da3ee3dc4643cc587f6967",
+        "family_assignment_hash": "2faf85cfcbfcad826a51cfadeccd21abfb1e6a6b7cdad5911f3ab0de07a1b7dd",
+        "split": "B"
+      },
+      {
+        "source_gid": 230,
+        "drawing_id": "high_quality_architectural_3691",
+        "family_fingerprint": "646364cf67c618f2fbe788df0b9ef6d0b1472557b00df2063f4ebc1fca161c76",
+        "row_count": 1442,
+        "family_id": "646364cf67c618f2fbe788df0b9ef6d0b1472557b00df2063f4ebc1fca161c76",
+        "family_assignment_hash": "384bd77cf363ee1ae1d823e2bab9e0772cfe0ba0f2fc9b816268b4b9e272853b",
+        "split": "B"
+      },
+      {
+        "source_gid": 231,
+        "drawing_id": "high_quality_architectural_375",
+        "family_fingerprint": "0edbed643f947c6bc96b08b62f132b1d8f2344dffa2795cbc5007788ec9648c7",
+        "row_count": 1130,
+        "family_id": "0edbed643f947c6bc96b08b62f132b1d8f2344dffa2795cbc5007788ec9648c7",
+        "family_assignment_hash": "003f693680251d4d19949af0150ff6aa15c907530f56265cc8711d2add892498",
+        "split": "B"
+      },
+      {
+        "source_gid": 232,
+        "drawing_id": "high_quality_architectural_3782",
+        "family_fingerprint": "04467109c7caaf76b7fc4903ba3c3c3adec641998a833a589faefccb5ce48224",
+        "row_count": 643,
+        "family_id": "04467109c7caaf76b7fc4903ba3c3c3adec641998a833a589faefccb5ce48224",
+        "family_assignment_hash": "c1462262e6534708cbdb2865784f0e3220a2040b911c06bc4ac49307ec21fbca",
+        "split": "B"
+      },
+      {
+        "source_gid": 233,
+        "drawing_id": "high_quality_architectural_3794",
+        "family_fingerprint": "22eeef26e196ff92d8a9c96b892f2a68da92f5768ee4be81decd7fe31c4924cb",
+        "row_count": 1246,
+        "family_id": "22eeef26e196ff92d8a9c96b892f2a68da92f5768ee4be81decd7fe31c4924cb",
+        "family_assignment_hash": "5b1ea08a7c8f0a8fc1399c0d3a17fd2d746bed0d294461e6ca554810db5ecb05",
+        "split": "B"
+      },
+      {
+        "source_gid": 234,
+        "drawing_id": "high_quality_architectural_3838",
+        "family_fingerprint": "42a04a997a8bf6b49c948b13935ee0885de7836798bfa472162d926691abbb4b",
+        "row_count": 471,
+        "family_id": "42a04a997a8bf6b49c948b13935ee0885de7836798bfa472162d926691abbb4b",
+        "family_assignment_hash": "257f59b9e347404fe8ffd375b8b7ecb8fe69e47a4e3e18e07be6abf95254fdf1",
+        "split": "A"
+      },
+      {
+        "source_gid": 235,
+        "drawing_id": "high_quality_architectural_3872",
+        "family_fingerprint": "03db38cae9f60b9f81898b95eb01251f5a89ad43e581a50278d3a5129d9588f5",
+        "row_count": 677,
+        "family_id": "03db38cae9f60b9f81898b95eb01251f5a89ad43e581a50278d3a5129d9588f5",
+        "family_assignment_hash": "bfafd855e4ac00a368b9496b4abe2431e4807aac062b056e41cb00edb48eabca",
+        "split": "A"
+      },
+      {
+        "source_gid": 236,
+        "drawing_id": "high_quality_architectural_3886",
+        "family_fingerprint": "0ecbfe2216133a4547bfa0d721dfb48db0dffa1f8180d433d33772ee38b5a290",
+        "row_count": 626,
+        "family_id": "0ecbfe2216133a4547bfa0d721dfb48db0dffa1f8180d433d33772ee38b5a290",
+        "family_assignment_hash": "176c27284a2f9f2cd00ab94a95e919db2dd9eb796f535f0c4610f2160bae845d",
+        "split": "B"
+      },
+      {
+        "source_gid": 237,
+        "drawing_id": "high_quality_architectural_3927",
+        "family_fingerprint": "0fd976f20bbc54cb390520a0024e2673df4f8ba87b6f1fe3a50d1fa1eab21364",
+        "row_count": 752,
+        "family_id": "0fd976f20bbc54cb390520a0024e2673df4f8ba87b6f1fe3a50d1fa1eab21364",
+        "family_assignment_hash": "a1271f362c68f751655ae1801057653a4b930212040eccabca17e2982a12ddd0",
+        "split": "A"
+      },
+      {
+        "source_gid": 238,
+        "drawing_id": "high_quality_architectural_393",
+        "family_fingerprint": "2c2326764902ecdc6245662cc10d14ff903899ea49c7742455eb351b6f040eb1",
+        "row_count": 461,
+        "family_id": "2c2326764902ecdc6245662cc10d14ff903899ea49c7742455eb351b6f040eb1",
+        "family_assignment_hash": "86691faedcaeb19023bbd59f5faecb348f0f5307f8e84123dddb8ed1074a3041",
+        "split": "A"
+      },
+      {
+        "source_gid": 239,
+        "drawing_id": "high_quality_architectural_3961",
+        "family_fingerprint": "108a9257ed7d76b7e7172c3514ec4379b95dcdda12c3c42b1a7b4744c0b92281",
+        "row_count": 466,
+        "family_id": "108a9257ed7d76b7e7172c3514ec4379b95dcdda12c3c42b1a7b4744c0b92281",
+        "family_assignment_hash": "c10a5634ceafc988538e76998d05b2cdc6f588f9e3dd74ed2b3a9edf879ebd2f",
+        "split": "A"
+      },
+      {
+        "source_gid": 240,
+        "drawing_id": "high_quality_architectural_4032",
+        "family_fingerprint": "0b111f0fe01aa224f84b47b52cb075339f2d4c0d0ff1dfdc95b893022e913902",
+        "row_count": 1196,
+        "family_id": "0b111f0fe01aa224f84b47b52cb075339f2d4c0d0ff1dfdc95b893022e913902",
+        "family_assignment_hash": "929e380cbaa4a141dbca5f54bbb627c8727bdda301efbe5466cf0ff2d9217eb7",
+        "split": "B"
+      },
+      {
+        "source_gid": 241,
+        "drawing_id": "high_quality_architectural_4524",
+        "family_fingerprint": "4d533f2213d0c6e38bcf7827342c7ce890e61b60257b3861c98ed615ff1dc6cd",
+        "row_count": 1024,
+        "family_id": "4d533f2213d0c6e38bcf7827342c7ce890e61b60257b3861c98ed615ff1dc6cd",
+        "family_assignment_hash": "28cca79637abb5803303889de19a2c0f5f40e2103c6df2ca3412ec698742ddf6",
+        "split": "B"
+      },
+      {
+        "source_gid": 242,
+        "drawing_id": "high_quality_architectural_4552",
+        "family_fingerprint": "295b531f94c59daf1620fb7d603e0302826fab9c420738f1268aeaf4cc561027",
+        "row_count": 1029,
+        "family_id": "295b531f94c59daf1620fb7d603e0302826fab9c420738f1268aeaf4cc561027",
+        "family_assignment_hash": "4ac458e3699722aa304194791fc574c27c9ef0d6f30deac2287d28a1601e1753",
+        "split": "B"
+      },
+      {
+        "source_gid": 243,
+        "drawing_id": "high_quality_architectural_4667",
+        "family_fingerprint": "1fe5e951b1d85682806806398264a66bfd810db252124e083011a9ed024c48b1",
+        "row_count": 1273,
+        "family_id": "1fe5e951b1d85682806806398264a66bfd810db252124e083011a9ed024c48b1",
+        "family_assignment_hash": "ab7e14a9d273dd4c63e387be9622b066d54fcf01cf6e10e4e1c21cd6ba123ef5",
+        "split": "B"
+      },
+      {
+        "source_gid": 244,
+        "drawing_id": "high_quality_architectural_4677",
+        "family_fingerprint": "3af96dc7cbc3e9e089ef961d4c0b3b2ac169e5626370ebd0e9a28a0c8cae436b",
+        "row_count": 505,
+        "family_id": "3af96dc7cbc3e9e089ef961d4c0b3b2ac169e5626370ebd0e9a28a0c8cae436b",
+        "family_assignment_hash": "231841ff2de1056c6b39b9b66c2fa5f77271a045e35104efebcc734923ab0198",
+        "split": "A"
+      },
+      {
+        "source_gid": 245,
+        "drawing_id": "high_quality_architectural_4706",
+        "family_fingerprint": "045eb0b5a05c2517b7ce2c1231b5ed694928f4ea948f1757fcc20e515c20cdf4",
+        "row_count": 299,
+        "family_id": "045eb0b5a05c2517b7ce2c1231b5ed694928f4ea948f1757fcc20e515c20cdf4",
+        "family_assignment_hash": "53d4bd173b5d38e9d6e64f88114bcd87c4fe8f159daf6efcb80e6aa6bc82d2cc",
+        "split": "B"
+      },
+      {
+        "source_gid": 246,
+        "drawing_id": "high_quality_architectural_4721",
+        "family_fingerprint": "0364de5d924fcd47fca46ddcea00d7c2075290a207612e2ce53bdf9bc6dcd3ac",
+        "row_count": 210,
+        "family_id": "0364de5d924fcd47fca46ddcea00d7c2075290a207612e2ce53bdf9bc6dcd3ac",
+        "family_assignment_hash": "7703d6318003d9bcb3522caeb2b99913715a8b2a899c1aa61f3969eac3249a87",
+        "split": "B"
+      },
+      {
+        "source_gid": 247,
+        "drawing_id": "high_quality_architectural_4788",
+        "family_fingerprint": "08050fb39ba2688d3a7d7288a8bf30a7aefe3dd4ef8ee1f9f1f54bd2f95759d8",
+        "row_count": 484,
+        "family_id": "08050fb39ba2688d3a7d7288a8bf30a7aefe3dd4ef8ee1f9f1f54bd2f95759d8",
+        "family_assignment_hash": "3034187e301fcef1475c6b915a9d1fddd6c062eca6ad720b4f8838c7f706871c",
+        "split": "B"
+      },
+      {
+        "source_gid": 248,
+        "drawing_id": "high_quality_architectural_4794",
+        "family_fingerprint": "0d8cfec1ca599e9b5374deb992c5b2a192cb488c8fcaa4d817ae66f508ada591",
+        "row_count": 1190,
+        "family_id": "0d8cfec1ca599e9b5374deb992c5b2a192cb488c8fcaa4d817ae66f508ada591",
+        "family_assignment_hash": "4f4cd8531d27f490129ae32a99bb303536db9601f9a44528eff05a1f35d26a3c",
+        "split": "B"
+      },
+      {
+        "source_gid": 249,
+        "drawing_id": "high_quality_architectural_4801",
+        "family_fingerprint": "39334373d44444f6228db24df5471b2e4d095a45fd68bc909a32c234b6de1d0c",
+        "row_count": 762,
+        "family_id": "39334373d44444f6228db24df5471b2e4d095a45fd68bc909a32c234b6de1d0c",
+        "family_assignment_hash": "48b5ca7d849cba6ab32c31976d830095087870203501a41a45db756ca8df37a7",
+        "split": "B"
+      },
+      {
+        "source_gid": 250,
+        "drawing_id": "high_quality_architectural_4820",
+        "family_fingerprint": "098566a93721da034229d7281c4540314c78244613c6bcc02748c4d03eb0473e",
+        "row_count": 698,
+        "family_id": "098566a93721da034229d7281c4540314c78244613c6bcc02748c4d03eb0473e",
+        "family_assignment_hash": "96e722751c0ad5193eab74cd17893dd1ef2516e9ceb5cd2673c12f7e620a8cc3",
+        "split": "A"
+      },
+      {
+        "source_gid": 251,
+        "drawing_id": "high_quality_architectural_4842",
+        "family_fingerprint": "2168b658d557e58728ddc8152e6f4cf1d0fa2f1608721585b024ebf9c70db570",
+        "row_count": 628,
+        "family_id": "2168b658d557e58728ddc8152e6f4cf1d0fa2f1608721585b024ebf9c70db570",
+        "family_assignment_hash": "c419970214efffc8c38abfcfd2ce3d2b229e216deee516d8f82965a0dfdc5cb0",
+        "split": "A"
+      },
+      {
+        "source_gid": 252,
+        "drawing_id": "high_quality_architectural_4850",
+        "family_fingerprint": "034505be1b7991a09dd8770b68b47968424fe9aab00e9df018263f6cf6ff406e",
+        "row_count": 1251,
+        "family_id": "034505be1b7991a09dd8770b68b47968424fe9aab00e9df018263f6cf6ff406e",
+        "family_assignment_hash": "e0604eb695811ab2b828fd31b77f91ba91124eb01385367aab94210d15d2faf9",
+        "split": "B"
+      },
+      {
+        "source_gid": 253,
+        "drawing_id": "high_quality_architectural_4864",
+        "family_fingerprint": "214575d7d60ed6f809e64b703e0c4c5560128cc0187088113be5492cf7730b4d",
+        "row_count": 615,
+        "family_id": "214575d7d60ed6f809e64b703e0c4c5560128cc0187088113be5492cf7730b4d",
+        "family_assignment_hash": "5912ab16c5cbd914cebb34d1381386151a2b10d54f455f47bc6c1e6e64a7f762",
+        "split": "B"
+      },
+      {
+        "source_gid": 254,
+        "drawing_id": "high_quality_architectural_4900",
+        "family_fingerprint": "2600c0a8c933f54e94f21a52082a88df6d6743ef00e5bcb387af89e1411a89b7",
+        "row_count": 624,
+        "family_id": "2600c0a8c933f54e94f21a52082a88df6d6743ef00e5bcb387af89e1411a89b7",
+        "family_assignment_hash": "b0aae21552c4221deb49ad72b61d00b68ecbe51556599e28692bb19098bd200e",
+        "split": "B"
+      },
+      {
+        "source_gid": 255,
+        "drawing_id": "high_quality_architectural_4972",
+        "family_fingerprint": "1d3237df28259d352647009a4ef5c7a8113000d8c1c79529b342ce508eb10946",
+        "row_count": 849,
+        "family_id": "1d3237df28259d352647009a4ef5c7a8113000d8c1c79529b342ce508eb10946",
+        "family_assignment_hash": "ece4c10ba51255c9a49bf1dad429f5270847898cd2f855069168444e72d3d00e",
+        "split": "A"
+      },
+      {
+        "source_gid": 256,
+        "drawing_id": "high_quality_architectural_5138",
+        "family_fingerprint": "122ecfbdf921320a988e187094ba59c5faff4bac7c08d21d3f08d14fe69b0e27",
+        "row_count": 386,
+        "family_id": "122ecfbdf921320a988e187094ba59c5faff4bac7c08d21d3f08d14fe69b0e27",
+        "family_assignment_hash": "df0dce9751e69db24ae4884d3a441207043f7530f9970c6e1f5b274efd1d168c",
+        "split": "A"
+      },
+      {
+        "source_gid": 257,
+        "drawing_id": "high_quality_architectural_5521",
+        "family_fingerprint": "26e6eb5d871d81ba699c72d9c9a9a03dc9b4fc76b406008bdb9f41040ab00b97",
+        "row_count": 1565,
+        "family_id": "26e6eb5d871d81ba699c72d9c9a9a03dc9b4fc76b406008bdb9f41040ab00b97",
+        "family_assignment_hash": "fcf00c1d3b42f10a29324f4a3abc8f2e9197a8c1f2b3e31d0d7440bacf050208",
+        "split": "A"
+      },
+      {
+        "source_gid": 258,
+        "drawing_id": "high_quality_architectural_555",
+        "family_fingerprint": "3f0c1de5aedaf0aae3956695ab919b412344c36e0646b626ddb8af7a1cc4acb5",
+        "row_count": 1115,
+        "family_id": "3f0c1de5aedaf0aae3956695ab919b412344c36e0646b626ddb8af7a1cc4acb5",
+        "family_assignment_hash": "870ff05c3e88d9885354fca5553dc2f737126fe28d4c53dacfb597a254698347",
+        "split": "B"
+      },
+      {
+        "source_gid": 259,
+        "drawing_id": "high_quality_architectural_5559",
+        "family_fingerprint": "02281a818a06fc4a00c64fd2fee9167cf0bf0bd4085075d6cfe2c893f7b976f9",
+        "row_count": 893,
+        "family_id": "02281a818a06fc4a00c64fd2fee9167cf0bf0bd4085075d6cfe2c893f7b976f9",
+        "family_assignment_hash": "eaf4e4867d6379fb41039666b922ca9f5f4352b27dbfb2b602a1dbca86d09937",
+        "split": "A"
+      },
+      {
+        "source_gid": 260,
+        "drawing_id": "high_quality_architectural_5566",
+        "family_fingerprint": "144178210403a8f90fd44a2438675de87229f18b45606818ec87f140bf3ba244",
+        "row_count": 917,
+        "family_id": "144178210403a8f90fd44a2438675de87229f18b45606818ec87f140bf3ba244",
+        "family_assignment_hash": "b6991601067b596ead3af11bac275361f450c242c51350d42c7dcc8a903865db",
+        "split": "B"
+      },
+      {
+        "source_gid": 261,
+        "drawing_id": "high_quality_architectural_5579",
+        "family_fingerprint": "08631bd170543f7fcadf41f2cff26bc0aa076ecfd36a2e82128a51f9196316b5",
+        "row_count": 1003,
+        "family_id": "08631bd170543f7fcadf41f2cff26bc0aa076ecfd36a2e82128a51f9196316b5",
+        "family_assignment_hash": "3e84a0bee0b6a66cf7b3d98514e8dcc0089bf0fb8c941e69f5b7e3acbb2f7882",
+        "split": "B"
+      },
+      {
+        "source_gid": 262,
+        "drawing_id": "high_quality_architectural_5599",
+        "family_fingerprint": "3b42d56864f3b31b55732bb1cc8069e5539da048c0fb6c21dadc36413b855004",
+        "row_count": 986,
+        "family_id": "3b42d56864f3b31b55732bb1cc8069e5539da048c0fb6c21dadc36413b855004",
+        "family_assignment_hash": "8bb49c1a05a46b464561bd177dc427bde0a38e3890f72c6e656e8669cd007230",
+        "split": "B"
+      },
+      {
+        "source_gid": 263,
+        "drawing_id": "high_quality_architectural_562",
+        "family_fingerprint": "124a955cefa852d883d5ef8c641f32ffa7caaa6f18191aef382d10d76e73532d",
+        "row_count": 966,
+        "family_id": "124a955cefa852d883d5ef8c641f32ffa7caaa6f18191aef382d10d76e73532d",
+        "family_assignment_hash": "7908f503cf25c2383cfbc109568de990adb687c26e0a7c8830c40a2321edd49e",
+        "split": "A"
+      },
+      {
+        "source_gid": 264,
+        "drawing_id": "high_quality_architectural_5625",
+        "family_fingerprint": "21201058e299825c112d95aa097a958e60409be4c5145776cda540e6f8586ee1",
+        "row_count": 1849,
+        "family_id": "21201058e299825c112d95aa097a958e60409be4c5145776cda540e6f8586ee1",
+        "family_assignment_hash": "44fa448d9f8bd04b87909bb57d6acbcddddbb513eb5479feb16ed40236f8a0e4",
+        "split": "B"
+      },
+      {
+        "source_gid": 265,
+        "drawing_id": "high_quality_architectural_5640",
+        "family_fingerprint": "1110ae6be92e3ce70289188f5c60b2f8b2cd44e81df484e5d2ddc7e3f921874f",
+        "row_count": 330,
+        "family_id": "1110ae6be92e3ce70289188f5c60b2f8b2cd44e81df484e5d2ddc7e3f921874f",
+        "family_assignment_hash": "83a46df3ec6eae94aaf6fabcda523b30c2d82164bc19ed22f6c2ec1aff7394b1",
+        "split": "A"
+      },
+      {
+        "source_gid": 266,
+        "drawing_id": "high_quality_architectural_566",
+        "family_fingerprint": "1ba9b4b4e8b8df0bb3ca7647f1c7b5443745a3993f478d2beed846b10ed48473",
+        "row_count": 749,
+        "family_id": "1ba9b4b4e8b8df0bb3ca7647f1c7b5443745a3993f478d2beed846b10ed48473",
+        "family_assignment_hash": "cad0b5f5785bdec2401e03d47c4008109ef8f5fdde84385d8d7ce7df1db0ddab",
+        "split": "B"
+      },
+      {
+        "source_gid": 267,
+        "drawing_id": "high_quality_architectural_5672",
+        "family_fingerprint": "260502af9d30b4994e1b03a9ee070630ac0bef546298c71bdd58df47753a53de",
+        "row_count": 871,
+        "family_id": "260502af9d30b4994e1b03a9ee070630ac0bef546298c71bdd58df47753a53de",
+        "family_assignment_hash": "a849dc4bd57e060504424e6310d2d26b5347ceebcb4507e663e4b8b9a7f92cbc",
+        "split": "B"
+      },
+      {
+        "source_gid": 268,
+        "drawing_id": "high_quality_architectural_5679",
+        "family_fingerprint": "3935f0e53e2a189812907cf7bb856e52877b4c9ec0b9b607e17515c3eac1d4e0",
+        "row_count": 514,
+        "family_id": "3935f0e53e2a189812907cf7bb856e52877b4c9ec0b9b607e17515c3eac1d4e0",
+        "family_assignment_hash": "253a283aef83e9ef6ebf13130de24bbcc1e801ff77120307f4805c6c39afbc39",
+        "split": "A"
+      },
+      {
+        "source_gid": 269,
+        "drawing_id": "high_quality_architectural_5698",
+        "family_fingerprint": "2399cbf70f677e7949a5033b4a68f0f2b1c5287c47572dae10f411605e8264fd",
+        "row_count": 836,
+        "family_id": "2399cbf70f677e7949a5033b4a68f0f2b1c5287c47572dae10f411605e8264fd",
+        "family_assignment_hash": "947e79fd6cf73ffa85656df3f7c85ed796261f157585f8c73bd7bc00cec0864d",
+        "split": "B"
+      },
+      {
+        "source_gid": 270,
+        "drawing_id": "high_quality_architectural_5701",
+        "family_fingerprint": "0b352bf569ecbb6dd9b239fa699e3ca74ff30f16c8db4bf6b6b5e59c4b332334",
+        "row_count": 2239,
+        "family_id": "0b352bf569ecbb6dd9b239fa699e3ca74ff30f16c8db4bf6b6b5e59c4b332334",
+        "family_assignment_hash": "2b4b1aced1e961eb051d09267f59f90506425837a27b20b209863a8dc4d06a66",
+        "split": "A"
+      },
+      {
+        "source_gid": 271,
+        "drawing_id": "high_quality_architectural_5734",
+        "family_fingerprint": "00d41f518897c656fbebb7b784375629c5b215191cd3fd232dfc4f101c76d4ab",
+        "row_count": 783,
+        "family_id": "00d41f518897c656fbebb7b784375629c5b215191cd3fd232dfc4f101c76d4ab",
+        "family_assignment_hash": "8024d9c09a483ed02facd742af63800416a21596043363fdb8ea2440dda2c40e",
+        "split": "A"
+      },
+      {
+        "source_gid": 272,
+        "drawing_id": "high_quality_architectural_5741",
+        "family_fingerprint": "15450438d226e03f8922fccca5e541356c3cbc86eb0753e87bdca9dbd8e02127",
+        "row_count": 411,
+        "family_id": "15450438d226e03f8922fccca5e541356c3cbc86eb0753e87bdca9dbd8e02127",
+        "family_assignment_hash": "a12c2075754b59dd9e48ae5389c53742f7af92a1ac2611fa9d744854b2c6eab5",
+        "split": "B"
+      },
+      {
+        "source_gid": 273,
+        "drawing_id": "high_quality_architectural_5742",
+        "family_fingerprint": "200d2bc8fad81dcdd2637f1da522efcc4acc2588cd44988729f5f78c14c9626c",
+        "row_count": 747,
+        "family_id": "200d2bc8fad81dcdd2637f1da522efcc4acc2588cd44988729f5f78c14c9626c",
+        "family_assignment_hash": "e2627c723469350ac2588a59d8ee5bd2ae8569bdd6778b837650beca049e1e9c",
+        "split": "B"
+      },
+      {
+        "source_gid": 274,
+        "drawing_id": "high_quality_architectural_5747",
+        "family_fingerprint": "108718b7cd3a771a0e0055fb02da4aaec6a38aea852812f644bf4cebe9e8a9d6",
+        "row_count": 1219,
+        "family_id": "108718b7cd3a771a0e0055fb02da4aaec6a38aea852812f644bf4cebe9e8a9d6",
+        "family_assignment_hash": "0106912778f09dc2672607d5ed242f71319ca2b232602603bc58598eb6f450ba",
+        "split": "B"
+      },
+      {
+        "source_gid": 275,
+        "drawing_id": "high_quality_architectural_5748",
+        "family_fingerprint": "0523d1168c1968e64adbdedcc9af45843a8787943b9d4a03364805591ddd1c1c",
+        "row_count": 1178,
+        "family_id": "0523d1168c1968e64adbdedcc9af45843a8787943b9d4a03364805591ddd1c1c",
+        "family_assignment_hash": "2123f0112e2c58c363670f76d666ef7841d3f978fed1d62a2ca1202d87b7eeb2",
+        "split": "B"
+      },
+      {
+        "source_gid": 277,
+        "drawing_id": "high_quality_architectural_5814",
+        "family_fingerprint": "0cded5ac0f3f0803022f7c5da59c8007eb5c1811a71c276f8adf70557f212bd1",
+        "row_count": 522,
+        "family_id": "0cded5ac0f3f0803022f7c5da59c8007eb5c1811a71c276f8adf70557f212bd1",
+        "family_assignment_hash": "485ac2857c51b6ebafb1ee387a2747811dba68d21c64904890e5c0f4fc987a9c",
+        "split": "A"
+      },
+      {
+        "source_gid": 278,
+        "drawing_id": "high_quality_architectural_590",
+        "family_fingerprint": "01cc88d67d803131d4cf2f8ccde37890fd064ea6d1445ea541d77f5e73408871",
+        "row_count": 775,
+        "family_id": "01cc88d67d803131d4cf2f8ccde37890fd064ea6d1445ea541d77f5e73408871",
+        "family_assignment_hash": "8104af1beef392b9151323724a361bfaa2fd96bb70abaf67bf8f490bd1c2463e",
+        "split": "A"
+      },
+      {
+        "source_gid": 279,
+        "drawing_id": "high_quality_architectural_5927",
+        "family_fingerprint": "05bf04bf0850a6e14f916f24fb12ba1982736873d3974a0bd2b78eab41ed37e4",
+        "row_count": 1582,
+        "family_id": "05bf04bf0850a6e14f916f24fb12ba1982736873d3974a0bd2b78eab41ed37e4",
+        "family_assignment_hash": "6096a46b4569190c55269030648167b9d8ddc39acbed287e88970a7b0557cbcb",
+        "split": "B"
+      },
+      {
+        "source_gid": 280,
+        "drawing_id": "high_quality_architectural_5942",
+        "family_fingerprint": "0510b0d924f0fb71cc6c8a5ab436f96dd456069bcc7a718dcdd72ca990ee2f87",
+        "row_count": 2038,
+        "family_id": "0510b0d924f0fb71cc6c8a5ab436f96dd456069bcc7a718dcdd72ca990ee2f87",
+        "family_assignment_hash": "90461d0a6b8fb458b9dc3b29d131347a3b3579c0488ad9c1e3be11f41c44a159",
+        "split": "B"
+      },
+      {
+        "source_gid": 281,
+        "drawing_id": "high_quality_architectural_5981",
+        "family_fingerprint": "4bffe792e54f6f044cd21f2fd1fbfd7d336d6df175c087931a164a62029fb386",
+        "row_count": 1829,
+        "family_id": "4bffe792e54f6f044cd21f2fd1fbfd7d336d6df175c087931a164a62029fb386",
+        "family_assignment_hash": "f25f66c6c3dade323e459a9946856e9fcdcc62e0205bb46d88dd92e514f3858a",
+        "split": "B"
+      },
+      {
+        "source_gid": 282,
+        "drawing_id": "high_quality_architectural_5996",
+        "family_fingerprint": "00526d480c58888be3b2d2f87584660dee13ed880efb50489acf6156696bbcfe",
+        "row_count": 1055,
+        "family_id": "00526d480c58888be3b2d2f87584660dee13ed880efb50489acf6156696bbcfe",
+        "family_assignment_hash": "b1a53038ed557a4eafa36b8b870a8d459098e6b82162f5e33fe7b350df26203c",
+        "split": "A"
+      },
+      {
+        "source_gid": 283,
+        "drawing_id": "high_quality_architectural_6022",
+        "family_fingerprint": "1de106682bcd02ffe0566dfe9b6d7baa9ff4e7d7c105b8020bf08ec6261ec247",
+        "row_count": 1095,
+        "family_id": "1de106682bcd02ffe0566dfe9b6d7baa9ff4e7d7c105b8020bf08ec6261ec247",
+        "family_assignment_hash": "6315d4dac8616b47906971193b66d69b2c425fcb124d1c1b9a56d92703d9cbab",
+        "split": "B"
+      },
+      {
+        "source_gid": 284,
+        "drawing_id": "high_quality_architectural_6033",
+        "family_fingerprint": "31a2bcb62811948cf74b3a877190020e07cf4f0a2d70542a4ea333596d6a4628",
+        "row_count": 1973,
+        "family_id": "31a2bcb62811948cf74b3a877190020e07cf4f0a2d70542a4ea333596d6a4628",
+        "family_assignment_hash": "d1194d859ab4a18b7f8c719192ad924eeeccce350a0a51326ed818599d11be06",
+        "split": "B"
+      },
+      {
+        "source_gid": 285,
+        "drawing_id": "high_quality_architectural_6038",
+        "family_fingerprint": "54520b1bf9096bcf272c4bdb43326543150b57a46103e1c79e16327d414575ab",
+        "row_count": 1772,
+        "family_id": "54520b1bf9096bcf272c4bdb43326543150b57a46103e1c79e16327d414575ab",
+        "family_assignment_hash": "19041e8391fe7b3e02c2a7b9df16a3ae6961fedce16deaea49da0ebb73ca2853",
+        "split": "B"
+      },
+      {
+        "source_gid": 286,
+        "drawing_id": "high_quality_architectural_6121",
+        "family_fingerprint": "09a96758097c1773b4e9713cca4386687f04ae76c99b5bd637298eb967fad0db",
+        "row_count": 462,
+        "family_id": "09a96758097c1773b4e9713cca4386687f04ae76c99b5bd637298eb967fad0db",
+        "family_assignment_hash": "ffefe37e2e8c11822b7ff6a8e28122865488d08fb7d1ab8e5fda124313dc7e0b",
+        "split": "A"
+      },
+      {
+        "source_gid": 287,
+        "drawing_id": "high_quality_architectural_6135",
+        "family_fingerprint": "11f58e29da7be954d03692c11a21b7a18c818894026b2e639f4afd2618906d92",
+        "row_count": 1175,
+        "family_id": "11f58e29da7be954d03692c11a21b7a18c818894026b2e639f4afd2618906d92",
+        "family_assignment_hash": "fee3b7ea0af0562157daf429711286ddc1e32d63d19b3c7c5f4210c510a8ae67",
+        "split": "B"
+      },
+      {
+        "source_gid": 288,
+        "drawing_id": "high_quality_architectural_6136",
+        "family_fingerprint": "039ff004ef28141b311348f8919e664fe1b5d3981733995fa9e5ebe352151ec4",
+        "row_count": 1752,
+        "family_id": "039ff004ef28141b311348f8919e664fe1b5d3981733995fa9e5ebe352151ec4",
+        "family_assignment_hash": "a2d02893de69fa97a0be3893e1173f6be6aae52cba37ef4634201aba80ffd05c",
+        "split": "B"
+      },
+      {
+        "source_gid": 289,
+        "drawing_id": "high_quality_architectural_6183",
+        "family_fingerprint": "23dfe3a8fe7b500f91b16e0c505c51dcc1608d7e6b2bb057a2335dbffa51ea18",
+        "row_count": 836,
+        "family_id": "23dfe3a8fe7b500f91b16e0c505c51dcc1608d7e6b2bb057a2335dbffa51ea18",
+        "family_assignment_hash": "fa44dd1d36e20414bcbcb32d5c0fcaef695ff50b9929275f9233816b9fbd326e",
+        "split": "B"
+      },
+      {
+        "source_gid": 290,
+        "drawing_id": "high_quality_architectural_6244",
+        "family_fingerprint": "46c0f5ae0d5eaf0d3cfe71c55bfa8ff7228f74876ac352cda6fab3132c21b23f",
+        "row_count": 769,
+        "family_id": "46c0f5ae0d5eaf0d3cfe71c55bfa8ff7228f74876ac352cda6fab3132c21b23f",
+        "family_assignment_hash": "2c205941695f2db49928a535d1b6a681bb2779ae0be39458af2b0c0b93bb697f",
+        "split": "A"
+      },
+      {
+        "source_gid": 291,
+        "drawing_id": "high_quality_architectural_6257",
+        "family_fingerprint": "07a0fee0ad875f51a2a6beb617518df2469fbe72ebdd23d8ace7e8df3ebfdbb1",
+        "row_count": 595,
+        "family_id": "07a0fee0ad875f51a2a6beb617518df2469fbe72ebdd23d8ace7e8df3ebfdbb1",
+        "family_assignment_hash": "6867cb2a80a58a00b6c7057497afd4bef2bb29c10e6434103b7a8eea5683853e",
+        "split": "A"
+      },
+      {
+        "source_gid": 292,
+        "drawing_id": "high_quality_architectural_6272",
+        "family_fingerprint": "0470c6a192f1ab07e30f5d50f3301817700b820945c21104af5da4b6494f0a69",
+        "row_count": 868,
+        "family_id": "0470c6a192f1ab07e30f5d50f3301817700b820945c21104af5da4b6494f0a69",
+        "family_assignment_hash": "0ee4672ff5be6dd941bf72456febc8cc120f35fd9eadc15ce2da96f64904711a",
+        "split": "B"
+      },
+      {
+        "source_gid": 293,
+        "drawing_id": "high_quality_architectural_6274",
+        "family_fingerprint": "16fc87044382ee85271248e61dac37bdf8326fba80f2ced95778f850bbb9f359",
+        "row_count": 500,
+        "family_id": "16fc87044382ee85271248e61dac37bdf8326fba80f2ced95778f850bbb9f359",
+        "family_assignment_hash": "563a36b8e2b3a2ab72cef6f9c965e419004fa558a471c0595934da326421a0c1",
+        "split": "A"
+      },
+      {
+        "source_gid": 294,
+        "drawing_id": "high_quality_architectural_6286",
+        "family_fingerprint": "0fb443818c0296346c09906f8759203427bf5c999199a863d24f950063dae31e",
+        "row_count": 425,
+        "family_id": "0fb443818c0296346c09906f8759203427bf5c999199a863d24f950063dae31e",
+        "family_assignment_hash": "ba0e3869c2057c57e4f62adb6bd682d82c9ec985a1d0c58315e07770cf4e1a60",
+        "split": "B"
+      },
+      {
+        "source_gid": 295,
+        "drawing_id": "high_quality_architectural_6290",
+        "family_fingerprint": "17bb183fc4685c938465e696958c63b8621bd789955ff34d776febe6fcc02d7e",
+        "row_count": 617,
+        "family_id": "17bb183fc4685c938465e696958c63b8621bd789955ff34d776febe6fcc02d7e",
+        "family_assignment_hash": "10f2d80e565e170bc890acdaafc4c88a0e892d7748791b5b0de12c1894a62998",
+        "split": "B"
+      },
+      {
+        "source_gid": 296,
+        "drawing_id": "high_quality_architectural_6301",
+        "family_fingerprint": "088fcb2c6985ee6d1d12af56625b7e6ee4749c2d0562c72a083e40f26f323971",
+        "row_count": 690,
+        "family_id": "088fcb2c6985ee6d1d12af56625b7e6ee4749c2d0562c72a083e40f26f323971",
+        "family_assignment_hash": "8091700326aabdfea78554ab7e8161af04c157cd0987a9239e8dcd57b2e08aa8",
+        "split": "A"
+      },
+      {
+        "source_gid": 297,
+        "drawing_id": "high_quality_architectural_6302",
+        "family_fingerprint": "0d509f5f3e16bfa0ea4076dcf6c16977257ec685e0af68f1f00570974f06ac4b",
+        "row_count": 747,
+        "family_id": "0d509f5f3e16bfa0ea4076dcf6c16977257ec685e0af68f1f00570974f06ac4b",
+        "family_assignment_hash": "3d9623429e9400ca582432aba633285b65818e8acf3781db49ac40e3b7d6f86a",
+        "split": "A"
+      },
+      {
+        "source_gid": 298,
+        "drawing_id": "high_quality_architectural_6320",
+        "family_fingerprint": "0539bbcb95c513e5672ed778a0c0b31c9d5cbbbfb3e41d00c65beb6c2a9f7b13",
+        "row_count": 472,
+        "family_id": "0539bbcb95c513e5672ed778a0c0b31c9d5cbbbfb3e41d00c65beb6c2a9f7b13",
+        "family_assignment_hash": "d9e33986ddb6aea0ef925a0ad7049e00bcf04a698b301cf8e507b204ca41a42d",
+        "split": "A"
+      },
+      {
+        "source_gid": 299,
+        "drawing_id": "high_quality_architectural_6339",
+        "family_fingerprint": "180a9e0fa9cb7b2d5fe544e1561e6de0b78eeb22279bc9590a0e158538dc8d01",
+        "row_count": 720,
+        "family_id": "180a9e0fa9cb7b2d5fe544e1561e6de0b78eeb22279bc9590a0e158538dc8d01",
+        "family_assignment_hash": "29f58f8f5c202f26df6a69837db1c94c2b59e202f48a07c13a5082c607a138cd",
+        "split": "A"
+      },
+      {
+        "source_gid": 300,
+        "drawing_id": "high_quality_architectural_6347",
+        "family_fingerprint": "0eb060c9bd798071dee0bf7f5ff8cdc5bc1cf9102ba3781c16dfc570c37971f5",
+        "row_count": 255,
+        "family_id": "0eb060c9bd798071dee0bf7f5ff8cdc5bc1cf9102ba3781c16dfc570c37971f5",
+        "family_assignment_hash": "33915399ba1b5cdc4778b452501a1331167fe4a3726307559aed8f01358882f7",
+        "split": "A"
+      },
+      {
+        "source_gid": 301,
+        "drawing_id": "high_quality_architectural_6379",
+        "family_fingerprint": "30b2f04ac1622370359389e42920c22281b8be352fe3ec11d105ff2edea87a9e",
+        "row_count": 668,
+        "family_id": "30b2f04ac1622370359389e42920c22281b8be352fe3ec11d105ff2edea87a9e",
+        "family_assignment_hash": "1491225b5e5a20ffa898a0bb2c9cab0c05fd00229636a4a9e3cad17002809700",
+        "split": "B"
+      },
+      {
+        "source_gid": 302,
+        "drawing_id": "high_quality_architectural_638",
+        "family_fingerprint": "01269c549f9b9f670e239a4fb7886238f78b1d4e5aa52454c5a2bcf99afa7378",
+        "row_count": 763,
+        "family_id": "01269c549f9b9f670e239a4fb7886238f78b1d4e5aa52454c5a2bcf99afa7378",
+        "family_assignment_hash": "ea37e9f5483523173da336d7ac45be471569170d2380f4bfbdd27373b3bd8ec5",
+        "split": "A"
+      },
+      {
+        "source_gid": 303,
+        "drawing_id": "high_quality_architectural_6387",
+        "family_fingerprint": "0cb88b6774b4797029b98ad8b53b0dce0262bde4ecf0d089dc09211b8374fecd",
+        "row_count": 977,
+        "family_id": "0cb88b6774b4797029b98ad8b53b0dce0262bde4ecf0d089dc09211b8374fecd",
+        "family_assignment_hash": "0ad249770c8014845edbbdd664e345487271e4a9441388d8579802e6b38ea4de",
+        "split": "B"
+      },
+      {
+        "source_gid": 304,
+        "drawing_id": "high_quality_architectural_6389",
+        "family_fingerprint": "0dd1e93873c15271e2cd1d7f0da7b98acba63a5b821fae375edcd3464d7fb73e",
+        "row_count": 1885,
+        "family_id": "0dd1e93873c15271e2cd1d7f0da7b98acba63a5b821fae375edcd3464d7fb73e",
+        "family_assignment_hash": "158130163ace45386a3fd93dcf204208c78d7e0a1bc3f3b19059b81322b93268",
+        "split": "A"
+      },
+      {
+        "source_gid": 306,
+        "drawing_id": "high_quality_architectural_651",
+        "family_fingerprint": "0377f4b4060e9902ec448182e0fe4c82a0f34eb5de2cd1d0d61fd13769c2f638",
+        "row_count": 490,
+        "family_id": "0377f4b4060e9902ec448182e0fe4c82a0f34eb5de2cd1d0d61fd13769c2f638",
+        "family_assignment_hash": "1e691208ea4e5bbc8f9fa0bd9400b9e8d1e450c9c93583310103b9b41b525247",
+        "split": "B"
+      },
+      {
+        "source_gid": 307,
+        "drawing_id": "high_quality_architectural_6514",
+        "family_fingerprint": "089b338c6f0964ac99ed15885cc2b868209dfcc7c13f4acdec2a2195ddc652ba",
+        "row_count": 454,
+        "family_id": "089b338c6f0964ac99ed15885cc2b868209dfcc7c13f4acdec2a2195ddc652ba",
+        "family_assignment_hash": "3e3d5f2c05f6d0859e8fb5d2266a09269ebd70d1ffc72eb56447136721b51657",
+        "split": "A"
+      },
+      {
+        "source_gid": 308,
+        "drawing_id": "high_quality_architectural_6537",
+        "family_fingerprint": "27079543e83b0014a1d3176c3eb8c62e559aa0f331ca1b9e1426e2a0089f27d3",
+        "row_count": 522,
+        "family_id": "27079543e83b0014a1d3176c3eb8c62e559aa0f331ca1b9e1426e2a0089f27d3",
+        "family_assignment_hash": "4d74d72d9089fddafaf7f05165c0e24bdd38adf4b5849da703d38786a313ae75",
+        "split": "B"
+      },
+      {
+        "source_gid": 309,
+        "drawing_id": "high_quality_architectural_6551",
+        "family_fingerprint": "250ba4a517303467aac6431c24e32fe79456f60ea197a21cb0074d2429e51aab",
+        "row_count": 1021,
+        "family_id": "250ba4a517303467aac6431c24e32fe79456f60ea197a21cb0074d2429e51aab",
+        "family_assignment_hash": "fdc4e9813b813761ce2feb1bd1b21297d143289b07774b03c58c346b724a72a9",
+        "split": "B"
+      },
+      {
+        "source_gid": 310,
+        "drawing_id": "high_quality_architectural_6552",
+        "family_fingerprint": "082446c18af1303ae106f50555812dd74617977240cdbf570f06b42f9cee97d7",
+        "row_count": 614,
+        "family_id": "082446c18af1303ae106f50555812dd74617977240cdbf570f06b42f9cee97d7",
+        "family_assignment_hash": "46550af72bd014eb0c17b0b635e543e5db5dffffe9449c15b265af2fea26a1cd",
+        "split": "A"
+      },
+      {
+        "source_gid": 311,
+        "drawing_id": "high_quality_architectural_6602",
+        "family_fingerprint": "00e39fbef4dcf4ad1b843a9ff8a3a68dfc25b34dbdde5fee87b940f7eab934cf",
+        "row_count": 962,
+        "family_id": "00e39fbef4dcf4ad1b843a9ff8a3a68dfc25b34dbdde5fee87b940f7eab934cf",
+        "family_assignment_hash": "0def745ce467ab20e4d674b787cec058c82d6a31114df74abb2730151c3cace7",
+        "split": "A"
+      },
+      {
+        "source_gid": 312,
+        "drawing_id": "high_quality_architectural_6644",
+        "family_fingerprint": "33dfd81382e75b0854efe95fd6ab0dee714ce0add01aa56557c8b3375377989d",
+        "row_count": 1352,
+        "family_id": "33dfd81382e75b0854efe95fd6ab0dee714ce0add01aa56557c8b3375377989d",
+        "family_assignment_hash": "8646696d8b655d2698fcdf7d26e06eafded5728981ef81f8ba1773e63ae1ad49",
+        "split": "B"
+      },
+      {
+        "source_gid": 313,
+        "drawing_id": "high_quality_architectural_6655",
+        "family_fingerprint": "13dd6f151b7baebc79890ddb968ced820bac9fd7b5584e9e1077b43e13ece92d",
+        "row_count": 412,
+        "family_id": "13dd6f151b7baebc79890ddb968ced820bac9fd7b5584e9e1077b43e13ece92d",
+        "family_assignment_hash": "cc48a473c773589e340bed584e4088d432e43ea6c59ca8a0428e7e01abef069c",
+        "split": "A"
+      },
+      {
+        "source_gid": 314,
+        "drawing_id": "high_quality_architectural_6675",
+        "family_fingerprint": "41c125072854a4aae8366be9a679432f2a4fee7c0b19621044e3cf0555d1265b",
+        "row_count": 1258,
+        "family_id": "41c125072854a4aae8366be9a679432f2a4fee7c0b19621044e3cf0555d1265b",
+        "family_assignment_hash": "b11e6cfe406bfcd9ba50cfb6c8424c125179788a057ac9bced86261701cac555",
+        "split": "B"
+      },
+      {
+        "source_gid": 315,
+        "drawing_id": "high_quality_architectural_702",
+        "family_fingerprint": "289290bff2c049103cd13b19cc4bd54be33122aa57a0037c5a0fdfd20527439f",
+        "row_count": 879,
+        "family_id": "289290bff2c049103cd13b19cc4bd54be33122aa57a0037c5a0fdfd20527439f",
+        "family_assignment_hash": "63ed663b3d08497bfdb8ab4ec67ad8cc9b840fb6ba194d939a0cc880cd3d479a",
+        "split": "A"
+      },
+      {
+        "source_gid": 316,
+        "drawing_id": "high_quality_architectural_7519",
+        "family_fingerprint": "0a680c4b6d56047a9bc331aec222ad68223cf2e05f70b0f22a260ec24aa4216d",
+        "row_count": 1534,
+        "family_id": "0a680c4b6d56047a9bc331aec222ad68223cf2e05f70b0f22a260ec24aa4216d",
+        "family_assignment_hash": "e414b6fc1b8d8b85049e67dbe571ea80febc82f347fc080aaa26252e587803dc",
+        "split": "B"
+      },
+      {
+        "source_gid": 317,
+        "drawing_id": "high_quality_architectural_7550",
+        "family_fingerprint": "0869b1423ec6473877ba9bf8c0bff802be48c7d6ae117b9a446d41882fa344c3",
+        "row_count": 381,
+        "family_id": "0869b1423ec6473877ba9bf8c0bff802be48c7d6ae117b9a446d41882fa344c3",
+        "family_assignment_hash": "688ff48476ffe07097bc6b84f8aa2712e59348198591312ef47e4e2fdfa46acc",
+        "split": "B"
+      },
+      {
+        "source_gid": 318,
+        "drawing_id": "high_quality_architectural_756",
+        "family_fingerprint": "353f43342ffab9a080b1a52f1892efbce1a9d043c7238d277742aa376186fa31",
+        "row_count": 567,
+        "family_id": "353f43342ffab9a080b1a52f1892efbce1a9d043c7238d277742aa376186fa31",
+        "family_assignment_hash": "08890bf7222978171b99acc3d813c78cb55b2495e7026a91495dd6e9b8ed553c",
+        "split": "A"
+      },
+      {
+        "source_gid": 319,
+        "drawing_id": "high_quality_architectural_7570",
+        "family_fingerprint": "028c14e2004ae4dfcd6338da988d6740d2976e01e4d8c758296c3ccea6b92023",
+        "row_count": 775,
+        "family_id": "028c14e2004ae4dfcd6338da988d6740d2976e01e4d8c758296c3ccea6b92023",
+        "family_assignment_hash": "0a405796978b39f94eb8d6e47583062a3ca63368c930d2df2147b898d4dd6f62",
+        "split": "A"
+      },
+      {
+        "source_gid": 320,
+        "drawing_id": "high_quality_architectural_7671",
+        "family_fingerprint": "3c73ae70b47afa4d1c0faba7bffd6c04f239c209da7fbe4cd3d7e5d497210570",
+        "row_count": 804,
+        "family_id": "3c73ae70b47afa4d1c0faba7bffd6c04f239c209da7fbe4cd3d7e5d497210570",
+        "family_assignment_hash": "b279f940d2e8d63431dd81529f291f70a8c2263f1f1d1ca401d75ee25188c403",
+        "split": "B"
+      },
+      {
+        "source_gid": 321,
+        "drawing_id": "high_quality_architectural_7677",
+        "family_fingerprint": "03d6569b5f7dbb2bcb84923e95d088251a8246dc81231b4a85ebf66af4ed7b5b",
+        "row_count": 1350,
+        "family_id": "03d6569b5f7dbb2bcb84923e95d088251a8246dc81231b4a85ebf66af4ed7b5b",
+        "family_assignment_hash": "cdf2c8e572e29b266d1a61319fb68f3f747fa31cd81fd0cbbef1872a4dde32d9",
+        "split": "A"
+      },
+      {
+        "source_gid": 322,
+        "drawing_id": "high_quality_architectural_7712",
+        "family_fingerprint": "319e1caca40cecbdc61e90df65a6bfb7d98590e2c5ab5059c93c0e2171460e67",
+        "row_count": 373,
+        "family_id": "319e1caca40cecbdc61e90df65a6bfb7d98590e2c5ab5059c93c0e2171460e67",
+        "family_assignment_hash": "448223165a1ff5c5afd4158335f8e3450ea66a836fa28ae46888bdfd19300e35",
+        "split": "A"
+      },
+      {
+        "source_gid": 323,
+        "drawing_id": "high_quality_architectural_7740",
+        "family_fingerprint": "10e03295c472db845489db35f1fbc84e45260e6774c221d1d29155154630d6d6",
+        "row_count": 1750,
+        "family_id": "10e03295c472db845489db35f1fbc84e45260e6774c221d1d29155154630d6d6",
+        "family_assignment_hash": "0023baa6683bce08a700d7065f263b8c845213c834fa38ce88110c21153ceb14",
+        "split": "A"
+      },
+      {
+        "source_gid": 324,
+        "drawing_id": "high_quality_architectural_7752",
+        "family_fingerprint": "27c2da40487ba0d81c410360619dfa9505f0eea8e39acec32b432aa52b13ef84",
+        "row_count": 977,
+        "family_id": "27c2da40487ba0d81c410360619dfa9505f0eea8e39acec32b432aa52b13ef84",
+        "family_assignment_hash": "e9f7c544a7b3a185d6213993614784a5ff012b352c6737db04312fce33e48f14",
+        "split": "A"
+      },
+      {
+        "source_gid": 325,
+        "drawing_id": "high_quality_architectural_7777",
+        "family_fingerprint": "40f3bb02b8aeefafbe33cf7f16743f7adc04a635d08c043ddf2d409cd58d8314",
+        "row_count": 679,
+        "family_id": "40f3bb02b8aeefafbe33cf7f16743f7adc04a635d08c043ddf2d409cd58d8314",
+        "family_assignment_hash": "fc3b17367e3d5cbc80873152626519c75b826bc957c3e055b66896cc3f10a171",
+        "split": "B"
+      },
+      {
+        "source_gid": 326,
+        "drawing_id": "high_quality_architectural_7799",
+        "family_fingerprint": "322653d43dd044eda8fe1592155604f06681b4371300a74655963f0f1cd47b23",
+        "row_count": 1095,
+        "family_id": "322653d43dd044eda8fe1592155604f06681b4371300a74655963f0f1cd47b23",
+        "family_assignment_hash": "34c8b1263ed47f71e36b77351936e09ea63975a3b15b9e8f9bd85d26a3135fb3",
+        "split": "B"
+      },
+      {
+        "source_gid": 327,
+        "drawing_id": "high_quality_architectural_7813",
+        "family_fingerprint": "04dd08c32055d135dc4147d76c12598c1510c85c9cedbc1e92447263fdc342d0",
+        "row_count": 775,
+        "family_id": "04dd08c32055d135dc4147d76c12598c1510c85c9cedbc1e92447263fdc342d0",
+        "family_assignment_hash": "ea4e508cbc78f7a33afa6e53c0cb1e427115219d12c7147ab081c67db923677e",
+        "split": "B"
+      },
+      {
+        "source_gid": 328,
+        "drawing_id": "high_quality_architectural_7820",
+        "family_fingerprint": "00fded27d00fb704d144c44c1bace62e56025a78006a648711693404390169f1",
+        "row_count": 2025,
+        "family_id": "00fded27d00fb704d144c44c1bace62e56025a78006a648711693404390169f1",
+        "family_assignment_hash": "f8d2d2794745f0eb30883b590550069723c9a99f05b08bc4ccdb7a24435727e7",
+        "split": "B"
+      },
+      {
+        "source_gid": 329,
+        "drawing_id": "high_quality_architectural_7842",
+        "family_fingerprint": "19ad6e0302406822e16a46d4cac69ba431df2f2464803563700e9a7f6ae71180",
+        "row_count": 520,
+        "family_id": "19ad6e0302406822e16a46d4cac69ba431df2f2464803563700e9a7f6ae71180",
+        "family_assignment_hash": "aea211f90cc5aed229d351c793d62ec351f6dbd5c715075558295bebd3f82124",
+        "split": "A"
+      },
+      {
+        "source_gid": 330,
+        "drawing_id": "high_quality_architectural_7864",
+        "family_fingerprint": "247fce81c14c9bd5aa4deee90c42191869836296adf90e52785a0942c0bb14ef",
+        "row_count": 601,
+        "family_id": "247fce81c14c9bd5aa4deee90c42191869836296adf90e52785a0942c0bb14ef",
+        "family_assignment_hash": "8ccb2bf94e7ceb97155d20112c657a92723d1fad763b40e9be7183452ad10650",
+        "split": "B"
+      },
+      {
+        "source_gid": 331,
+        "drawing_id": "high_quality_architectural_7880",
+        "family_fingerprint": "1a3a8b878ec4c35aa7ee7483feb6ba8f35ab8a9ffb0dca9f8098ea47a6a02152",
+        "row_count": 2742,
+        "family_id": "1a3a8b878ec4c35aa7ee7483feb6ba8f35ab8a9ffb0dca9f8098ea47a6a02152",
+        "family_assignment_hash": "4b739ca651b5e729c60558165bbaecb633342512aaa1680471497046ba52436e",
+        "split": "A"
+      },
+      {
+        "source_gid": 332,
+        "drawing_id": "high_quality_architectural_801",
+        "family_fingerprint": "127db8c946b3e0dd58657e4dc32023e015be35fcaaeee135b6cdbd9d2e5d2275",
+        "row_count": 778,
+        "family_id": "127db8c946b3e0dd58657e4dc32023e015be35fcaaeee135b6cdbd9d2e5d2275",
+        "family_assignment_hash": "dbd8436c62bdf3cc4708fbd6b338d2753f1c148dbb51402820e9367dc1c975e7",
+        "split": "A"
+      },
+      {
+        "source_gid": 333,
+        "drawing_id": "high_quality_architectural_8029",
+        "family_fingerprint": "24caa29eb4c6feb52bd467925786add5d32b15d1352cb980de1efaaf8fa65854",
+        "row_count": 416,
+        "family_id": "24caa29eb4c6feb52bd467925786add5d32b15d1352cb980de1efaaf8fa65854",
+        "family_assignment_hash": "96c5ed1ff141901b48c947728d6aa2f86ed86ffa75d1da294376fc22ebb3bc0d",
+        "split": "B"
+      },
+      {
+        "source_gid": 334,
+        "drawing_id": "high_quality_architectural_8049",
+        "family_fingerprint": "3f5c4f70d772e06c48265cbdbb21f9fa595c4496860c6bc5f92d94925082d940",
+        "row_count": 1274,
+        "family_id": "3f5c4f70d772e06c48265cbdbb21f9fa595c4496860c6bc5f92d94925082d940",
+        "family_assignment_hash": "d138d6cc9259bf5a875775bec4996bbff85e639674d508a0107a7308f2d9e9a2",
+        "split": "A"
+      },
+      {
+        "source_gid": 335,
+        "drawing_id": "high_quality_architectural_8090",
+        "family_fingerprint": "11e7c72c2427e62d70358591aaf919551d13c968c2c2f4e81ac70ecd151fb58c",
+        "row_count": 1400,
+        "family_id": "11e7c72c2427e62d70358591aaf919551d13c968c2c2f4e81ac70ecd151fb58c",
+        "family_assignment_hash": "18a79bb6cee396f5f42c1020d66c5aa152342798468e9efa969051b89289a53f",
+        "split": "B"
+      },
+      {
+        "source_gid": 336,
+        "drawing_id": "high_quality_architectural_8117",
+        "family_fingerprint": "217033e3a889d44c16bd2053851784c6b91ce9a59621e600ab8a738854f307c3",
+        "row_count": 1791,
+        "family_id": "217033e3a889d44c16bd2053851784c6b91ce9a59621e600ab8a738854f307c3",
+        "family_assignment_hash": "98b717c8b52a707d0c257973922f8e2c07007a57b8e8b5a22d8fb0bd7561d8b4",
+        "split": "B"
+      },
+      {
+        "source_gid": 337,
+        "drawing_id": "high_quality_architectural_8154",
+        "family_fingerprint": "155460ed902d916768473f3cfab5aa3b13da11cb740ba29c219587e4a8ce9e8b",
+        "row_count": 622,
+        "family_id": "155460ed902d916768473f3cfab5aa3b13da11cb740ba29c219587e4a8ce9e8b",
+        "family_assignment_hash": "e7c5166b7834c5e987a75058bd2616dd7b1e773309f1de20eb87563b32d9fd39",
+        "split": "A"
+      },
+      {
+        "source_gid": 338,
+        "drawing_id": "high_quality_architectural_8159",
+        "family_fingerprint": "3318ac3c2079134de04d6b96e0849a37af6dc90133d8db40fdf0f060f3c8ff03",
+        "row_count": 1512,
+        "family_id": "3318ac3c2079134de04d6b96e0849a37af6dc90133d8db40fdf0f060f3c8ff03",
+        "family_assignment_hash": "29c3832520c32445fd638904e88cadc91e0983f0c091db15e91515c11c75b46a",
+        "split": "B"
+      },
+      {
+        "source_gid": 339,
+        "drawing_id": "high_quality_architectural_8160",
+        "family_fingerprint": "13702f04e4113480451071333a9715ddd92f81dd4c399e6f605bea09aeda54ae",
+        "row_count": 1817,
+        "family_id": "13702f04e4113480451071333a9715ddd92f81dd4c399e6f605bea09aeda54ae",
+        "family_assignment_hash": "e37086f935ed8fe4be441d5190d21e108fedea05f358778292e766c281e6624b",
+        "split": "A"
+      },
+      {
+        "source_gid": 340,
+        "drawing_id": "high_quality_architectural_8207",
+        "family_fingerprint": "196e1d83b901eaf319110a6a6ff3f45ad9fbf5dc586a6b96b2ad495c024b21db",
+        "row_count": 557,
+        "family_id": "196e1d83b901eaf319110a6a6ff3f45ad9fbf5dc586a6b96b2ad495c024b21db",
+        "family_assignment_hash": "cf1504b9225d0be7b0262c62b859f49b6d5f69d24f89b6e2c7d4eed6d5881e9d",
+        "split": "B"
+      },
+      {
+        "source_gid": 341,
+        "drawing_id": "high_quality_architectural_8299",
+        "family_fingerprint": "04d9c84d0635432e9faae408abf15d4804fdd25bf8bb68dc2b64722fa4ea47c4",
+        "row_count": 479,
+        "family_id": "04d9c84d0635432e9faae408abf15d4804fdd25bf8bb68dc2b64722fa4ea47c4",
+        "family_assignment_hash": "2f343ec5b3596126c3f5019f778a05bbcb53c804bad02728796c180738fda03a",
+        "split": "A"
+      },
+      {
+        "source_gid": 342,
+        "drawing_id": "high_quality_architectural_834",
+        "family_fingerprint": "3ae130f5fc0c68a96738f54fce8f055c73123d035a2e11c0864973387924939e",
+        "row_count": 1016,
+        "family_id": "3ae130f5fc0c68a96738f54fce8f055c73123d035a2e11c0864973387924939e",
+        "family_assignment_hash": "18b77f6b5686aedeea9ea9273f5fcc3ed7779e03a1dbea76060031403c7cf37f",
+        "split": "A"
+      },
+      {
+        "source_gid": 343,
+        "drawing_id": "high_quality_architectural_8344",
+        "family_fingerprint": "29856069902b85da62e6bac8c77bd33805543a00f8be83b9273570bd9eb1064e",
+        "row_count": 983,
+        "family_id": "29856069902b85da62e6bac8c77bd33805543a00f8be83b9273570bd9eb1064e",
+        "family_assignment_hash": "e55a12b3b9f0baa2d3fd3c75a0034c28b685549e8e214dd0e0d1eb44a6d9f9a0",
+        "split": "B"
+      },
+      {
+        "source_gid": 344,
+        "drawing_id": "high_quality_architectural_8388",
+        "family_fingerprint": "124f20ce5da5cf31cf380a28f87f16e6ba6bce3c29150f26625e94e597193219",
+        "row_count": 1956,
+        "family_id": "124f20ce5da5cf31cf380a28f87f16e6ba6bce3c29150f26625e94e597193219",
+        "family_assignment_hash": "f4153188403cfe80b7f4f68008974b92a843f939909b2fb74f33b2e7ed8b86b2",
+        "split": "B"
+      },
+      {
+        "source_gid": 345,
+        "drawing_id": "high_quality_architectural_8413",
+        "family_fingerprint": "0118a5d71c016e6154fbcee6f08df698c792edafe0505ac04ff4bcbd18d5f8e3",
+        "row_count": 334,
+        "family_id": "0118a5d71c016e6154fbcee6f08df698c792edafe0505ac04ff4bcbd18d5f8e3",
+        "family_assignment_hash": "073308c84ea5a4e3fdc13ef270bfde99589cfc9b5c24dd34cd1a77ec0c6cc32d",
+        "split": "B"
+      },
+      {
+        "source_gid": 346,
+        "drawing_id": "high_quality_architectural_8425",
+        "family_fingerprint": "1b435b8ed96672052bd9753cadc2fb983dc2cbfc5d3ff9a7b8cc4909f3db655e",
+        "row_count": 1614,
+        "family_id": "1b435b8ed96672052bd9753cadc2fb983dc2cbfc5d3ff9a7b8cc4909f3db655e",
+        "family_assignment_hash": "75cc8e0000af79938e837d447d6c24dabb094d506a5be0604acce5c00792fe5b",
+        "split": "B"
+      },
+      {
+        "source_gid": 347,
+        "drawing_id": "high_quality_architectural_8486",
+        "family_fingerprint": "16781e6776bc0368095a6ad2e2a22d8409f9a7f460112cb952f864f83ee8afdd",
+        "row_count": 621,
+        "family_id": "16781e6776bc0368095a6ad2e2a22d8409f9a7f460112cb952f864f83ee8afdd",
+        "family_assignment_hash": "db569c3c304aac538222d51c8de503f9fc98f983930e526c6e2c9b0948d47d8a",
+        "split": "B"
+      },
+      {
+        "source_gid": 348,
+        "drawing_id": "high_quality_architectural_8515",
+        "family_fingerprint": "051dc428d12a56a9a6920f55b0767cad740a842fe77892ca35a5f7f54776081f",
+        "row_count": 607,
+        "family_id": "051dc428d12a56a9a6920f55b0767cad740a842fe77892ca35a5f7f54776081f",
+        "family_assignment_hash": "b2e63ef8b20c4ee85bc83b8114994b5611c396a5a2744471584e7b0db10d0eec",
+        "split": "A"
+      },
+      {
+        "source_gid": 349,
+        "drawing_id": "high_quality_architectural_8532",
+        "family_fingerprint": "190acf55a96547ae040b1e419c35d64063a258dfbfdfc2d52f18f3d1db0d72c6",
+        "row_count": 737,
+        "family_id": "190acf55a96547ae040b1e419c35d64063a258dfbfdfc2d52f18f3d1db0d72c6",
+        "family_assignment_hash": "a21c44a5b258a97b78fa74b4b7ad906ddc7c8035fc490c7d3be7d40dec7d22e2",
+        "split": "A"
+      },
+      {
+        "source_gid": 350,
+        "drawing_id": "high_quality_architectural_8545",
+        "family_fingerprint": "1705ae7087a3369f588437dabceb9ee074b103232cc9c23b11be15f19fb5a867",
+        "row_count": 405,
+        "family_id": "1705ae7087a3369f588437dabceb9ee074b103232cc9c23b11be15f19fb5a867",
+        "family_assignment_hash": "bc31d63e081462d2e88ee7c7a7eb57311e0a6a8338aac7322762ef1f020e13f1",
+        "split": "B"
+      },
+      {
+        "source_gid": 351,
+        "drawing_id": "high_quality_architectural_858",
+        "family_fingerprint": "584dc934bfbde696b057520e4eaff5889dc21dd895d06134eea9cd9ec379a690",
+        "row_count": 432,
+        "family_id": "584dc934bfbde696b057520e4eaff5889dc21dd895d06134eea9cd9ec379a690",
+        "family_assignment_hash": "d418b070ccd0a224edd606ad7ed9b8eaf4b4f477e7478d693fdf5d1a7f29f455",
+        "split": "B"
+      },
+      {
+        "source_gid": 352,
+        "drawing_id": "high_quality_architectural_8628",
+        "family_fingerprint": "0d34ef9e0c54ff76ac6b749f58de83baad71c198aa48cdc33f7c90a8567cb114",
+        "row_count": 948,
+        "family_id": "0d34ef9e0c54ff76ac6b749f58de83baad71c198aa48cdc33f7c90a8567cb114",
+        "family_assignment_hash": "b0ee4c47a532f021c1e690ae838be20227d5dacb8e1c2e1af1c0524ffa23f358",
+        "split": "A"
+      },
+      {
+        "source_gid": 353,
+        "drawing_id": "high_quality_architectural_865",
+        "family_fingerprint": "03ca5c2ae1f05cb138d61668b284c27d98a82ce5f210fc5b92657c2306afa182",
+        "row_count": 365,
+        "family_id": "03ca5c2ae1f05cb138d61668b284c27d98a82ce5f210fc5b92657c2306afa182",
+        "family_assignment_hash": "2c134e81d33b404465b9a0e7b33bbff900caff5421dcfdb1097fdb4fc6384052",
+        "split": "B"
+      },
+      {
+        "source_gid": 354,
+        "drawing_id": "high_quality_architectural_8675",
+        "family_fingerprint": "2881062ccb5e044d95cb912334af33b5d71583fe4572c62e3148e3ac2474a76d",
+        "row_count": 1012,
+        "family_id": "2881062ccb5e044d95cb912334af33b5d71583fe4572c62e3148e3ac2474a76d",
+        "family_assignment_hash": "b350abb73d18edec6b4703fabe95b76ac1614464a5bf20e11ea42f0eb813eef8",
+        "split": "A"
+      },
+      {
+        "source_gid": 355,
+        "drawing_id": "high_quality_architectural_8681",
+        "family_fingerprint": "2fbe71a2f5d4646311562794a7bbe949c50b7bbabd10c192f0c8f6a723dc5e78",
+        "row_count": 464,
+        "family_id": "2fbe71a2f5d4646311562794a7bbe949c50b7bbabd10c192f0c8f6a723dc5e78",
+        "family_assignment_hash": "866c97976ecc73bb42ec08e0030e3029a4835c768f974f0e25f0606b802441fe",
+        "split": "B"
+      },
+      {
+        "source_gid": 356,
+        "drawing_id": "high_quality_architectural_8690",
+        "family_fingerprint": "21ee2df8681d7a182f50354661fc2eb43d75f6e9415126e6b19197880cbe8d2c",
+        "row_count": 575,
+        "family_id": "21ee2df8681d7a182f50354661fc2eb43d75f6e9415126e6b19197880cbe8d2c",
+        "family_assignment_hash": "f6d415e89b41525134f96887e7e9bd9aab39fa9c76f2b57389a6b841c00ff6cc",
+        "split": "B"
+      },
+      {
+        "source_gid": 357,
+        "drawing_id": "high_quality_architectural_8702",
+        "family_fingerprint": "2e3cd029faef920f0cf5a9c1723cecb93793d302b826fbc5b314a42a83049022",
+        "row_count": 531,
+        "family_id": "2e3cd029faef920f0cf5a9c1723cecb93793d302b826fbc5b314a42a83049022",
+        "family_assignment_hash": "6022452e0e414fee9aa36f4fa7ccbb61d39d5db3273451d89498a277f54dd905",
+        "split": "A"
+      },
+      {
+        "source_gid": 358,
+        "drawing_id": "high_quality_architectural_8750",
+        "family_fingerprint": "1d7d7cc186585f62f351e46d0fa17c49212ee1957f64eed5601056a6b50b5b98",
+        "row_count": 657,
+        "family_id": "1d7d7cc186585f62f351e46d0fa17c49212ee1957f64eed5601056a6b50b5b98",
+        "family_assignment_hash": "8a7ba866a225a047ec79c71209e3e1812a254c1c10eed123231ba20978e9a6db",
+        "split": "A"
+      },
+      {
+        "source_gid": 359,
+        "drawing_id": "high_quality_architectural_8786",
+        "family_fingerprint": "0ae26ac6b21d2bf10e681b69186b69cfd632456785690e9d4d8606cf8d77d750",
+        "row_count": 1372,
+        "family_id": "0ae26ac6b21d2bf10e681b69186b69cfd632456785690e9d4d8606cf8d77d750",
+        "family_assignment_hash": "3b95a80ddadcbd174312252f8ba7325559bb12e9189e39cf011725601c6352c1",
+        "split": "B"
+      },
+      {
+        "source_gid": 360,
+        "drawing_id": "high_quality_architectural_8796",
+        "family_fingerprint": "183f9f4b8072e4766073fe9a96f0db46360e4e2dc277202960724a6aad722510",
+        "row_count": 498,
+        "family_id": "183f9f4b8072e4766073fe9a96f0db46360e4e2dc277202960724a6aad722510",
+        "family_assignment_hash": "cf797d7d57b1b8b7754ab6c082d5b5b92d6ec9fc822e7803033da8b687d342ba",
+        "split": "B"
+      },
+      {
+        "source_gid": 361,
+        "drawing_id": "high_quality_architectural_9001",
+        "family_fingerprint": "35bec2055aa785114fb5243c718acefaca60b7de9ddf1677e7316905f2bdb34a",
+        "row_count": 1305,
+        "family_id": "35bec2055aa785114fb5243c718acefaca60b7de9ddf1677e7316905f2bdb34a",
+        "family_assignment_hash": "db34ae9983300748e22d50a2d8459822631886e6546339031126bb09e6bceefc",
+        "split": "A"
+      },
+      {
+        "source_gid": 362,
+        "drawing_id": "high_quality_architectural_9005",
+        "family_fingerprint": "2943f30018bd64f0aef218193b8254084ced32aaaca1f041e8e0497b1d261622",
+        "row_count": 1178,
+        "family_id": "2943f30018bd64f0aef218193b8254084ced32aaaca1f041e8e0497b1d261622",
+        "family_assignment_hash": "4d8ebac12bd502bb5a99520b2ec038950d603a1b156c7619012e4880fcca189a",
+        "split": "A"
+      },
+      {
+        "source_gid": 363,
+        "drawing_id": "high_quality_architectural_9031",
+        "family_fingerprint": "171d3e0cbfbd28cfb4ebf178681f984199f21a82aa196109937549a943425a63",
+        "row_count": 558,
+        "family_id": "171d3e0cbfbd28cfb4ebf178681f984199f21a82aa196109937549a943425a63",
+        "family_assignment_hash": "a3c6c0eea6bec53c361e189106d06bcdd0cd98c183fe0a587f407027bfb79a47",
+        "split": "B"
+      },
+      {
+        "source_gid": 364,
+        "drawing_id": "high_quality_architectural_9035",
+        "family_fingerprint": "2badd82fbc581d631695a96f4329f116b3626d16dd8c5ba6d6f8c2eb2e9f1bc3",
+        "row_count": 387,
+        "family_id": "2badd82fbc581d631695a96f4329f116b3626d16dd8c5ba6d6f8c2eb2e9f1bc3",
+        "family_assignment_hash": "43712f7efd6276f3d07075fa71b84dd45ec7989932d795816b1f72b197dc2206",
+        "split": "A"
+      },
+      {
+        "source_gid": 365,
+        "drawing_id": "high_quality_architectural_9038",
+        "family_fingerprint": "29391e41ae03e3ce154534a0ecf12571f76f6e7fc5d4306eaf54c50b677c4a6d",
+        "row_count": 353,
+        "family_id": "29391e41ae03e3ce154534a0ecf12571f76f6e7fc5d4306eaf54c50b677c4a6d",
+        "family_assignment_hash": "de137dc603427cb871432152ba1f6281713ac4f8281afe6a52f91e6f607c6973",
+        "split": "B"
+      },
+      {
+        "source_gid": 366,
+        "drawing_id": "high_quality_architectural_9055",
+        "family_fingerprint": "0c1d48f68344c244435864ccf706e6b9609ce33b713e978f78d16379e623e551",
+        "row_count": 1860,
+        "family_id": "0c1d48f68344c244435864ccf706e6b9609ce33b713e978f78d16379e623e551",
+        "family_assignment_hash": "feba45a627cce888e1018a25f883eb8d3f959fdffffc702e8aa0bced2bf037a6",
+        "split": "A"
+      },
+      {
+        "source_gid": 367,
+        "drawing_id": "high_quality_architectural_9066",
+        "family_fingerprint": "027072324f0e1baa6c50dc4f2b6e9cfc4ad2dece51aa0e088265cd64fb9e459d",
+        "row_count": 810,
+        "family_id": "027072324f0e1baa6c50dc4f2b6e9cfc4ad2dece51aa0e088265cd64fb9e459d",
+        "family_assignment_hash": "0ef6d6b2fce83670af1f9af3002d57e9c1c4d2f0e67288d9c35d0656ba4043c4",
+        "split": "A"
+      },
+      {
+        "source_gid": 368,
+        "drawing_id": "high_quality_architectural_9088",
+        "family_fingerprint": "45dce9db4d40d4625db4cf262b25c95ad74add6802ab94de812b6fc791afb87d",
+        "row_count": 1028,
+        "family_id": "45dce9db4d40d4625db4cf262b25c95ad74add6802ab94de812b6fc791afb87d",
+        "family_assignment_hash": "1015480d479510182a9ff9f7356acdcfb1dd633816be57937858345f2d3d68fc",
+        "split": "B"
+      },
+      {
+        "source_gid": 369,
+        "drawing_id": "high_quality_architectural_9096",
+        "family_fingerprint": "00cd8d08a422716ce5f700d1f8699780f50dae5a539904414fc5985cca55bf58",
+        "row_count": 1589,
+        "family_id": "00cd8d08a422716ce5f700d1f8699780f50dae5a539904414fc5985cca55bf58",
+        "family_assignment_hash": "e8cdf1e1801c7e828c9589732f9247bebd5120ec20a816c06ad0e54a773e7e44",
+        "split": "A"
+      },
+      {
+        "source_gid": 370,
+        "drawing_id": "high_quality_architectural_9157",
+        "family_fingerprint": "0b9d8a0d081d1f3d6cf43d4fd13e209f6f314f3f2b5190f411d893431a2e72fe",
+        "row_count": 778,
+        "family_id": "0b9d8a0d081d1f3d6cf43d4fd13e209f6f314f3f2b5190f411d893431a2e72fe",
+        "family_assignment_hash": "3e770fe3e2ed0fa5e5b913a81572e70abfdaf28201bb9e619693113c38b53a78",
+        "split": "A"
+      },
+      {
+        "source_gid": 371,
+        "drawing_id": "high_quality_architectural_9180",
+        "family_fingerprint": "15c6a14ea3818a2b884547b8ae285d779d4530655a0f32e6ec85c3577fb5a472",
+        "row_count": 1311,
+        "family_id": "15c6a14ea3818a2b884547b8ae285d779d4530655a0f32e6ec85c3577fb5a472",
+        "family_assignment_hash": "d78ae094ebfefa035191260d5d907a181365019b18b531db8d9b608e0eaa3803",
+        "split": "A"
+      },
+      {
+        "source_gid": 372,
+        "drawing_id": "high_quality_architectural_9237",
+        "family_fingerprint": "0979a5c784d61b8fc152d9c4e1d9cb3df301ef6b065666beeaf9f414f7f28bdd",
+        "row_count": 495,
+        "family_id": "0979a5c784d61b8fc152d9c4e1d9cb3df301ef6b065666beeaf9f414f7f28bdd",
+        "family_assignment_hash": "1874d79fe08f16030df9bed55dd1428181927de3cf5b49d8beb5c57e01361535",
+        "split": "A"
+      },
+      {
+        "source_gid": 373,
+        "drawing_id": "high_quality_architectural_9282",
+        "family_fingerprint": "05aa0fa7ea53a6f1026593a1c53f16c8521917b6638929b5519ba903b70fafa1",
+        "row_count": 757,
+        "family_id": "05aa0fa7ea53a6f1026593a1c53f16c8521917b6638929b5519ba903b70fafa1",
+        "family_assignment_hash": "638d5c4229696c785195a386265153acdbbd89b93f0efc710ed6740629a14b16",
+        "split": "B"
+      },
+      {
+        "source_gid": 374,
+        "drawing_id": "high_quality_architectural_9296",
+        "family_fingerprint": "00a7a40bbcb2bb0bfd2b5c55a6a57c56d49286850c2e2c9bcff910d2adf215e4",
+        "row_count": 447,
+        "family_id": "00a7a40bbcb2bb0bfd2b5c55a6a57c56d49286850c2e2c9bcff910d2adf215e4",
+        "family_assignment_hash": "3fe61b41581755addb4d94c6692546edbd6bd8e2e40b632c89cd6700bd7ed992",
+        "split": "A"
+      },
+      {
+        "source_gid": 375,
+        "drawing_id": "high_quality_architectural_9347",
+        "family_fingerprint": "2109ca9788e025d759de2accfdd91ad69a75a1fcf3ea505692d5c24838c0de51",
+        "row_count": 605,
+        "family_id": "2109ca9788e025d759de2accfdd91ad69a75a1fcf3ea505692d5c24838c0de51",
+        "family_assignment_hash": "eb548b25ad5773e7573001b7996cd55706e338702ade5921e025fe2231c3a4b0",
+        "split": "B"
+      },
+      {
+        "source_gid": 376,
+        "drawing_id": "high_quality_architectural_9361",
+        "family_fingerprint": "20333ee380e96ff4575aaf124293559f2574e667611f43a6b2ae1d299d5aafe8",
+        "row_count": 778,
+        "family_id": "20333ee380e96ff4575aaf124293559f2574e667611f43a6b2ae1d299d5aafe8",
+        "family_assignment_hash": "55ebf92a9d068d397846a88c915d73f152b1cd1a966dc8ef89873945720d87fa",
+        "split": "B"
+      },
+      {
+        "source_gid": 377,
+        "drawing_id": "high_quality_architectural_938",
+        "family_fingerprint": "14251cec530d962b83bc2003b1f9fee6595e0bfeb19035b15bfc666689e5c2eb",
+        "row_count": 1310,
+        "family_id": "14251cec530d962b83bc2003b1f9fee6595e0bfeb19035b15bfc666689e5c2eb",
+        "family_assignment_hash": "dd6058e4877313f1c5dab201cc7d257517395455c2c7da5ca597d1c05473466b",
+        "split": "A"
+      },
+      {
+        "source_gid": 378,
+        "drawing_id": "high_quality_architectural_9436",
+        "family_fingerprint": "3e335d73ad72e26209cf0ccb25647a989895be10af40a9e1f0fbb026c5bca9e3",
+        "row_count": 851,
+        "family_id": "3e335d73ad72e26209cf0ccb25647a989895be10af40a9e1f0fbb026c5bca9e3",
+        "family_assignment_hash": "d84903587192a045b3b7367919e033f4caa40ac8e6a61350926e2d5346ac83fe",
+        "split": "B"
+      },
+      {
+        "source_gid": 379,
+        "drawing_id": "high_quality_architectural_9438",
+        "family_fingerprint": "5e7da74372a4881e920e27a3556a48c2ba93590a9a1420cba8938d894aa0a131",
+        "row_count": 1274,
+        "family_id": "5e7da74372a4881e920e27a3556a48c2ba93590a9a1420cba8938d894aa0a131",
+        "family_assignment_hash": "e56c4e591cf6722558c6e108f4b575e7085e39c13b31f4a201fd214aebd65439",
+        "split": "A"
+      },
+      {
+        "source_gid": 380,
+        "drawing_id": "high_quality_architectural_9461",
+        "family_fingerprint": "10f556a1bb45951adc0d2a38e746aa612064d6d119d0049d138b2c959a69e321",
+        "row_count": 1072,
+        "family_id": "10f556a1bb45951adc0d2a38e746aa612064d6d119d0049d138b2c959a69e321",
+        "family_assignment_hash": "8dcb71d035ea8129b0eb2d1668cad6e47dec0664fa7fdb75171926b3875351e8",
+        "split": "B"
+      },
+      {
+        "source_gid": 381,
+        "drawing_id": "high_quality_architectural_9483",
+        "family_fingerprint": "2ade48090cb152b61b7afe9d2af4aec388561802d5e244a6c4f10a62432f2896",
+        "row_count": 671,
+        "family_id": "2ade48090cb152b61b7afe9d2af4aec388561802d5e244a6c4f10a62432f2896",
+        "family_assignment_hash": "76e766774e9c12c8aa029e60020f44c89f1e7af0a7db26df61077d021d0b7ae0",
+        "split": "A"
+      },
+      {
+        "source_gid": 382,
+        "drawing_id": "high_quality_architectural_9491",
+        "family_fingerprint": "280a75734fce044585acbe2b64e5c441b439da46271af0e6852cfb62cec7c3e9",
+        "row_count": 944,
+        "family_id": "280a75734fce044585acbe2b64e5c441b439da46271af0e6852cfb62cec7c3e9",
+        "family_assignment_hash": "5c9ccabaabdf89c8f9fbbe0657a378d0e17f8272a34908b7bb10974e15cdfd33",
+        "split": "A"
+      },
+      {
+        "source_gid": 383,
+        "drawing_id": "high_quality_architectural_9516",
+        "family_fingerprint": "01d06320946a1c94ef6e705ad6d45b8367d15c1a8a52ff636782ca3ce6fdec80",
+        "row_count": 1032,
+        "family_id": "01d06320946a1c94ef6e705ad6d45b8367d15c1a8a52ff636782ca3ce6fdec80",
+        "family_assignment_hash": "338276f418edc9a618d01c79467d00ce2e64b96ed965ccbcf54ca469fbeb4cb0",
+        "split": "B"
+      },
+      {
+        "source_gid": 384,
+        "drawing_id": "high_quality_architectural_9556",
+        "family_fingerprint": "1fd7018c321ef5d1b66495cd7b0b1b2e433a4bbfaee7f490164ca82efaeb42cc",
+        "row_count": 700,
+        "family_id": "1fd7018c321ef5d1b66495cd7b0b1b2e433a4bbfaee7f490164ca82efaeb42cc",
+        "family_assignment_hash": "b9d09afce2a7782f042c76d78a74982b624cb338830e1684d74852ca821f2417",
+        "split": "A"
+      },
+      {
+        "source_gid": 385,
+        "drawing_id": "high_quality_architectural_9603",
+        "family_fingerprint": "11f43f0c9a7f657f563e6d6d3adc64b2478fb9cf692181087cdb09622074a389",
+        "row_count": 849,
+        "family_id": "11f43f0c9a7f657f563e6d6d3adc64b2478fb9cf692181087cdb09622074a389",
+        "family_assignment_hash": "ae22155fb03240702d42a6207fdf5d69d8c231d0a1ce2eb073d38eaaf6a1be20",
+        "split": "A"
+      },
+      {
+        "source_gid": 386,
+        "drawing_id": "high_quality_architectural_9604",
+        "family_fingerprint": "0953be21ac043e2d8ffefd551da6d2eb96835284f20c718225e7be225a97de69",
+        "row_count": 1903,
+        "family_id": "0953be21ac043e2d8ffefd551da6d2eb96835284f20c718225e7be225a97de69",
+        "family_assignment_hash": "a88c24fa517472ba22bf9b89f982706caccf730e5bcced4b934dbcc70d8caeae",
+        "split": "A"
+      },
+      {
+        "source_gid": 387,
+        "drawing_id": "high_quality_architectural_9630",
+        "family_fingerprint": "132507343db586a42199700adc5410457906e9f25fd72f5913615d1ddad2af77",
+        "row_count": 340,
+        "family_id": "132507343db586a42199700adc5410457906e9f25fd72f5913615d1ddad2af77",
+        "family_assignment_hash": "1be14cac87c3ae0f8d2b78cbe1eebf7a0bb981e4fe136e744281499a1ba564b9",
+        "split": "A"
+      },
+      {
+        "source_gid": 388,
+        "drawing_id": "high_quality_architectural_9639",
+        "family_fingerprint": "03b9d5e40d79cdf0de75534e30109967ab98ccb62f08cb3fc8e91816f5e72b5e",
+        "row_count": 1678,
+        "family_id": "03b9d5e40d79cdf0de75534e30109967ab98ccb62f08cb3fc8e91816f5e72b5e",
+        "family_assignment_hash": "731e06221e0e02fe1fd9ae33df76b6fbb038ac62e66d7f8ac3410a2236c8379c",
+        "split": "A"
+      },
+      {
+        "source_gid": 389,
+        "drawing_id": "high_quality_architectural_9661",
+        "family_fingerprint": "12c0bd259d9ea10aa89b5a2423bf83a4dbbe0390a5b6dde1f26df9de7a9793dc",
+        "row_count": 1124,
+        "family_id": "12c0bd259d9ea10aa89b5a2423bf83a4dbbe0390a5b6dde1f26df9de7a9793dc",
+        "family_assignment_hash": "0f98742abb55f2abf63af8bd6f330cce00a8ff2155445586553d64d236394a90",
+        "split": "B"
+      },
+      {
+        "source_gid": 390,
+        "drawing_id": "high_quality_architectural_9730",
+        "family_fingerprint": "0e28da530ffcb31ac8008efc7262ff74c84440c5ed5c4bd73a34d04362f2dd21",
+        "row_count": 722,
+        "family_id": "0e28da530ffcb31ac8008efc7262ff74c84440c5ed5c4bd73a34d04362f2dd21",
+        "family_assignment_hash": "abe1af85b0b8afc6b913a8931f22e025a8cdbbeaa14e7521827059abbc059081",
+        "split": "A"
+      },
+      {
+        "source_gid": 391,
+        "drawing_id": "high_quality_architectural_9787",
+        "family_fingerprint": "348c21bccf6dd6dbf74d37c2b3ae04a18830b51254e651a6a2b0cca995ef117a",
+        "row_count": 1204,
+        "family_id": "348c21bccf6dd6dbf74d37c2b3ae04a18830b51254e651a6a2b0cca995ef117a",
+        "family_assignment_hash": "f3953f5b8a623bb6387aeeead5cb623e710361e0d7c5988993bcb2d733d528f7",
+        "split": "B"
+      },
+      {
+        "source_gid": 392,
+        "drawing_id": "high_quality_architectural_9795",
+        "family_fingerprint": "1eb89fc600580ee73ce454ad9fd0dc04d6e94c6925b211f85f937b3b6b0c0146",
+        "row_count": 875,
+        "family_id": "1eb89fc600580ee73ce454ad9fd0dc04d6e94c6925b211f85f937b3b6b0c0146",
+        "family_assignment_hash": "e692a7e953f9048f228e4c27cc79aa5af845a01c212786a6464db31299f9d61d",
+        "split": "A"
+      },
+      {
+        "source_gid": 393,
+        "drawing_id": "high_quality_architectural_9860",
+        "family_fingerprint": "066f575b5d20230dd12dab211a75e2bba151f3621d11c603edac7535c6f5f95a",
+        "row_count": 756,
+        "family_id": "066f575b5d20230dd12dab211a75e2bba151f3621d11c603edac7535c6f5f95a",
+        "family_assignment_hash": "1ef0cc33dc3bf96d2fff6617b3904132cd63771bff2b02429b579dab6249ad53",
+        "split": "A"
+      },
+      {
+        "source_gid": 394,
+        "drawing_id": "high_quality_architectural_9885",
+        "family_fingerprint": "1dc768d3f7dc38ad85b8b93083be3b662a2ada243014a575e5476a7ec9794c73",
+        "row_count": 2478,
+        "family_id": "1dc768d3f7dc38ad85b8b93083be3b662a2ada243014a575e5476a7ec9794c73",
+        "family_assignment_hash": "dca8ce4cda0dc370950b5dd97573bddaf36fa856a55236dd8b1b96ea38f0a1c7",
+        "split": "B"
+      },
+      {
+        "source_gid": 395,
+        "drawing_id": "high_quality_architectural_9905",
+        "family_fingerprint": "0af5b966d77bf38e28527cf427999904c65bb3d5360dbec75429b421847a20af",
+        "row_count": 673,
+        "family_id": "0af5b966d77bf38e28527cf427999904c65bb3d5360dbec75429b421847a20af",
+        "family_assignment_hash": "12e35cca25b888fda76d62427ebb030f493f22a24f4cb824f09f54a3b5e1e72b",
+        "split": "A"
+      },
+      {
+        "source_gid": 396,
+        "drawing_id": "high_quality_architectural_9925",
+        "family_fingerprint": "14000cf28c978c96b62ecfe82cf3eb5fca473c36078eb9b9418b3969561b0647",
+        "row_count": 1389,
+        "family_id": "14000cf28c978c96b62ecfe82cf3eb5fca473c36078eb9b9418b3969561b0647",
+        "family_assignment_hash": "63045def4c082f89466d17c4ae3e015f0d098a5040bcb3fdc89c199bf98d5c82",
+        "split": "A"
+      },
+      {
+        "source_gid": 397,
+        "drawing_id": "high_quality_architectural_9935",
+        "family_fingerprint": "08706e2c26c9c01a1c911acc273d5b8e6082a3c3e0e0f04fea70766cef5631ed",
+        "row_count": 876,
+        "family_id": "08706e2c26c9c01a1c911acc273d5b8e6082a3c3e0e0f04fea70766cef5631ed",
+        "family_assignment_hash": "38ba4711f18b89af8be603be65e85aa9ac9ea8218747d08e9cf9679198bd8df0",
+        "split": "A"
+      },
+      {
+        "source_gid": 398,
+        "drawing_id": "high_quality_architectural_9936",
+        "family_fingerprint": "0756d1d0afa7b815ffab1a328270e1cf145ee520b9b88278ef78480cea05aeb3",
+        "row_count": 1423,
+        "family_id": "0756d1d0afa7b815ffab1a328270e1cf145ee520b9b88278ef78480cea05aeb3",
+        "family_assignment_hash": "bb67ccb44081abe875771e860ed45e3f4ac3d15c21bec18698487fc1bc71237f",
+        "split": "A"
+      },
+      {
+        "source_gid": 399,
+        "drawing_id": "high_quality_architectural_9985",
+        "family_fingerprint": "32cf964da68df02c66eb2afd40bb390255be1846577cab52198b6d7b6add94b8",
+        "row_count": 1001,
+        "family_id": "32cf964da68df02c66eb2afd40bb390255be1846577cab52198b6d7b6add94b8",
+        "family_assignment_hash": "08271cb37e854376e3f0c222bd282b79b198d85fd7d0872b09773ceced310e5b",
+        "split": "B"
+      }
+    ],
+    "family_crossing_count": 0,
+    "row_order_contract": "within each split, rows retain original val.npz order; gid maps to source_gid"
+  },
+  "content_hash": "5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b"
+}

@@ -1,0 +1,307 @@
+﻿{
+  "missing_nested_defs": {
+    "all_anonymous": false,
+    "count": 320,
+    "names": [
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c",
+      "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$84c"
+    ]
+  },
+  "reasons": {
+    "missing_nested_def": 320,
+    "other": 0,
+    "unsupported_kind": 6867
+  },
+  "schema": "ariadne.deferred_kind_analysis.v1",
+  "totals": {
+    "missing_nested_def": 320,
+    "other": 0,
+    "total": 7187,
+    "unsupported_kind": 6867
+  },
+  "unsupported_kinds": [
+    {
+      "count": 3973,
+      "dxf_name_set": [
+        "SPLINE"
+      ],
+      "geometry_keys_present": {
+        "closed": 1.0,
+        "degree": 1.0,
+        "fit_points": 0.10873395419078782,
+        "kind": 1.0
+      },
+      "kind": "spline",
+      "sample": {
+        "block_name": "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$FU1",
+        "def_entity_index": 70,
+        "geometry": [
+          "closed",
+          "degree",
+          "kind"
+        ]
+      },
+      "strategy": "defer_documented"
+    },
+    {
+      "count": 1443,
+      "dxf_name_set": [
+        "LWPOLYLINE"
+      ],
+      "geometry_keys_present": {
+        "closed": 1.0,
+        "kind": 1.0,
+        "vertices": 1.0
+      },
+      "kind": "lwpolyline",
+      "sample": {
+        "block_name": "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$is2",
+        "def_entity_index": 0,
+        "geometry": [
+          "closed",
+          "kind",
+          "vertices"
+        ]
+      },
+      "strategy": "native_append_extension"
+    },
+    {
+      "count": 943,
+      "dxf_name_set": [
+        "INSERT"
+      ],
+      "geometry_keys_present": {
+        "block_name": 1.0,
+        "kind": 1.0,
+        "position": 1.0,
+        "rotation": 1.0,
+        "scale": 1.0
+      },
+      "kind": "block_reference",
+      "sample": {
+        "block_name": "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$A$C059766AB",
+        "def_entity_index": 307,
+        "geometry": [
+          "block_name",
+          "kind",
+          "position",
+          "rotation",
+          "scale"
+        ]
+      },
+      "strategy": "defer_documented"
+    },
+    {
+      "count": 265,
+      "dxf_name_set": [
+        "HATCH"
+      ],
+      "geometry_keys_present": {
+        "elevation": 1.0,
+        "hatch_style": 1.0,
+        "is_associative": 1.0,
+        "is_gradient": 1.0,
+        "is_solid_fill": 1.0,
+        "kind": 1.0,
+        "loop_count": 1.0,
+        "loops": 1.0,
+        "normal": 1.0,
+        "pattern_angle": 1.0,
+        "pattern_double": 1.0,
+        "pattern_name": 1.0,
+        "pattern_scale": 1.0,
+        "pattern_type": 1.0
+      },
+      "kind": "hatch",
+      "sample": {
+        "block_name": "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$A$C019C01BD",
+        "def_entity_index": 9,
+        "geometry": [
+          "elevation",
+          "hatch_style",
+          "is_associative",
+          "is_gradient",
+          "is_solid_fill",
+          "kind",
+          "loop_count",
+          "loops",
+          "normal",
+          "pattern_angle",
+          "pattern_double",
+          "pattern_name",
+          "pattern_scale",
+          "pattern_type"
+        ]
+      },
+      "strategy": "decompose_to_certified"
+    },
+    {
+      "count": 201,
+      "dxf_name_set": [
+        "ELLIPSE"
+      ],
+      "geometry_keys_present": {
+        "center": 1.0,
+        "end_angle": 1.0,
+        "kind": 1.0,
+        "major_axis": 1.0,
+        "normal": 1.0,
+        "radius_ratio": 1.0,
+        "start_angle": 1.0
+      },
+      "kind": "ellipse",
+      "sample": {
+        "block_name": "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$hd1050",
+        "def_entity_index": 84,
+        "geometry": [
+          "center",
+          "end_angle",
+          "kind",
+          "major_axis",
+          "normal",
+          "radius_ratio",
+          "start_angle"
+        ]
+      },
+      "strategy": "defer_documented"
+    },
+    {
+      "count": 34,
+      "dxf_name_set": [
+        "3DFACE"
+      ],
+      "geometry_keys_present": {
+        "edge_visibility": 1.0,
+        "kind": 1.0,
+        "p0": 1.0,
+        "p1": 1.0,
+        "p2": 1.0,
+        "p3": 1.0
+      },
+      "kind": "face3d",
+      "sample": {
+        "block_name": "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$\uc53d\ud06c$0$59C$0$gasdfasdfs$0$COK3",
+        "def_entity_index": 0,
+        "geometry": [
+          "edge_visibility",
+          "kind",
+          "p0",
+          "p1",
+          "p2",
+          "p3"
+        ]
+      },
+      "strategy": "defer_documented"
+    },
+    {
+      "count": 5,
+      "dxf_name_set": [
+        "WIPEOUT"
+      ],
+      "geometry_keys_present": {
+        "clip_boundary": 1.0,
+        "clip_boundary_type": 1.0,
+        "frame_on": 1.0,
+        "image_size": 1.0,
+        "kind": 1.0,
+        "origin": 1.0,
+        "source_file_name": 1.0,
+        "u_vector": 1.0,
+        "v_vector": 1.0
+      },
+      "kind": "wipeout",
+      "sample": {
+        "block_name": "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)",
+        "def_entity_index": 163,
+        "geometry": [
+          "clip_boundary",
+          "clip_boundary_type",
+          "frame_on",
+          "image_size",
+          "kind",
+          "origin",
+          "source_file_name",
+          "u_vector",
+          "v_vector"
+        ]
+      },
+      "strategy": "defer_documented"
+    },
+    {
+      "count": 2,
+      "dxf_name_set": [
+        "POINT"
+      ],
+      "geometry_keys_present": {
+        "kind": 1.0,
+        "position": 1.0
+      },
+      "kind": "point",
+      "sample": {
+        "block_name": "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$\uc218\uc804",
+        "def_entity_index": 31,
+        "geometry": [
+          "kind",
+          "position"
+        ]
+      },
+      "strategy": "defer_documented"
+    },
+    {
+      "count": 1,
+      "dxf_name_set": [
+        "POLYLINE"
+      ],
+      "geometry_keys_present": {
+        "closed": 1.0,
+        "default_end_width": 1.0,
+        "default_start_width": 1.0,
+        "elevation": 1.0,
+        "kind": 1.0,
+        "vertices": 1.0
+      },
+      "kind": "polyline",
+      "sample": {
+        "block_name": "X-\ud3c9\uba74\ub3c4(\uae30\ubcf8\ud615)$0$IW990",
+        "def_entity_index": 430,
+        "geometry": [
+          "closed",
+          "default_end_width",
+          "default_start_width",
+          "elevation",
+          "kind",
+          "vertices"
+        ]
+      },
+      "strategy": "native_append_extension"
+    }
+  ]
+}

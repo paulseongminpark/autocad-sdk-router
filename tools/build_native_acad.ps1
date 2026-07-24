@@ -96,6 +96,32 @@ $dbxBase = if ([string]::IsNullOrWhiteSpace($TargetSuffix)) { 'Ariadne.AcadNativ
 $artifactLeaves = @("$dbxBase.dbx", "$nativeBase.crx", "$nativeBase.arx")
 if ($arxVersionedName) { $artifactLeaves += "$arxVersionedName.arx" }
 
+# Deploy headless modules into prebuilt/<newest>/ -- patch_engine resolves
+# prebuilt BEFORE src/bin (_resolve_native_acad_bin_dir), so a rebuild that
+# does not refresh prebuilt ships STALE code to every subsequent flight.
+# Measured on R4t (runs/e2e_1dwg_R4t_vintage_20260710): the lwpolyline
+# setElevation repair was built to src/bin but the flight arxloaded
+# prebuilt/2027's 07-09 crx -- 25 predicted pairs did not fold. Canonical,
+# non-isolated, non-suffixed builds now refresh prebuilt automatically.
+$prebuiltDeployed = @()
+if (-not $isolatedBuild -and [string]::IsNullOrWhiteSpace($TargetSuffix)) {
+  $prebuiltRoot = Join-Path $RouterHome 'prebuilt'
+  if (Test-Path -LiteralPath $prebuiltRoot) {
+    $deployDir = Get-ChildItem -LiteralPath $prebuiltRoot -Directory |
+      Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName 'Ariadne.AcadNative.crx') } |
+      Sort-Object Name -Descending | Select-Object -First 1
+    if ($deployDir) {
+      foreach ($leaf in @('Ariadne.AcadNativeDbx.dbx', 'Ariadne.AcadNative.crx')) {
+        $src = Join-Path $bin $leaf
+        if (Test-Path -LiteralPath $src) {
+          Copy-Item -LiteralPath $src -Destination (Join-Path $deployDir.FullName $leaf) -Force
+          $prebuiltDeployed += (Join-Path $deployDir.FullName $leaf)
+        }
+      }
+    }
+  }
+}
+
 [ordered]@{
   status = 'ok'
   msbuild = $msbuild
@@ -105,6 +131,7 @@ if ($arxVersionedName) { $artifactLeaves += "$arxVersionedName.arx" }
     'Canonical .arx is held by a running AutoCAD; relinked to a versioned target. Canonical relinks on next lock-free build. AutoCAD was NOT killed.'
   } else { 'Canonical .arx relinked normally.' }
   projects = @($dbxProj, $crxProj, $arxProj)
+  prebuilt_deployed = $prebuiltDeployed
   artifacts = @($artifactLeaves | ForEach-Object {
     $path = Join-Path $bin $_
     [ordered]@{

@@ -1,0 +1,34 @@
+{
+  "prereg": "e2.wave1.v1",
+  "sealed_at": "2026-07-17",
+  "sealed_before": "any Wave-1 evaluation run (pack generation itself is not an evaluation)",
+  "bands": {
+    "B1_fidelity_gate": {
+      "metric": "s2_fidelity compare: thickness-hist KS and entity-mix total variation, synth M-tier pack vs reports/e2/s2/real_stats.json",
+      "pass": "KS <= 0.20 AND TV <= 0.25",
+      "on_fail": "generator revision ticket; M-tier results reported as PROVISIONAL"
+    },
+    "B2_detector_functional": {
+      "metric": "wall_detect v1 per-handle precision/recall vs truth ledgers on S-tier pack (threshold 0.5)",
+      "pass": "precision >= 0.80 AND recall >= 0.80",
+      "report_only_tiers": ["F", "M"],
+      "ablation": "name-blind twin (--no-layer-channel) always reported alongside"
+    },
+    "B3_real_coverage_recovery": {
+      "metric": "share of 384 e1 defs where detector v1 scores zero handles, vs v0 zero_frac 0.682 (calibration_v0.json)",
+      "pass": "zero_frac_v1 <= 0.40",
+      "note": "measured on staged DXF of 1.dwg via router staging; original READ-ONLY"
+    },
+    "B4_invariance": {
+      "metric": "S5 battery invariance per rigid transform on S-tier pack, sentinels armed, recall floor 0.5",
+      "pass": "invariance >= 0.90 per rotate/translate/mirror/scale; explode/rename report-only in v1",
+      "note": "any sentinel trip = automatic FAIL regardless of invariance"
+    },
+    "B5_silver_alignment": {
+      "metric": "Pearson(detector v1 per-def max-score, E1.5 top-tier mean wall_likelihood merged-vocab)",
+      "pass": null,
+      "note": "EXPLORATORY - no band; report value only. Silver is not truth (proxy independence unmeasured until W2)."
+    }
+  },
+  "constraints": ["no human labels", "originals READ-ONLY (staged copies only)", "no fake PASS - failed bands reported as FAIL with evidence"]
+}

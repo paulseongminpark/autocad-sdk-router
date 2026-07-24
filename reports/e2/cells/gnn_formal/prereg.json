@@ -1,0 +1,210 @@
+{
+  "schema": "e2.gnn_formal.prereg.v1",
+  "sealed_at_utc": "2026-07-18T20:05:14.8711970Z",
+  "frozen": {
+    "cell": "gnn_formal",
+    "execution_surface": "local NVIDIA RTX only",
+    "write_root": "D:\\runs\\e2_program\\cells\\gnn_formal",
+    "write_policy": "all writes stay below write_root; repository and prerequisite cell artifacts are read-only",
+    "access_policy": {
+      "train": "CubiCasa train SEG-IR and train truth are allowed for fitting; all 4200 drawings",
+      "validation": "only the 198 val-A drawing ids sealed by W2-09 may be opened",
+      "val_B": "drawing access forbidden and rejected before any filesystem call",
+      "test": "access forbidden and rejected before any filesystem call",
+      "original_CAD": "access forbidden",
+      "subagents": "forbidden",
+      "git": "forbidden"
+    },
+    "universe": {
+      "train_drawings": 4200,
+      "train_rows": 3862317,
+      "val_A_drawings": 198,
+      "val_A_rows": 167556,
+      "val_A_families": 198,
+      "split_manifest_content_hash": "5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b",
+      "val_A_drawing_ids_sha256": "4905890378c4dc3958bcd04876dd4e78f9c8cba0d1511b7c23117b8f12f6a6f7",
+      "val_A_family_ids_sha256": "ce0bd39ee0902bd1182e5c5aab86a7c8c5e11944c614bbd24a4f4d98e204a3ba",
+      "family_crossing_count": 0,
+      "training_fit_universe": "train only",
+      "evaluation_universe": "val-A only"
+    },
+    "graph": {
+      "builder": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\cells\\graph_builder.py",
+      "builder_sha256": "c95d4a30d30e0db157fe56102053a7884902b7749464f7f4cb8852c0819321f6",
+      "config": "GraphConfig() frozen defaults",
+      "config_sha256": "56911f4633979a3fe00fd56be2d0a39ac06757ed255ed49ed18ca20ba9d4ac49",
+      "topology": "one graph per drawing; segment nodes; frozen typed directed edges",
+      "feature_count": 17,
+      "feature_allowlist": [
+        "log1p_length_norm",
+        "midpoint_x_drawing_norm",
+        "midpoint_y_drawing_norm",
+        "bbox_width_norm",
+        "bbox_height_norm",
+        "sin_2theta",
+        "cos_2theta",
+        "sagitta_norm",
+        "closed_geometry",
+        "kind_line",
+        "kind_poly_edge",
+        "kind_arc_chord",
+        "log1p_endpoint_degree",
+        "log1p_junction_count",
+        "log1p_parallel_count",
+        "log1p_collinear_count",
+        "block_depth_norm"
+      ],
+      "identifier_name_layer_text_label_feature_count": 0
+    },
+    "seeds": [17, 29, 43],
+    "arms": {
+      "GNN_A_no_pretrain": {
+        "architecture": "17 -> 64 projection; 2 typed message-passing layers; node binary head",
+        "initialization": "seed-specific random initialization",
+        "fit": "supervised train-only node fine-tune"
+      },
+      "GNN_B_SSL_pretrain": {
+        "architecture": "identical to GNN_A",
+        "initialization": "masked-feature plus graph-contrastive SSL on all 4200 unlabeled train graphs, then identical supervised fine-tune",
+        "fit": "train-only SSL and train-only node fine-tune"
+      },
+      "control_twohop_GBDT_full": {
+        "protocol": "W2-02 full 30-feature arm; fresh train-only refit per seed; val-A scoring",
+        "features": "6 base + 6 context + 18 two-hop",
+        "estimator": "sklearn HistGradientBoostingClassifier",
+        "estimator_parameters_except_seed": {
+          "categorical_features": "from_dtype",
+          "class_weight": null,
+          "early_stopping": "auto",
+          "interaction_cst": null,
+          "l2_regularization": 0.0,
+          "learning_rate": 0.1,
+          "loss": "log_loss",
+          "max_bins": 255,
+          "max_depth": null,
+          "max_features": 1.0,
+          "max_iter": 100,
+          "max_leaf_nodes": 31,
+          "min_samples_leaf": 20,
+          "monotonic_cst": null,
+          "n_iter_no_change": 10,
+          "scoring": "loss",
+          "tol": 1e-07,
+          "validation_fraction": 0.1,
+          "verbose": 0,
+          "warm_start": false
+        },
+        "reference_val_A_AUPRC_mean": 0.8740823342431078
+      }
+    },
+    "gnn_training": {
+      "hidden_dim": 64,
+      "message_passing_layers": 2,
+      "dropout": 0.1,
+      "learning_rate": 0.003,
+      "weight_decay": 0.0001,
+      "fine_tune_epochs": 16,
+      "ssl_epochs": 20,
+      "fine_tune_graph_batch_size": 4,
+      "ssl_graph_batch_size": 5,
+      "minimum_graph_batch_size": 1,
+      "mask_probability": 0.15,
+      "edge_keep_probability": 0.85,
+      "contrastive_temperature": 0.2,
+      "masked_loss_weight": 1.0,
+      "contrastive_loss_weight": 1.0,
+      "gradient_clip_norm": 5.0,
+      "positive_class_weight": "computed once from the complete train node universe"
+    },
+    "metrics": {
+      "primary": ["val-A pooled per-handle AUPRC", "val-A F1 at threshold 0.5"],
+      "seed_aggregation": "three seed point estimates plus arithmetic mean and population SD",
+      "comparisons": [
+        "GNN_A minus control delta AUPRC and delta F1",
+        "GNN_B minus control delta AUPRC and delta F1",
+        "GNN_B minus GNN_A SSL-lift delta AUPRC and delta F1"
+      ],
+      "calibration": "ECE with 10 equal-width probability bins, measured without threshold or calibration refitting",
+      "lowest_family_slice": "pooled and per-family AUPRC on the W2-01 frozen bottom-20 families",
+      "resource_measurements": ["peak CUDA allocated", "peak CUDA reserved", "peak process-tree RSS", "elapsed seconds"]
+    },
+    "bootstrap": {
+      "replicates": 10000,
+      "confidence": 0.95,
+      "seed": 43,
+      "unit": "W2-09 geometry family cluster",
+      "pairing": "identical family multiplicities for every arm and matched seed within each replicate",
+      "aggregation": "compute each seed metric inside each replicate, then average the three seed metrics before arm differencing",
+      "interval": "percentile 2.5 and 97.5"
+    },
+    "ablations": {
+      "NoMessage": "inference-time message_mode=none on each frozen trained GNN",
+      "edge_type_shuffle": "inference-time deterministic within-drawing edge-type permutation keyed by seed and drawing; topology unchanged"
+    },
+    "w2_01_bottom_20_family_ids": [
+      "1110ae6be92e3ce70289188f5c60b2f8b2cd44e81df484e5d2ddc7e3f921874f",
+      "39e272c0644bca05ef9a1072d6fddfceb26fef2f89d2d7a5fbf9e77ab301ca71",
+      "319e1caca40cecbdc61e90df65a6bfb7d98590e2c5ab5059c93c0e2171460e67",
+      "33cb37871aba4a8a752b8447a6477d5c673b9d12323b2248f387e3081d6df02e",
+      "2168b658d557e58728ddc8152e6f4cf1d0fa2f1608721585b024ebf9c70db570",
+      "28875d1e3f37c4ce0c65bfd218ebc972b7a6d7a59fe88a601235d5b29650497f",
+      "04d9c84d0635432e9faae408abf15d4804fdd25bf8bb68dc2b64722fa4ea47c4",
+      "0bd75bcf23bf3958934b6eeef32c7d9486ee949bf187d06fb89b633f0f6f19d8",
+      "03db38cae9f60b9f81898b95eb01251f5a89ad43e581a50278d3a5129d9588f5",
+      "202d94e93e71064515cdf59ce2acab89bfee773a60fb6a0445bdbc1aa6c58313",
+      "2e3cd029faef920f0cf5a9c1723cecb93793d302b826fbc5b314a42a83049022",
+      "353f43342ffab9a080b1a52f1892efbce1a9d043c7238d277742aa376186fa31",
+      "07a0fee0ad875f51a2a6beb617518df2469fbe72ebdd23d8ace7e8df3ebfdbb1",
+      "1394ce8e13e6aa38502a53bd763ad9016c145076bfce18ff33b928e9bc53b547",
+      "0b9d8a0d081d1f3d6cf43d4fd13e209f6f314f3f2b5190f411d893431a2e72fe",
+      "3d00de647586dd74fb4eb5bf7d285f81cd223a1dc1e4199d25c25b41b3b97394",
+      "132b4ab859803cd775275dd79942b9b81c0048137c1c2f24482e830f2c2acbc3",
+      "1beaab4ca845e75c7806be945198df540e6be915889864ff066ba5279c6ec042",
+      "1ab858ea0af88be21fab72d5397ef20503c2d0cc9312f7f3e42be39a6815544d",
+      "1fd7018c321ef5d1b66495cd7b0b1b2e433a4bbfaee7f490164ca82efaeb42cc"
+    ],
+    "resource_caps": {
+      "G5_RTX_hours_total": 132.0,
+      "prior_G5_screen_charge_hours": 0.4481405555555563,
+      "formal_available_RTX_hours": 131.55185944444445,
+      "peak_RAM_GiB": 48.0,
+      "on_RTX_cap": "BUDGET_KILL",
+      "on_RAM_cap": "BUDGET_KILL"
+    },
+    "oom_policy": {
+      "stage_1": "halve graph batch size until 1 and record every CUDA OOM",
+      "stage_2": "if one full drawing still OOMs, deterministic induced-node sampling capped at 4096 nodes per training drawing; preserve every positive node and fill remaining slots by seed-hash of the 17 numeric features; full-graph val-A evaluation remains mandatory",
+      "stage_3": "if deterministic sampled training or full-graph val-A evaluation still OOMs, stop BLOCKED",
+      "silent_downgrade": false
+    },
+    "output_policy": {
+      "required": ["prereg.json", "PREREG.csv", "gnn_formal.py", "results.json", "ckpt", "REPORT.md"],
+      "judgment_output": "forbidden; output numeric measurements and unresolved items only",
+      "report_last_line": "CELL_COMPLETE: gnn_formal"
+    },
+    "input_hashes": {
+      "packet": "499e27629cc9391f14a222257e4b114c26d14b77874537d293073a87ee66d682",
+      "dossier": "6641dd63044ad22b94d6c2a61baf85f86ca4c9191745659171e8a806864c294d",
+      "prereg_base": "fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2",
+      "amendment1": "30f752db803f7f589d1a8d1f1a2d8557364ae2d624f76a639533161f552b8283",
+      "amendment2": "6e29bbd5f8c502a1bc36277a535521c117408b2460e80511907d610321dd442a",
+      "split_manifest": "8aad64eeda77df55296fc711c21d7befdeada7fe379aeafec81fd1691aea044f",
+      "w2_09_source": "85481aa49f6cf62307588e73ea502160079f1172de8f5f927a1a7c23bb5ef1de",
+      "graph_builder": "c95d4a30d30e0db157fe56102053a7884902b7749464f7f4cb8852c0819321f6",
+      "screen_v2": "895249f0b6c77ac8f8a7cfb73e859a0882681ad6bba6e337480b55db269ce120",
+      "screen_v2_results": "564320aa1a2e92c0f80fbc56cd2438c3902edc7708e86b12ab96be7dcd60db14",
+      "w2_02_source": "ae81bf8c5311fc19c8ad38f7feca5d1c15bf39a71d41a1fb925775d6e63aafe6",
+      "w2_02_results": "391aedddf26c0b44116de89bcb27b1b3a6fed07aa1ae8b9dcae9d8b71995bbfb",
+      "w2_02_report": "fb40b501ae603bd3ca67460c3445f0e4b5c9ed07891be3cda53ab7c968786751",
+      "w2_02_prereg": "6c7db98abe8eb08edd05f09ef1b52d68aa849b9cc2aa803c033e66d01dff747d",
+      "w2_01_results": "251f01eb6a3f3e59c85ab12dcbb3a1c05a173cf2647c26508ab8bc6c7d316fd2",
+      "train_npz": "8f72d8931c6e08927bf027ee87f1bc5362ab1a85217862e09a0cddd6b0b0d5aa",
+      "baseline_design_full_train": "8e2ca80cc52ab9ebcbb9f8f60fb1d4177186cd1e7fafcfee486cfcbc40335a11",
+      "baseline_context_val_A": "b568bb4c3dffce46629355bf7670cf00f6c86ecbfe14b5feb87f4e6103449a91",
+      "baseline_twohop_val_A": "ef0febd1d6da09a2a129c26dcc19028828e80bb4fa19c9db2b3eb5b423cef1df",
+      "cubicasa_ml": "e9baf9f361ca9cfc1a113e084bf5c34be33cf9b6c14615c2ed080f771cd3b466",
+      "cml_ctx": "ac0ef389ca971a87645763bd4153cf4f564731d17f8689331bc9de04a67e1b98"
+    },
+    "known_prerequisite_gap": "W2-02 cell has REPORT.md, results.json, prereg.json, source, models, and work artifacts but no README file; REPORT.md is used as the read-only narrative source and the gap is reported, not invented"
+  }
+}

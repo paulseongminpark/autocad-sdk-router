@@ -1,0 +1,261 @@
+{
+  "schema": "e2.w3.onto_real1.measurement.v1",
+  "cell": "e2.w3.onto_real1",
+  "method": "onto_constraint_real_v1",
+  "report_only": true,
+  "created_at": "2026-07-20T16:28:50",
+  "w3_boundary": "본 보고의 탐지기 사다리·모든 val-A/val-B 수치의 유효 범위는 CubiCasa SEG-IR 우주 한정이다. E1 실무 도면 전이는 미검증이다.",
+  "seal": {
+    "rules_library_sha256": "0b51586b69a7b677f5c1476b48acef07dc52fefbe60350c6e800cd0c81a22f5d",
+    "prereg_local_sha256": "97929c61a895f2902ff4aa8eb2ece7f5f60c0b0d9547088dfb3de6515cda81ba",
+    "prereg_csv_sha256": "fe65ca82b56e603437b2b4f349e605e16dd9175b04d0237495a72d93a8a90f54",
+    "split_manifest_content_hash": "5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b",
+    "graph_config_hash": "56911f4633979a3fe00fd56be2d0a39ac06757ed255ed49ed18ca20ba9d4ac49"
+  },
+  "input_hashes": {
+    "gnn_formal_py": "0413f1035de76ab8a175c37c291c3fca634a2f1effb8135b5371aa357d5a94c0",
+    "graph_builder_py": "c95d4a30d30e0db157fe56102053a7884902b7749464f7f4cb8852c0819321f6",
+    "screen_v2_py": "895249f0b6c77ac8f8a7cfb73e859a0882681ad6bba6e337480b55db269ce120",
+    "gnn_a_ckpt_seed_17": "612e4bf954ff5967853f7a08e66195b79dfa15250d6e9d42f88a877c92a3952c",
+    "gnn_a_ckpt_seed_29": "1b4bbd004491609cfe8cfc217d18b0ec5ff344f8fee43c67b392a4c37dbc6877",
+    "gnn_a_ckpt_seed_43": "ab37cf25894e8ed7f2e96ca287a21da961c68d37bcf2bd9633ae1cb9b663e2a3"
+  },
+  "universe": {
+    "split": "val-A (DEV)",
+    "drawings": 198,
+    "rows": 167556,
+    "wall_positives": 19584,
+    "base_rate": 0.11688032657738308,
+    "valA_ir_reads": 198,
+    "valB_reads": 0,
+    "test_reads": 0
+  },
+  "standalone": {
+    "auprc": 0.2797802875167646,
+    "score_min": 0,
+    "score_max": 16,
+    "score_mean": 4.37324237866743
+  },
+  "gnn_a": {
+    "arm": "GNN_A_no_pretrain",
+    "seeds": [
+      17,
+      29,
+      43
+    ],
+    "seed_auprc": {
+      "17": 0.9756709463223272,
+      "29": 0.9738583168108583,
+      "43": 0.97474938395322
+    },
+    "pool_rule": "arithmetic_mean",
+    "pooled_auprc": 0.9785063095549439,
+    "threshold": 0.5,
+    "residual_total": 5341,
+    "residual_fp": 5131,
+    "residual_fn": 210,
+    "gnn_pred_positive": 24505
+  },
+  "residual_capture": {
+    "headline_operating_point": "score>=8",
+    "headline_residual_capture": 0.5800411907882419,
+    "by_operating_point": {
+      "1": {
+        "flagged_rate": 0.7007209529948196,
+        "residual_capture": 0.9606815203145478,
+        "fp_capture": 0.9631650750341064,
+        "fn_capture": 0.9
+      },
+      "4": {
+        "flagged_rate": 0.5089343264341474,
+        "residual_capture": 0.8696873244710729,
+        "fp_capture": 0.8787760670434613,
+        "fn_capture": 0.6476190476190476
+      },
+      "8": {
+        "flagged_rate": 0.22946955047864595,
+        "residual_capture": 0.5800411907882419,
+        "fp_capture": 0.5940362502436173,
+        "fn_capture": 0.23809523809523808
+      },
+      "12": {
+        "flagged_rate": 0.09099047482632672,
+        "residual_capture": 0.3840104849279161,
+        "fp_capture": 0.39524459169752485,
+        "fn_capture": 0.10952380952380952
+      }
+    }
+  },
+  "per_rule": [
+    {
+      "rule_id": "A1_length_tier_1",
+      "category": "wall_topology",
+      "dev_fire_rate": 0.39912626226455633,
+      "dev_P_wall_given_fire": 0.15012859620790717,
+      "dev_lift": 1.2844642088547842,
+      "residual_capture": 0.7081070960494289,
+      "fp_capture": 0.7162346521145976,
+      "fn_capture": 0.5095238095238095
+    },
+    {
+      "rule_id": "A2_length_tier_2",
+      "category": "wall_topology",
+      "dev_fire_rate": 0.2313017737353482,
+      "dev_P_wall_given_fire": 0.2137475487666426,
+      "dev_lift": 1.828772685924406,
+      "residual_capture": 0.5495225613181052,
+      "fp_capture": 0.5595400506723835,
+      "fn_capture": 0.3047619047619048
+    },
+    {
+      "rule_id": "A3_length_tier_3",
+      "category": "wall_topology",
+      "dev_fire_rate": 0.12715748764592136,
+      "dev_P_wall_given_fire": 0.30676804655965456,
+      "dev_lift": 2.624633721882633,
+      "residual_capture": 0.36360232166261,
+      "fp_capture": 0.37166244396803744,
+      "fn_capture": 0.16666666666666666
+    },
+    {
+      "rule_id": "A4_length_tier_4",
+      "category": "wall_topology",
+      "dev_fire_rate": 0.023120628327245818,
+      "dev_P_wall_given_fire": 0.6334537945276201,
+      "dev_lift": 5.4196785128610045,
+      "residual_capture": 0.05560756412656806,
+      "fp_capture": 0.05749366595205613,
+      "fn_capture": 0.009523809523809525
+    },
+    {
+      "rule_id": "B1_junction_hub_1",
+      "category": "connectivity",
+      "dev_fire_rate": 0.5971257370670104,
+      "dev_P_wall_given_fire": 0.17342981649542238,
+      "dev_lift": 1.4838238527730288,
+      "residual_capture": 0.889721026025089,
+      "fp_capture": 0.897096082634964,
+      "fn_capture": 0.7095238095238096
+    },
+    {
+      "rule_id": "B2_junction_hub_2",
+      "category": "connectivity",
+      "dev_fire_rate": 0.11541812886437967,
+      "dev_P_wall_given_fire": 0.34117586224727237,
+      "dev_lift": 2.919018728283495,
+      "residual_capture": 0.3924358734319416,
+      "fp_capture": 0.40206587409861627,
+      "fn_capture": 0.15714285714285714
+    },
+    {
+      "rule_id": "B3_endpoint_degree_1",
+      "category": "connectivity",
+      "dev_fire_rate": 0.49697414595717254,
+      "dev_P_wall_given_fire": 0.19942116703294063,
+      "dev_lift": 1.7061996049515626,
+      "residual_capture": 0.9039505710541097,
+      "fp_capture": 0.9152212044435782,
+      "fn_capture": 0.6285714285714286
+    },
+    {
+      "rule_id": "B4_endpoint_degree_2",
+      "category": "connectivity",
+      "dev_fire_rate": 0.2602592566067464,
+      "dev_P_wall_given_fire": 0.24988534213905705,
+      "dev_lift": 2.137958965862533,
+      "residual_capture": 0.5895899644261374,
+      "fp_capture": 0.6010524264275969,
+      "fn_capture": 0.30952380952380953
+    },
+    {
+      "rule_id": "C1_anchored_both_ends",
+      "category": "spatial_closure",
+      "dev_fire_rate": 0.49285611974504046,
+      "dev_P_wall_given_fire": 0.2010874172025042,
+      "dev_lift": 1.720455641175592,
+      "residual_capture": 0.9039505710541097,
+      "fp_capture": 0.9152212044435782,
+      "fn_capture": 0.6285714285714286
+    },
+    {
+      "rule_id": "C2_continuous_run",
+      "category": "spatial_closure",
+      "dev_fire_rate": 0.4029518489340877,
+      "dev_P_wall_given_fire": 0.15369462505739295,
+      "dev_lift": 1.3149742951448393,
+      "residual_capture": 0.762778505897772,
+      "fp_capture": 0.7772364061586435,
+      "fn_capture": 0.4095238095238095
+    },
+    {
+      "rule_id": "C3_enclosing_hub",
+      "category": "spatial_closure",
+      "dev_fire_rate": 0.31683735586908257,
+      "dev_P_wall_given_fire": 0.19731389391199516,
+      "dev_lift": 1.688170282287493,
+      "residual_capture": 0.601572739187418,
+      "fp_capture": 0.6137205223153381,
+      "fn_capture": 0.3047619047619048
+    },
+    {
+      "rule_id": "C4_long_anchored_spine",
+      "category": "spatial_closure",
+      "dev_fire_rate": 0.09567547566186826,
+      "dev_P_wall_given_fire": 0.3604890524608571,
+      "dev_lift": 3.084257744798375,
+      "residual_capture": 0.34600262123197906,
+      "fp_capture": 0.35470668485675305,
+      "fn_capture": 0.13333333333333333
+    },
+    {
+      "rule_id": "D1_opening_host_collinear",
+      "category": "opening_relations",
+      "dev_fire_rate": 0.29998328916899425,
+      "dev_P_wall_given_fire": 0.1750159159637116,
+      "dev_lift": 1.497394138848839,
+      "residual_capture": 0.5907133495600075,
+      "fp_capture": 0.6006626388618203,
+      "fn_capture": 0.3476190476190476
+    },
+    {
+      "rule_id": "D2_long_opening_host",
+      "category": "opening_relations",
+      "dev_fire_rate": 0.17070113872376996,
+      "dev_P_wall_given_fire": 0.2552968323893434,
+      "dev_lift": 2.1842583766252464,
+      "residual_capture": 0.4639580602883355,
+      "fp_capture": 0.4739816799844085,
+      "fn_capture": 0.21904761904761905
+    },
+    {
+      "rule_id": "D3_double_line_face",
+      "category": "opening_relations",
+      "dev_fire_rate": 0.16075222612141613,
+      "dev_P_wall_given_fire": 0.19250046408019306,
+      "dev_lift": 1.6469877328135636,
+      "residual_capture": 0.30967983523684706,
+      "fp_capture": 0.31748197232508285,
+      "fn_capture": 0.11904761904761904
+    },
+    {
+      "rule_id": "D4_long_parallel_face",
+      "category": "opening_relations",
+      "dev_fire_rate": 0.1830015039747905,
+      "dev_P_wall_given_fire": 0.19567556990509735,
+      "dev_lift": 1.674153175603477,
+      "residual_capture": 0.5066466953753979,
+      "fp_capture": 0.5170532060027285,
+      "fn_capture": 0.2523809523809524
+    }
+  ],
+  "telemetry": {
+    "wall_seconds": 92.24630559998332,
+    "peak_rss_bytes": 939696128,
+    "peak_vram_bytes": "N/A(no_GPU)",
+    "device": "cpu",
+    "cuda_visible": "-1",
+    "torch_cuda_is_available": false,
+    "budget_charge_cpu_hours": 0.031896701388888886,
+    "cpu_cap_hours": 10.0
+  }
+}

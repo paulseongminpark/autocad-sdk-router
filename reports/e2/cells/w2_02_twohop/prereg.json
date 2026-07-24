@@ -1,0 +1,272 @@
+{
+  "schema": "e2.w2_02.twohop.prereg.v1",
+  "sealed_at": "2026-07-19T03:30:06+09:00",
+  "frozen": {
+    "schema": "e2.w2_02.twohop.prereg.v1",
+    "cell": "w2_02",
+    "packet_sha256": "e0967dd15619491d8e23ee5d4dc1020f7fc64702c944dcdc9e11e8bb0c4ff6ef",
+    "input_hashes": {
+      "packet_w2_02": "e0967dd15619491d8e23ee5d4dc1020f7fc64702c944dcdc9e11e8bb0c4ff6ef",
+      "prereg_r2_v1": "fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2",
+      "amendment1": "30f752db803f7f589d1a8d1f1a2d8557364ae2d624f76a639533161f552b8283",
+      "amendment2": "6e29bbd5f8c502a1bc36277a535521c117408b2460e80511907d610321dd442a",
+      "wave2_joint_design": "a41d4442438b99215af6f38ec362e929499c1e3962dad082c3ce35482dbb82e9",
+      "w2_09_valb_py": "85481aa49f6cf62307588e73ea502160079f1172de8f5f927a1a7c23bb5ef1de",
+      "split_manifest": "8aad64eeda77df55296fc711c21d7befdeada7fe379aeafec81fd1691aea044f",
+      "clean_incumbent": "a0f37c1ab89d64773a7adbea871425a7f1bcc945e0b83ccea969e15d54ea1dcc",
+      "clean_incumbent_manifest": "7f5ee863dc0de5a657442df4970253b735dac920eabcbf85f47908e2bace7263",
+      "cml_ctx": "ac0ef389ca971a87645763bd4153cf4f564731d17f8689331bc9de04a67e1b98",
+      "cubicasa_ml": "e9baf9f361ca9cfc1a113e084bf5c34be33cf9b6c14615c2ed080f771cd3b466",
+      "baseline_extraction_meta": "1198d41cc98c8424fdf8a2dc3b09548a836ffcbf8a39ec2f47ce0932419e97f0",
+      "train_npz": "8f72d8931c6e08927bf027ee87f1bc5362ab1a85217862e09a0cddd6b0b0d5aa"
+    },
+    "data_scope": {
+      "train": "all train drawings",
+      "validation": "only split_manifest val-A drawing ids",
+      "val_B_drawing_reads": 0,
+      "test_reads": 0,
+      "original_CAD_reads": 0,
+      "identifier_name_layer_features": 0,
+      "packet_literal_ir_root": "D:\\runs\\e2_ext_cubicasa\\ir",
+      "resolved_ir_root": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2_ext_cubicasa\\ir",
+      "resolution_basis": "W2-09 source and its earlier packet resolve repo-relative runs/e2_ext_cubicasa; the newer packet's D:/runs spelling is absent"
+    },
+    "candidate_feature_families": [
+      "junction_of_junction",
+      "second_ring_parallel",
+      "connected_component",
+      "twohop_context_aggregate",
+      "path_signal"
+    ],
+    "candidate_features": [
+      {
+        "family": "junction_of_junction",
+        "name": "junction_neighbor_degree_sum",
+        "definition": "sum of exact W2-09 junction degrees over the focal segment's exact junction neighbors",
+        "empty_value": 0.0
+      },
+      {
+        "family": "junction_of_junction",
+        "name": "junction_neighbor_degree_max",
+        "definition": "maximum exact W2-09 junction degree among exact junction neighbors",
+        "empty_value": 0.0
+      },
+      {
+        "family": "junction_of_junction",
+        "name": "junction_neighbor_degree_variance",
+        "definition": "population variance of exact W2-09 junction degrees among exact junction neighbors",
+        "empty_value": 0.0
+      },
+      {
+        "family": "second_ring_parallel",
+        "name": "twohop_parallel_count",
+        "definition": "count in exact midpoint-radius graph distance-2 ring meeting W2-09 angle, overlap, and frozen thickness-band gap conditions relative to self",
+        "empty_value": 0.0
+      },
+      {
+        "family": "second_ring_parallel",
+        "name": "twohop_parallel_gap_min_px",
+        "definition": "minimum perpendicular gap among qualifying second-ring parallel segments",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "second_ring_parallel",
+        "name": "twohop_parallel_gap_mean_px",
+        "definition": "mean perpendicular gap among qualifying second-ring parallel segments",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "second_ring_parallel",
+        "name": "twohop_parallel_gap_std_px",
+        "definition": "population standard deviation of perpendicular gaps among qualifying second-ring parallel segments",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "second_ring_parallel",
+        "name": "twohop_parallel_gap_max_px",
+        "definition": "maximum perpendicular gap among qualifying second-ring parallel segments",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "connected_component",
+        "name": "junction_component_size",
+        "definition": "number of segments in the focal segment's undirected exact-junction connected component",
+        "empty_value": 1.0
+      },
+      {
+        "family": "connected_component",
+        "name": "junction_component_thickness_rate",
+        "definition": "fraction of component segments with frozen base thickness evidence greater than zero",
+        "empty_value": 0.0
+      },
+      {
+        "family": "twohop_context_aggregate",
+        "name": "twohop_ring_count",
+        "definition": "number of segments at exact graph distance two in the 20px midpoint-radius graph",
+        "empty_value": 0.0
+      },
+      {
+        "family": "twohop_context_aggregate",
+        "name": "twohop_length_mean_px",
+        "definition": "mean segment length in the exact distance-2 ring",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "twohop_context_aggregate",
+        "name": "twohop_length_std_px",
+        "definition": "population standard deviation of segment length in the exact distance-2 ring",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "twohop_context_aggregate",
+        "name": "twohop_length_max_px",
+        "definition": "maximum segment length in the exact distance-2 ring",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "twohop_context_aggregate",
+        "name": "twohop_angle_alignment_mean",
+        "definition": "mean cosine of undirected angle difference to self over the exact distance-2 ring",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "twohop_context_aggregate",
+        "name": "twohop_angle_alignment_std",
+        "definition": "population standard deviation of cosine angle alignment over the exact distance-2 ring",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "twohop_context_aggregate",
+        "name": "twohop_angle_aligned_fraction_2deg",
+        "definition": "fraction of exact distance-2 ring segments with undirected angle difference at most 2 degrees",
+        "empty_value": "NaN"
+      },
+      {
+        "family": "path_signal",
+        "name": "collinear_extension_chain_length_px_le2",
+        "definition": "maximum projected span of a simple collinear-extension path starting at self with at most two edges; each edge has angle difference at most 2 degrees, support-line offset at most frozen snap tolerance, and endpoint distance at most 20px",
+        "empty_value": "self segment length"
+      }
+    ],
+    "candidate_addition_after_seal": "forbidden",
+    "fixed_parameters": {
+      "radius_px": 20.0,
+      "radius_search": 0,
+      "angle_tolerance_deg": 2.0,
+      "overlap_min": 0.5,
+      "parallel_band_mm": [
+        50.0,
+        400.0
+      ],
+      "parallel_band_px": [
+        4.166666666666667,
+        33.333333333333336
+      ],
+      "scale_mm_per_px": 12.0,
+      "angle_bins": 12
+    },
+    "fit_protocol": {
+      "estimator": "sklearn HistGradientBoostingClassifier defaults except random_state",
+      "fit_universe": "train only",
+      "evaluation_universe": "val-A only",
+      "seeds": [
+        17,
+        29,
+        43
+      ],
+      "threshold": 0.5,
+      "primary_metric": "average_precision_score",
+      "reported_metrics": [
+        "AUPRC",
+        "F1"
+      ],
+      "seed_aggregation": "arithmetic mean of the three per-seed metrics"
+    },
+    "arms": {
+      "full": [
+        "parallel",
+        "thickness",
+        "junction",
+        "log10_len",
+        "sin2t",
+        "cos2t",
+        "parallel_band_neighbor_count",
+        "nearest_parallel_gap_px",
+        "junction_degree",
+        "drawing_length_percentile",
+        "radius_density_r20_per_px2",
+        "neighbor_angle_entropy_r20",
+        "junction_neighbor_degree_sum",
+        "junction_neighbor_degree_max",
+        "junction_neighbor_degree_variance",
+        "twohop_parallel_count",
+        "twohop_parallel_gap_min_px",
+        "twohop_parallel_gap_mean_px",
+        "twohop_parallel_gap_std_px",
+        "twohop_parallel_gap_max_px",
+        "junction_component_size",
+        "junction_component_thickness_rate",
+        "twohop_ring_count",
+        "twohop_length_mean_px",
+        "twohop_length_std_px",
+        "twohop_length_max_px",
+        "twohop_angle_alignment_mean",
+        "twohop_angle_alignment_std",
+        "twohop_angle_aligned_fraction_2deg",
+        "collinear_extension_chain_length_px_le2"
+      ],
+      "twohop_removed": [
+        "parallel",
+        "thickness",
+        "junction",
+        "log10_len",
+        "sin2t",
+        "cos2t",
+        "parallel_band_neighbor_count",
+        "nearest_parallel_gap_px",
+        "junction_degree",
+        "drawing_length_percentile",
+        "radius_density_r20_per_px2",
+        "neighbor_angle_entropy_r20"
+      ],
+      "difference": "only the sealed two-hop feature columns"
+    },
+    "comparison_target": {
+      "name": "protocol-matched clean incumbent",
+      "configuration_source": "D:\\runs\\e2_program\\cells\\w2_09_valb\\clean_incumbent.joblib",
+      "manifest_source": "D:\\runs\\e2_program\\cells\\w2_09_valb\\clean_incumbent_manifest.json",
+      "rule": "retrain the frozen context12 estimator configuration on train only; do not score the supplied train+val-A artifact on its own fit rows"
+    },
+    "bootstrap": {
+      "unit": "val-A geometry family cluster",
+      "paired": 1,
+      "replicates": 10000,
+      "rng_seed": 43,
+      "resampling": "multinomial draw of family_count families with replacement",
+      "seed_aggregation": "same family multiplicities for both arms and all seeds; average per-seed metric within each replicate before arm subtraction",
+      "ci": "percentile 2.5 and 97.5"
+    },
+    "feature_importance": {
+      "kind": "gain",
+      "definition": "sum positive internal-node gain by feature across every tree; aggregate raw gain over three full-arm seed models",
+      "top_k": 20
+    },
+    "selftest": {
+      "determinism": "two independent feature calculations; volatile fields runtime and timestamps excluded; all numeric fields identical",
+      "isolation_guards": [
+        "val-B blocked",
+        "test blocked"
+      ],
+      "label_leakage": "shuffle labels and verify feature matrix unchanged"
+    },
+    "budget": {
+      "cpu_hours": 48.0,
+      "ram_gib": 48.0,
+      "threads": 8,
+      "cap_increase_allowed": 0
+    },
+    "judgment_policy": "numeric outputs only; no adoption or rejection verdict",
+    "optional_w2_01": "quote lowest-family deltas only if the declared W2-01 artifact exists; otherwise record unavailable and continue"
+  },
+  "content_hash": "afb7b7f476289e9d3b0ef7d6ef8a74229139a27706dd0b864d4d2085dec8d95c"
+}

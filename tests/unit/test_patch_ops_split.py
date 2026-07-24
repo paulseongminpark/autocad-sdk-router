@@ -291,6 +291,9 @@ _ORIGINAL_NATIVE_WRITE_OP_MAP = {
     "append_block_entity": "write.block.append_entity",
     "create_attribdef": "write.entity.attribdef",
     "create_block_simple": "write.block.simple_create",
+    # P3 assoc-relink arc (R4v): census-handle relink pass, translated to
+    # rebuilt handles by patch_engine._translate_relink_records at batch time.
+    "relink_hatch_assoc": "write.block.relink_hatch_assoc",
     "create_solid3d_primitive": "write.entity.solid3d.primitive",
     "create_solid3d_extrude": "write.entity.solid3d.extrude",
     "create_solid3d_revolve": "write.entity.solid3d.revolve",

@@ -1,0 +1,236 @@
+{
+  "card": "S4-E",
+  "component": "tools/e2/detect/cli.py",
+  "python": "3.12.10",
+  "mode": "full",
+  "fixture": {
+    "native_entities": [
+      {
+        "kind": "LINE",
+        "layer": "WALL",
+        "handle": "8A"
+      },
+      {
+        "kind": "LWPOLYLINE",
+        "layer": "WALL",
+        "handle": "8B"
+      },
+      {
+        "kind": "ARC",
+        "layer": "DETAIL",
+        "handle": "8C"
+      }
+    ],
+    "insert": {
+      "block": "DOOR_ASSEMBLY",
+      "nested_block": "DOOR_LEAF",
+      "handle": "97",
+      "rotation": 30,
+      "insert_at": [
+        5000,
+        0
+      ]
+    },
+    "insunits": 4,
+    "path": "C:\\Users\\PAUL\\AppData\\Local\\Temp\\s4e_selftest_pukevinz\\s4e_demo.dxf",
+    "bytes": 69095
+  },
+  "siblings_present": [
+    "evidence_grid",
+    "insert_expand",
+    "normalize",
+    "unit_anchor"
+  ],
+  "siblings_missing": [],
+  "detect": {
+    "n_segments": 10,
+    "units": "mm",
+    "scale_mm_per_unit": 1.0,
+    "n_handles_scored": 5,
+    "n_walls": 0
+  },
+  "eval": {
+    "drawing_id": "s4e_demo",
+    "threshold": 0.5,
+    "n_handles_scored": 5,
+    "baseline": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.666667,
+      "source": "per_handle.score>=threshold",
+      "predicted": [
+        "8B"
+      ],
+      "truth": [
+        "8A",
+        "8B"
+      ]
+    },
+    "ablation": [
+      {
+        "channel_removed": "none",
+        "n_predicted": 2,
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "delta_f1": 0.0
+      },
+      {
+        "channel_removed": "parallel",
+        "n_predicted": 2,
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "delta_f1": 0.0
+      },
+      {
+        "channel_removed": "thickness",
+        "n_predicted": 2,
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "delta_f1": 0.0
+      },
+      {
+        "channel_removed": "junction",
+        "n_predicted": 2,
+        "tp": 2,
+        "fp": 0,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "delta_f1": 0.0
+      },
+      {
+        "channel_removed": "layer",
+        "n_predicted": 1,
+        "tp": 1,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "f1": 0.666667,
+        "delta_f1": 0.333333
+      }
+    ]
+  },
+  "eval_selfcheck": {
+    "drawing_id": "selfcheck",
+    "threshold": 0.5,
+    "n_handles_scored": 3,
+    "baseline": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1.0,
+      "recall": 0.666667,
+      "f1": 0.8,
+      "source": "walls",
+      "predicted": [
+        "A",
+        "B"
+      ],
+      "truth": [
+        "A",
+        "B",
+        "D"
+      ]
+    },
+    "ablation": [
+      {
+        "channel_removed": "none",
+        "n_predicted": 2,
+        "tp": 2,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.666667,
+        "f1": 0.8,
+        "delta_f1": 0.0
+      },
+      {
+        "channel_removed": "parallel",
+        "n_predicted": 2,
+        "tp": 2,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.666667,
+        "f1": 0.8,
+        "delta_f1": 0.0
+      },
+      {
+        "channel_removed": "thickness",
+        "n_predicted": 2,
+        "tp": 2,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.666667,
+        "f1": 0.8,
+        "delta_f1": 0.0
+      },
+      {
+        "channel_removed": "junction",
+        "n_predicted": 2,
+        "tp": 2,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.666667,
+        "f1": 0.8,
+        "delta_f1": 0.0
+      },
+      {
+        "channel_removed": "layer",
+        "n_predicted": 2,
+        "tp": 2,
+        "fp": 0,
+        "fn": 1,
+        "precision": 1.0,
+        "recall": 0.666667,
+        "f1": 0.8,
+        "delta_f1": 0.0
+      }
+    ]
+  },
+  "wiring": {
+    "loader": "importlib.util.spec_from_file_location",
+    "search_dir": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\detect",
+    "expected": [
+      "normalize",
+      "insert_expand",
+      "unit_anchor",
+      "evidence_grid"
+    ],
+    "callables_checked": {
+      "normalize": {
+        "parse_modelspace": true,
+        "entity_to_segments": true
+      },
+      "insert_expand": {
+        "expand": true
+      },
+      "unit_anchor": {
+        "infer_from_dxf": true
+      },
+      "evidence_grid": {
+        "score": true
+      }
+    }
+  },
+  "notes": []
+}

@@ -1,0 +1,368 @@
+DWG block definition annotation task v1 / DWG 블록 정의 주석 작업 v1
+The model has no filesystem access. Use only the inline projections below.
+You will annotate 20 block definitions. Definitions are independent; judge each on its own.
+
+For EACH definition output one JSON object with ALL of these fields:
+- "unit_id": copied exactly from the definition header
+- "def": definition name exactly as given
+- "role": exactly one of "평면 부분도" | "심볼" | "치수캐시" | "가구" | "기타"
+- "wall_likelihood": number 0..1
+- "wall_line_handles": up to 10 [{"handle":"...","reason":"one phrase"}] entities that look like wall lines; [] if none
+- "notes": one-line summary
+- "rationale": {
+    "evidence": which concrete entities/layers/patterns drove the judgment (2-4 sentences),
+    "rule": the general principle applied, stated so it would transfer to other drawings (1-2 sentences),
+    "counterfactual": what, if present or absent in this projection, would flip the judgment (1-2 sentences),
+    "uncertainty": what cannot be determined from this projection alone and why (1-2 sentences)
+  }
+
+Answer STRICTLY as one JSON array of 20 objects, in the same order as the definitions below.
+No surrounding prose, no markdown fence, no trailing commentary.
+
+=== DEFINITION 1/20 (unit_id: defannot-d355-61) ===
+Definition name: *D355
+entity_count: 9
+dxf_name histogram: INSERT=2, LINE=3, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=6
+bbox from LINE start/end: [60793.83, 25680.207, 0, 62773.83, 36080.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8D88 (60793.83,25680.207)->(62773.83,25680.207)
+- LINE layer=DIM handle=8D89 (60793.83,36080.207)->(62773.83,36080.207)
+- LINE layer=DIM handle=8D8A (62693.83,25740.207)->(62693.83,36020.207)
+- INSERT layer=DIM handle=8D8B block=DIMDOT
+- INSERT layer=DIM handle=8D8C block=DIMDOT
+- MTEXT layer=DIM handle=8D8D '\A1;10400'
+- POINT layer=DEFPOINTS handle=8D8E
+- POINT layer=DEFPOINTS handle=8D8F
+- POINT layer=DEFPOINTS handle=8D90
+
+=== DEFINITION 2/20 (unit_id: defannot-d356-62) ===
+Definition name: *D356
+entity_count: 9
+dxf_name histogram: INSERT=2, LINE=3, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=6
+bbox from LINE start/end: [60793.83, 25680.207, 0, 62453.83, 27380.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8D91 (60793.83,27380.207)->(62453.83,27380.207)
+- LINE layer=DIM handle=8D92 (60793.83,25680.207)->(62453.83,25680.207)
+- LINE layer=DIM handle=8D93 (62373.83,27320.207)->(62373.83,25740.207)
+- INSERT layer=DIM handle=8D94 block=DIMDOT
+- INSERT layer=DIM handle=8D95 block=DIMDOT
+- MTEXT layer=DIM handle=8D96 '\A1;1700'
+- POINT layer=DEFPOINTS handle=8D97
+- POINT layer=DEFPOINTS handle=8D98
+- POINT layer=DEFPOINTS handle=8D99
+
+=== DEFINITION 3/20 (unit_id: defannot-d357-63) ===
+Definition name: *D357
+entity_count: 9
+dxf_name histogram: INSERT=2, LINE=3, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=6
+bbox from LINE start/end: [60793.83, 34555.207, 0, 62453.83, 35420.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8D9A (60793.83,35420.207)->(62453.83,35420.207)
+- LINE layer=DIM handle=8D9B (60793.83,34555.207)->(62453.83,34555.207)
+- LINE layer=DIM handle=8D9C (62373.83,35360.207)->(62373.83,34615.207)
+- INSERT layer=DIM handle=8D9D block=DIMDOT
+- INSERT layer=DIM handle=8D9E block=DIMDOT
+- MTEXT layer=DIM handle=8D9F '\A1;865'
+- POINT layer=DEFPOINTS handle=8DA0
+- POINT layer=DEFPOINTS handle=8DA1
+- POINT layer=DEFPOINTS handle=8DA2
+
+=== DEFINITION 4/20 (unit_id: defannot-d358-64) ===
+Definition name: *D358
+entity_count: 9
+dxf_name histogram: INSERT=2, LINE=3, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=6
+bbox from LINE start/end: [60813.83, 31375.207, 0, 61793.83, 33795.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8DA3 (60813.83,33735.207)->(61793.83,33735.207)
+- LINE layer=DIM handle=8DA4 (60813.83,31435.207)->(61793.83,31435.207)
+- LINE layer=DIM handle=8DA5 (61733.83,33795.207)->(61733.83,31375.207)
+- INSERT layer=DIM handle=8DA6 block=_ArchTick
+- INSERT layer=DIM handle=8DA7 block=_ArchTick
+- MTEXT layer=DIM handle=8DA8 '\A1;2300'
+- POINT layer=DEFPOINTS handle=8DA9
+- POINT layer=DEFPOINTS handle=8DAA
+- POINT layer=DEFPOINTS handle=8DAB
+
+=== DEFINITION 5/20 (unit_id: defannot-d359-65) ===
+Definition name: *D359
+entity_count: 9
+dxf_name histogram: INSERT=2, LINE=3, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=6
+bbox from LINE start/end: [60813.83, 31225.207, 0, 61793.83, 31495.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8DAC (60813.83,31435.207)->(61793.83,31435.207)
+- LINE layer=DIM handle=8DAD (60813.83,31285.207)->(61793.83,31285.207)
+- LINE layer=DIM handle=8DAE (61733.83,31495.207)->(61733.83,31225.207)
+- MTEXT layer=DIM handle=8DAF '\A1;150'
+- INSERT layer=DIM handle=8DB0 block=_ArchTick
+- INSERT layer=DIM handle=8DB1 block=_ArchTick
+- POINT layer=DEFPOINTS handle=8DB2
+- POINT layer=DEFPOINTS handle=8DB3
+- POINT layer=DEFPOINTS handle=8DB4
+
+=== DEFINITION 6/20 (unit_id: defannot-d360-66) ===
+Definition name: *D360
+entity_count: 9
+dxf_name histogram: INSERT=2, LINE=3, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=6
+bbox from LINE start/end: [60813.83, 31075.207, 0, 61793.83, 31345.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8DB5 (60813.83,31285.207)->(61793.83,31285.207)
+- LINE layer=DIM handle=8DB6 (60813.83,31135.207)->(61793.83,31135.207)
+- LINE layer=DIM handle=8DB7 (61733.83,31345.207)->(61733.83,31075.207)
+- MTEXT layer=DIM handle=8DB8 '\A1;150'
+- INSERT layer=DIM handle=8DB9 block=_ArchTick
+- INSERT layer=DIM handle=8DBA block=_ArchTick
+- POINT layer=DEFPOINTS handle=8DBB
+- POINT layer=DEFPOINTS handle=8DBC
+- POINT layer=DEFPOINTS handle=8DBD
+
+=== DEFINITION 7/20 (unit_id: defannot-d361-67) ===
+Definition name: *D361
+entity_count: 9
+dxf_name histogram: INSERT=2, LINE=3, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=6
+bbox from LINE start/end: [60813.83, 27475.207, 0, 61793.83, 31195.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8DBE (60813.83,31135.207)->(61793.83,31135.207)
+- LINE layer=DIM handle=8DBF (60813.83,27535.207)->(61793.83,27535.207)
+- LINE layer=DIM handle=8DC0 (61733.83,31195.207)->(61733.83,27475.207)
+- INSERT layer=DIM handle=8DC1 block=_ArchTick
+- INSERT layer=DIM handle=8DC2 block=_ArchTick
+- MTEXT layer=DIM handle=8DC3 '\A1;3600'
+- POINT layer=DEFPOINTS handle=8DC4
+- POINT layer=DEFPOINTS handle=8DC5
+- POINT layer=DEFPOINTS handle=8DC6
+
+=== DEFINITION 8/20 (unit_id: defannot-d362-68) ===
+Definition name: *D362
+entity_count: 11
+dxf_name histogram: INSERT=2, LINE=5, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=8
+bbox from LINE start/end: [60813.83, 27340.207, 0, 61793.83, 27575.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8DC7 (60813.83,27535.207)->(61793.83,27535.207)
+- LINE layer=DIM handle=8DC8 (60813.83,27380.207)->(61793.83,27380.207)
+- LINE layer=DIM handle=8DC9 (61733.83,27535.207)->(61733.83,27575.207)
+- LINE layer=DIM handle=8DCA (61733.83,27380.207)->(61733.83,27340.207)
+- LINE layer=DIM handle=8DCB (61733.83,27535.207)->(61733.83,27380.207)
+- INSERT layer=DIM handle=8DCC block=_ArchTick
+- INSERT layer=DIM handle=8DCD block=_ArchTick
+- MTEXT layer=DIM handle=8DCE '\A1;155'
+- POINT layer=DEFPOINTS handle=8DCF
+- POINT layer=DEFPOINTS handle=8DD0
+- POINT layer=DEFPOINTS handle=8DD1
+
+=== DEFINITION 9/20 (unit_id: defannot-d363-69) ===
+Definition name: *D363
+entity_count: 11
+dxf_name histogram: INSERT=2, LINE=5, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=8
+bbox from LINE start/end: [60813.83, 33695.207, 0, 61793.83, 33965.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8DD2 (60813.83,33925.207)->(61793.83,33925.207)
+- LINE layer=DIM handle=8DD3 (60813.83,33735.207)->(61793.83,33735.207)
+- LINE layer=DIM handle=8DD4 (61733.83,33925.207)->(61733.83,33965.207)
+- LINE layer=DIM handle=8DD5 (61733.83,33735.207)->(61733.83,33695.207)
+- LINE layer=DIM handle=8DD6 (61733.83,33925.207)->(61733.83,33735.207)
+- INSERT layer=DIM handle=8DD7 block=_ArchTick
+- INSERT layer=DIM handle=8DD8 block=_ArchTick
+- MTEXT layer=DIM handle=8DD9 '\A1;190'
+- POINT layer=DEFPOINTS handle=8DDA
+- POINT layer=DEFPOINTS handle=8DDB
+- POINT layer=DEFPOINTS handle=8DDC
+
+=== DEFINITION 10/20 (unit_id: defannot-d364-70) ===
+Definition name: *D364
+entity_count: 11
+dxf_name histogram: INSERT=2, LINE=5, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=8
+bbox from LINE start/end: [48663.83, 37180.207, 0, 49118.83, 38520.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8DDD (48783.83,37180.207)->(48783.83,38520.207)
+- LINE layer=DIM handle=8DDE (48998.83,37180.207)->(48998.83,38520.207)
+- LINE layer=DIM handle=8DDF (48723.83,38440.207)->(48663.83,38440.207)
+- LINE layer=DIM handle=8DE0 (49058.83,38440.207)->(49118.83,38440.207)
+- LINE layer=DIM handle=8DE1 (48783.83,38440.207)->(48998.83,38440.207)
+- INSERT layer=DIM handle=8DE2 block=DIMDOT
+- INSERT layer=DIM handle=8DE3 block=DIMDOT
+- MTEXT layer=DIM handle=8DE4 '\A1;215'
+- POINT layer=DEFPOINTS handle=8DE5
+- POINT layer=DEFPOINTS handle=8DE6
+- POINT layer=DEFPOINTS handle=8DE7
+
+=== DEFINITION 11/20 (unit_id: defannot-d365-71) ===
+Definition name: *D365
+entity_count: 11
+dxf_name histogram: INSERT=2, LINE=5, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=8
+bbox from LINE start/end: [41288.83, 25560.207, 0, 42948.83, 26075.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8DE8 (42948.83,25955.207)->(41288.83,25955.207)
+- LINE layer=DIM handle=8DE9 (42948.83,25680.207)->(41288.83,25680.207)
+- LINE layer=DIM handle=8DEA (41368.83,26015.207)->(41368.83,26075.207)
+- LINE layer=DIM handle=8DEB (41368.83,25620.207)->(41368.83,25560.207)
+- LINE layer=DIM handle=8DEC (41368.83,25955.207)->(41368.83,25680.207)
+- INSERT layer=DIM handle=8DED block=DIMDOT
+- INSERT layer=DIM handle=8DEE block=DIMDOT
+- MTEXT layer=DIM handle=8DEF '\A1;275'
+- POINT layer=DEFPOINTS handle=8DF0
+- POINT layer=DEFPOINTS handle=8DF1
+- POINT layer=DEFPOINTS handle=8DF2
+
+=== DEFINITION 12/20 (unit_id: defannot-d366-72) ===
+Definition name: *D366
+entity_count: 9
+dxf_name histogram: INSERT=2, LINE=3, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=6
+bbox from LINE start/end: [60793.83, 27380.207, 0, 62453.83, 34555.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8DF3 (60793.83,34555.207)->(62453.83,34555.207)
+- LINE layer=DIM handle=8DF4 (60793.83,27380.207)->(62453.83,27380.207)
+- LINE layer=DIM handle=8DF5 (62373.83,34495.207)->(62373.83,27440.207)
+- INSERT layer=DIM handle=8DF6 block=DIMDOT
+- INSERT layer=DIM handle=8DF7 block=DIMDOT
+- MTEXT layer=DIM handle=8DF8 '\A1;7175'
+- POINT layer=DEFPOINTS handle=8DF9
+- POINT layer=DEFPOINTS handle=8DFA
+- POINT layer=DEFPOINTS handle=8DFB
+
+=== DEFINITION 13/20 (unit_id: defannot-d367-73) ===
+Definition name: *D367
+entity_count: 9
+dxf_name histogram: INSERT=2, LINE=3, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=6
+bbox from LINE start/end: [44248.83, 37180.207, 0, 48998.83, 38840.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8DFC (44248.83,37180.207)->(44248.83,38840.207)
+- LINE layer=DIM handle=8DFD (48998.83,37180.207)->(48998.83,38840.207)
+- LINE layer=DIM handle=8DFE (44308.83,38760.207)->(48938.83,38760.207)
+- INSERT layer=DIM handle=8DFF block=DIMDOT
+- INSERT layer=DIM handle=8E00 block=DIMDOT
+- MTEXT layer=DIM handle=8E01 '\A1;4750'
+- POINT layer=DEFPOINTS handle=8E02
+- POINT layer=DEFPOINTS handle=8E03
+- POINT layer=DEFPOINTS handle=8E04
+
+=== DEFINITION 14/20 (unit_id: defannot-d368-74) ===
+Definition name: *D368
+entity_count: 9
+dxf_name histogram: INSERT=2, LINE=3, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=6
+bbox from LINE start/end: [48998.83, 37180.207, 0, 59348.83, 38840.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8E05 (48998.83,37180.207)->(48998.83,38840.207)
+- LINE layer=DIM handle=8E06 (59348.83,37180.207)->(59348.83,38840.207)
+- LINE layer=DIM handle=8E07 (49058.83,38760.207)->(59288.83,38760.207)
+- INSERT layer=DIM handle=8E08 block=DIMDOT
+- INSERT layer=DIM handle=8E09 block=DIMDOT
+- MTEXT layer=DIM handle=8E0A '\A1;10350'
+- POINT layer=DEFPOINTS handle=8E0B
+- POINT layer=DEFPOINTS handle=8E0C
+- POINT layer=DEFPOINTS handle=8E0D
+
+=== DEFINITION 15/20 (unit_id: defannot-d369-75) ===
+Definition name: *D369
+entity_count: 9
+dxf_name histogram: INSERT=2, LINE=3, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=6
+bbox from LINE start/end: [60793.83, 35420.207, 0, 62453.83, 36080.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8E0E (60793.83,36080.207)->(62453.83,36080.207)
+- LINE layer=DIM handle=8E0F (60793.83,35420.207)->(62453.83,35420.207)
+- LINE layer=DIM handle=8E10 (62373.83,36020.207)->(62373.83,35480.207)
+- INSERT layer=DIM handle=8E11 block=DIMDOT
+- INSERT layer=DIM handle=8E12 block=DIMDOT
+- MTEXT layer=DIM handle=8E13 '\A1;660'
+- POINT layer=DEFPOINTS handle=8E14
+- POINT layer=DEFPOINTS handle=8E15
+- POINT layer=DEFPOINTS handle=8E16
+
+=== DEFINITION 16/20 (unit_id: defannot-d370-76) ===
+Definition name: *D370
+entity_count: 9
+dxf_name histogram: INSERT=2, LINE=3, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=6
+bbox from LINE start/end: [57278.83, 37180.207, 0, 59348.83, 37560.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8E17 (57278.83,37180.207)->(57278.83,37560.207)
+- LINE layer=DIM handle=8E18 (59348.83,37180.207)->(59348.83,37560.207)
+- LINE layer=DIM handle=8E19 (57338.83,37480.207)->(59288.83,37480.207)
+- INSERT layer=DIM handle=8E1A block=DIMDOT
+- INSERT layer=DIM handle=8E1B block=DIMDOT
+- MTEXT layer=DIM handle=8E1C '\A1;2070'
+- POINT layer=DEFPOINTS handle=8E1D
+- POINT layer=DEFPOINTS handle=8E1E
+- POINT layer=DEFPOINTS handle=8E1F
+
+=== DEFINITION 17/20 (unit_id: defannot-d371-77) ===
+Definition name: *D371
+entity_count: 9
+dxf_name histogram: INSERT=2, LINE=3, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=6
+bbox from LINE start/end: [57843.83, 24895.207, 0, 58763.83, 25835.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8E20 (58763.83,25835.207)->(58763.83,24895.207)
+- LINE layer=DIM handle=8E21 (57843.83,25835.207)->(57843.83,24895.207)
+- LINE layer=DIM handle=8E22 (58730.496,24955.207)->(57877.163,24955.207)
+- INSERT layer=DIM handle=8E23 block=DIMDOT
+- INSERT layer=DIM handle=8E24 block=DIMDOT
+- MTEXT layer=DIM handle=8E25 '\A1;920'
+- POINT layer=DEFPOINTS handle=8E26
+- POINT layer=DEFPOINTS handle=8E27
+- POINT layer=DEFPOINTS handle=8E28
+
+=== DEFINITION 18/20 (unit_id: defannot-d372-78) ===
+Definition name: *D372
+entity_count: 9
+dxf_name histogram: INSERT=2, LINE=3, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=6
+bbox from LINE start/end: [58763.83, 24895.207, 0, 59348.83, 25835.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8E29 (58763.83,25835.207)->(58763.83,24895.207)
+- LINE layer=DIM handle=8E2A (59348.83,25835.207)->(59348.83,24895.207)
+- LINE layer=DIM handle=8E2B (58797.163,24955.207)->(59315.496,24955.207)
+- INSERT layer=DIM handle=8E2C block=DIMDOT
+- INSERT layer=DIM handle=8E2D block=DIMDOT
+- MTEXT layer=DIM handle=8E2E '\A1;585'
+- POINT layer=DEFPOINTS handle=8E2F
+- POINT layer=DEFPOINTS handle=8E30
+- POINT layer=DEFPOINTS handle=8E31
+
+=== DEFINITION 19/20 (unit_id: defannot-d373-79) ===
+Definition name: *D373
+entity_count: 9
+dxf_name histogram: INSERT=2, LINE=3, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=6
+bbox from LINE start/end: [57348.83, 24895.207, 0, 57843.83, 25835.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8E32 (57348.83,25835.207)->(57348.83,24895.207)
+- LINE layer=DIM handle=8E33 (57843.83,25835.207)->(57843.83,24895.207)
+- LINE layer=DIM handle=8E34 (57382.163,24955.207)->(57810.496,24955.207)
+- INSERT layer=DIM handle=8E35 block=DIMDOT
+- INSERT layer=DIM handle=8E36 block=DIMDOT
+- MTEXT layer=DIM handle=8E37 '\A1;495'
+- POINT layer=DEFPOINTS handle=8E38
+- POINT layer=DEFPOINTS handle=8E39
+- POINT layer=DEFPOINTS handle=8E3A
+
+=== DEFINITION 20/20 (unit_id: defannot-d374-80) ===
+Definition name: *D374
+entity_count: 9
+dxf_name histogram: INSERT=2, LINE=3, MTEXT=1, POINT=3
+layer histogram: DEFPOINTS=3, DIM=6
+bbox from LINE start/end: [55728.83, 24895.207, 0, 57348.83, 25835.207, 0]
+sampled entities (max 30):
+- LINE layer=DIM handle=8E3B (57348.83,25835.207)->(57348.83,24895.207)
+- LINE layer=DIM handle=8E3C (55728.83,25835.207)->(55728.83,24895.207)
+- LINE layer=DIM handle=8E3D (57315.496,24955.207)->(55762.163,24955.207)
+- INSERT layer=DIM handle=8E3E block=DIMDOT
+- INSERT layer=DIM handle=8E3F block=DIMDOT
+- MTEXT layer=DIM handle=8E40 '\A1;1620'
+- POINT layer=DEFPOINTS handle=8E41
+- POINT layer=DEFPOINTS handle=8E42
+- POINT layer=DEFPOINTS handle=8E43

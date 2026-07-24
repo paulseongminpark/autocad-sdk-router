@@ -1,0 +1,91 @@
+{
+  "family": "entities",
+  "fixtures": {
+    "write.entity.dim.aligned": {
+      "args": {
+        "layer": "ARIADNE_F1_PROBE",
+        "dim_text": "",
+        "xline1": {"x": 0.0, "y": 0.0, "z": 0.0},
+        "xline2": {"x": 10.0, "y": 0.0, "z": 0.0},
+        "dim_line": {"x": 0.0, "y": 5.0, "z": 0.0}
+      },
+      "evidence": "m08h_handlers.inc (write.entity.dim.aligned: m08hReadPoint xline1/xline2/dim_line; jsonFindString layer/dim_text)"
+    },
+    "write.entity.dim.angular2line": {
+      "args": {
+        "layer": "ARIADNE_F1_PROBE",
+        "dim_text": "",
+        "xline1_start": {"x": 0.0, "y": 0.0, "z": 0.0},
+        "xline1_end": {"x": 10.0, "y": 0.0, "z": 0.0},
+        "xline2_start": {"x": 0.0, "y": 0.0, "z": 0.0},
+        "xline2_end": {"x": 0.0, "y": 10.0, "z": 0.0},
+        "arc_point": {"x": 5.0, "y": 5.0, "z": 0.0}
+      },
+      "evidence": "m08h_handlers.inc (write.entity.dim.angular2line: m08hReadPoint xline1_start/xline1_end/xline2_start/xline2_end/arc_point; jsonFindString layer/dim_text)"
+    },
+    "write.entity.dim.angular3pt": {
+      "args": {
+        "layer": "ARIADNE_F1_PROBE",
+        "dim_text": "",
+        "center": {"x": 0.0, "y": 0.0, "z": 0.0},
+        "xline1": {"x": 10.0, "y": 0.0, "z": 0.0},
+        "xline2": {"x": 0.0, "y": 10.0, "z": 0.0},
+        "arc_point": {"x": 5.0, "y": 5.0, "z": 0.0}
+      },
+      "evidence": "m08h_handlers.inc (write.entity.dim.angular3pt: m08hReadPoint center/xline1/xline2/arc_point; jsonFindString layer/dim_text)"
+    },
+    "write.entity.dim.arc": {
+      "args": {
+        "layer": "ARIADNE_F1_PROBE",
+        "dim_text": "",
+        "center": {"x": 0.0, "y": 0.0, "z": 0.0},
+        "xline1": {"x": 10.0, "y": 0.0, "z": 0.0},
+        "xline2": {"x": 0.0, "y": 10.0, "z": 0.0},
+        "arc_point": {"x": 5.0, "y": 5.0, "z": 0.0}
+      },
+      "evidence": "m08h_handlers.inc (write.entity.dim.arc: m08hReadPoint center/xline1/xline2/arc_point; jsonFindString layer/dim_text)"
+    },
+    "write.entity.dim.diametric": {
+      "args": {
+        "layer": "ARIADNE_F1_PROBE",
+        "dim_text": "",
+        "leader_length": 2.0,
+        "chord_point": {"x": 10.0, "y": 0.0, "z": 0.0},
+        "far_chord_point": {"x": -10.0, "y": 0.0, "z": 0.0}
+      },
+      "evidence": "m08h_handlers.inc (write.entity.dim.diametric: m08hReadPoint chord_point/far_chord_point; jsonFindNumber leader_length; jsonFindString layer/dim_text)"
+    },
+    "write.entity.dim.ordinate": {
+      "args": {
+        "layer": "ARIADNE_F1_PROBE",
+        "dim_text": "",
+        "use_x_axis": 1,
+        "defining_point": {"x": 10.0, "y": 5.0, "z": 0.0},
+        "leader_end_point": {"x": 10.0, "y": 15.0, "z": 0.0}
+      },
+      "evidence": "m08h_handlers.inc (write.entity.dim.ordinate: m08hReadPoint defining_point/leader_end_point; jsonFindNumber use_x_axis; jsonFindString layer/dim_text)"
+    },
+    "write.entity.dim.radial": {
+      "args": {
+        "layer": "ARIADNE_F1_PROBE",
+        "dim_text": "",
+        "leader_length": 3.0,
+        "center": {"x": 0.0, "y": 0.0, "z": 0.0},
+        "chord_point": {"x": 10.0, "y": 0.0, "z": 0.0}
+      },
+      "evidence": "m08h_handlers.inc (write.entity.dim.radial: m08hReadPoint center/chord_point; jsonFindNumber leader_length; jsonFindString layer/dim_text)"
+    },
+    "write.entity.dim.radiallarge": {
+      "args": {
+        "layer": "ARIADNE_F1_PROBE",
+        "dim_text": "",
+        "jog_angle": 0.785398163397448,
+        "center": {"x": 0.0, "y": 0.0, "z": 0.0},
+        "chord_point": {"x": 20.0, "y": 0.0, "z": 0.0},
+        "override_center": {"x": 5.0, "y": 0.0, "z": 0.0},
+        "jog_point": {"x": 12.0, "y": 0.0, "z": 0.0}
+      },
+      "evidence": "m08h_handlers.inc (write.entity.dim.radiallarge: m08hReadPoint center/chord_point/override_center/jog_point; jsonFindNumber jog_angle; jsonFindString layer/dim_text)"
+    }
+  }
+}

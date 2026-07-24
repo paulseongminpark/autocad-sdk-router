@@ -1,0 +1,282 @@
+[
+ {
+  "unit_id": "defannot-u174-181",
+  "def": "*U174",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.4,
+  "wall_line_handles": [],
+  "notes": "INSUL 레이어 5정점 LWPOLYLINE 44개로만 구성된 단열 해치 조각; 벽면 선 없음",
+  "rationale": {
+   "evidence": "엔티티 44개가 전부 X-평면도(기본형)$0$INSUL 위의 LWPOLYLINE이며 샘플 30개(530F–532C)가 모두 vertices=5로 동일하다. LINE·INSERT·치수 요소가 없고 LINE bbox도 도출되지 않아 긴 벽면 선분이 아니라 단열재 채우기 셀 묶음이다. 익명 *U174와 xref 바인드 레이어($0$)는 평면도에서 잘라 낸 재료 지오메트리임을 가리킨다.",
+   "rule": "평면 INSUL/단열 전용 레이어에 균일 소형 폐합 폴리라인이 대량 반복되면 벽체 공동 단열 채우기로 보고 평면 부분도로 분류하되, 패턴 셀 자체는 추출 가능한 벽면 선이 아니다.",
+   "counterfactual": "동일 형상이 WALL/구조 레이어의 긴 2정점 평행 LINE 쌍이었다면 wall_likelihood가 크게 오르고 wall_line_handles에 수록되었을 것이다. 가구·심볼 레이어나 텍스트가 섞이면 role이 바뀐다.",
+   "uncertainty": "정점 좌표가 없어 셀이 벽 경로를 따르는지, 슬래브·기둥 단열인지 구분할 수 없고 벽 두께도 측정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u175-182",
+  "def": "*U175",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.4,
+  "wall_line_handles": [],
+  "notes": "INSUL 레이어 5정점 LWPOLYLINE 58개 단열 해치 블록; 벽면 선 후보 없음",
+  "rationale": {
+   "evidence": "58개 전부가 X-평면도(기본형)$0$INSUL LWPOLYLINE이고 샘플(5340–535D)이 전부 5정점이다. 단일 재료 레이어·균일 셀 반복·LINE 부재는 벽 경계선이 아닌 단열 해치 익명 블록(*U175)의 전형이다.",
+   "rule": "INSUL 레이어만으로 이뤄진 균일 LWPOLYLINE 군집은 평면도 벽체 조립 재료 표현으로 분류하고, 벽 존재 힌트는 주되 벽면 handle는 비운다.",
+   "counterfactual": "WALL 레이어의 장평행선이거나 이중선 간격이 벽두께로 읽히면 벽선 판정으로 뒤집힌다. 치수·심볼 요소가 추가되면 치수캐시/심볼로 이동한다.",
+   "uncertainty": "좌표·bbox 부재로 배치가 외벽/내벽/비벽 부재인지 확정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u176-183",
+  "def": "*U176",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.4,
+  "wall_line_handles": [],
+  "notes": "INSUL 5정점 LWPOLYLINE 30개 단열 채우기; 벽선 미포함",
+  "rationale": {
+   "evidence": "30개 엔티티가 모두 INSUL 레이어 LWPOLYLINE(샘플 537F–539C, vertices=5)이다. 해치 셀 반복만 있고 구조 선분·INSERT가 없어 평면 단열 부분도로 읽힌다.",
+   "rule": "단일 INSUL 레이어의 동일 정점 수 폐합 폴리라인 집합은 재료 채우기이며 벽면 추출 대상이 아니다.",
+   "counterfactual": "2정점 장선이 벽 레이어에 평행쌍으로 있으면 wall_line_handles가 채워지고 likelihood가 상승한다.",
+   "uncertainty": "투영만으로는 셀 크기·정렬·실제 벽 추적 여부를 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u177-184",
+  "def": "*U177",
+  "role": "심볼",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "국기계양대 INSERT+WIPEOUT2+LINE20 명판 프레임 심볼; 벽 아님",
+  "rationale": {
+   "evidence": "구성은 WIPEOUT 2(53A2–53A3), 국기계양대 INSERT 1(53A4), layer 0 LINE 20개다. LINE은 내부 약 2076×50 얇은 사각형과 bbox [-1060,-103.5]–[1060,22.5]의 외곽 노치 프레임을 이루며, 높이만 ~126인 납작한 라벨 박스다. 이름 '국기계양대'와 WIPEOUT 마스킹은 시설 마커/태그 심볼의 전형이다.",
+   "rule": "명명된 시설 INSERT + WIPEOUT 배경 + 얇은 명판/테두리 LINE 조합은 건축 본체 지오메트리가 아니라 심볼로 분류하고, 프레임 평행선은 벽면으로 보지 않는다.",
+   "counterfactual": "WIPEOUT·국기계양대 INSERT가 없고 벽 레이어에서 100–300 간격의 긴 평행 이중선만 남으면 평면 벽선으로 재분류된다.",
+   "uncertainty": "INSERT 내부 도형과 텍스트가 없어 표지가 정확히 무엇을 가리키는지, 50 간격 바가 연석인지 장식인지 확정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u179-185",
+  "def": "*U179",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.4,
+  "wall_line_handles": [],
+  "notes": "INSUL LWPOLYLINE 20개 단열 해치 조각; 벽면 handle 없음",
+  "rationale": {
+   "evidence": "20개 전부가 X-평면도(기본형)$0$INSUL의 5정점 LWPOLYLINE(53F6–5409)이다. LINE/치수/심볼 INSERT가 없어 평면 단열 채우기 블록이다.",
+   "rule": "INSUL 전용 균일 폴리라인 군집은 평면 부분도(재료)로 두고 wall_line_handles는 비운다.",
+   "counterfactual": "벽 레이어 장평행선으로 바뀌면 벽선 판정으로 전환된다.",
+   "uncertainty": "좌표 부재로 벽 공동 단열인지 다른 부재 단열인지 구분 불가."
+  }
+ },
+ {
+  "unit_id": "defannot-u180-186",
+  "def": "*U180",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.4,
+  "wall_line_handles": [],
+  "notes": "INSUL 5정점 LWPOLYLINE 62개 단열 패턴; 벽선 아님",
+  "rationale": {
+   "evidence": "62개 엔티티가 모두 INSUL LWPOLYLINE이며 샘플(540F–542C)이 vertices=5로 균일하다. 대량 반복 해치 셀과 LINE 부재는 벽면이 아닌 단열 부분도를 지지한다.",
+   "rule": "평면도 INSUL 레이어의 반복 소형 폐합선은 벽 공동 재료 표현으로 분류하고 벽면 추출 대상에서 제외한다.",
+   "counterfactual": "구조/WALL 레이어의 긴 평행 LINE이 있으면 likelihood와 handles가 상승한다.",
+   "uncertainty": "bbox·정점 좌표가 없어 실제 벽 경로와의 정합은 검증할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u181-187",
+  "def": "*U181",
+  "role": "심볼",
+  "wall_likelihood": 0.08,
+  "wall_line_handles": [],
+  "notes": "국기계양대 마커(*U181): WIPEOUT+INSERT+LINE 프레임; 벽 아님",
+  "rationale": {
+   "evidence": "*U177과 동일 패턴으로 WIPEOUT 2(5452–5453), 국기계양대 INSERT(5454), LINE 20개가 내부 ~1376×50 명판과 bbox [-710,-103.5]–[710,22.5] 외곽 프레임을 만든다. 납작한 라벨 비율과 시설물 블록명이 심볼임을 확정한다.",
+   "rule": "WIPEOUT+명명 INSERT+얇은 테두리 LINE 블록은 심볼/태그이며 프레임 선은 벽면이 아니다.",
+   "counterfactual": "시설 INSERT와 WIPEOUT을 제거하고 벽 레이어 이중 장선만 남으면 벽 후보가 된다.",
+   "uncertainty": "중첩 블록 내부와 축척이 없어 명판 50 간격의 물리적 의미를 단정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u183-188",
+  "def": "*U183",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.4,
+  "wall_line_handles": [],
+  "notes": "INSUL LWPOLYLINE 43개 단열 해치; 벽면 선 없음",
+  "rationale": {
+   "evidence": "43개 전부가 INSUL 레이어 5정점 LWPOLYLINE(샘플 54A6–54C3)이다. 단일 재료 해치 구성으로 평면 부분도다.",
+   "rule": "INSUL만의 균일 폴리라인 블록은 단열 채우기 평면 지오메트리로 분류한다.",
+   "counterfactual": "WALL 레이어 장평행선이면 벽선으로 재판정한다.",
+   "uncertainty": "정점 좌표 부재로 벽 추적 여부는 레이어 의미에만 의존한다."
+  }
+ },
+ {
+  "unit_id": "defannot-u184-189",
+  "def": "*U184",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.4,
+  "wall_line_handles": [],
+  "notes": "INSUL 5정점 LWPOLYLINE 26개 단열 조각; 벽선 후보 없음",
+  "rationale": {
+   "evidence": "26개 엔티티가 모두 X-평면도(기본형)$0$INSUL LWPOLYLINE(54D6–54EF, vertices=5)이다. LINE bbox 불가·균일 셀은 단열 해치 익명 블록 패턴이다.",
+   "rule": "평면 INSUL 균일 셀 군집은 평면 부분도이며 wall_line_handles는 비운다.",
+   "counterfactual": "긴 2정점 벽 레이어 선분이면 handles가 채워진다.",
+   "uncertainty": "배치가 벽 공동인지 다른 단열 구역인지 투영만으로 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u185-190",
+  "def": "*U185",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.4,
+  "wall_line_handles": [],
+  "notes": "INSUL LWPOLYLINE 46개 단열 패턴 블록; 벽면 아님",
+  "rationale": {
+   "evidence": "46개 전부가 INSUL 5정점 LWPOLYLINE(샘플 54F5–5512)이다. 재료 레이어 해치만 있어 벽면 추출 대상이 아니다.",
+   "rule": "INSUL 전용 반복 폐합 폴리라인은 벽 공동 단열 표시로 평면 부분도 처리한다.",
+   "counterfactual": "구조 벽 레이어 평행 LINE 쌍이면 wall_likelihood가 상승한다.",
+   "uncertainty": "좌표 없어 외벽/내벽/비벽 단열 구분이 불가하다."
+  }
+ },
+ {
+  "unit_id": "defannot-u186-191",
+  "def": "*U186",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.4,
+  "wall_line_handles": [],
+  "notes": "INSUL LWPOLYLINE 18개 소형 단열 해치; 벽선 없음",
+  "rationale": {
+   "evidence": "18개 전부가 INSUL 레이어 5정점 LWPOLYLINE(5528–5539)이다. 소규모지만 동일 해치 지문이 유지된다.",
+   "rule": "엔티티 수가 적어도 INSUL 균일 셀만 있으면 단열 평면 부분도로 본다.",
+   "counterfactual": "심볼 INSERT나 치수 텍스트가 섞이면 role이 심볼/치수캐시로 바뀐다.",
+   "uncertainty": "소수 셀이라 벽 경로 길이·형태를 추정하기 어렵다."
+  }
+ },
+ {
+  "unit_id": "defannot-u187-192",
+  "def": "*U187",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.4,
+  "wall_line_handles": [],
+  "notes": "INSUL 5정점 LWPOLYLINE 28개 단열 채우기; 벽면 handle 없음",
+  "rationale": {
+   "evidence": "28개 엔티티가 모두 INSUL LWPOLYLINE(553F–555A, vertices=5)이다. LINE·다른 레이어 혼재가 없다.",
+   "rule": "단일 INSUL 해치 블록은 평면 재료 부분도이며 벽면 선으로 등재하지 않는다.",
+   "counterfactual": "WALL 레이어 장선 평행쌍이면 벽선 판정으로 전환된다.",
+   "uncertainty": "정점 좌표 부재로 실제 기하 스케일을 확인할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u188-193",
+  "def": "*U188",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.42,
+  "wall_line_handles": [],
+  "notes": "INSUL LWPOLYLINE 83개 대형 단열 해치 군집; 벽면 선은 아님",
+  "rationale": {
+   "evidence": "83개 전부가 INSUL 5정점 LWPOLYLINE(샘플 5560–557D)로, 대량 셀이 벽 공동을 따라갈 가능성을 높이지만 여전히 패턴 채우기다. LINE bbox가 없어 벽면 직선을 직접 고를 수 없다.",
+   "rule": "INSUL 셀 수가 많아도 균일 해치이면 벽 '존재' 힌트만 주고 벽면 handle는 비운다.",
+   "counterfactual": "동일 영역이 WALL 레이어 장평행선으로 바뀌면 handles가 채워진다.",
+   "uncertainty": "샘플 30개만 보여 나머지 53개의 형태 이질성 여부는 확인 불가."
+  }
+ },
+ {
+  "unit_id": "defannot-u189-194",
+  "def": "*U189",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.45,
+  "wall_line_handles": [],
+  "notes": "INSUL LWPOLYLINE 147개 대규모 단열 패턴; 추출 벽선 없음",
+  "rationale": {
+   "evidence": "147개 전부가 X-평면도(기본형)$0$INSUL LWPOLYLINE이며 샘플(55B8–55D5)이 vertices=5로 균일하다. 규모상 긴 벽 구간의 단열 채우기로 보이지만 엔티티 타입은 해치 셀이다.",
+   "rule": "대규모 INSUL 해치 블록도 평면 부분도(재료)이며 벽면 선 목록에는 넣지 않는다. 다만 벽 인접 가능성은 셀 밀도에 비례해 소폭 상향한다.",
+   "counterfactual": "구조 벽 레이어의 연속 이중 LINE이 포함되면 wall_line_handles와 likelihood가 급등한다.",
+   "uncertainty": "117개 미샘플 엔티티와 좌표 부재로 외곽 윤곽·개구부 관계를 알 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u191-195",
+  "def": "*U191",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.4,
+  "wall_line_handles": [],
+  "notes": "INSUL 5정점 LWPOLYLINE 36개 단열 해치; 벽선 아님",
+  "rationale": {
+   "evidence": "36개 전부가 INSUL LWPOLYLINE(샘플 56E7–5704, vertices=5)이다. 평면도 바인드 단열 레이어만 존재한다.",
+   "rule": "INSUL 균일 폴리라인만 있는 익명 블록은 평면 단열 부분도로 분류한다.",
+   "counterfactual": "WALL 레이어 평행 장선이 있으면 벽선 판정으로 바뀐다.",
+   "uncertainty": "좌표 없어 벽 두께·실내외 구분을 할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u192-196",
+  "def": "*U192",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.4,
+  "wall_line_handles": [],
+  "notes": "INSUL LWPOLYLINE 41개 단열 패턴; 벽면 handle 없음",
+  "rationale": {
+   "evidence": "41개 엔티티가 모두 INSUL 5정점 LWPOLYLINE(샘플 5710–572D)이다. LINE·INSERT 혼재 없음.",
+   "rule": "단일 INSUL 해치 집합은 벽면이 아닌 재료 평면 부분도다.",
+   "counterfactual": "치수/심볼 요소가 추가되거나 벽 레이어 선이 나타나면 role·likelihood가 바뀐다.",
+   "uncertainty": "미샘플 11개와 정점 좌표를 볼 수 없어 형태 이상은 검출 불가."
+  }
+ },
+ {
+  "unit_id": "defannot-u193-197",
+  "def": "*U193",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.4,
+  "wall_line_handles": [],
+  "notes": "INSUL LWPOLYLINE 32개 단열 채우기; 벽선 후보 없음",
+  "rationale": {
+   "evidence": "32개 전부가 INSUL 레이어 LWPOLYLINE(샘플 573E–575B, vertices=5)이다. 해치 셀 지문이 명확하다.",
+   "rule": "INSUL 전용 균일 폐합선 블록은 평면 부분도로 두고 wall_line_handles는 빈 배열로 둔다.",
+   "counterfactual": "2정점 벽 레이어 장평행선이면 handles가 채워진다.",
+   "uncertainty": "bbox 부재로 공간적 범위와 벽 정렬을 검증할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u194-198",
+  "def": "*U194",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.35,
+  "wall_line_handles": [],
+  "notes": "INSUL LWPOLYLINE 5개 최소 단열 해치 조각; 벽선 아님",
+  "rationale": {
+   "evidence": "단 5개의 INSUL 5정점 LWPOLYLINE(5763–5767)만 있다. 동일 해치 지문이지만 셀 수가 적어 긴 벽 구간 증거는 약하다.",
+   "rule": "소수의 INSUL 셀도 재료 평면 부분도로 분류하되, 벽 인접 확신은 셀 규모에 따라 낮춘다.",
+   "counterfactual": "셀이 벽 레이어 장선으로 대체되거나 대량 INSUL로 늘면 likelihood가 오른다.",
+   "uncertainty": "5개만으로는 벽 경로인지 고립 패치인지 구분할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u195-199",
+  "def": "*U195",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.38,
+  "wall_line_handles": [],
+  "notes": "INSUL LWPOLYLINE 15개 단열 해치; 벽면 선 없음",
+  "rationale": {
+   "evidence": "15개 전부가 INSUL 5정점 LWPOLYLINE(576D–577B)이다. LINE bbox 불가로 벽면 직선을 고를 수 없다.",
+   "rule": "INSUL 균일 폴리라인 군집은 단열 평면 부분도이며 벽면 추출 대상이 아니다.",
+   "counterfactual": "WALL 레이어 평행 LINE이 있으면 벽선으로 재분류된다.",
+   "uncertainty": "좌표·스케일 정보 없어 부재 종류를 레이어명 외에 확정할 수 없다."
+  }
+ },
+ {
+  "unit_id": "defannot-u196-200",
+  "def": "*U196",
+  "role": "평면 부분도",
+  "wall_likelihood": 0.4,
+  "wall_line_handles": [],
+  "notes": "INSUL LWPOLYLINE 38개 단열 패턴 블록; 벽선 아님",
+  "rationale": {
+   "evidence": "38개 엔티티가 모두 X-평면도(기본형)$0$INSUL의 5정점 LWPOLYLINE(샘플 5781–579E)이다. 익명 *U196은 평면도에서 바인드된 단열 해치 조각이다.",
+   "rule": "평면 INSUL 레이어의 반복 소형 폐합 폴리라인만으로 된 블록은 평면 부분도(단열)로 분류하고 wall_line_handles는 비운다.",
+   "counterfactual": "구조/WALL 레이어의 긴 평행 이중선이 포함되면 wall_likelihood와 handles가 상승한다.",
+   "uncertainty": "정점 좌표와 전체 bbox가 없어 이 단열이 어느 벽 구간을 따르는지 투영만으로 확정할 수 없다."
+  }
+ }
+]

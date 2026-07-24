@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-u282-221",
+    "def": "*U282",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 42 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a medium-length insulation run; no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 42 entities are LWPOLYLINEs with exactly 5 vertices (handles 7F54–7F71 contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u283-222",
+    "def": "*U283",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 70 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a medium-length insulation run; no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 70 entities are LWPOLYLINEs with exactly 5 vertices (handles 7F83–7FA0 contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u290-223",
+    "def": "*U290",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 30 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a short insulation run; no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 30 entities are LWPOLYLINEs with exactly 5 vertices (handles 81EA–8207 contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u45-224",
+    "def": "*U45",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 38 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a short insulation run; no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 38 entities are LWPOLYLINEs with exactly 5 vertices (handles 3857–3874 contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u47-225",
+    "def": "*U47",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 38 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a short insulation run; no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 38 entities are LWPOLYLINEs with exactly 5 vertices (handles 38A6–38C3 contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u48-226",
+    "def": "*U48",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 12 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a short insulation run; no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 12 entities are LWPOLYLINEs with exactly 5 vertices (handles 38D1–38DC contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u49-227",
+    "def": "*U49",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 105 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a long insulation run (likely a full wall segment or several); no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 105 entities are LWPOLYLINEs with exactly 5 vertices (handles 38E2–38FF contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u50-228",
+    "def": "*U50",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 41 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a medium-length insulation run; no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 41 entities are LWPOLYLINEs with exactly 5 vertices (handles 3950–396D contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u51-229",
+    "def": "*U51",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 101 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a long insulation run (likely a full wall segment or several); no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 101 entities are LWPOLYLINEs with exactly 5 vertices (handles 397E–399B contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u52-230",
+    "def": "*U52",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 102 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a long insulation run (likely a full wall segment or several); no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 102 entities are LWPOLYLINEs with exactly 5 vertices (handles 39E8–3A05 contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u53-231",
+    "def": "*U53",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 19 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a short insulation run; no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 19 entities are LWPOLYLINEs with exactly 5 vertices (handles 3A53–3A65 contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u54-232",
+    "def": "*U54",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 68 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a medium-length insulation run; no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 68 entities are LWPOLYLINEs with exactly 5 vertices (handles 3A6B–3A88 contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u55-233",
+    "def": "*U55",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 23 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a short insulation run; no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 23 entities are LWPOLYLINEs with exactly 5 vertices (handles 3AB4–3ACA contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u56-234",
+    "def": "*U56",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 130 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a long insulation run (likely a full wall segment or several); no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 130 entities are LWPOLYLINEs with exactly 5 vertices (handles 3AD0–3AED contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u57-235",
+    "def": "*U57",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 112 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a long insulation run (likely a full wall segment or several); no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 112 entities are LWPOLYLINEs with exactly 5 vertices (handles 3B57–3B74 contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u58-236",
+    "def": "*U58",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 19 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a short insulation run; no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 19 entities are LWPOLYLINEs with exactly 5 vertices (handles 3BCC–3BDE contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u59-237",
+    "def": "*U59",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 63 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a medium-length insulation run; no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 63 entities are LWPOLYLINEs with exactly 5 vertices (handles 3BE4–3C01 contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u60-238",
+    "def": "*U60",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 18 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a short insulation run; no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 18 entities are LWPOLYLINEs with exactly 5 vertices (handles 3C28–3C39 contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u61-239",
+    "def": "*U61",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 16 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a short insulation run; no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 16 entities are LWPOLYLINEs with exactly 5 vertices (handles 3C3F–3C4E contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u62-240",
+    "def": "*U62",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Anonymous block of 23 uniform 5-vertex LWPOLYLINEs on bound-xref layer X-평면도(기본형)$0$INSUL — insulation batting zigzag pattern, a short insulation run; no wall lines themselves.",
+    "rationale": {
+      "evidence": "All 23 entities are LWPOLYLINEs with exactly 5 vertices (handles 3C54–3C6A contiguous), with no other entity types present. The single layer X-평면도(기본형)$0$INSUL is a bound-xref layer whose $0$INSUL suffix names insulation. Dozens of identical tiny 5-vertex polylines in consecutive handle order is the signature of a programmatically generated insulation batting zigzag, not hand-drawn geometry.",
+      "rule": "An anonymous *U block containing only many identical small-vertex-count polylines on an INSUL(ation) layer is a repeated hatch/batting pattern block, so classify it as 기타 rather than a semantic symbol, furniture, or a plan fragment. Contiguous handle ranges plus uniform vertex counts indicate machine-generated pattern geometry in any drawing.",
+      "counterfactual": "If the block mixed LINE/ARC wall outlines, doors, or text with these polylines, it would flip to 평면 부분도; if the layer were a wall layer (e.g. *WALL) or the polylines were long 2-vertex segments, wall_likelihood would rise sharply.",
+      "uncertainty": "No coordinates or bbox are given, so the actual extent and placement of the batting run cannot be confirmed, and whether it sits inside a wall cavity (which the INSUL layer suggests) versus a roof/floor section cannot be determined from this projection alone."
+    }
+  }
+]

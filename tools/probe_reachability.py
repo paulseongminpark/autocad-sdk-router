@@ -520,6 +520,59 @@ FIXTURES: dict[str, dict] = {
 
 
 # --------------------------------------------------------------------------- #
+# P3b fleet-authored REACHABLE->RUNNABLE fixtures (merged from disjoint fragments)
+# --------------------------------------------------------------------------- #
+# The inline entries above are the curated v1 valid-arg set. Promoting the
+# remaining REACHABLE ops to RUNNABLE means authoring one valid-arg fixture per
+# op -- a large per-family effort dispatched to the worker fleet. An op is never
+# edited into this shared dict (N packets editing one file = write collision);
+# instead each family packet writes a DISJOINT fragment
+# measure/reachable_fixtures/<family>.json of the SAME per-entry schema
+# ({"args": {...}, "evidence": "<handler .inc arg-key read citation>"}), the
+# orchestrator reviews + lands it, and it is merged here at import time. Inline
+# curated entries WIN on any key collision (they are hand-verified). Each merged
+# op carries source_fragment for provenance. A malformed fragment degrades to
+# skipped -- never crashes the probe, never fabricates an arg. When the dir is
+# absent/empty (the v1 baseline) the merge is a no-op, so this is additive-only.
+_REACHABLE_FIXTURE_DIR = ROUTER_HOME / "measure" / "reachable_fixtures"
+
+
+def _merge_reachable_fixtures() -> int:
+    if not _REACHABLE_FIXTURE_DIR.is_dir():
+        return 0
+    merged = 0
+    for frag in sorted(_REACHABLE_FIXTURE_DIR.glob("*.json")):
+        try:
+            data = json.loads(frag.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        entries = data.get("fixtures", data) if isinstance(data, dict) else {}
+        if not isinstance(entries, dict):
+            continue
+        # Optional fragment-level "dwg": these fixtures reference handles that
+        # only exist in a PURPOSE-BUILT fixture DWG (e.g. the P3b enriched
+        # seed) -- the sweep must probe those ops against THAT dwg, or the
+        # valid leg dies on a dead handle and silently demotes the row.
+        frag_dwg = data.get("dwg") if isinstance(data, dict) else None
+        for op_id, entry in entries.items():
+            if op_id in FIXTURES:                 # curated inline set wins
+                continue
+            if isinstance(entry, dict) and isinstance(entry.get("args"), dict):
+                FIXTURES[op_id] = {
+                    "args": entry["args"],
+                    "evidence": entry.get("evidence", ""),
+                    "source_fragment": frag.name,
+                }
+                if isinstance(frag_dwg, str) and frag_dwg:
+                    FIXTURES[op_id]["dwg"] = frag_dwg
+                merged += 1
+    return merged
+
+
+_MERGED_REACHABLE_FIXTURES = _merge_reachable_fixtures()
+
+
+# --------------------------------------------------------------------------- #
 # Runtime availability (cheap, read-only; does not guarantee any one op runs)
 # --------------------------------------------------------------------------- #
 def runtime_available() -> tuple[bool, str]:
@@ -935,6 +988,17 @@ def write_jsonl(rows: list[dict], out_path: Path | str) -> None:
             fh.write("\n")
         fh.flush()
         os.fsync(fh.fileno())
+    # os.replace can raise a transient PermissionError (WinError 5/32) when an
+    # AV/indexer (Defender/Everything) momentarily holds the target -- this matrix
+    # is rewritten once per op (~489x/sweep), so a single unretried lock crashed
+    # the whole sweep at op 84 (2026-07-13, SWEEP_EXIT=1). Back off + retry; the
+    # final attempt lets a genuine permissions error propagate.
+    for _attempt in range(10):
+        try:
+            tmp.replace(out_path)
+            return
+        except PermissionError:
+            time.sleep(0.1 * (_attempt + 1))
     tmp.replace(out_path)
 
 
@@ -971,9 +1035,15 @@ def run_live(registry_path: Path | str = OPERATIONS_V2, dwg_path: Path | str = D
         elif wanted is not None and op_id not in wanted:
             rows.append(build_row(op))  # stays "pending" -- not in this run's subset
         else:
-            fixture = FIXTURES.get(op_id, {}).get("args")
+            fx = FIXTURES.get(op_id, {})
+            fixture = fx.get("args")
+            op_dwg = dwg_path
+            if fx.get("dwg"):
+                cand = ROUTER_HOME / fx["dwg"]
+                if cand.is_file():
+                    op_dwg = cand      # fixture-DWG override (see _merge_reachable_fixtures)
             op_dir = work_dir / _safe_name(op_id)
-            payload = _run_isolated(op_id, dwg_path, op_dir, fixture, timeout_sec)
+            payload = _run_isolated(op_id, op_dwg, op_dir, fixture, timeout_sec)
             if payload.get("_original_mutated"):
                 write_jsonl(rows + [build_row(op)], out_path)  # DISK-FIRST before aborting
                 raise OriginalMutatedError(f"{op_id}: {payload}")

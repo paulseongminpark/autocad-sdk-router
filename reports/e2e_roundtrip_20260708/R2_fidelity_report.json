@@ -1,0 +1,355 @@
+{
+  "schema": "ariadne.roundtrip_report.v1",
+  "run_dir": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R2_20260708",
+  "source": {},
+  "ceiling": {
+    "modelspace_entity_total": 375,
+    "certified_total": 375,
+    "out_of_class_total": 0,
+    "deferred_count": 23
+  },
+  "kind_buckets": {
+    "ARC": {
+      "status": "VACUOUS",
+      "certified": true,
+      "label": null,
+      "kind": null,
+      "census_count": 0,
+      "attempted_count": 0,
+      "attempted_live_count": 0,
+      "deferred_count": 0,
+      "diff0_count": 0,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0,
+      "absent_from_drawing": true
+    },
+    "CIRCLE": {
+      "status": "PASS",
+      "certified": true,
+      "label": "circle",
+      "kind": "circle",
+      "census_count": 1,
+      "attempted_count": 1,
+      "attempted_live_count": 1,
+      "deferred_count": 0,
+      "diff0_count": 1,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0
+    },
+    "DIMENSION": {
+      "status": "PASS",
+      "certified": true,
+      "label": "dimension_all_subtypes",
+      "kind": "dimension",
+      "census_count": 113,
+      "attempted_count": 113,
+      "attempted_live_count": 113,
+      "deferred_count": 0,
+      "diff0_count": 113,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0
+    },
+    "ELLIPSE": {
+      "status": "VACUOUS",
+      "certified": true,
+      "label": null,
+      "kind": null,
+      "census_count": 0,
+      "attempted_count": 0,
+      "attempted_live_count": 0,
+      "deferred_count": 0,
+      "diff0_count": 0,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0,
+      "absent_from_drawing": true
+    },
+    "INSERT": {
+      "status": "FAIL",
+      "certified": true,
+      "label": "insert",
+      "kind": "block_reference",
+      "census_count": 50,
+      "attempted_count": 50,
+      "attempted_live_count": 50,
+      "deferred_count": 0,
+      "diff0_count": 49,
+      "modified_count": 0,
+      "removed_count": 1,
+      "added_count": 0
+    },
+    "LEADER": {
+      "status": "VACUOUS",
+      "certified": true,
+      "label": null,
+      "kind": null,
+      "census_count": 0,
+      "attempted_count": 0,
+      "attempted_live_count": 0,
+      "deferred_count": 0,
+      "diff0_count": 0,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0,
+      "absent_from_drawing": true
+    },
+    "LINE": {
+      "status": "PASS",
+      "certified": true,
+      "label": "line",
+      "kind": "line",
+      "census_count": 21,
+      "attempted_count": 21,
+      "attempted_live_count": 21,
+      "deferred_count": 0,
+      "diff0_count": 21,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0
+    },
+    "LWPOLYLINE": {
+      "status": "PASS",
+      "certified": true,
+      "label": "lwpolyline",
+      "kind": "lwpolyline",
+      "census_count": 73,
+      "attempted_count": 73,
+      "attempted_live_count": 73,
+      "deferred_count": 0,
+      "diff0_count": 73,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0
+    },
+    "MLINE": {
+      "status": "VACUOUS",
+      "certified": true,
+      "label": null,
+      "kind": null,
+      "census_count": 0,
+      "attempted_count": 0,
+      "attempted_live_count": 0,
+      "deferred_count": 0,
+      "diff0_count": 0,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0,
+      "absent_from_drawing": true
+    },
+    "MTEXT": {
+      "status": "VACUOUS",
+      "certified": true,
+      "label": null,
+      "kind": null,
+      "census_count": 0,
+      "attempted_count": 0,
+      "attempted_live_count": 0,
+      "deferred_count": 0,
+      "diff0_count": 0,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0,
+      "absent_from_drawing": true
+    },
+    "MULTILEADER": {
+      "status": "VACUOUS",
+      "certified": true,
+      "label": null,
+      "kind": null,
+      "census_count": 0,
+      "attempted_count": 0,
+      "attempted_live_count": 0,
+      "deferred_count": 0,
+      "diff0_count": 0,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0,
+      "absent_from_drawing": true
+    },
+    "POLYLINE": {
+      "status": "VACUOUS",
+      "certified": true,
+      "label": null,
+      "kind": null,
+      "census_count": 0,
+      "attempted_count": 0,
+      "attempted_live_count": 0,
+      "deferred_count": 0,
+      "diff0_count": 0,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0,
+      "absent_from_drawing": true
+    },
+    "SPLINE": {
+      "status": "VACUOUS",
+      "certified": true,
+      "label": null,
+      "kind": null,
+      "census_count": 0,
+      "attempted_count": 0,
+      "attempted_live_count": 0,
+      "deferred_count": 0,
+      "diff0_count": 0,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0,
+      "absent_from_drawing": true
+    },
+    "TEXT": {
+      "status": "PASS",
+      "certified": true,
+      "label": "text",
+      "kind": "text",
+      "census_count": 117,
+      "attempted_count": 117,
+      "attempted_live_count": 117,
+      "deferred_count": 0,
+      "diff0_count": 117,
+      "modified_count": 0,
+      "removed_count": 0,
+      "added_count": 0
+    }
+  },
+  "per_layer": {
+    "설비OPEN": {
+      "removed": 1,
+      "added": 0,
+      "modified": 0
+    }
+  },
+  "patterns": [
+    {
+      "signature": {
+        "dxf_name": "INSERT",
+        "change": "removed",
+        "context": "layer:설비OPEN"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "handle": "8468",
+          "change": "removed",
+          "dxf_name": "INSERT",
+          "layer": "설비OPEN"
+        }
+      ],
+      "judgment": "unreviewed",
+      "rule_id": null,
+      "note": ""
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:def_entity kind unsupported by write.block.append_entity"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "X-FORM_청주",
+          "def_entity_index": 101,
+          "handle": "34A",
+          "kind": "block_reference",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        }
+      ],
+      "judgment": "unreviewed",
+      "rule_id": null,
+      "note": ""
+    },
+    {
+      "signature": {
+        "dxf_name": "block_reference",
+        "change": "deferred",
+        "context": "reason:no block_definitions entry for block_name 'X-평면도(기본형)'"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "index": 0,
+          "handle": "8468",
+          "kind": "block_reference",
+          "reason": "no block_definitions entry for block_name 'X-평면도(기본형)'"
+        }
+      ],
+      "judgment": "harmful",
+      "rule_id": "R_DEFERRED_BLOCK_DEF",
+      "note": "Deferred op references a missing block definition; real fidelity loss."
+    },
+    {
+      "signature": {
+        "dxf_name": "hatch",
+        "change": "deferred",
+        "context": "reason:def_entity kind unsupported by write.block.append_entity"
+      },
+      "count": 1,
+      "examples": [
+        {
+          "block_name": "LV2",
+          "def_entity_index": 0,
+          "handle": "17D4",
+          "kind": "hatch",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        }
+      ],
+      "judgment": "unreviewed",
+      "rule_id": null,
+      "note": ""
+    },
+    {
+      "signature": {
+        "dxf_name": "lwpolyline",
+        "change": "deferred",
+        "context": "reason:def_entity kind unsupported by write.block.append_entity"
+      },
+      "count": 20,
+      "examples": [
+        {
+          "block_name": "X-FORM_청주",
+          "def_entity_index": 0,
+          "handle": "2E5",
+          "kind": "lwpolyline",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        },
+        {
+          "block_name": "X-FORM_청주",
+          "def_entity_index": 1,
+          "handle": "2E6",
+          "kind": "lwpolyline",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        },
+        {
+          "block_name": "X-FORM_청주",
+          "def_entity_index": 2,
+          "handle": "2E7",
+          "kind": "lwpolyline",
+          "reason": "def_entity kind unsupported by write.block.append_entity"
+        }
+      ],
+      "judgment": "unreviewed",
+      "rule_id": null,
+      "note": ""
+    }
+  ],
+  "naive_vs_smart": {
+    "naive_pass": false,
+    "smart_all_diff0": false,
+    "contrast_note": "Naive foil already fails; smart diff0 gate remains the authoritative ceiling-aware verdict."
+  },
+  "totals": {
+    "regen_attempted_count": 375,
+    "diff0_count": 374,
+    "modified_count": 0,
+    "removed_count": 1,
+    "added_count": 0,
+    "deferred_count": 23,
+    "pattern_count": 5,
+    "harmful_pattern_count": 1,
+    "harmless_pattern_count": 0,
+    "unreviewed_pattern_count": 4
+  }
+}

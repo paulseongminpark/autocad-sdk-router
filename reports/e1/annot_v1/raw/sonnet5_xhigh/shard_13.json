@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-u63-241",
+    "def": "*U63",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Batch of 151 identical 5-vertex closed LWPOLYLINEs on the INSUL layer of the 평면도(기본형) floor-plan xref; insulation-fill pattern, not wall-boundary geometry.",
+    "rationale": {
+      "evidence": "All 151 entities are LWPOLYLINE with 5 vertices (closed quads) on a single layer, X-평면도(기본형)$0$INSUL, whose $0$INSUL suffix marks the insulation-fill layer of the '평면도(기본형)' floor-plan xref. Handles run in one tight contiguous block (3C70-3C8D and onward), consistent with a single batch-generated hatch/tick pattern rather than a hand-placed multi-purpose symbol. No LINE, INSERT, or WIPEOUT entities appear, so there is no explicit wall-boundary or fixture geometry in this definition.",
+      "rule": "A block made entirely of many identical small closed polylines on a layer name containing 'INSUL' should be classified as a floor-plan insulation-fill fragment (평면 부분도), not as a discrete symbol, dimension cache, or furniture, and its wall_likelihood should be moderate rather than high because it depicts fill material rather than the wall boundary line itself.",
+      "counterfactual": "If LINE entities forming a long rectilinear pair (the two edges of a wall) were present, or if the layer read 'WALL' instead of 'INSUL', wall_likelihood would rise sharply and specific handles would be flagged in wall_line_handles.",
+      "uncertainty": "Without vertex coordinates (only 'vertices=5' is given, no bbox), the actual size and placement of each polyline relative to a wall cavity cannot be confirmed, so whether this fill sits inside an interior or exterior wall assembly is undeterminable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u64-242",
+    "def": "*U64",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Batch of 25 identical 5-vertex closed LWPOLYLINEs on the INSUL layer of the 평면도(기본형) floor-plan xref; insulation-fill pattern, not wall-boundary geometry.",
+    "rationale": {
+      "evidence": "All 25 entities are LWPOLYLINE with 5 vertices (closed quads) on a single layer, X-평면도(기본형)$0$INSUL, whose $0$INSUL suffix marks the insulation-fill layer of the '평면도(기본형)' floor-plan xref. Handles run in one tight contiguous block (3D0C-3D24), consistent with a single batch-generated hatch/tick pattern rather than a hand-placed multi-purpose symbol. No LINE, INSERT, or WIPEOUT entities appear, so there is no explicit wall-boundary or fixture geometry in this definition.",
+      "rule": "A block made entirely of many identical small closed polylines on a layer name containing 'INSUL' should be classified as a floor-plan insulation-fill fragment (평면 부분도), not as a discrete symbol, dimension cache, or furniture, and its wall_likelihood should be moderate rather than high because it depicts fill material rather than the wall boundary line itself.",
+      "counterfactual": "If LINE entities forming a long rectilinear pair (the two edges of a wall) were present, or if the layer read 'WALL' instead of 'INSUL', wall_likelihood would rise sharply and specific handles would be flagged in wall_line_handles.",
+      "uncertainty": "Without vertex coordinates (only 'vertices=5' is given, no bbox), the actual size and placement of each polyline relative to a wall cavity cannot be confirmed, so whether this fill sits inside an interior or exterior wall assembly is undeterminable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u67-243",
+    "def": "*U67",
+    "role": "심볼",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Parametric symbol: nested INSERT of '국기계양대' sub-block, 2 WIPEOUTs, and a thin (~2-3 unit) double-line frame spanning bbox width 3320; reads as a flagpole/site-object marker, not a wall.",
+    "rationale": {
+      "evidence": "The definition mixes 20 LINE entities forming a stepped rectangular frame (bbox [-1660,-103.5] to [1660,22.5], height 126 units) with 2 WIPEOUT entities and a single INSERT of the named sub-block 'X-평면도(기본형)$0$국기계양대' (flagpole/flag-mast layer). Most LINE/WIPEOUT entities sit on layer 0, with only the INSERT itself carrying the named layer. The double-line offsets in the frame are only ~2-3 units apart, far thinner than a typical wall assembly, and the WIPEOUT pair is characteristic of masking background linework behind a discrete inserted symbol.",
+      "rule": "A block combining a nested named INSERT with WIPEOUT masking and a thin few-unit double-line frame - rather than one continuous wall-thickness boundary - should be read as a parametric site/equipment symbol (심볼), not wall geometry, even though it contains LINE entities that superficially form a rectangle.",
+      "counterfactual": "If the double-line offset matched a standard wall thickness (roughly 100-200 units) and ran the full length of a room edge rather than a small local frame, or if the nested INSERT referenced a generic wall-panel block instead of a named site object like 국기계양대, the classification would shift toward floor-plan-partial with a much higher wall_likelihood.",
+      "uncertainty": "The exact real-world function of the nested '국기계양대' sub-block cannot be confirmed from a layer-name/histogram projection alone since its own geometry is not shown here, so whether this assembly is a flagpole base, a similarly framed fixture, or something else stays uncertain."
+    }
+  },
+  {
+    "unit_id": "defannot-u68-244",
+    "def": "*U68",
+    "role": "심볼",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Parametric symbol: nested INSERT of '국기계양대' sub-block, 2 WIPEOUTs, and a thin (~2-3 unit) double-line frame spanning bbox width 920; reads as a flagpole/site-object marker, not a wall.",
+    "rationale": {
+      "evidence": "The definition mixes 20 LINE entities forming a stepped rectangular frame (bbox [-460,-103.5] to [460,22.5], height 126 units) with 2 WIPEOUT entities and a single INSERT of the named sub-block 'X-평면도(기본형)$0$국기계양대' (flagpole/flag-mast layer). Most LINE/WIPEOUT entities sit on layer 0, with only the INSERT itself carrying the named layer. The double-line offsets in the frame are only ~2-3 units apart, far thinner than a typical wall assembly, and the WIPEOUT pair is characteristic of masking background linework behind a discrete inserted symbol.",
+      "rule": "A block combining a nested named INSERT with WIPEOUT masking and a thin few-unit double-line frame - rather than one continuous wall-thickness boundary - should be read as a parametric site/equipment symbol (심볼), not wall geometry, even though it contains LINE entities that superficially form a rectangle.",
+      "counterfactual": "If the double-line offset matched a standard wall thickness (roughly 100-200 units) and ran the full length of a room edge rather than a small local frame, or if the nested INSERT referenced a generic wall-panel block instead of a named site object like 국기계양대, the classification would shift toward floor-plan-partial with a much higher wall_likelihood.",
+      "uncertainty": "The exact real-world function of the nested '국기계양대' sub-block cannot be confirmed from a layer-name/histogram projection alone since its own geometry is not shown here, so whether this assembly is a flagpole base, a similarly framed fixture, or something else stays uncertain."
+    }
+  },
+  {
+    "unit_id": "defannot-u70-245",
+    "def": "*U70",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Batch of 53 identical 5-vertex closed LWPOLYLINEs on the INSUL layer of the 평면도(기본형) floor-plan xref; insulation-fill pattern, not wall-boundary geometry.",
+    "rationale": {
+      "evidence": "All 53 entities are LWPOLYLINE with 5 vertices (closed quads) on a single layer, X-평면도(기본형)$0$INSUL, whose $0$INSUL suffix marks the insulation-fill layer of the '평면도(기본형)' floor-plan xref. Handles run in one tight contiguous block (3DBC-3DD9), consistent with a single batch-generated hatch/tick pattern rather than a hand-placed multi-purpose symbol. No LINE, INSERT, or WIPEOUT entities appear, so there is no explicit wall-boundary or fixture geometry in this definition.",
+      "rule": "A block made entirely of many identical small closed polylines on a layer name containing 'INSUL' should be classified as a floor-plan insulation-fill fragment (평면 부분도), not as a discrete symbol, dimension cache, or furniture, and its wall_likelihood should be moderate rather than high because it depicts fill material rather than the wall boundary line itself.",
+      "counterfactual": "If LINE entities forming a long rectilinear pair (the two edges of a wall) were present, or if the layer read 'WALL' instead of 'INSUL', wall_likelihood would rise sharply and specific handles would be flagged in wall_line_handles.",
+      "uncertainty": "Without vertex coordinates (only 'vertices=5' is given, no bbox), the actual size and placement of each polyline relative to a wall cavity cannot be confirmed, so whether this fill sits inside an interior or exterior wall assembly is undeterminable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u71-246",
+    "def": "*U71",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Batch of 41 identical 5-vertex closed LWPOLYLINEs on the INSUL layer of the 평면도(기본형) floor-plan xref; insulation-fill pattern, not wall-boundary geometry.",
+    "rationale": {
+      "evidence": "All 41 entities are LWPOLYLINE with 5 vertices (closed quads) on a single layer, X-평면도(기본형)$0$INSUL, whose $0$INSUL suffix marks the insulation-fill layer of the '평면도(기본형)' floor-plan xref. Handles run in one tight contiguous block (3DF6-3E13), consistent with a single batch-generated hatch/tick pattern rather than a hand-placed multi-purpose symbol. No LINE, INSERT, or WIPEOUT entities appear, so there is no explicit wall-boundary or fixture geometry in this definition.",
+      "rule": "A block made entirely of many identical small closed polylines on a layer name containing 'INSUL' should be classified as a floor-plan insulation-fill fragment (평면 부분도), not as a discrete symbol, dimension cache, or furniture, and its wall_likelihood should be moderate rather than high because it depicts fill material rather than the wall boundary line itself.",
+      "counterfactual": "If LINE entities forming a long rectilinear pair (the two edges of a wall) were present, or if the layer read 'WALL' instead of 'INSUL', wall_likelihood would rise sharply and specific handles would be flagged in wall_line_handles.",
+      "uncertainty": "Without vertex coordinates (only 'vertices=5' is given, no bbox), the actual size and placement of each polyline relative to a wall cavity cannot be confirmed, so whether this fill sits inside an interior or exterior wall assembly is undeterminable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u72-247",
+    "def": "*U72",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Batch of 15 identical 5-vertex closed LWPOLYLINEs on the INSUL layer of the 평면도(기본형) floor-plan xref; insulation-fill pattern, not wall-boundary geometry.",
+    "rationale": {
+      "evidence": "All 15 entities are LWPOLYLINE with 5 vertices (closed quads) on a single layer, X-평면도(기본형)$0$INSUL, whose $0$INSUL suffix marks the insulation-fill layer of the '평면도(기본형)' floor-plan xref. Handles run in one tight contiguous block (3E24-3E32), consistent with a single batch-generated hatch/tick pattern rather than a hand-placed multi-purpose symbol. No LINE, INSERT, or WIPEOUT entities appear, so there is no explicit wall-boundary or fixture geometry in this definition.",
+      "rule": "A block made entirely of many identical small closed polylines on a layer name containing 'INSUL' should be classified as a floor-plan insulation-fill fragment (평면 부분도), not as a discrete symbol, dimension cache, or furniture, and its wall_likelihood should be moderate rather than high because it depicts fill material rather than the wall boundary line itself.",
+      "counterfactual": "If LINE entities forming a long rectilinear pair (the two edges of a wall) were present, or if the layer read 'WALL' instead of 'INSUL', wall_likelihood would rise sharply and specific handles would be flagged in wall_line_handles.",
+      "uncertainty": "Without vertex coordinates (only 'vertices=5' is given, no bbox), the actual size and placement of each polyline relative to a wall cavity cannot be confirmed, so whether this fill sits inside an interior or exterior wall assembly is undeterminable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u73-248",
+    "def": "*U73",
+    "role": "심볼",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Parametric symbol: nested INSERT of '국기계양대' sub-block, 2 WIPEOUTs, and a thin (~2-3 unit) double-line frame spanning bbox width 1820; reads as a flagpole/site-object marker, not a wall.",
+    "rationale": {
+      "evidence": "The definition mixes 20 LINE entities forming a stepped rectangular frame (bbox [-910,-103.5] to [910,22.5], height 126 units) with 2 WIPEOUT entities and a single INSERT of the named sub-block 'X-평면도(기본형)$0$국기계양대' (flagpole/flag-mast layer). Most LINE/WIPEOUT entities sit on layer 0, with only the INSERT itself carrying the named layer. The double-line offsets in the frame are only ~2-3 units apart, far thinner than a typical wall assembly, and the WIPEOUT pair is characteristic of masking background linework behind a discrete inserted symbol.",
+      "rule": "A block combining a nested named INSERT with WIPEOUT masking and a thin few-unit double-line frame - rather than one continuous wall-thickness boundary - should be read as a parametric site/equipment symbol (심볼), not wall geometry, even though it contains LINE entities that superficially form a rectangle.",
+      "counterfactual": "If the double-line offset matched a standard wall thickness (roughly 100-200 units) and ran the full length of a room edge rather than a small local frame, or if the nested INSERT referenced a generic wall-panel block instead of a named site object like 국기계양대, the classification would shift toward floor-plan-partial with a much higher wall_likelihood.",
+      "uncertainty": "The exact real-world function of the nested '국기계양대' sub-block cannot be confirmed from a layer-name/histogram projection alone since its own geometry is not shown here, so whether this assembly is a flagpole base, a similarly framed fixture, or something else stays uncertain."
+    }
+  },
+  {
+    "unit_id": "defannot-u74-249",
+    "def": "*U74",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Batch of 8 identical 5-vertex closed LWPOLYLINEs on the INSUL layer of the 평면도(기본형) floor-plan xref; insulation-fill pattern, not wall-boundary geometry.",
+    "rationale": {
+      "evidence": "All 8 entities are LWPOLYLINE with 5 vertices (closed quads) on a single layer, X-평면도(기본형)$0$INSUL, whose $0$INSUL suffix marks the insulation-fill layer of the '평면도(기본형)' floor-plan xref. Handles run in one tight contiguous block (3E54-3E5B), consistent with a single batch-generated hatch/tick pattern rather than a hand-placed multi-purpose symbol. No LINE, INSERT, or WIPEOUT entities appear, so there is no explicit wall-boundary or fixture geometry in this definition.",
+      "rule": "A block made entirely of many identical small closed polylines on a layer name containing 'INSUL' should be classified as a floor-plan insulation-fill fragment (평면 부분도), not as a discrete symbol, dimension cache, or furniture, and its wall_likelihood should be moderate rather than high because it depicts fill material rather than the wall boundary line itself.",
+      "counterfactual": "If LINE entities forming a long rectilinear pair (the two edges of a wall) were present, or if the layer read 'WALL' instead of 'INSUL', wall_likelihood would rise sharply and specific handles would be flagged in wall_line_handles.",
+      "uncertainty": "Without vertex coordinates (only 'vertices=5' is given, no bbox), the actual size and placement of each polyline relative to a wall cavity cannot be confirmed, so whether this fill sits inside an interior or exterior wall assembly is undeterminable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u75-250",
+    "def": "*U75",
+    "role": "심볼",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Parametric symbol: nested INSERT of '국기계양대' sub-block, 2 WIPEOUTs, and a thin (~2-3 unit) double-line frame spanning bbox width 3920; reads as a flagpole/site-object marker, not a wall.",
+    "rationale": {
+      "evidence": "The definition mixes 20 LINE entities forming a stepped rectangular frame (bbox [-1960,-103.5] to [1960,22.5], height 126 units) with 2 WIPEOUT entities and a single INSERT of the named sub-block 'X-평면도(기본형)$0$국기계양대' (flagpole/flag-mast layer). Most LINE/WIPEOUT entities sit on layer 0, with only the INSERT itself carrying the named layer. The double-line offsets in the frame are only ~2-3 units apart, far thinner than a typical wall assembly, and the WIPEOUT pair is characteristic of masking background linework behind a discrete inserted symbol.",
+      "rule": "A block combining a nested named INSERT with WIPEOUT masking and a thin few-unit double-line frame - rather than one continuous wall-thickness boundary - should be read as a parametric site/equipment symbol (심볼), not wall geometry, even though it contains LINE entities that superficially form a rectangle.",
+      "counterfactual": "If the double-line offset matched a standard wall thickness (roughly 100-200 units) and ran the full length of a room edge rather than a small local frame, or if the nested INSERT referenced a generic wall-panel block instead of a named site object like 국기계양대, the classification would shift toward floor-plan-partial with a much higher wall_likelihood.",
+      "uncertainty": "The exact real-world function of the nested '국기계양대' sub-block cannot be confirmed from a layer-name/histogram projection alone since its own geometry is not shown here, so whether this assembly is a flagpole base, a similarly framed fixture, or something else stays uncertain."
+    }
+  },
+  {
+    "unit_id": "defannot-u76-251",
+    "def": "*U76",
+    "role": "심볼",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "Parametric symbol: nested INSERT of '국기계양대' sub-block, 2 WIPEOUTs, and a thin (~2-3 unit) double-line frame spanning bbox width 2420; reads as a flagpole/site-object marker, not a wall.",
+    "rationale": {
+      "evidence": "The definition mixes 20 LINE entities forming a stepped rectangular frame (bbox [-1210,-103.5] to [1210,22.5], height 126 units) with 2 WIPEOUT entities and a single INSERT of the named sub-block 'X-평면도(기본형)$0$국기계양대' (flagpole/flag-mast layer). Most LINE/WIPEOUT entities sit on layer 0, with only the INSERT itself carrying the named layer. The double-line offsets in the frame are only ~2-3 units apart, far thinner than a typical wall assembly, and the WIPEOUT pair is characteristic of masking background linework behind a discrete inserted symbol.",
+      "rule": "A block combining a nested named INSERT with WIPEOUT masking and a thin few-unit double-line frame - rather than one continuous wall-thickness boundary - should be read as a parametric site/equipment symbol (심볼), not wall geometry, even though it contains LINE entities that superficially form a rectangle.",
+      "counterfactual": "If the double-line offset matched a standard wall thickness (roughly 100-200 units) and ran the full length of a room edge rather than a small local frame, or if the nested INSERT referenced a generic wall-panel block instead of a named site object like 국기계양대, the classification would shift toward floor-plan-partial with a much higher wall_likelihood.",
+      "uncertainty": "The exact real-world function of the nested '국기계양대' sub-block cannot be confirmed from a layer-name/histogram projection alone since its own geometry is not shown here, so whether this assembly is a flagpole base, a similarly framed fixture, or something else stays uncertain."
+    }
+  },
+  {
+    "unit_id": "defannot-u77-252",
+    "def": "*U77",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Batch of 42 identical 5-vertex closed LWPOLYLINEs on the INSUL layer of the 평면도(기본형) floor-plan xref; insulation-fill pattern, not wall-boundary geometry.",
+    "rationale": {
+      "evidence": "All 42 entities are LWPOLYLINE with 5 vertices (closed quads) on a single layer, X-평면도(기본형)$0$INSUL, whose $0$INSUL suffix marks the insulation-fill layer of the '평면도(기본형)' floor-plan xref. Handles run in one tight contiguous block (3E99-3EB6), consistent with a single batch-generated hatch/tick pattern rather than a hand-placed multi-purpose symbol. No LINE, INSERT, or WIPEOUT entities appear, so there is no explicit wall-boundary or fixture geometry in this definition.",
+      "rule": "A block made entirely of many identical small closed polylines on a layer name containing 'INSUL' should be classified as a floor-plan insulation-fill fragment (평면 부분도), not as a discrete symbol, dimension cache, or furniture, and its wall_likelihood should be moderate rather than high because it depicts fill material rather than the wall boundary line itself.",
+      "counterfactual": "If LINE entities forming a long rectilinear pair (the two edges of a wall) were present, or if the layer read 'WALL' instead of 'INSUL', wall_likelihood would rise sharply and specific handles would be flagged in wall_line_handles.",
+      "uncertainty": "Without vertex coordinates (only 'vertices=5' is given, no bbox), the actual size and placement of each polyline relative to a wall cavity cannot be confirmed, so whether this fill sits inside an interior or exterior wall assembly is undeterminable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u79-253",
+    "def": "*U79",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Batch of 33 identical 5-vertex closed LWPOLYLINEs on the INSUL layer of the 평면도(기본형) floor-plan xref; insulation-fill pattern, not wall-boundary geometry.",
+    "rationale": {
+      "evidence": "All 33 entities are LWPOLYLINE with 5 vertices (closed quads) on a single layer, X-평면도(기본형)$0$INSUL, whose $0$INSUL suffix marks the insulation-fill layer of the '평면도(기본형)' floor-plan xref. Handles run in one tight contiguous block (3F00-3F1D), consistent with a single batch-generated hatch/tick pattern rather than a hand-placed multi-purpose symbol. No LINE, INSERT, or WIPEOUT entities appear, so there is no explicit wall-boundary or fixture geometry in this definition.",
+      "rule": "A block made entirely of many identical small closed polylines on a layer name containing 'INSUL' should be classified as a floor-plan insulation-fill fragment (평면 부분도), not as a discrete symbol, dimension cache, or furniture, and its wall_likelihood should be moderate rather than high because it depicts fill material rather than the wall boundary line itself.",
+      "counterfactual": "If LINE entities forming a long rectilinear pair (the two edges of a wall) were present, or if the layer read 'WALL' instead of 'INSUL', wall_likelihood would rise sharply and specific handles would be flagged in wall_line_handles.",
+      "uncertainty": "Without vertex coordinates (only 'vertices=5' is given, no bbox), the actual size and placement of each polyline relative to a wall cavity cannot be confirmed, so whether this fill sits inside an interior or exterior wall assembly is undeterminable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u81-254",
+    "def": "*U81",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Batch of 39 identical 5-vertex closed LWPOLYLINEs on the INSUL layer of the 평면도(기본형) floor-plan xref; insulation-fill pattern, not wall-boundary geometry.",
+    "rationale": {
+      "evidence": "All 39 entities are LWPOLYLINE with 5 vertices (closed quads) on a single layer, X-평면도(기본형)$0$INSUL, whose $0$INSUL suffix marks the insulation-fill layer of the '평면도(기본형)' floor-plan xref. Handles run in one tight contiguous block (3F5E-3F7B), consistent with a single batch-generated hatch/tick pattern rather than a hand-placed multi-purpose symbol. No LINE, INSERT, or WIPEOUT entities appear, so there is no explicit wall-boundary or fixture geometry in this definition.",
+      "rule": "A block made entirely of many identical small closed polylines on a layer name containing 'INSUL' should be classified as a floor-plan insulation-fill fragment (평면 부분도), not as a discrete symbol, dimension cache, or furniture, and its wall_likelihood should be moderate rather than high because it depicts fill material rather than the wall boundary line itself.",
+      "counterfactual": "If LINE entities forming a long rectilinear pair (the two edges of a wall) were present, or if the layer read 'WALL' instead of 'INSUL', wall_likelihood would rise sharply and specific handles would be flagged in wall_line_handles.",
+      "uncertainty": "Without vertex coordinates (only 'vertices=5' is given, no bbox), the actual size and placement of each polyline relative to a wall cavity cannot be confirmed, so whether this fill sits inside an interior or exterior wall assembly is undeterminable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u82-255",
+    "def": "*U82",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Batch of 19 identical 5-vertex closed LWPOLYLINEs on the INSUL layer of the 평면도(기본형) floor-plan xref; insulation-fill pattern, not wall-boundary geometry.",
+    "rationale": {
+      "evidence": "All 19 entities are LWPOLYLINE with 5 vertices (closed quads) on a single layer, X-평면도(기본형)$0$INSUL, whose $0$INSUL suffix marks the insulation-fill layer of the '평면도(기본형)' floor-plan xref. Handles run in one tight contiguous block (3F8A-3F9C), consistent with a single batch-generated hatch/tick pattern rather than a hand-placed multi-purpose symbol. No LINE, INSERT, or WIPEOUT entities appear, so there is no explicit wall-boundary or fixture geometry in this definition.",
+      "rule": "A block made entirely of many identical small closed polylines on a layer name containing 'INSUL' should be classified as a floor-plan insulation-fill fragment (평면 부분도), not as a discrete symbol, dimension cache, or furniture, and its wall_likelihood should be moderate rather than high because it depicts fill material rather than the wall boundary line itself.",
+      "counterfactual": "If LINE entities forming a long rectilinear pair (the two edges of a wall) were present, or if the layer read 'WALL' instead of 'INSUL', wall_likelihood would rise sharply and specific handles would be flagged in wall_line_handles.",
+      "uncertainty": "Without vertex coordinates (only 'vertices=5' is given, no bbox), the actual size and placement of each polyline relative to a wall cavity cannot be confirmed, so whether this fill sits inside an interior or exterior wall assembly is undeterminable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u83-256",
+    "def": "*U83",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Batch of 9 identical 5-vertex closed LWPOLYLINEs on the INSUL layer of the 평면도(기본형) floor-plan xref; insulation-fill pattern, not wall-boundary geometry.",
+    "rationale": {
+      "evidence": "All 9 entities are LWPOLYLINE with 5 vertices (closed quads) on a single layer, X-평면도(기본형)$0$INSUL, whose $0$INSUL suffix marks the insulation-fill layer of the '평면도(기본형)' floor-plan xref. Handles run in one tight contiguous block (3FA2-3FAA), consistent with a single batch-generated hatch/tick pattern rather than a hand-placed multi-purpose symbol. No LINE, INSERT, or WIPEOUT entities appear, so there is no explicit wall-boundary or fixture geometry in this definition.",
+      "rule": "A block made entirely of many identical small closed polylines on a layer name containing 'INSUL' should be classified as a floor-plan insulation-fill fragment (평면 부분도), not as a discrete symbol, dimension cache, or furniture, and its wall_likelihood should be moderate rather than high because it depicts fill material rather than the wall boundary line itself.",
+      "counterfactual": "If LINE entities forming a long rectilinear pair (the two edges of a wall) were present, or if the layer read 'WALL' instead of 'INSUL', wall_likelihood would rise sharply and specific handles would be flagged in wall_line_handles.",
+      "uncertainty": "Without vertex coordinates (only 'vertices=5' is given, no bbox), the actual size and placement of each polyline relative to a wall cavity cannot be confirmed, so whether this fill sits inside an interior or exterior wall assembly is undeterminable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u84-257",
+    "def": "*U84",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Batch of 71 identical 5-vertex closed LWPOLYLINEs on the INSUL layer of the 평면도(기본형) floor-plan xref; insulation-fill pattern, not wall-boundary geometry.",
+    "rationale": {
+      "evidence": "All 71 entities are LWPOLYLINE with 5 vertices (closed quads) on a single layer, X-평면도(기본형)$0$INSUL, whose $0$INSUL suffix marks the insulation-fill layer of the '평면도(기본형)' floor-plan xref. Handles run in one tight contiguous block (3FB0-3FCD), consistent with a single batch-generated hatch/tick pattern rather than a hand-placed multi-purpose symbol. No LINE, INSERT, or WIPEOUT entities appear, so there is no explicit wall-boundary or fixture geometry in this definition.",
+      "rule": "A block made entirely of many identical small closed polylines on a layer name containing 'INSUL' should be classified as a floor-plan insulation-fill fragment (평면 부분도), not as a discrete symbol, dimension cache, or furniture, and its wall_likelihood should be moderate rather than high because it depicts fill material rather than the wall boundary line itself.",
+      "counterfactual": "If LINE entities forming a long rectilinear pair (the two edges of a wall) were present, or if the layer read 'WALL' instead of 'INSUL', wall_likelihood would rise sharply and specific handles would be flagged in wall_line_handles.",
+      "uncertainty": "Without vertex coordinates (only 'vertices=5' is given, no bbox), the actual size and placement of each polyline relative to a wall cavity cannot be confirmed, so whether this fill sits inside an interior or exterior wall assembly is undeterminable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u85-258",
+    "def": "*U85",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Batch of 18 identical 5-vertex closed LWPOLYLINEs on the INSUL layer of the 평면도(기본형) floor-plan xref; insulation-fill pattern, not wall-boundary geometry.",
+    "rationale": {
+      "evidence": "All 18 entities are LWPOLYLINE with 5 vertices (closed quads) on a single layer, X-평면도(기본형)$0$INSUL, whose $0$INSUL suffix marks the insulation-fill layer of the '평면도(기본형)' floor-plan xref. Handles run in one tight contiguous block (3FFC-400D), consistent with a single batch-generated hatch/tick pattern rather than a hand-placed multi-purpose symbol. No LINE, INSERT, or WIPEOUT entities appear, so there is no explicit wall-boundary or fixture geometry in this definition.",
+      "rule": "A block made entirely of many identical small closed polylines on a layer name containing 'INSUL' should be classified as a floor-plan insulation-fill fragment (평면 부분도), not as a discrete symbol, dimension cache, or furniture, and its wall_likelihood should be moderate rather than high because it depicts fill material rather than the wall boundary line itself.",
+      "counterfactual": "If LINE entities forming a long rectilinear pair (the two edges of a wall) were present, or if the layer read 'WALL' instead of 'INSUL', wall_likelihood would rise sharply and specific handles would be flagged in wall_line_handles.",
+      "uncertainty": "Without vertex coordinates (only 'vertices=5' is given, no bbox), the actual size and placement of each polyline relative to a wall cavity cannot be confirmed, so whether this fill sits inside an interior or exterior wall assembly is undeterminable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u86-259",
+    "def": "*U86",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Batch of 16 identical 5-vertex closed LWPOLYLINEs on the INSUL layer of the 평면도(기본형) floor-plan xref; insulation-fill pattern, not wall-boundary geometry.",
+    "rationale": {
+      "evidence": "All 16 entities are LWPOLYLINE with 5 vertices (closed quads) on a single layer, X-평면도(기본형)$0$INSUL, whose $0$INSUL suffix marks the insulation-fill layer of the '평면도(기본형)' floor-plan xref. Handles run in one tight contiguous block (4013-4022), consistent with a single batch-generated hatch/tick pattern rather than a hand-placed multi-purpose symbol. No LINE, INSERT, or WIPEOUT entities appear, so there is no explicit wall-boundary or fixture geometry in this definition.",
+      "rule": "A block made entirely of many identical small closed polylines on a layer name containing 'INSUL' should be classified as a floor-plan insulation-fill fragment (평면 부분도), not as a discrete symbol, dimension cache, or furniture, and its wall_likelihood should be moderate rather than high because it depicts fill material rather than the wall boundary line itself.",
+      "counterfactual": "If LINE entities forming a long rectilinear pair (the two edges of a wall) were present, or if the layer read 'WALL' instead of 'INSUL', wall_likelihood would rise sharply and specific handles would be flagged in wall_line_handles.",
+      "uncertainty": "Without vertex coordinates (only 'vertices=5' is given, no bbox), the actual size and placement of each polyline relative to a wall cavity cannot be confirmed, so whether this fill sits inside an interior or exterior wall assembly is undeterminable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u87-260",
+    "def": "*U87",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.3,
+    "wall_line_handles": [],
+    "notes": "Batch of 68 identical 5-vertex closed LWPOLYLINEs on the INSUL layer of the 평면도(기본형) floor-plan xref; insulation-fill pattern, not wall-boundary geometry.",
+    "rationale": {
+      "evidence": "All 68 entities are LWPOLYLINE with 5 vertices (closed quads) on a single layer, X-평면도(기본형)$0$INSUL, whose $0$INSUL suffix marks the insulation-fill layer of the '평면도(기본형)' floor-plan xref. Handles run in one tight contiguous block (4028-4045), consistent with a single batch-generated hatch/tick pattern rather than a hand-placed multi-purpose symbol. No LINE, INSERT, or WIPEOUT entities appear, so there is no explicit wall-boundary or fixture geometry in this definition.",
+      "rule": "A block made entirely of many identical small closed polylines on a layer name containing 'INSUL' should be classified as a floor-plan insulation-fill fragment (평면 부분도), not as a discrete symbol, dimension cache, or furniture, and its wall_likelihood should be moderate rather than high because it depicts fill material rather than the wall boundary line itself.",
+      "counterfactual": "If LINE entities forming a long rectilinear pair (the two edges of a wall) were present, or if the layer read 'WALL' instead of 'INSUL', wall_likelihood would rise sharply and specific handles would be flagged in wall_line_handles.",
+      "uncertainty": "Without vertex coordinates (only 'vertices=5' is given, no bbox), the actual size and placement of each polyline relative to a wall cavity cannot be confirmed, so whether this fill sits inside an interior or exterior wall assembly is undeterminable from this projection alone."
+    }
+  }
+]

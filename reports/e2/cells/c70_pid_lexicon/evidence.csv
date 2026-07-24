@@ -1,0 +1,16 @@
+section,metric,value,value_exact,status,source
+PREREG,sha256,bc5a463340cdbad858bf54104e377cc945894404dc4672e0acddbca9488f7f4d,bc5a463340cdbad858bf54104e377cc945894404dc4672e0acddbca9488f7f4d,SEALED,D:\runs\e2_program\cells\c70_pid_lexicon\PREREG_local.json
+PREREG,schema_amendment_sha256,7e2c0885456cc27790ae200b8f2fe37b3515edd6ac0994b1ad55e45833be9d1e,7e2c0885456cc27790ae200b8f2fe37b3515edd6ac0994b1ad55e45833be9d1e,SEALED,D:\runs\e2_program\cells\c70_pid_lexicon\PREREG_SCHEMA_AMENDMENT.json
+INPUT,verified_input_n,140,140,RESOLVED,D:\runs\e2_program\cells\c70_pid_lexicon\input_manifest_verified.csv
+INPUT,sha256_verification,MATCH,MATCH,RESOLVED,D:\runs\e2_program\cells\c70_pid_lexicon\input_manifest_verified.csv
+LEX,frozen_token_n,6,6,RESOLVED,D:\runs\e2_program\cells\c70_pid_lexicon\lexicon_freeze.json
+LEX,definition_coverage,0.2994791666666667,115/384,RESOLVED,D:\runs\e2_program\cells\c70_pid_lexicon\definition_features.csv
+PID,independent_project_source_n,1,1,UNKNOWN,D:\runs\e2_program\cells\c70_pid_lexicon\pid_audit.csv
+PID,direct_identifier_fields_used_n,0,0,RESOLVED,D:\runs\e2_program\cells\c70_pid_lexicon\pid_audit.csv
+CP,eligible_definition_n,384,384,RESOLVED,D:\runs\e2_program\cells\c70_pid_lexicon\probe_predictions.csv
+CP,positive_n,131,131,RESOLVED,D:\runs\e2_program\cells\c70_pid_lexicon\probe_predictions.csv
+CP,negative_n,253,253,RESOLVED,D:\runs\e2_program\cells\c70_pid_lexicon\probe_predictions.csv
+CP,loo_auc,0.5684759979482847,18841/33143,RESOLVED,D:\runs\e2_program\cells\c70_pid_lexicon\probe_predictions.csv
+CP,cross_project_auc,UNKNOWN,UNKNOWN,UNKNOWN,D:\runs\e2_program\cells\c70_pid_lexicon\pid_audit.csv
+CAD,staged_dxf_unchanged,MATCH,5a6035721630cddc6d753b1b97b898e7a4ce4d5988342ce85e2c465cdb81deff,RESOLVED,D:\dev\99_tools\autocad-sdk-router\runs\e2_b3_dxfout_20260717\1_export.dxf
+OUTPUT,evidence.xlsx,not_created,CSV_FALLBACK,CSV_FALLBACK,D:\dev\99_tools\autocad-sdk-router\reports\e2\cells\c70_pid_lexicon\EVIDENCE_XLSX_UNAVAILABLE.txt

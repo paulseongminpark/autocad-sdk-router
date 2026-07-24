@@ -1,0 +1,291 @@
+[
+  {
+    "unit_id": "defannot-u197-201",
+    "def": "*U197",
+    "role": "심볼",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [
+      {
+        "handle": "57AF",
+        "reason": "long 1176 horizontal at y=-50.5, upper face of a 50-thick band"
+      },
+      {
+        "handle": "57B1",
+        "reason": "long 1176 horizontal at y=-100.5, parallel lower face 50 below 57AF"
+      }
+    ],
+    "notes": "Mixed symbol block: 2 WIPEOUT masks + nested 국기계양대(flagpole) INSERT + 20 LINEs forming a notched border box with an inner 1176x50 double-line bar; bbox only 1220x126.",
+    "rationale": {
+      "evidence": "Content is mixed: 2 WIPEOUT (handles 57AC-57AD) that mask underlying graphics, 1 nested INSERT to block X-평면도(기본형)$0$국기계양대 (a flagpole/국기계양대 marker), and 20 LINEs. The LINEs form an outer notched border at x=+/-610/+/-600 (57B4/57BA/57BC/57C2) enclosing an inner 1176x50 rectangle whose long edges 57AF and 57B1 are duplicated by 57BF/57B7. Overall bbox is only 1220x126.",
+      "rule": "A compact block that combines WIPEOUT masks, a named nested marker block, and a bordered frame is an annotation symbol/marker rather than raw plan geometry; WIPEOUT is a masking device used by symbols/callouts and never by structural wall linework.",
+      "counterfactual": "Remove the WIPEOUTs and the nested 국기계양대 INSERT and replace the border with long parallel wall pairs on a wall layer, and this would read as 평면 부분도 with high wall_likelihood; adding an attribute/text would push it to a pure label symbol.",
+      "uncertainty": "Without the nested block's own geometry I cannot fully confirm it is a flagpole marker versus a tiny plan detail, and the coincident-duplicated 50-thick bar may be a base curb rather than a wall; drawing units/scale are also unverifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u199-202",
+    "def": "*U199",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "17 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 5802-5812; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 17 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 5802-5812; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u200-203",
+    "def": "*U200",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "11 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 5818-5822; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 11 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 5818-5822; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u201-204",
+    "def": "*U201",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "7 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 5828-582E; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 7 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 5828-582E; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u202-205",
+    "def": "*U202",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "12 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 5834-583F; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 12 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 5834-583F; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u232-206",
+    "def": "*U232",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "27 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 6CE9-6D03; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 27 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 6CE9-6D03; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u236-207",
+    "def": "*U236",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "61 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 7727-7744; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 61 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 7727-7744; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u237-208",
+    "def": "*U237",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "23 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 7769-777F; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 23 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 7769-777F; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u238-209",
+    "def": "*U238",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "214 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 7785-77A2; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 214 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 7785-77A2; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u239-210",
+    "def": "*U239",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "159 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 7860-787D; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 159 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 7860-787D; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u240-211",
+    "def": "*U240",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "106 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 7904-7921; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 106 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 7904-7921; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u241-212",
+    "def": "*U241",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "19 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 7973-7985; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 19 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 7973-7985; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u272-213",
+    "def": "*U272",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "45 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 7DD0-7DED; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 45 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 7DD0-7DED; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u273-214",
+    "def": "*U273",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "17 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 7E02-7E12; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 17 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 7E02-7E12; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u274-215",
+    "def": "*U274",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "7 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 7E18-7E1E; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 7 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 7E18-7E1E; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u275-216",
+    "def": "*U275",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "18 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 7E24-7E35; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 18 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 7E24-7E35; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u278-217",
+    "def": "*U278",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "79 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 7E51-7E6E; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 79 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 7E51-7E6E; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u279-218",
+    "def": "*U279",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "42 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 7EA5-7EC2; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 42 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 7EA5-7EC2; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u280-219",
+    "def": "*U280",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "95 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 7ED4-7EF1; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 95 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 7ED4-7EF1; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u281-220",
+    "def": "*U281",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.35,
+    "wall_line_handles": [],
+    "notes": "23 insulation-layer LWPOLYLINE (5-vtx closed quads) on X-평면도(기본형)$0$INSUL, sampled handles 7F38-7F4E; no LINE/INSERT/WIPEOUT and no derivable bbox — a single insulation-board cluster, not wall linework.",
+    "rationale": {
+      "evidence": "All 23 entities are 5-vertex closed LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), across sampled handles 7F38-7F4E; there are zero LINE/INSERT/WIPEOUT entities and no bbox is derivable, so the block is a uniform single-purpose insulation cluster rather than mixed plan content.",
+      "rule": "A block whose entities lie entirely on a dedicated insulation (INSUL) layer represents wall-cavity insulation — real 평면도 geometry, not a symbol, dimension, or furniture; insulation hugs walls so it indicates their location but is not itself wall face/centerline linework.",
+      "counterfactual": "Had these polylines sat on a wall/structural layer (WALL, 구조벽) or appeared as long parallel 2-vertex LINE pairs, wall_likelihood would climb above 0.5 and individual wall handles would be listed; a mix of text/leader entities would instead push toward 심볼/치수캐시.",
+      "uncertainty": "Vertex coordinates are not projected, so I cannot confirm each quad's proportions or whether any traces a wall run; role could alternatively be 기타 if 평면 부분도 is reserved for composite plan fragments, and wall_likelihood would rise if this drawing encodes walls via insulation-filled cavities — neither is verifiable from this projection."
+    }
+  }
+]

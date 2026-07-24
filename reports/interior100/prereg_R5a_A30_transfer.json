@@ -1,0 +1,34 @@
+{
+  "schema": "ariadne.interior100.prereg.v1",
+  "run": "R5a — A30 generalization (transfer) test",
+  "committed_before_run": true,
+  "target": {
+    "dwg": "D:\\dev\\.build\\A30-001~013 단위세대 평면도(기본형).dwg",
+    "original_sha256": "d48ae49b35488df0d95ee04af58e74194e8f2b1a878a982db0fce8a2972e74f2",
+    "byte_size": 2866380,
+    "census": "runs/e2e_A30_R5a_20260713/census (census_ok=true, 1 attempt)"
+  },
+  "why_this_drawing": "발견도면(1.dwg) != 검증도면. A30 heavily exercises the SAME machinery the 11 repairs + 7 LEX laws were built for: 265 HATCH (pattern-scale idempotence fix b939f8d + LEX-0008 orphan-assoc + LEX-0009 angle-branch + LEX-0011 assoc-cardinality + LEX-0012 loop-rotation), 4005 SPLINE (the Bezier re-decomposition residue class), 783 DIMENSION. Modelspace out_of_class=0; block-def out_of_class = WIPEOUT 33 + POLYLINE 1.",
+  "composition": {
+    "modelspace_entities": 2719,
+    "block_definitions": 1083,
+    "block_def_entities": 34558,
+    "hatch": 265,
+    "spline": 4005,
+    "dimension": 783,
+    "out_of_class": {"WIPEOUT": 33, "POLYLINE": 1}
+  },
+  "probe_config": "bounded transfer probe: --per-kind-limit 25 --batch-size 25 --with-records --skip-identity (fast signal on the key classes before the multi-hour full run)",
+  "predictions": {
+    "hatch_transfer": "sampled HATCHes roundtrip CLEAN — pattern-scale fix means no 40x drift; LEX quotients fold notation/angle/loop differences. Predict per-hatch diff0 with 0 novel residue classes (i.e. no residue kind not already seen/legislated on 1.dwg).",
+    "spline_transfer": "sampled SPLINEs show the KNOWN Bezier re-decomposition residue (curve-equal, control-net notation differs) — a small per-spline residual, NOT a regression and NOT a new class.",
+    "out_of_class_defer": "WIPEOUT + POLYLINE defer HONESTLY (no certified create op) and appear in deferred.json — not silently dropped, not fake-passed.",
+    "overall_transfer_signal": "interior diff fraction on the sampled CERTIFIED entities > 0.95 if the laws generalize. The load-bearing claim is QUALITATIVE: the residue COMPOSITION on A30 is drawn from the same classes legislated on 1.dwg (splines + out-of-class defers), with NO novel unexplained residue class."
+  },
+  "fail_investigation_triggers": [
+    "A30 HATCHes show pattern-scale drift (40x or any systematic scale error) => the b939f8d fix is 1.dwg-overfit, not general.",
+    "A novel residue class appears that was NOT seen/legislated on 1.dwg => the 7 LEX laws are incomplete for the domain.",
+    "out_of_class entities are silently counted as applied (FM8) instead of deferred."
+  ],
+  "discipline": "FAIL is investigated, never renamed. Any prereg miss is dissected to a named class before the number is accepted."
+}

@@ -64,6 +64,10 @@ _IMPLEMENTED = {
     "write.dictionary.set",
     "write.entity.set_xdata",
     "write.block.append_entity",
+    # P3 assoc-relink arc (R4v): second REAL, persisting write primitive
+    # (no staged-transaction wrapper, same shape as append_entity) -- re-arms
+    # hatch associativity with rebuilt-handle source ids + persistent reactors.
+    "write.block.relink_hatch_assoc",
     "transform.database.deep_clone",
     "transform.database.insert_block",
 }

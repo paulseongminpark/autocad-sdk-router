@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-d375-81",
+    "def": "*D375",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '325' equals bbox span 325; DIM-layer extension+dimension lines (8E44/8E45/8E46), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D375' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8E44/8E45), one horizontal dimension LINE (8E46), two DIMDOT INSERT terminators (8E47/8E48) and one MTEXT (8E49) reading '325'; three POINTs (8E4A/8E4B/8E4C) sit on DEFPOINTS as the associative definition points. The MTEXT value 325 equals the bbox horizontal span (55403.83->55728.83 = 325) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d376-82",
+    "def": "*D376",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '3320' equals bbox span 3320; DIM-layer extension+dimension lines (8E4D/8E4E/8E4F), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D376' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8E4D/8E4E), one horizontal dimension LINE (8E4F), two DIMDOT INSERT terminators (8E50/8E51) and one MTEXT (8E52) reading '3320'; three POINTs (8E53/8E54/8E55) sit on DEFPOINTS as the associative definition points. The MTEXT value 3320 equals the bbox horizontal span (51358.83->54678.83 = 3320) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d377-83",
+    "def": "*D377",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '725' equals bbox span 725; DIM-layer extension+dimension lines (8E56/8E57/8E58), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D377' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8E56/8E57), one horizontal dimension LINE (8E58), two DIMDOT INSERT terminators (8E59/8E5A) and one MTEXT (8E5B) reading '725'; three POINTs (8E5C/8E5D/8E5E) sit on DEFPOINTS as the associative definition points. The MTEXT value 725 equals the bbox horizontal span (54678.83->55403.83 = 725) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d378-84",
+    "def": "*D378",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '725' equals bbox span 725; DIM-layer extension+dimension lines (8E5F/8E60/8E61), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D378' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8E5F/8E60), one horizontal dimension LINE (8E61), two DIMDOT INSERT terminators (8E62/8E63) and one MTEXT (8E64) reading '725'; three POINTs (8E65/8E66/8E67) sit on DEFPOINTS as the associative definition points. The MTEXT value 725 equals the bbox horizontal span (50633.83->51358.83 = 725) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d379-85",
+    "def": "*D379",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '1620' equals bbox span 1620; DIM-layer extension+dimension lines (8E68/8E69/8E6A), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D379' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8E68/8E69), one horizontal dimension LINE (8E6A), two DIMDOT INSERT terminators (8E6B/8E6C) and one MTEXT (8E6D) reading '1620'; three POINTs (8E6E/8E6F/8E70) sit on DEFPOINTS as the associative definition points. The MTEXT value 1620 equals the bbox horizontal span (48238.83->49858.83 = 1620) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d380-86",
+    "def": "*D380",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '775' equals bbox span 775; DIM-layer extension+dimension lines (8E71/8E72/8E73), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D380' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8E71/8E72), one horizontal dimension LINE (8E73), two DIMDOT INSERT terminators (8E74/8E75) and one MTEXT (8E76) reading '775'; three POINTs (8E77/8E78/8E79) sit on DEFPOINTS as the associative definition points. The MTEXT value 775 equals the bbox horizontal span (49858.83->50633.83 = 775) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d381-87",
+    "def": "*D381",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '710' equals bbox span 710; DIM-layer extension+dimension lines (8E7A/8E7B/8E7C), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D381' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8E7A/8E7B), one horizontal dimension LINE (8E7C), two DIMDOT INSERT terminators (8E7D/8E7E) and one MTEXT (8E7F) reading '710'; three POINTs (8E80/8E81/8E82) sit on DEFPOINTS as the associative definition points. The MTEXT value 710 equals the bbox horizontal span (47528.83->48238.83 = 710) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d382-88",
+    "def": "*D382",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '1620' equals bbox span 1620; DIM-layer extension+dimension lines (8E83/8E84/8E85), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D382' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8E83/8E84), one horizontal dimension LINE (8E85), two DIMDOT INSERT terminators (8E86/8E87) and one MTEXT (8E88) reading '1620'; three POINTs (8E89/8E8A/8E8B) sit on DEFPOINTS as the associative definition points. The MTEXT value 1620 equals the bbox horizontal span (45148.83->46768.83 = 1620) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d383-89",
+    "def": "*D383",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '760' equals bbox span 760; DIM-layer extension+dimension lines (8E8C/8E8D/8E8E), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D383' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8E8C/8E8D), one horizontal dimension LINE (8E8E), two DIMDOT INSERT terminators (8E8F/8E90) and one MTEXT (8E91) reading '760'; three POINTs (8E92/8E93/8E94) sit on DEFPOINTS as the associative definition points. The MTEXT value 760 equals the bbox horizontal span (46768.83->47528.83 = 760) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d384-90",
+    "def": "*D384",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '900' equals bbox span 900; DIM-layer extension+dimension lines (8E95/8E96/8E97), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D384' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8E95/8E96), one horizontal dimension LINE (8E97), two DIMDOT INSERT terminators (8E98/8E99) and one MTEXT (8E9A) reading '900'; three POINTs (8E9B/8E9C/8E9D) sit on DEFPOINTS as the associative definition points. The MTEXT value 900 equals the bbox horizontal span (44248.83->45148.83 = 900) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d385-91",
+    "def": "*D385",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '820' equals bbox span 820; DIM-layer extension+dimension lines (8E9E/8E9F/8EA0), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D385' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8E9E/8E9F), one horizontal dimension LINE (8EA0), two DIMDOT INSERT terminators (8EA1/8EA2) and one MTEXT (8EA3) reading '820'; three POINTs (8EA4/8EA5/8EA6) sit on DEFPOINTS as the associative definition points. The MTEXT value 820 equals the bbox horizontal span (55178.83->55998.83 = 820) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d386-92",
+    "def": "*D386",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '1280' equals bbox span 1280; DIM-layer extension+dimension lines (8EA7/8EA8/8EA9), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D386' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8EA7/8EA8), one horizontal dimension LINE (8EA9), two DIMDOT INSERT terminators (8EAA/8EAB) and one MTEXT (8EAC) reading '1280'; three POINTs (8EAD/8EAE/8EAF) sit on DEFPOINTS as the associative definition points. The MTEXT value 1280 equals the bbox horizontal span (55998.83->57278.83 = 1280) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d387-93",
+    "def": "*D387",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '350' equals bbox span 350; DIM-layer extension+dimension lines (8EB0/8EB1/8EB2), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D387' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8EB0/8EB1), one horizontal dimension LINE (8EB2), two DIMDOT INSERT terminators (8EB3/8EB4) and one MTEXT (8EB5) reading '350'; three POINTs (8EB6/8EB7/8EB8) sit on DEFPOINTS as the associative definition points. The MTEXT value 350 equals the bbox horizontal span (57278.83->57628.83 = 350) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d388-94",
+    "def": "*D388",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '1020' equals bbox span 1020; DIM-layer extension+dimension lines (8EB9/8EBA/8EBB), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D388' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8EB9/8EBA), one horizontal dimension LINE (8EBB), two DIMDOT INSERT terminators (8EBC/8EBD) and one MTEXT (8EBE) reading '1020'; three POINTs (8EBF/8EC0/8EC1) sit on DEFPOINTS as the associative definition points. The MTEXT value 1020 equals the bbox horizontal span (57628.83->58648.83 = 1020) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d389-95",
+    "def": "*D389",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '710' equals bbox span 710; DIM-layer extension+dimension lines (8EC2/8EC3/8EC4), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D389' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8EC2/8EC3), one horizontal dimension LINE (8EC4), two DIMDOT INSERT terminators (8EC5/8EC6) and one MTEXT (8EC7) reading '710'; three POINTs (8EC8/8EC9/8ECA) sit on DEFPOINTS as the associative definition points. The MTEXT value 710 equals the bbox horizontal span (54468.83->55178.83 = 710) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d390-96",
+    "def": "*D390",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '320' equals bbox span 320; DIM-layer extension+dimension lines (8ECB/8ECC/8ECD), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D390' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8ECB/8ECC), one horizontal dimension LINE (8ECD), two DIMDOT INSERT terminators (8ECE/8ECF) and one MTEXT (8ED0) reading '320'; three POINTs (8ED1/8ED2/8ED3) sit on DEFPOINTS as the associative definition points. The MTEXT value 320 equals the bbox horizontal span (54148.83->54468.83 = 320) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d391-97",
+    "def": "*D391",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '1820' equals bbox span 1820; DIM-layer extension+dimension lines (8ED4/8ED5/8ED6), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D391' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8ED4/8ED5), one horizontal dimension LINE (8ED6), two DIMDOT INSERT terminators (8ED7/8ED8) and one MTEXT (8ED9) reading '1820'; three POINTs (8EDA/8EDB/8EDC) sit on DEFPOINTS as the associative definition points. The MTEXT value 1820 equals the bbox horizontal span (52328.83->54148.83 = 1820) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d392-98",
+    "def": "*D392",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '1125' equals bbox span 1125; DIM-layer extension+dimension lines (8EDD/8EDE/8EDF), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D392' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8EDD/8EDE), one horizontal dimension LINE (8EDF), two DIMDOT INSERT terminators (8EE0/8EE1) and one MTEXT (8EE2) reading '1125'; three POINTs (8EE3/8EE4/8EE5) sit on DEFPOINTS as the associative definition points. The MTEXT value 1125 equals the bbox horizontal span (51203.83->52328.83 = 1125) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d393-99",
+    "def": "*D393",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '1220' equals bbox span 1220; DIM-layer extension+dimension lines (8EE6/8EE7/8EE8), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D393' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8EE6/8EE7), one horizontal dimension LINE (8EE8), two DIMDOT INSERT terminators (8EE9/8EEA) and one MTEXT (8EEB) reading '1220'; three POINTs (8EEC/8EED/8EEE) sit on DEFPOINTS as the associative definition points. The MTEXT value 1220 equals the bbox horizontal span (49983.83->51203.83 = 1220) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  },
+  {
+    "unit_id": "defannot-d394-100",
+    "def": "*D394",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "AutoCAD *D#### dimension block: MTEXT '985' equals bbox span 985; DIM-layer extension+dimension lines (8EEF/8EF0/8EF1), DIMDOT terminators, DEFPOINTS defpoints -- cached dimension, contains no wall lines.",
+    "rationale": {
+      "evidence": "The block name '*D394' follows AutoCAD's *D#### convention for anonymous dimension blocks, and its 9 entities confirm it: on layer DIM sit two vertical extension LINEs (8EEF/8EF0), one horizontal dimension LINE (8EF1), two DIMDOT INSERT terminators (8EF2/8EF3) and one MTEXT (8EF4) reading '985'; three POINTs (8EF5/8EF6/8EF7) sit on DEFPOINTS as the associative definition points. The MTEXT value 985 equals the bbox horizontal span (48998.83->49983.83 = 985) to the millimetre, so the text is a measured dimension, not a free label.",
+      "rule": "A block named *D#### whose lines are on a DIM layer carrying DIMDOT/arrow terminators plus a DEFPOINTS definition-point trio, and whose text equals its own geometric span, is a cached (exploded/anonymous) dimension in any AutoCAD drawing -- annotation, not building fabric. Extension and dimension lines are annotation geometry and never count as walls.",
+      "counterfactual": "Had the three LINEs been on a wall/structural layer as an offset parallel pair forming a thickness, with no DIMDOT terminators, no span-matching MTEXT and no DEFPOINTS points, the block would classify as plan/wall geometry (평면 부분도) instead. Removing only the text-equals-span match would leave it a leader or generic symbol rather than a dimension.",
+      "uncertainty": "This projection shows the definition in isolation, not its INSERT sites, so I cannot tell what feature each dimension measures (wall run, opening, or furniture edge) or how often it is placed. Linetype, colour and any XDATA are omitted, so I cannot fully distinguish a live associative dimension from a frozen graphical copy."
+    }
+  }
+]

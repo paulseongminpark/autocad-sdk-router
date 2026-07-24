@@ -1,0 +1,67 @@
+{
+  "family": "geometry_kernel",
+  "fixtures": {
+    "compute.geometry.point.distance": {
+      "args": {
+        "a": {"x": 0, "y": 0, "z": 0},
+        "b": {"x": 3, "y": 4, "z": 0}
+      },
+      "evidence": "m08d_handlers.inc (compute.geometry.point.distance, line 427: m08dFindNamedPoint(job, \"a\", ...) and m08dFindNamedPoint(job, \"b\", ...), both required)"
+    },
+    "compute.geometry.point.transform": {
+      "args": {
+        "point": {"x": 1, "y": 2, "z": 0},
+        "translate": {"x": 5, "y": -2, "z": 0}
+      },
+      "evidence": "m08d_handlers.inc (compute.geometry.point.transform, line 439: m08dFindNamedPoint(job, \"point\", ...) required; m08dFindNamedPoint(job, \"translate\", ...) optional, defaults to identity 0,0,0)"
+    },
+    "compute.geometry.lineseg": {
+      "args": {
+        "a": {"x": 0, "y": 0, "z": 0},
+        "b": {"x": 4, "y": 3, "z": 0}
+      },
+      "evidence": "m08d_handlers.inc (compute.geometry.lineseg, line 510: m08dFindNamedPoint(job, \"a\", ...) and m08dFindNamedPoint(job, \"b\", ...), both required)"
+    },
+    "compute.geometry.circarc": {
+      "args": {
+        "center": {"x": 2, "y": 2, "z": 0},
+        "radius": 3.5
+      },
+      "evidence": "m08d_handlers.inc (compute.geometry.circarc, line 525: m08dFindNamedPoint(job, \"center\", ...) required; jsonFindNumber(job, \"radius\", ...) optional, defaults to 1.0)"
+    },
+    "compute.geometry.elliparc": {
+      "args": {
+        "center": {"x": -2, "y": 3, "z": 0},
+        "major": 8,
+        "minor": 3
+      },
+      "evidence": "m08d_handlers.inc (compute.geometry.elliparc, line 540: m08dFindNamedPoint(job, \"center\", ...) required; jsonFindNumber(job, \"major\", ...) and jsonFindNumber(job, \"minor\", ...) optional, default to 2.0/1.0)"
+    },
+    "compute.geometry.curve.closest": {
+      "args": {
+        "center": {"x": 5, "y": 5, "z": 0},
+        "radius": 2,
+        "query": {"x": 10, "y": 5, "z": 0}
+      },
+      "evidence": "m08d_handlers.inc (compute.geometry.curve.closest, line 599: m08dFindNamedPoint(job, \"center\", ...) optional default 0,0,0; m08dFindNamedPoint(job, \"query\", ...) required; jsonFindNumber(job, \"radius\", ...) optional default 1.0)"
+    }
+  },
+  "needs_state": [
+    {
+      "op": "compute.entity.intersect",
+      "reason": "handler (m08d_handlers.inc line 710) resolves 'handle_a'/'handle_b' via m08dOpenEntity() against entities that must already exist in the open drawing DB; no single stateless fixture call can both create and reference two entities by handle"
+    },
+    {
+      "op": "compute.solid3d.interference",
+      "reason": "handler (m08d_handlers.inc line 736) resolves 'handle_a'/'handle_b' via m08dOpenEntity()+AcDb3dSolid::cast() against two pre-existing AcDb3dSolid entities in the drawing DB; requires prior solid-creation state, not just args"
+    },
+    {
+      "op": "modify.entity.solid3d.boolean",
+      "reason": "handler (m08g_handlers.inc line 1877) resolves 'handle' via m08gFindHandle()/m08gOpenEntityForWrite() and 'other_handle' via resolveHandle(), both must already be AcDb3dSolid entities in the drawing DB before this call runs"
+    },
+    {
+      "op": "modify.entity.transform",
+      "reason": "handler (m08g_handlers.inc line 1603) resolves 'handle' via m08gFindHandle()/m08gOpenEntityForWrite() to mutate an entity already present in the drawing DB in place; no create-then-transform path exists in one stateless fixture call"
+    }
+  ]
+}

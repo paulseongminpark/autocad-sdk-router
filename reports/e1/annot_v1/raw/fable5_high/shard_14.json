@@ -1,0 +1,348 @@
+[
+  {
+    "unit_id": "defannot-u88-261",
+    "def": "*U88",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "익명 블록 — INSUL 레이어의 5정점 LWPOLYLINE 8개, 단열재 표기 패턴 조각",
+    "rationale": {
+      "evidence": "8개 엔티티 전부가 LWPOLYLINE이고 전부 X-평면도(기본형)$0$INSUL 단일 레이어에 있다. 모든 폴리라인이 정확히 vertices=5로 동일해, 단열재(insulation batt) 지그재그 표기의 반복 세그먼트로 보인다. *U 접두 익명 블록이라 사용자가 명명한 재사용 심볼이 아니라 생성된 그룹 조각이다.",
+      "rule": "단일 INSUL 계열 레이어에 동일 정점수의 폴리라인만 반복되는 익명(*U) 블록은 단열재 해칭/표기 패턴이며, 벽선 자체가 아니라 벽체 내부 채움 표기로 본다.",
+      "counterfactual": "W1/WAL 계열 레이어의 긴 평행 LINE 쌍이 섞여 있었다면 벽 부분도로 판정이 뒤집혔을 것이다. 반대로 TEXT나 치수 엔티티가 있었다면 주석 캐시 쪽으로 기울었을 것이다.",
+      "uncertainty": "좌표·bbox가 없어 폴리라인들이 실제로 지그재그 단열 패턴을 이루는지 기하학적으로 확인할 수 없다. INSUL 레이어명 관례에 의존한 추론이다."
+    }
+  },
+  {
+    "unit_id": "defannot-u89-262",
+    "def": "*U89",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "익명 블록 — INSUL 레이어 5정점 LWPOLYLINE 30개, 더 긴 단열재 표기 런",
+    "rationale": {
+      "evidence": "30개 엔티티 전부가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE이고 모두 vertices=5로 균일하다. *U88과 동일 구성에 개수만 많아, 같은 단열 표기 패턴의 더 긴 구간으로 보인다. 핸들이 407E-409B로 연속이라 한 번의 작업으로 생성된 그룹이다.",
+      "rule": "동일 레이어·동일 정점수 폴리라인만의 익명 블록은 반복 패턴 표기(단열재 등)이며, 개수 차이는 표기 구간 길이 차이일 뿐 역할을 바꾸지 않는다.",
+      "counterfactual": "폴리라인 정점수가 다양하고 DOOR/FUR 레이어가 섞였다면 가구나 부분도로 재판정했을 것이다. 벽 레이어 LINE이 있었다면 wall_likelihood를 크게 올렸을 것이다.",
+      "uncertainty": "이 조각이 어느 벽체를 따라가는지, 삽입 위치·스케일을 이 투영만으로는 알 수 없다. INSUL 표기가 벽 내부인지 지붕/바닥 단열인지도 판별 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u90-263",
+    "def": "*U90",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "익명 블록 — INSUL 레이어 5정점 LWPOLYLINE 41개, 단열재 표기 패턴",
+    "rationale": {
+      "evidence": "41개 전부 LWPOLYLINE, 전부 X-평면도(기본형)$0$INSUL 레이어, 샘플 30개 모두 vertices=5로 균일하다. 핸들 40A1 이후 연속 대역이라 *U88/*U89와 같은 계열의 생성 그룹이다. 텍스트·치수·타 레이어 엔티티가 전혀 없다.",
+      "rule": "익명 *U 블록에서 단일 표기 레이어의 균일 폴리라인 반복은 패턴 표기 조각으로 분류하고, 재사용 심볼이나 평면 부분도로 승격하지 않는다.",
+      "counterfactual": "vertices 수가 제각각이고 ARC/CIRCLE이 섞여 있었다면 가구·위생기구 심볼 가능성을 검토했을 것이다. 벽 계열 레이어 등장 시 wall_likelihood를 상향했을 것이다.",
+      "uncertainty": "좌표가 제공되지 않아 41개 조각의 공간 배치를 알 수 없고, 인접 벽선과의 관계(벽체 내 단열인지)를 이 투영만으로 확정할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u91-264",
+    "def": "*U91",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "익명 블록 — INSUL 레이어 5정점 LWPOLYLINE 6개, 짧은 단열재 표기 조각",
+    "rationale": {
+      "evidence": "6개 엔티티 전부가 INSUL 레이어의 vertices=5 LWPOLYLINE으로, *U88-*U90과 동일한 구성의 최소 단위 조각이다. 핸들 40CF-40D4 연속 대역이다. 다른 어떤 엔티티 타입이나 레이어도 없다.",
+      "rule": "같은 도면에서 동일 구성의 익명 블록 계열이 반복 관찰되면 같은 역할(여기서는 단열 표기 패턴)로 일관 분류한다.",
+      "counterfactual": "이 블록에만 TEXT나 치수 관련 엔티티가 있었다면 계열에서 분리해 재판정했을 것이다. INSUL이 아닌 W1 레이어였다면 벽선 후보로 판정을 뒤집었을 것이다.",
+      "uncertainty": "6개뿐인 짧은 조각이 독립 표기인지 더 큰 패턴의 잔여인지 알 수 없다. 삽입 컨텍스트(어느 평면도의 어느 위치)가 투영에 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u92-265",
+    "def": "*U92",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "익명 블록 — INSUL 레이어 5정점 LWPOLYLINE 23개, 단열재 표기 패턴",
+    "rationale": {
+      "evidence": "23개 엔티티 전부가 X-평면도(기본형)$0$INSUL 레이어의 LWPOLYLINE이고 샘플 전체가 vertices=5로 균일하다. 핸들 40DA-40F0 연속으로 한 번에 생성된 그룹임을 시사한다. *U88-*U91과 동일 계열이다.",
+      "rule": "단일 단열 레이어에 균일 폴리라인만 담긴 익명 블록은 단열 표기 패턴 조각이며, 벽선 판정 대상 엔티티를 포함하지 않는 것으로 본다.",
+      "counterfactual": "긴 직선 LINE이 평행쌍으로 존재했다면 벽선 후보로 wall_line_handles에 올렸을 것이다. 레이어가 FUR였다면 가구로 판정했을 것이다.",
+      "uncertainty": "폴리라인 좌표가 없어 패턴의 실제 형상(지그재그인지 사각 반복인지)을 확인할 수 없다. 단열이 접하는 벽의 존재는 블록 외부 정보라 판단 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-u93-266",
+    "def": "*U93",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "익명 블록 — INSUL 레이어 5정점 LWPOLYLINE 6개, 짧은 단열재 표기 조각",
+    "rationale": {
+      "evidence": "6개 전부 INSUL 레이어 LWPOLYLINE, 전부 vertices=5로 *U91과 사실상 동형이다. 핸들 40F6-40FB 연속 대역이다. 텍스트·호·원 등 심볼성 요소가 전무하다.",
+      "rule": "익명 *U 계열에서 구성(타입·레이어·정점수)이 동일하면 개체 수와 무관하게 동일 역할로 분류한다 — 여기서는 단열 표기 패턴.",
+      "counterfactual": "DOOR 레이어의 ARC(문 스윙)가 포함됐다면 문 심볼로 뒤집었을 것이다. W1 계열 LINE 등장 시 wall_likelihood를 0.7 이상으로 올렸을 것이다.",
+      "uncertainty": "이 투영만으로는 6개 조각의 기하와 삽입처를 알 수 없어, 단열 표기라는 판정은 레이어명 관례와 계열 유사성에 의존한다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-form-267",
+    "def": "X-FORM_청주",
+    "role": "기타",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "도곽/표제란 시트 폼 — A-SHEET 계열 레이어, 820x572 종이 좌표, 표 괘선 LINE + TEXT 72개",
+    "rationale": {
+      "evidence": "레이어가 전부 A-SHEET/A-SHEET-DEF/A-SHEET-TEXT 계열이고 TEXT가 72개로 많다. bbox [27,22]-[820,572]는 A1급 용지의 mm 좌표 스케일이다. 샘플 LINE들이 (820,y)->(758,y) 형태로 등간격 수평 괘선을 이뤄 표제란 표를 그리고 있다.",
+      "rule": "SHEET/FORM 계열 레이어 + 용지 크기 bbox + 다량의 짧은 등간격 괘선과 텍스트 조합은 도곽·표제란 폼이며, 그 LINE들은 표 괘선이지 벽선이 아니다.",
+      "counterfactual": "bbox가 수만 단위(mm 실척)였고 W1/CEN 레이어가 있었다면 평면 부분도로 판정했을 것이다. TEXT가 없고 괘선 대신 닫힌 실 스케일 외곽 폴리라인이었다면 다른 판정을 검토했을 것이다.",
+      "uncertainty": "TEXT 내용이 샘플에 없어 표제란 항목(도면명·축척 등)을 직접 확인하지는 못했다. 내부 INSERT 1개가 무엇인지(로고로 추정) 이 투영만으로 확정 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-x-form-0-block-5-268",
+    "def": "X-FORM_청주$0$Block_5",
+    "role": "심볼",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "시트 폼 내부의 SPLINE+SOLID HATCH 소형 그래픽 — 로고 구성 요소로 추정",
+    "rationale": {
+      "evidence": "SPLINE 4개와 SOLID 패턴 HATCH 2개뿐이며 레이어는 전부 시트 폼 소유의 A-SHEET 계열이다. 자유곡선+솔리드 채움 조합은 도면 요소가 아니라 그래픽/로고 형상의 전형이다. 부모 이름공간이 X-FORM_청주(도곽 폼)라 표제란 장식 요소다.",
+      "rule": "SPLINE과 SOLID HATCH만으로 구성된 소형 블록은 로고·마크 등 그래픽 심볼이며 건축 실체(벽·문·가구)가 아니다.",
+      "counterfactual": "HATCH 패턴이 SOLID가 아닌 ANSI/콘크리트 계열이고 직선 경계였다면 단면 표기 쪽을 검토했을 것이다. 실척 좌표의 긴 LINE이 있었다면 판정을 재고했을 것이다.",
+      "uncertainty": "SPLINE 좌표가 없어 실제 형상(글자인지 그림인지)을 알 수 없다. dA로고 블록에서 참조되는 관계는 다음 정의에서 추정될 뿐 이 투영 단독으로는 확인 불가."
+    }
+  },
+  {
+    "unit_id": "defannot-x-form-0-da-269",
+    "def": "X-FORM_청주$0$dA로고",
+    "role": "심볼",
+    "wall_likelihood": 0.0,
+    "wall_line_handles": [],
+    "notes": "회사 로고 블록 — 이름에 '로고' 명시, SPLINE 24 + SOLID HATCH 5 + Block_5 참조",
+    "rationale": {
+      "evidence": "블록명 자체가 'dA로고'로 로고임을 명시한다. 내용물이 SPLINE 24개와 SOLID HATCH 5개로 곡선 글자/마크 채움의 전형이며, INSERT 1개가 X-FORM_청주$0$Block_5(앞서 로고 부품으로 판정)를 참조한다. 레이어는 전부 A-SHEET로 도곽 폼 소속이다.",
+      "rule": "블록명이 로고·마크를 명시하고 내용이 SPLINE+SOLID HATCH 위주면 그래픽 심볼로 확정하며 wall_likelihood는 0으로 둔다.",
+      "counterfactual": "이름과 달리 W1 레이어 LINE이나 실척 벽 기하가 포함됐다면 이름보다 내용을 우선해 재판정했을 것이다. 그런 요소는 전혀 없다.",
+      "uncertainty": "로고의 시각적 형태와 정확한 크기는 좌표 부재로 알 수 없으나 역할 판정에는 영향이 없다. 어떤 시트 위치에 삽입되는지는 부모 블록 정보에 있다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-270",
+    "def": "X-평면도(기본형)",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.6,
+    "wall_line_handles": [],
+    "notes": "단지 배치/기준층 평면 종합 블록 — 4723개 엔티티, 동번호 TEXT·GRID·유닛 INSERT 포함, W1/RW1 벽 레이어 소량 존재",
+    "rationale": {
+      "evidence": "4723개 엔티티에 GRID 18, DOOR 25, FUR 4238, W1 4, RW1 4 등 평면도 구성 레이어가 총망라돼 있다. TEXT가 '101 동', '(84A+84B+84C+84A)42F+40F', '84A' 등 동·유닛 표기이고, INSERT가 X-평면도(기본형)$0$84c 같은 유닛 블록을 참조한다. bbox가 수십만 mm로 단지 스케일이다.",
+      "rule": "다층 레이어 구성 + 유닛 블록 INSERT + 동/유닛 라벨 TEXT + 실척 대형 bbox를 갖춘 블록은 평면 부분도(여기서는 단지 종합 평면)로 분류한다.",
+      "counterfactual": "GRID와 TEXT만 있고 유닛 INSERT가 없었다면 도곽·키맵 쪽을 검토했을 것이다. 샘플에 W1 레이어 LINE 핸들이 노출됐다면 wall_line_handles에 올리고 wall_likelihood를 더 높였을 것이다.",
+      "uncertainty": "레이어 히스토그램상 W1=4, RW1=4로 벽선이 존재하지만 샘플 30개에는 GRID/TEXT/INSERT만 잡혀 구체 벽선 핸들을 지목할 수 없다. FUR 4238개의 실제 내용(가구인지 다른 표기인지)도 샘플에 없어 미확인이다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-1000-271",
+    "def": "X-평면도(기본형)$0$1000",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "폭 1000 문 심볼 — DOOR 단일 레이어, ARC 스윙 + 문짝/문틀 폴리라인, 이름=호칭폭",
+    "rationale": {
+      "evidence": "16개 엔티티 전부가 DOOR 레이어이고 ARC 1개(문 스윙 호)와 다수의 소형 LWPOLYLINE(문짝·문틀 단면)으로 구성된다. bbox 폭이 약 980으로 블록명 '1000'(호칭 개구폭)과 일치한다. LINE (960,-40)->(40,-40)과 (960,-43)->(40,-43)은 3 간격 평행선으로 문지방/마감선이지 벽이 아니다.",
+      "rule": "DOOR 단일 레이어 + 스윙 ARC + 이름이 개구폭 수치인 소형 블록은 문 심볼로 분류하고, 내부 평행 LINE은 문틀·문지방 선으로 벽선에서 제외한다.",
+      "counterfactual": "ARC가 없고 W1 레이어의 두꺼운 평행 LINE 쌍이 지배적이었다면 벽 개구부 부분도로 판정을 바꿨을 것이다. 이름이 수치가 아닌 가구명이었다면 가구를 검토했을 것이다.",
+      "uncertainty": "폴리라인 정점 좌표가 없어 문짝 상세(미서기인지 여닫이인지)를 확정할 수 없다. 이 문이 삽입되는 벽의 두께·재질은 블록 외부 정보다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-100012-272",
+    "def": "X-평면도(기본형)$0$100012",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "폭 1000 문 심볼 변형 — DOOR 레이어 16개, 스윙 호 개방각이 얕은 버전(bbox 깊이 -120)",
+    "rationale": {
+      "evidence": "구성이 $0$1000과 동일하게 DOOR 단일 레이어, ARC 1 + LINE 3 + LWPOLYLINE 12다. bbox 깊이가 -120으로 $0$1000의 -260보다 얕아 스윙 표현 각도만 다른 변형으로 보인다. (960,-40)/(960,-43) 평행선 쌍도 동일하게 존재한다.",
+      "rule": "기존 문 심볼과 엔티티 구성이 동일하고 이름이 수치 계열 파생(100012)이면 같은 문 심볼의 변형으로 분류한다.",
+      "counterfactual": "레이어가 DOOR가 아니라 WIN이었다면 창 심볼로, ARC 없이 직선만 있었다면 개구부 표기로 판정했을 것이다.",
+      "uncertainty": "이름 뒤 '12'가 의미하는 변형 코드(개방각·타입 번호)를 투영만으로 해석할 수 없다. 실제 스윙 기하는 ARC 파라미터 부재로 미확인이다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-1000m-273",
+    "def": "X-평면도(기본형)$0$1000m",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "폭 1000 문 심볼의 미러/세로 배치 변형 — DOOR 레이어 14개, 문지방선이 수직 방향",
+    "rationale": {
+      "evidence": "DOOR 단일 레이어에 ARC 1 + LWPOLYLINE 11 + LINE 2 구성으로 $0$1000 계열과 동형이다. LINE이 (40,960)->(40,40)과 (43,960)->(43,40)의 수직 평행쌍이라 같은 문지방선을 90도 돌린 배치다. 이름 접미 'm'은 mirror/변형 관례와 부합한다.",
+      "rule": "기준 문 심볼과 동일 구성에 접미사(m 등)만 붙은 블록은 방향·미러 변형 심볼로 분류하며 역할은 원본을 따른다.",
+      "counterfactual": "엔티티 수나 레이어 구성이 크게 달랐다면(예: 가구 레이어 추가) 별개 역할을 검토했을 것이다. 평행선 간격이 벽 두께급(100+)이었다면 벽선 후보로 봤을 것이다.",
+      "uncertainty": "'m'이 미러인지 다른 규격 코드인지 이름 관례 추정이다. ARC의 중심·반경이 없어 스윙 방향을 확정할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-101co1-274",
+    "def": "X-평면도(기본형)$0$101co1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.9,
+    "wall_line_handles": [
+      {"handle": "7A9D", "reason": "W1 레이어 수직 벽선"},
+      {"handle": "7A9F", "reason": "W1 레이어, 7A9D와 500 간격 평행 벽선쌍"},
+      {"handle": "7A9E", "reason": "W1 레이어 수직 벽선"},
+      {"handle": "7AA0", "reason": "W1 레이어, 7A9E와 평행한 벽선"},
+      {"handle": "7AA2", "reason": "W1 레이어 벽 단부 마감선"},
+      {"handle": "7AA3", "reason": "W1 레이어 벽 단부 마감선"},
+      {"handle": "7AA9", "reason": "W1 레이어 장스팬 수직 벽선"},
+      {"handle": "7AAA", "reason": "W1 레이어 수직 벽선 연속 구간"},
+      {"handle": "7AAB", "reason": "W1 레이어 장스팬 벽선"},
+      {"handle": "7AAC", "reason": "W1 레이어 수평 벽선"}
+    ],
+    "notes": "101동 코어 평면 부분도 — W1 벽선 54개 지배적, CEN 중심선·STL 계단·설비OPEN 포함",
+    "rationale": {
+      "evidence": "이름 '101co1'은 101동 코어(core) 1을 뜻하고, 레이어 히스토그램에서 W1(벽)이 54개로 지배적이며 CEN(중심선) 15, STL(계단) 8, 설비OPEN 8이 코어 평면의 전형 구성을 이룬다. 샘플에서 (-5020,...)과 (-5520,...)처럼 500 간격 평행 수직선 쌍이 확인돼 벽 두께 표현과 일치한다. bbox 약 13000x12000 mm로 코어 실척이다.",
+      "rule": "W* 벽 레이어가 지배적이고 중심선·계단 레이어가 동반되며 실척 bbox를 갖는 co/core 명명 블록은 코어 평면 부분도로 분류하고, W1 레이어의 평행 장선을 벽선으로 지목한다.",
+      "counterfactual": "W1 레이어가 없고 CEN과 TEXT만 있었다면 축선/기준선 캐시로 판정했을 것이다. 평행쌍 간격이 수 mm급(괘선)이었다면 도곽 폼으로 봤을 것이다.",
+      "uncertainty": "샘플 30개 밖의 W1 라인 44개는 핸들을 지목할 수 없다. HATCH 3개의 위치(벽체 채움인지 설비 표기인지)는 DASH 패턴이 설비OPEN 레이어에 있어 후자로 추정하나 좌표 미제공으로 미확정이다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-101co1-rf-275",
+    "def": "X-평면도(기본형)$0$101co1-RF",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.9,
+    "wall_line_handles": [
+      {"handle": "7C42", "reason": "W1 레이어 장스팬 수평 벽선"},
+      {"handle": "7C43", "reason": "W1 레이어 수평 벽선"},
+      {"handle": "7C44", "reason": "W1 레이어 수직 벽선"},
+      {"handle": "7C4B", "reason": "W1 레이어 수직 벽선"},
+      {"handle": "7C4D", "reason": "W1 레이어, -5020 계열과 500 간격 평행 벽선"},
+      {"handle": "7C50", "reason": "W1 레이어 벽 단부 마감선"},
+      {"handle": "7C51", "reason": "W1 레이어 벽 단부 마감선"},
+      {"handle": "7C54", "reason": "W1 레이어 장스팬 수직 벽선"},
+      {"handle": "7C56", "reason": "W1 레이어 장스팬 수직 벽선"},
+      {"handle": "7C57", "reason": "W1 레이어 수평 벽선"}
+    ],
+    "notes": "101동 코어 옥탑(RF)층 평면 부분도 — W1 52 + W3 9 벽선, 문·계단 표기는 축소",
+    "rationale": {
+      "evidence": "이름이 101co1-RF로 코어의 지붕층(RF) 버전이며, W1=52에 W3=9가 추가된 벽선 위주 구성이다. 샘플 좌표가 101co1과 거의 동일한 축(-5520/-5020, 3620/3870, 7300 등)을 공유해 같은 코어의 상층 평면임을 뒷받침한다. W3 레이어의 (3620,y)->(3870,y) 짧은 가로선들은 250 두께 벽 사이의 구획선이다.",
+      "rule": "기존 코어 부분도와 좌표계·레이어 구성을 공유하며 -RF 접미가 붙은 블록은 동일 코어의 지붕층 평면 부분도로 분류한다.",
+      "counterfactual": "W 계열 레이어가 사라지고 7RF/M_ 계열만 남았다면 옥탑 소부재 표기로 판정을 낮췄을 것이다. 좌표축이 전혀 달랐다면 별개 코어로 봤을 것이다.",
+      "uncertainty": "TEXT가 없어 층 표기를 직접 확인할 수 없고 이름 접미 관례에 의존한다. AHID 레이어 2개의 은선 내용은 샘플에 없어 미확인이다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-101co1-rf2-276",
+    "def": "X-평면도(기본형)$0$101co1-RF2",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.85,
+    "wall_line_handles": [
+      {"handle": "7D3A", "reason": "W1 레이어 장스팬 수평 벽선"},
+      {"handle": "7D3B", "reason": "W1 레이어 수평 벽선"},
+      {"handle": "7D42", "reason": "W1 레이어 수직 벽선"},
+      {"handle": "7D44", "reason": "W1 레이어, -5020 계열과 500 간격 평행 벽선"},
+      {"handle": "7D47", "reason": "W1 레이어 벽 단부 마감선"},
+      {"handle": "7D48", "reason": "W1 레이어 벽 단부 마감선"},
+      {"handle": "7D4B", "reason": "W1 레이어 장스팬 수직 벽선"},
+      {"handle": "7D4C", "reason": "W1 레이어 장스팬 수직 벽선"},
+      {"handle": "7D4E", "reason": "W1 레이어 장스팬 수평 벽선"},
+      {"handle": "7D50", "reason": "W1 레이어 장스팬 수직 벽선"}
+    ],
+    "notes": "101동 코어 옥탑 상부(RF2) 평면 부분도 — W1 34, OPEN 개구 표기·안전사다리 INSERT 포함",
+    "rationale": {
+      "evidence": "이름 101co1-RF2와 함께 좌표축(-5520/-5020, 7300, 6800)이 RF 버전과 일치해 같은 코어의 더 위층 평면이다. W1이 34개로 여전히 지배적이고, OPEN 레이어 6개(대각선 LINE + 사각 폴리라인)가 지붕 개구부 표기를, 안전사다리·CW900 INSERT가 옥탑 설비를 나타낸다.",
+      "rule": "코어 계열 블록에서 -RF2 등 층 접미가 증가해도 벽 레이어가 지배적이면 평면 부분도 역할을 유지하되, 개구(OPEN) 표기 증가는 상층으로 갈수록 자연스러운 신호로 본다.",
+      "counterfactual": "W1이 수 개 이하로 줄고 OPEN·M_ 계열만 남았다면 RF3처럼 wall_likelihood를 크게 낮췄을 것이다. 대각선 LINE이 W1 레이어였다면 벽선 판정에서 제외하는 근거를 다시 검토했을 것이다.",
+      "uncertainty": "OPEN 레이어 대각선이 개구 표시 관례(X자)인지 실제 경사 부재인지 좌표만으로 단정하기 어렵다. WIN 레이어 2개의 창 위치는 샘플에 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-101co1-rf3-277",
+    "def": "X-평면도(기본형)$0$101co1-RF3",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "101동 코어 최상부(RF3) 소형 평면 조각 — 벽 레이어 부재, CEN 중심선과 우수관·사다리 표기 위주",
+    "rationale": {
+      "evidence": "14개 엔티티 중 CEN(중심선)이 6개로 최다이고 W1 계열 벽 레이어가 전혀 없다. 내용물이 7RF 폴리라인 2, 우수관_100A INSERT 2, 안전사다리 INSERT 1, M_1 짧은 평행선 2로 옥탑 최상부의 잔여 부재 표기다. 좌표축(7050, -5270, 175)은 101co1 계열과 일치한다.",
+      "rule": "코어 계열의 최상층 조각에서 벽 레이어가 소멸하고 중심선+설비 심볼만 남으면 평면 부분도로 유지하되 wall_likelihood는 낮게 준다.",
+      "counterfactual": "W1 LINE이 하나라도 있었다면 wall_likelihood를 0.5 이상으로 올리고 해당 핸들을 지목했을 것이다. CEN만 있고 부재 표기가 없었다면 축선 캐시로 재분류했을 것이다.",
+      "uncertainty": "M_1/M_2 레이어의 의미(옥탑 기계 부재로 추정)를 레이어명만으로 확정할 수 없다. 7RF 폴리라인 9정점의 형상은 좌표 부재로 미확인이다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-101co2-278",
+    "def": "X-평면도(기본형)$0$101co2",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.9,
+    "wall_line_handles": [
+      {"handle": "7A33", "reason": "W1 레이어 수직 벽선"},
+      {"handle": "7A34", "reason": "W1 레이어 수직 벽선"},
+      {"handle": "7A35", "reason": "W1 레이어 장스팬 수직 벽선"},
+      {"handle": "7A36", "reason": "W1 레이어 수직 벽선"},
+      {"handle": "7A37", "reason": "W1 레이어 장스팬 수직 벽선"},
+      {"handle": "7A38", "reason": "W1 레이어 수평 벽선"},
+      {"handle": "7A3A", "reason": "W1 레이어, 7A38과 250 간격 평행 벽선쌍"},
+      {"handle": "7A3B", "reason": "W1 레이어 장스팬 수평 벽선"},
+      {"handle": "7A3D", "reason": "W1 레이어, 7A3B와 250 간격 평행 벽선쌍"},
+      {"handle": "7A3F", "reason": "W1 레이어 수직 벽선"}
+    ],
+    "notes": "101동 코어 2 평면 부분도 — W1 벽선 52개 지배적, CEN·STL·설비OPEN·40HAT 동반",
+    "rationale": {
+      "evidence": "이름 101co2는 101동의 두 번째 코어이며 W1=52, CEN=14, STL=8, 설비OPEN=8(DASH HATCH 동반)로 101co1과 동일한 코어 평면 구성이다. 샘플에서 (-3570,2530)/(-3570,2780)과 (-510,...)/(-260,...)처럼 250 간격 평행 벽선 쌍이 반복 확인된다. bbox 약 10300x11500 mm 실척이다.",
+      "rule": "co 명명 + 벽 레이어 지배 + 250/500 간격 평행 LINE 쌍 반복은 벽체를 갖춘 코어 평면 부분도의 결정적 신호다.",
+      "counterfactual": "평행쌍 간격이 일정하지 않고 레이어가 FUR 위주였다면 가구 배치도로 판정했을 것이다. DEFTXT 텍스트가 지배적이었다면 주석 조각으로 봤을 것이다.",
+      "uncertainty": "샘플 밖 W1 라인 다수와 A-DOOR 3개의 문 위치는 핸들 미노출로 지목 불가하다. 40HAT 해치 3개의 채움 대상(벽체 단면인지)은 좌표 부재로 미확정이다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-103co1-279",
+    "def": "X-평면도(기본형)$0$103co1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.9,
+    "wall_line_handles": [
+      {"handle": "7B02", "reason": "W1 레이어 수직 벽선"},
+      {"handle": "7B03", "reason": "W1 레이어 수직 벽선"},
+      {"handle": "7B04", "reason": "W1 레이어 장스팬 수직 벽선"},
+      {"handle": "7B05", "reason": "W1 레이어 수직 벽선"},
+      {"handle": "7B06", "reason": "W1 레이어 장스팬 수직 벽선"},
+      {"handle": "7B09", "reason": "W1 레이어 수평 벽선"},
+      {"handle": "7B0A", "reason": "W1 레이어 장스팬 수평 벽선"},
+      {"handle": "7B0E", "reason": "W1 레이어 수직 벽선"},
+      {"handle": "7B11", "reason": "W1 레이어, -1350 계열과 250 간격 평행 벽선쌍"},
+      {"handle": "7B14", "reason": "W1 레이어 벽 단부 연결선"}
+    ],
+    "notes": "103동 코어 평면 부분도 — 101co2와 동형 구성(W1 56 지배), 좌표만 이동",
+    "rationale": {
+      "evidence": "레이어 히스토그램이 101co2와 사실상 동일(W1=56, CEN=15, STL=10, 설비OPEN=8)하고 엔티티 수도 106으로 근접한다. 샘플에서 (-1350,...)/(-1100,...) 250 간격 평행 수직선 쌍 등 벽 두께 표현이 반복된다. 이름 103co1은 103동 코어 1을 뜻한다.",
+      "rule": "동일 도면 내 co 계열 블록들이 같은 레이어 구성·평행쌍 패턴을 공유하면 동별 코어 평면 부분도 계열로 일관 분류한다.",
+      "counterfactual": "구성은 같은데 W1 좌표들이 평행쌍을 이루지 않았다면 벽선 판정 확신을 낮췄을 것이다. STL(계단)이 없었다면 코어가 아닌 일반 구획 조각을 검토했을 것이다.",
+      "uncertainty": "TEXT 4개(DEFTXT)의 내용이 샘플에 없어 실 이름 표기를 확인 못 했다. INSERT 10개가 참조하는 하위 블록(문·설비 추정)은 이 투영에 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-104co1-280",
+    "def": "X-평면도(기본형)$0$104co1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.9,
+    "wall_line_handles": [
+      {"handle": "809D", "reason": "W1 레이어 장스팬 수평 벽선"},
+      {"handle": "809F", "reason": "W1 레이어 수평 벽선"},
+      {"handle": "80A0", "reason": "W1 레이어 수직 벽선"},
+      {"handle": "80A2", "reason": "W1 레이어, -5675 계열과 500 간격 평행 벽선쌍"},
+      {"handle": "80AA", "reason": "W1 레이어 장스팬 수직 벽선"},
+      {"handle": "80AC", "reason": "W1 레이어 장스팬 수직 벽선"},
+      {"handle": "80AD", "reason": "W1 레이어 수평 벽선"},
+      {"handle": "80AE", "reason": "W1 레이어, 80AD와 250 간격 평행 벽선쌍"},
+      {"handle": "80B0", "reason": "W1 레이어 수직 벽선"},
+      {"handle": "80B3", "reason": "W1 레이어, 3035 계열과 250 간격 평행 벽선쌍"}
+    ],
+    "notes": "104동 코어 평면 부분도 — W1 벽선 55개 지배, co 계열 표준 구성",
+    "rationale": {
+      "evidence": "이름 104co1과 함께 W1=55, CEN=16, STL=10, 설비OPEN=8(DASH HATCH)로 101/103 코어 계열과 동일한 구성이다. 샘플에서 (-5675,...)/(-5175,...) 500 간격 쌍과 (3035,...)/(2785,...), (5635,2780)/(5635,3030) 등 250 간격 평행 벽선 쌍이 다수 확인된다. bbox 약 14200x12200 mm 실척이다.",
+      "rule": "벽 레이어 지배 + 250/500 간격 평행 LINE 반복 + co 명명 + 계단·중심선 동반이면 코어 평면 부분도로 분류하고 W1 장선을 벽선으로 지목한다.",
+      "counterfactual": "W1 선들이 등간격 3mm급 괘선이었다면 표제란 폼으로 뒤집었을 것이다. 벽 레이어 없이 CEN만 남았다면 RF3처럼 wall_likelihood를 낮췄을 것이다.",
+      "uncertainty": "샘플 30개 밖의 W1 라인 약 25개는 핸들 지목이 불가하다. TEXT 5개와 INSERT 7개의 내용(실명·설비 심볼 추정)은 투영에 노출되지 않았다."
+    }
+  }
+]

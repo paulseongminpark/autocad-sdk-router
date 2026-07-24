@@ -1,0 +1,81 @@
+{
+  "family": "entities_3",
+  "fixtures": {
+    "write.entity.polyline2d": {
+      "args": {
+        "layer": "ARIADNE_F1_PROBE",
+        "closed": 1,
+        "points": [
+          {"x": 0.0, "y": 0.0, "z": 0.0},
+          {"x": 10.0, "y": 0.0, "z": 0.0},
+          {"x": 10.0, "y": 6.0, "z": 0.0}
+        ]
+      },
+      "evidence": "m08g_handlers.inc (write.entity.polyline2d: shared layer read L503 jsonFindString(job,\"layer\",layer); branch L639 'op == \"write.entity.polyline\" || op == \"write.entity.polyline2d\"'; per-vertex points[].x/points[].y/points[].bulge via jsonFindNumber L656-658; closed via jsonFindNumber(job,\"closed\",cf) L666; requires points.length()>=2 L664)"
+    },
+    "write.entity.polyline2d.deep": {
+      "args": {
+        "layer": "ARIADNE_F1_PROBE",
+        "elevation": 5.0,
+        "closed": 1,
+        "default_start_width": 0.5,
+        "default_end_width": 0.25,
+        "points": [
+          {"x": 0.0, "y": 0.0, "z": 0.0, "bulge": 0.0, "start_width": 0.2, "end_width": 0.2},
+          {"x": 12.0, "y": 0.0, "z": 0.0, "bulge": 0.5, "start_width": 0.3, "end_width": 0.1},
+          {"x": 12.0, "y": 8.0, "z": 0.0, "bulge": 0.0, "start_width": 0.1, "end_width": 0.1}
+        ]
+      },
+      "evidence": "m08g_handlers.inc (write.entity.polyline2d.deep: shared layer read L503; branch L728; per-vertex points[].x/points[].y/points[].bulge/points[].start_width/points[].end_width via jsonFindNumber L756-760; elevation via jsonFindNumber(job,\"elevation\",elevation) L773; closed via jsonFindNumber(job,\"closed\",cf) L774-775; default_start_width/default_end_width via jsonFindNumber L776-778; requires pts.length()>=2 L769)"
+    },
+    "write.entity.spline": {
+      "args": {
+        "layer": "ARIADNE_F1_PROBE",
+        "order": 3,
+        "points": [
+          {"x": 0.0, "y": 0.0, "z": 0.0},
+          {"x": 5.0, "y": 8.0, "z": 0.0},
+          {"x": 10.0, "y": -3.0, "z": 0.0},
+          {"x": 15.0, "y": 5.0, "z": 0.0}
+        ]
+      },
+      "evidence": "m08g_handlers.inc (write.entity.spline: shared layer read L503; branch L600; fit points[].x/points[].y/points[].z via jsonFindNumber L619-620, requires fitPts.length()>=2 L626; order via jsonFindNumber(job,\"order\",order) L630-632, default 4 if <2)"
+    },
+    "write.entity.wipeout": {
+      "args": {
+        "layer": "ARIADNE_F1_PROBE",
+        "name": "ARIADNE_WIPEOUT_PROBE_DEF",
+        "vertices": [
+          {"x": 0.0, "y": 0.0, "z": 0.0},
+          {"x": 20.0, "y": 0.0, "z": 0.0},
+          {"x": 20.0, "y": 15.0, "z": 0.0},
+          {"x": 0.0, "y": 15.0, "z": 0.0}
+        ]
+      },
+      "evidence": "m08g_handlers.inc (write.entity.wipeout: shared layer read L503, applied L1577/L1580; branch L1529; verts via m08gRead2dVertices(job, verts) L1536, which reads \"vertices\" (fallback \"points\") arrays of {x,y,z} via m08gReadPointArray L416-417, requires >=3 points else falls back to a default unit square; name via jsonFindString(job,\"name\",defName) L1557-1558, overrides the ARIADNE_WIPEOUT_IMAGEDEF default)"
+    },
+    "write.entity.section": {
+      "args": {
+        "layer": "ARIADNE_F1_PROBE",
+        "name": "ARIADNE_SECTION_PROBE",
+        "state": "plane",
+        "points": [
+          {"x": 0.0, "y": 0.0, "z": 0.0},
+          {"x": 20.0, "y": 0.0, "z": 0.0}
+        ],
+        "vertical_dir": {"x": 0.0, "y": 0.0, "z": 1.0}
+      },
+      "evidence": "w6_section_handlers.inc (write.entity.section: branch L287; layer via jsonFindString(job,\"layer\",layer) L288; name via jsonFindString(job,\"name\",name) L289 -> AcDbSection::setName; state via jsonFindString(job,\"state\",stateStr) L290 -> w6sectionStateFromName; points via w6sectionReadPoints(job,pts) L293 (reads \"points\", falls back to \"vertices\", each {x,y,z}), requires >=2; vertical_dir via w6sectionReadVector(job,\"vertical_dir\",0,0,1) L301, {x,y,z} object)"
+    }
+  },
+  "needs_state": [
+    {
+      "op": "write.entity.region",
+      "reason": "Handler (m08g_handlers.inc L1100-1149) requires 'curves':[<handle>,...] -- hex handles of pre-existing coplanar closed curve entities that AcDbRegion::createFromCurves clones from (resolveHandle + acdbOpenObject per handle at L1109-1120); a single stateless args object cannot supply a real, already-database-resident curve handle to reference."
+    },
+    {
+      "op": "write.entity.rasterimage",
+      "reason": "Handler (m08g_handlers.inc L1497-1528) requires 'image_path' (non-empty, MISSING_ARG otherwise at L1502) which is set verbatim as the AcDbRasterImageDef source/active filename -- an external backing raster file on disk. A stateless fixture call cannot supply a real, existing image file path grounded in evidence rather than invented."
+    }
+  ]
+}

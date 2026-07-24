@@ -1,0 +1,300 @@
+[
+  {
+    "unit_id": "defannot-x-0-a-c059766ab-301",
+    "def": "X-평면도(기본형)$0$A$C059766AB",
+    "role": "가구",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [
+      {"handle": "3283", "reason": "long straight line paired with 20-unit offset twin (3284), resembling a double-line wall"},
+      {"handle": "328B", "reason": "vertical line paired with 20-unit offset twin (328C) spanning most of the block height"}
+    ],
+    "notes": "Kitchen-unit block (layer KIT) with counter outline, arcs/circles for sink and faucet; double-line edges are furniture panel thickness, not wall.",
+    "rationale": {
+      "evidence": "All 307 non-default entities sit on a single layer suffixed 'KIT', and the geometry is a closed rectangular outline (e.g. handles 3283/3284, 328B/328C) offset by only ~20 units, plus three circles (radii 81/91/95) and multiple arcs consistent with a sink basin and faucet swing, at an overall footprint of only 960x475 units — furniture scale, not room scale.",
+      "rule": "A closed double-line perimeter only reads as a wall when it sits on a wall-designated layer and the offset matches typical wall thickness (~100+ units); a ~20-unit offset matches standard cabinet/panel thickness and should be read as furniture even when the outline is a full rectangle.",
+      "counterfactual": "If this geometry were on a layer named WALL/A-WALL, or if the perimeter offset were ~100-200 units instead of 20, the wall_likelihood verdict would flip toward a plan/wall reading.",
+      "uncertainty": "The projection samples only 30 of 308 entities and gives no block-insertion scale factor, so it cannot be confirmed whether this unit is inserted at 1:1 or scaled up to room dimensions elsewhere in the drawing."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c072c115f-302",
+    "def": "X-평면도(기본형)$0$A$C072C115F",
+    "role": "가구",
+    "wall_likelihood": 0.12,
+    "wall_line_handles": [
+      {"handle": "4136", "reason": "long vertical line paired with 20-unit offset twin (4137) spanning the full block height"},
+      {"handle": "4137", "reason": "parallel counterpart to 4136, forming a thin double line"}
+    ],
+    "notes": "Small L-shaped fitted-furniture piece (layers I-FL-FUR(B)/F-FUR-FIX) with a 20-unit side panel and diagonal corner returns; no wall-scale geometry.",
+    "rationale": {
+      "evidence": "23 entities split across I-FL-FUR(B) (furniture) and F-FUR-FIX (fixed furniture) layers; handles 4136/4137 form a 20-unit-offset parallel pair over the full 1650-unit height, and diagonal LINE pairs like 4146/4147 and 4149/414A look like mitred furniture corners rather than any wall opening.",
+      "rule": "Layer names containing FUR/FIX signal furniture even when a line pair superficially resembles a double-line wall; the deciding factor is the offset magnitude (here ~20 units, a panel thickness) combined with the non-wall layer name.",
+      "counterfactual": "A wall verdict would require either a WALL-tagged layer or an offset in the 100-200 unit range consistent with masonry/stud thickness; neither is present here.",
+      "uncertainty": "The two LWPOLYLINE groups with 4 vertices each are not resolved to coordinates in this projection, nor is the block's insertion scale/rotation in the parent drawing, so whether this exact geometry is reused at a different scale elsewhere cannot be confirmed."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c0a097a0c-303",
+    "def": "X-평면도(기본형)$0$A$C0A097A0C",
+    "role": "가구",
+    "wall_likelihood": 0.08,
+    "wall_line_handles": [],
+    "notes": "Tall narrow fixture (single layer I-FL-FUR(S)) with repeated small hinge/handle arc clusters typical of a cabinet or sanitary fitting; no wall-like double-line perimeter.",
+    "rationale": {
+      "evidence": "All 125 entities sit on one layer, I-FL-FUR(S) (interior floor furniture, sanitary/standalone); the arcs cluster in tight groups of 4-6 around handles 31FE-3205 and 320B, matching a repeated hinge/knob or hardware motif rather than door/window openings in a wall.",
+      "rule": "Repeated small-radius arc clusters (radius well under 50 units) attached to short line segments are a hardware/fitting signature, not a wall-opening signature, which would instead show one or two large arcs (door swing) cut into a long straight wall line.",
+      "counterfactual": "If the arcs were fewer, larger radius, and centered on a break in a long straight line (a door swing into a wall), this would flip toward a wall/opening reading.",
+      "uncertainty": "Only 30 of 125 entities are sampled, so it is not certain whether a long straight wall-scale line exists elsewhere in the unsampled remainder."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c0c1f5443-304",
+    "def": "X-평면도(기본형)$0$A$C0C1F5443",
+    "role": "가구",
+    "wall_likelihood": 0.13,
+    "wall_line_handles": [
+      {"handle": "2AE2", "reason": "long vertical line paired with 20-unit offset twin (2AE3) spanning nearly the full block height"},
+      {"handle": "2AE3", "reason": "parallel counterpart to 2AE2, forming a thin double line"}
+    ],
+    "notes": "Corner furniture assembly combining F-FUR-FIX, I-FL-FUR(B), and I-FL-FUR(S) layers; a 20-unit double line plus mitred-corner diagonals indicate a cabinet, not a wall.",
+    "rationale": {
+      "evidence": "93 entities span three furniture-family layers; handles 2AE2/2AE3 form a 20-unit parallel pair over 1650 units, matching the same panel-thickness pattern seen in sibling blocks (e.g. definitions 2, 5, 6, 14) in this shard, and the diagonal pairs 2AF2/2AF3 and 2AF5/2AF6 look like mitred cabinet corners.",
+      "rule": "When several sibling block definitions in the same drawing repeat an identical ~20-unit offset convention on furniture-named layers, that offset should be read as a standard panel thickness across the whole set, not re-litigated as a wall each time.",
+      "counterfactual": "A different, larger offset (100+ units) or a WALL-named layer on just this one definition (breaking the sibling pattern) would be the signal needed to reclassify it as a wall segment.",
+      "uncertainty": "The second layer group (I-FL-FUR(S)) entities near handles 2AF7-2AFD are only partially sampled, so the full extent of that sub-assembly's geometry is not visible here."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c0e9d10f9-305",
+    "def": "X-평면도(기본형)$0$A$C0E9D10F9",
+    "role": "가구",
+    "wall_likelihood": 0.12,
+    "wall_line_handles": [
+      {"handle": "33B7", "reason": "long vertical line paired with 20-unit offset twin (33B8) spanning nearly the full 1819-unit height"},
+      {"handle": "33B8", "reason": "parallel counterpart to 33B7, forming a thin double line"}
+    ],
+    "notes": "Tall narrow wardrobe/cabinet strip (F-FUR-FIX/I-FL-FUR(B)) with a 20-unit side panel and mitred corner diagonals; no wall-thickness geometry.",
+    "rationale": {
+      "evidence": "46 entities on furniture layers only; handles 33B7/33B8 are a 20-unit-offset parallel pair running the full 1819-unit height, and diagonal pairs like 33C4/33C5 and 33C7/33C8 form small 60-unit mitred returns typical of a cabinet door or drawer front, not a wall corner.",
+      "rule": "A tall, narrow (370x2480-unit) footprint with a single 20-unit-thick side panel is dimensionally consistent with a fitted wardrobe/cabinet run, whereas a wall segment of this length would normally be drawn thicker and as part of a larger enclosed room outline.",
+      "counterfactual": "If this same shape were paired with a matching wall on the opposite side at a consistent room-scale offset (and tagged on a WALL layer), it would read as a partition instead of furniture.",
+      "uncertainty": "The projection does not show what lies beyond the -370 to 0 unit strip, so whether this piece abuts an actual wall elsewhere in the full drawing cannot be determined from this shard alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c0ef505d0-306",
+    "def": "X-평면도(기본형)$0$A$C0EF505D0",
+    "role": "가구",
+    "wall_likelihood": 0.12,
+    "wall_line_handles": [
+      {"handle": "1E3F", "reason": "long vertical line paired with 20-unit offset twin (1E40) spanning the full 1650-unit height"},
+      {"handle": "1E40", "reason": "parallel counterpart to 1E3F, forming a thin double line"}
+    ],
+    "notes": "Narrow cabinet/wardrobe strip (F-FUR-FIX/I-FL-FUR(B)) nearly identical in construction to definitions 5, 12, and 14 in this shard; 20-unit panel offset, mitred corners.",
+    "rationale": {
+      "evidence": "32 entities on furniture-only layers; handles 1E3F/1E40 form the same 20-unit parallel pair pattern seen repeatedly across this shard, and diagonal pairs 1E4C/1E4D and 1E4F/1E50 are 60-unit mitred returns matching a cabinet door corner.",
+      "rule": "Recognizing a repeated construction template across multiple sibling block definitions (same offset, same mitred-corner motif, same furniture layer family) increases confidence that the pattern is a furniture drafting convention rather than an incidental wall resemblance.",
+      "counterfactual": "A wall verdict would need this offset to jump to a wall-thickness range and/or the layer to change to a WALL designation, breaking from the template shared with definitions 5/12/14.",
+      "uncertainty": "Two of the 32 entities fall outside this 30-item sample, so the picture is nearly complete, but the exact vertex coordinates of the LWPOLYLINE groups (e.g. 1E4B, 1E4E) are not given, leaving their precise shape unresolved."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c17c8346b-307",
+    "def": "X-평면도(기본형)$0$A$C17C8346B",
+    "role": "가구",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Large single-layer (I-FL-FUR(S)) fixture cluster with repeated small hinge/handle arc groups, similar in construction to definition 3; no clean wall-scale double line.",
+    "rationale": {
+      "evidence": "188 entities all on I-FL-FUR(S); arc clusters around handles 4207-420E and 4214 repeat the same tight hinge/knob motif seen in definition 3, and the closest thing to a parallel pair (4205 at -1459.711 and 4219 at -1436.711) is only 23 units apart over a 300-unit run — a bracket detail, not a room-spanning wall.",
+      "rule": "A single homogeneous furniture layer covering all entities in a definition, combined with repeated small-radius hardware arcs, should be read as one fixture assembly rather than segmented into wall/opening components.",
+      "counterfactual": "If the 4205/4219 pair extended across the full 1660-unit height at a wall-typical offset (100+ units) instead of 23 units over 300, it would be a stronger wall candidate.",
+      "uncertainty": "Only 30 of 188 entities are shown, so additional long parallel lines elsewhere in the definition cannot be ruled out."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c200833b1-308",
+    "def": "X-평면도(기본형)$0$A$C200833B1",
+    "role": "가구",
+    "wall_likelihood": 0.08,
+    "wall_line_handles": [],
+    "notes": "Low, long counter/fixture run (FUR-FIX/FUR-KIT) built from short bracket segments and mitred corner returns; no continuous wall-like double line.",
+    "rationale": {
+      "evidence": "24 entities split between FUR-FIX (21) and FUR-KIT (3); the parallel-looking segments (e.g. 340F/3413/3414 near x=-980 to -920, and 3410/3411 near x=-20/-38) are short (20-60 units) and non-uniform in length, forming bracket/leg details rather than one continuous perimeter line.",
+      "rule": "Fragmented, unevenly-spaced parallel segments (varying lengths and offsets across the same run) indicate furniture hardware/leg brackets, whereas a genuine wall representation shows one continuous pair of lines running the full length of the wall.",
+      "counterfactual": "A single unbroken pair of parallel lines spanning the whole 1030-unit width at a consistent offset would flip this toward a wall/partition reading.",
+      "uncertainty": "The bbox z-range down to -0.006 suggests a near-zero-thickness 3D nuance not resolvable from this 2D projection, and its purpose (draft artifact vs. intentional detail) is unclear."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c24b0555e-309",
+    "def": "X-평면도(기본형)$0$A$C24B0555E",
+    "role": "가구",
+    "wall_likelihood": 0.08,
+    "wall_line_handles": [],
+    "notes": "Mirror-image counterpart to definition 8 (FUR-FIX/FUR-KIT), same fragmented bracket construction; no wall-like continuous double line.",
+    "rationale": {
+      "evidence": "24 entities on FUR-KIT (20) and FUR-FIX (4); the geometry mirrors definition 8's layout (short segments near 4F75/4F79/4F7A and 4F76/4F77) with the same non-uniform bracket lengths rather than one continuous perimeter pair.",
+      "rule": "Mirrored/paired block definitions that repeat a bracketed, non-continuous line pattern across a shard reinforce that the pattern is a furniture-hardware convention, not an incidental wall shape.",
+      "counterfactual": "If this and definition 8 instead shared a continuous full-length double-line perimeter at wall-typical thickness, both would warrant a higher wall_likelihood.",
+      "uncertainty": "As with definition 8, all 24 entities are fully listed here, but exact LWPOLYLINE vertex coordinates are not given, so fine shape details remain unresolved."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c41d360df-310",
+    "def": "X-평면도(기본형)$0$A$C41D360DF",
+    "role": "가구",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Small decorative furniture detail (single FUR layer) built almost entirely from ARC/ELLIPSE/SPLINE curves; no straight wall-like lines present.",
+    "rationale": {
+      "evidence": "107 entities on the FUR layer are dominated by 30+ ARC entities, 15 ELLIPSE, and 45 SPLINE, with only a single LINE (handle 6C5D) in the whole definition; the bbox is a small 49x538x36.5-unit volume, consistent with a curved furniture part such as a leg, knob, or decorative moulding.",
+      "rule": "A definition whose entity mix is overwhelmingly curved (arc/ellipse/spline) with essentially no straight-line perimeter cannot represent a wall, since walls are drawn as straight (or gently curved at large radius) line/polyline pairs, not dense small-radius curve networks.",
+      "counterfactual": "Only if the drawing convention used splines to represent wall curves at a room-scale radius (much larger than seen here) would this pattern warrant reconsideration, and that is not the case given the sub-meter bbox.",
+      "uncertainty": "Because only 1 LINE exists among 107 entities and it is not paired with a matching offset partner in the sample, its exact role (dimension helper vs. geometry edge) cannot be confirmed from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c48ba1cd6-311",
+    "def": "X-평면도(기본형)$0$A$C48BA1CD6",
+    "role": "가구",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Large multi-fixture assembly (F-FUR-FIX/I-FL-FUR(B)/I-FL-FUR(S)) combining a wardrobe-like strip with repeated hinge-arc fixture clusters; no confirmed continuous double-line perimeter in the sample.",
+    "rationale": {
+      "evidence": "127 entities span three furniture layers; handle 1E64 is a single 1490-unit vertical line without a visible parallel twin in this sample, while the arc clusters around 1E67-1E74 and 1E80 repeat the same small hinge/knob motif seen in definitions 3 and 7.",
+      "rule": "A long single line without a confirmed nearby parallel offset should not be flagged as a wall candidate on its own; wall_line_handles are reserved for lines with an observed matching pair at a plausible thickness.",
+      "counterfactual": "If a second vertical line were found at a consistent offset from 1E64 (either ~20 units for furniture or ~100+ for wall), this verdict could be refined in either direction.",
+      "uncertainty": "97 of 127 entities are outside this sample, so a matching partner to handle 1E64 may exist unseen, and its offset (furniture vs. wall scale) cannot be determined here."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c49112a41-312",
+    "def": "X-평면도(기본형)$0$A$C49112A41",
+    "role": "가구",
+    "wall_likelihood": 0.09,
+    "wall_line_handles": [],
+    "notes": "Tall cabinet/wardrobe unit (F-FUR-FIX/I-FL-FUR(B)) with a 400-unit-wide body and mitred-corner diagonals; the 400-unit gap is a furniture body width, not a thin wall-like offset.",
+    "rationale": {
+      "evidence": "32 entities on furniture layers only; the two long verticals 31D6 (x=-430) and 31DE (x=-30) are 400 units apart — matching a cabinet/wardrobe body depth, not the ~20-unit panel-edge offset seen in sibling definitions 2/4/5/6/14, and diagonal pairs 31E2/31E3 and 31E5/31E6 are 60-unit mitred returns.",
+      "rule": "A 400-unit separation between two long parallel lines is too wide to read as a double-line wall thickness convention in this drawing (walls, if present, would need a WALL layer) and too narrow to be a room; it matches a single piece of case furniture instead.",
+      "counterfactual": "If layer names shifted to WALL/A-WALL and the two verticals bounded an enclosed room-scale area with door/window breaks, this would become a wall reading.",
+      "uncertainty": "Two of 32 entities are outside this sample, and whether a thin 20-unit double-line detail exists elsewhere in the unshown entities (as in sibling definitions) cannot be fully ruled out."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c4b913e7c-313",
+    "def": "X-평면도(기본형)$0$A$C4B913E7C",
+    "role": "심볼",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Door symbol block (single DOOR layer): LWPOLYLINE leaf shapes, one ARC swing, and two thin parallel jamb lines 3 units apart.",
+    "rationale": {
+      "evidence": "All 14 entities are on the DOOR layer; there are 9 LWPOLYLINE entities of varying vertex counts (5-19) consistent with a door leaf/panel outline, a single ARC (8248) consistent with a door swing arc, and two LINE entities (8251/8252) only 3 units apart over a 920-unit run, consistent with a door frame/jamb pair rather than a wall.",
+      "rule": "A DOOR-tagged layer combined with exactly one swing arc and a pair of very thin (single-digit unit) parallel jamb lines is the standard symbol convention for a door leaf, and should be classified as a symbol rather than furniture or a wall segment even though it lives inside a wall opening.",
+      "counterfactual": "If the jamb-like lines were instead ~100+ units apart and matched the drawing's wall thickness, or if the layer were WALL-named, this would indicate the surrounding wall opening rather than the door symbol itself.",
+      "uncertainty": "This projection does not show the wall opening the door sits within, so the relationship between this DOOR block and any adjacent wall geometry elsewhere in the drawing cannot be assessed from this shard alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c4d747d6b-314",
+    "def": "X-평면도(기본형)$0$A$C4D747D6B",
+    "role": "가구",
+    "wall_likelihood": 0.12,
+    "wall_line_handles": [
+      {"handle": "1EE8", "reason": "long vertical line paired with 20-unit offset twin (1EE9) spanning the full 1650-unit height"},
+      {"handle": "1EE9", "reason": "parallel counterpart to 1EE8, forming a thin double line"}
+    ],
+    "notes": "Tall cabinet/wardrobe strip (F-FUR-FIX/I-FL-FUR(B)) matching the same 20-unit-panel construction template as definitions 5, 6, and 12 in this shard.",
+    "rationale": {
+      "evidence": "32 entities on furniture layers only; handles 1EE8/1EE9 form a 20-unit parallel pair over the full 1650-unit height, and diagonal pairs 1EF5/1EF6 and 1EF8/1EF9 are 60-unit mitred corner returns, matching the exact template seen in definitions 5, 6, and 12.",
+      "rule": "When a shard contains a family of near-identical block definitions sharing the same layer set, offset, and corner-mitre pattern, the whole family should be classified consistently as furniture rather than evaluating each in isolation.",
+      "counterfactual": "A change in layer to WALL/A-WALL or a jump in offset to wall-typical thickness on just this one sibling (breaking the shared template) would be needed to reclassify it individually.",
+      "uncertainty": "Two of 32 entities fall outside this sample, and the exact vertex coordinates of the LWPOLYLINE groups (e.g. 1EF4, 1EFA-1EFF) are not given, leaving fine drawer/door-front shape unresolved."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c57321cdf-315",
+    "def": "X-평면도(기본형)$0$A$C57321CDF",
+    "role": "가구",
+    "wall_likelihood": 0.08,
+    "wall_line_handles": [],
+    "notes": "Vertical counter/cabinet run (FUR-FIX/FUR-KIT), same fragmented-bracket construction as definitions 8 and 9; no continuous wall-like double line.",
+    "rationale": {
+      "evidence": "24 entities split between FUR-FIX (21) and FUR-KIT (3); segments such as 41E9/41ED/41EE and 41FA/41F9 are short (60-90 units) and non-uniform, forming leg/bracket details rather than one continuous perimeter pair, matching the layout style of definitions 8 and 9.",
+      "rule": "Fragmented, short, non-uniform parallel segments across a furniture-tagged layer set are a hardware/bracket signature; a genuine wall would instead show one unbroken pair of lines running the full extent of the wall.",
+      "counterfactual": "A single unbroken pair of parallel lines spanning the full 930-unit height at a consistent offset would flip this toward a wall/partition reading.",
+      "uncertainty": "All 24 entities are shown in this sample, but exact LWPOLYLINE vertex coordinates are not given, so the precise silhouette of the counter front cannot be fully confirmed."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c5aa0109c-316",
+    "def": "X-평면도(기본형)$0$A$C5AA0109C",
+    "role": "심볼",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Plumbing/pipe symbol block (single PIPE layer): three circles of differing radii and short unpaired lines suggest a drain or cleanout fitting, not a wall.",
+    "rationale": {
+      "evidence": "All 9 entities are on the PIPE layer; three CIRCLE entities (radii 37.5, 62.5, 45) are concentric-scale fittings typical of a drain/cleanout cover, and the two LINE entities (1E32, 1E33) are single (unpaired) centerlines rather than an offset double-line pair.",
+      "rule": "A small entity count entirely on a PIPE-named layer, dominated by circles rather than long straight lines, is the standard symbol convention for a plumbing fitting and should not be conflated with wall geometry regardless of any long individual lines present.",
+      "counterfactual": "If the two LINE entities were instead part of a matched parallel offset pair at wall thickness, or if the layer were WALL-tagged, this would need reconsideration, but neither condition holds here.",
+      "uncertainty": "The two LWPOLYLINE entities (1E35, 1E36) are not resolved to coordinates in this projection, so it is unclear whether they represent additional pipe/fitting detail or a mounting plate."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c5c7666b6-317",
+    "def": "X-평면도(기본형)$0$A$C5C7666B6",
+    "role": "가구",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Dense decorative furniture detail (single FUR layer, 865 entities) built from hundreds of short LINE segments plus SPLINE/ARC/ELLIPSE, e.g. tufted upholstery or textured surface pattern; no wall-scale straight lines.",
+    "rationale": {
+      "evidence": "865 entities all on the FUR layer include 362 SPLINE and 18 ELLIPSE alongside 364 short LINE segments, most under 10 units long (e.g. handles 6528-653F cluster around a 0.1-1 unit range), consistent with fine decorative stitching/texture detail on an upholstered furniture surface within a 600x284-unit footprint.",
+      "rule": "An extremely high entity count made of very short line/spline segments on a single furniture layer, with no line approaching room or wall scale, is a strong signal of decorative surface detail on furniture rather than any architectural element.",
+      "counterfactual": "A wall reading would require long (meter-scale), few, straight line pairs on a wall-named layer — the opposite of the dense sub-unit-length curve network seen here.",
+      "uncertainty": "Only 30 of 865 entities are shown, so the overall silhouette of the furniture piece these details belong to (chair, ottoman, etc.) cannot be fully confirmed from this sample."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c5fea68fe-318",
+    "def": "X-평면도(기본형)$0$A$C5FEA68FE",
+    "role": "가구",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Symmetric decorative furniture silhouette (single FUR layer, 402 entities) with fine ARC/LINE/SPLINE detail mirrored about y=0; no wall-scale straight lines.",
+    "rationale": {
+      "evidence": "402 entities all on the FUR layer, with lines like 6969/696A and 6974/6975 mirrored symmetrically about y=0 at sub-unit offsets, and a mix of 103 ARC and 166 SPLINE entities forming a small 167x78-unit curved silhouette consistent with a chair back or decorative furniture profile.",
+      "rule": "Bilateral symmetry about a center axis combined with dense short curved segments (arc/spline) at sub-meter scale is characteristic of a furniture silhouette or ornamental detail, not architectural wall geometry, which does not typically exhibit this kind of fine mirrored detailing.",
+      "counterfactual": "A wall verdict would require abandoning the mirrored fine-detail pattern in favor of a small number of long straight lines at wall thickness on a wall-tagged layer.",
+      "uncertainty": "Only 30 of 402 entities are shown, so it is not certain whether any long straight line exists in the unsampled remainder, though the small 167x78-unit bbox makes this unlikely."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c60d55377-319",
+    "def": "X-평면도(기본형)$0$A$C60D55377",
+    "role": "가구",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Large fixture/cabinet assembly (single I-FL-FUR(S) layer) with repeated hinge-arc clusters and cabinet inset details; longer lines (e.g. 5650, 5666) appear unpaired in this sample.",
+    "rationale": {
+      "evidence": "146 entities all on I-FL-FUR(S); arc clusters around handles 5652, 5657-5661, and 566D repeat the same small hinge/knob motif seen in definitions 3, 7, and 11, while longer lines such as 5650 (0,0)->(1890,0) and 5666 (0,957)->(400,957) do not have a visible matching parallel offset partner within the sampled 30 entities.",
+      "rule": "A long line without a confirmed nearby parallel twin at a consistent small offset should be treated as a boundary/reference edge of a fixture assembly rather than flagged as a wall candidate, since wall_line_handles require an observed pairing.",
+      "counterfactual": "If a matching line were found ~18-20 units from 5650 or 5666 (furniture panel thickness) or ~100+ units away on a WALL layer, the verdict could be refined accordingly.",
+      "uncertainty": "116 of 146 entities are outside this sample, so whether 5650/5666 have an unseen parallel partner, and at what offset, cannot be determined from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c610442a9-320",
+    "def": "X-평면도(기본형)$0$A$C610442A9",
+    "role": "가구",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Large fixture/cabinet assembly (single I-FL-FUR(S) layer, bbox up to 37-unit z-height) with repeated hinge-arc clusters matching the same construction family as definition 19.",
+    "rationale": {
+      "evidence": "136 entities all on I-FL-FUR(S); arc clusters around handles 42ED-42F1 and 42F7 repeat the same small hinge/knob motif as definitions 3, 7, 11, and 19, and the bbox z-range up to 37.154 units suggests a shallow 3D plinth/toe-kick typical of case furniture rather than a flat 2D wall representation.",
+      "rule": "A non-zero but shallow z-extent (tens of units, not room-height) combined with repeated small hardware arcs on a furniture-family layer indicates case furniture with a toe-kick or plinth detail, not a wall, which would be either flat (z=0) or full room-height in 3D.",
+      "counterfactual": "A wall reading would require either a flat z=0 profile with a WALL-tagged layer, or a full floor-to-ceiling z-extent, neither of which matches the shallow 37-unit z-range seen here.",
+      "uncertainty": "106 of 136 entities are outside this sample, so the full extent of the assembly this fixture belongs to cannot be completely confirmed."
+    }
+  }
+]

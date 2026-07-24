@@ -1,0 +1,202 @@
+[
+  {
+    "unit_id": "defannot-d355-61",
+    "answer": {
+      "def": "*D355",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (DIMDOT) and a single MTEXT '\\A1;10400' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8D8A length 10280.0 vs MTEXT value 10400.0, constant offset -120.0 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d356-62",
+    "answer": {
+      "def": "*D356",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (DIMDOT) and a single MTEXT '\\A1;1700' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8D91 length 1660.0 vs MTEXT value 1700.0, constant offset -40.0 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d357-63",
+    "answer": {
+      "def": "*D357",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (DIMDOT) and a single MTEXT '\\A1;865' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8D9C length 745.0 vs MTEXT value 865.0, constant offset -120.0 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d358-64",
+    "answer": {
+      "def": "*D358",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (_ArchTick) and a single MTEXT '\\A1;2300' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8DA5 length 2420.0 vs MTEXT value 2300.0, constant offset 120.0 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d359-65",
+    "answer": {
+      "def": "*D359",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (_ArchTick) and a single MTEXT '\\A1;150' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8DAE length 270.0 vs MTEXT value 150.0, constant offset 120.0 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d360-66",
+    "answer": {
+      "def": "*D360",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (_ArchTick) and a single MTEXT '\\A1;150' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8DB7 length 270.0 vs MTEXT value 150.0, constant offset 120.0 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d361-67",
+    "answer": {
+      "def": "*D361",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (_ArchTick) and a single MTEXT '\\A1;3600' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8DC0 length 3720.0 vs MTEXT value 3600.0, constant offset 120.0 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d362-68",
+    "answer": {
+      "def": "*D362",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (_ArchTick) and a single MTEXT '\\A1;155' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8DCB length 155.0 vs MTEXT value 155.0, constant offset 0.0 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d363-69",
+    "answer": {
+      "def": "*D363",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (_ArchTick) and a single MTEXT '\\A1;190' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8DD6 length 190.0 vs MTEXT value 190.0, constant offset 0.0 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d364-70",
+    "answer": {
+      "def": "*D364",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (DIMDOT) and a single MTEXT '\\A1;215' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8DE1 length 215.0 vs MTEXT value 215.0, constant offset 0.0 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d365-71",
+    "answer": {
+      "def": "*D365",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (DIMDOT) and a single MTEXT '\\A1;275' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8DEC length 275.0 vs MTEXT value 275.0, constant offset 0.0 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d366-72",
+    "answer": {
+      "def": "*D366",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (DIMDOT) and a single MTEXT '\\A1;7175' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8DF5 length 7055.0 vs MTEXT value 7175.0, constant offset -120.0 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d367-73",
+    "answer": {
+      "def": "*D367",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (DIMDOT) and a single MTEXT '\\A1;4750' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8DFE length 4630.0 vs MTEXT value 4750.0, constant offset -120.0 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d368-74",
+    "answer": {
+      "def": "*D368",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (DIMDOT) and a single MTEXT '\\A1;10350' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8E07 length 10230.0 vs MTEXT value 10350.0, constant offset -120.0 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d369-75",
+    "answer": {
+      "def": "*D369",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (DIMDOT) and a single MTEXT '\\A1;660' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8E10 length 540.0 vs MTEXT value 660.0, constant offset -120.0 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d370-76",
+    "answer": {
+      "def": "*D370",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (DIMDOT) and a single MTEXT '\\A1;2070' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8E19 length 1950.0 vs MTEXT value 2070.0, constant offset -120.0 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d371-77",
+    "answer": {
+      "def": "*D371",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (DIMDOT) and a single MTEXT '\\A1;920' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8E20 length 940.0 vs MTEXT value 920.0, constant offset 20.0 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d372-78",
+    "answer": {
+      "def": "*D372",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (DIMDOT) and a single MTEXT '\\A1;585' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8E2B length 518.333 vs MTEXT value 585.0, constant offset -66.667 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d373-79",
+    "answer": {
+      "def": "*D373",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (DIMDOT) and a single MTEXT '\\A1;495' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8E34 length 428.333 vs MTEXT value 495.0, constant offset -66.667 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-d374-80",
+    "answer": {
+      "def": "*D374",
+      "role": "치수캐시",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All entities sit on DIM/DEFPOINTS layers with 2x tick-symbol INSERTs (DIMDOT) and a single MTEXT '\\A1;1620' reading a dimension value; the DIM-layer LINEs are extension/dimension lines (nearest line handle 8E3D length 1553.333 vs MTEXT value 1620.0, constant offset -66.667 consistent with tick/arrow gap, not a wall span). 3x POINT on DEFPOINTS are AutoCAD associative-dimension definition points. This is an anonymous dimension-cache block, not architectural wall geometry."
+    }
+  }
+]

@@ -41,11 +41,20 @@ STABLE_ID_FLOAT_EPSILON = 1e-6
 _STABLE_ID_EXCLUDED_ENTITY_FIELDS = frozenset((
     "bbox",
     "block_record_handle",
+    # color_index/color_method/true_color, linetype/lineweight, and xclip are
+    # volatile DISPLAY attributes (PR #29 emission): kept in the output entity for
+    # faithful rendering, but a recolor / re-linetype / re-clip must diff as a
+    # MODIFY of the same entity (not delete+create), so they are excluded from
+    # stable identity. Also keeps stable_ids drift-free vs pre-#29 IRs.
+    "color_index",
+    "color_method",
     "dim_block_handle",
     "dim_block_name",
     "extension_dictionary_handle",
     "handle",
     "leader_length",
+    "linetype",
+    "lineweight",
     "object_id",
     "origin",
     "owner_handle",
@@ -55,6 +64,8 @@ _STABLE_ID_EXCLUDED_ENTITY_FIELDS = frozenset((
     "spline_knots",
     "stable_id",
     "stable_id_ordinal",
+    "true_color",
+    "xclip",
     "xdata",
 ))
 _STABLE_ID_VIEWPORT_GEOMETRY_EXCLUDES = frozenset(VPORT_MANAGED_FIELDS)
@@ -447,7 +458,10 @@ def stable_identity_payload(entity: dict) -> dict:
     attrs = {"space": str(entity.get("space", "model") or "model")}
     if entity.get("layout"):
         attrs["layout"] = str(entity["layout"])
-    for key in ("class", "linetype", "color_index", "lineweight", "visible"):
+    # linetype/color_index/lineweight moved OUT of identity attrs when native
+    # emission landed (PR #29 + supplement): they are display attributes now
+    # excluded via _STABLE_ID_EXCLUDED_ENTITY_FIELDS above.
+    for key in ("class", "visible"):
         if key in entity:
             attrs[key] = entity[key]
     payload = {
@@ -465,7 +479,7 @@ def stable_identity_payload(entity: dict) -> dict:
         if key in _STABLE_ID_EXCLUDED_ENTITY_FIELDS:
             continue
         if key in ("class", "dxf_name", "geometry", "layer", "layout", "space",
-                   "linetype", "color_index", "lineweight", "visible"):
+                   "visible"):
             continue
         extras[key] = _normalize_for_stable_hash(entity[key])
     if extras:
@@ -503,6 +517,49 @@ def apply_stable_entity_identity(ir: dict) -> dict:
 
 
 # --- entity normalization ------------------------------------------------------
+
+def _derive_count_scope(entities: list) -> str:
+    """Derive diagnostics.count_scope from the entity spaces actually present."""
+    spaces = {e.get("space", "model") for e in entities}
+    return "modelspace_and_paperspace" if "paper" in spaces else "modelspace"
+
+
+def _normalize_xdata_blocks(raw_xdata: list) -> list:
+    """Normalize entity XDATA into the schema's $defs.xdata_block form.
+
+    Extractors ship XDATA in two shapes: the native database-graph emitter
+    sends already-grouped blocks ({"app", "items": [{"code", "value"}]}),
+    which pass through unchanged; the geometry-extract emitter sends a flat
+    resbuf stream ({"type_code"|"code": <int>, "value": ...}) where group
+    code 1001 -- the DXF XDATA registered-app marker -- opens one app's
+    block. Items arriving before any 1001 marker are kept under an empty
+    app name rather than dropped (no-fake-success).
+    """
+    blocks: list = []
+    current = None
+    for item in raw_xdata:
+        if not isinstance(item, dict):
+            continue
+        if "app" in item:
+            current = None
+            blocks.append(item)
+            continue
+        code = item.get("type_code", item.get("code"))
+        try:
+            code = int(code)
+        except (TypeError, ValueError):
+            continue
+        value = item.get("value")
+        if code == 1001:
+            current = {"app": "" if value is None else str(value), "items": []}
+            blocks.append(current)
+            continue
+        if current is None:
+            current = {"app": "", "items": []}
+            blocks.append(current)
+        current["items"].append({"code": code, "value": value})
+    return blocks
+
 
 def _normalize_entity(raw, source_block):
     """Map one dwg_geometry_extract entity to one IR entity (all required fields)."""
@@ -546,9 +603,12 @@ def _normalize_entity(raw, source_block):
     layout = raw.get("layout")
     if layout:
         entity["layout"] = str(layout)
-    # carry XDATA through untouched if the extractor attached it
+    # XDATA arrives as a flat resbuf stream from this extractor; the IR
+    # legislates the per-app grouped form, so normalize on the way in.
     if isinstance(raw.get("xdata"), list) and raw["xdata"]:
-        entity["xdata"] = raw["xdata"]
+        xdata_blocks = _normalize_xdata_blocks(raw["xdata"])
+        if xdata_blocks:
+            entity["xdata"] = xdata_blocks
 
     return entity
 
@@ -629,7 +689,7 @@ def build_ir_from_extract(extract: dict, summary: dict | None, source_meta: dict
 
     diagnostics = {
         "entity_count": entity_count,
-        "count_scope": "modelspace",
+        "count_scope": _derive_count_scope(entities),
         "realized_entity_count": entity_count,
         "entities_by_type": entities_by_type,
         "warnings": warnings,
@@ -891,6 +951,11 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
                    ("jog_angle", "jog_angle"), ("elevation", "elevation"),
                    ("default_start_width", "default_start_width"),
                    ("default_end_width", "default_end_width"),
+                   # #35 supplement: AcDbPolyline constant width. PR #29's native
+                   # side emits const_width but the numeric allow-list here was
+                   # never taught it, so the lift silently DROPPED it (the
+                   # per-vertex start_width/end_width lift below already worked).
+                   ("const_width", "const_width"),
                    # a1-hatchread: AcDbHatch's own plane/pattern/gradient
                    # numbers. pattern_type/hatch_style/gradient_type are
                    # AutoCAD enum ordinals (AcDbHatch::HatchPatternType/
@@ -995,6 +1060,26 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     # equivalent (write.entity.hatch is attended-gated on this build; see
     # build_log.md), so this is verified via cross-oracle DXF comparison
     # instead of a create->re-extract P-gate diff like closed/m_closed above.
+    # hatch-origin cert (2026-07-09): AcDbHatch::originPoint() [x, y] -- the
+    # per-hatch pattern phase anchor (HPORIGIN). Live-verified round-trip:
+    # setOriginPoint([123.5, -77.25]) -> re-extract [123.5, -77.25] exactly
+    # (runs/hatch_origin_cert2_20260709; the native emit existed but THIS
+    # whitelist dropped the key). Same bare [x, y] passthrough shape as
+    # clip_boundary's pairs below.
+    pattern_origin = raw.get("pattern_origin")
+    if (isinstance(pattern_origin, list) and len(pattern_origin) >= 2
+            and all(isinstance(v, (int, float)) for v in pattern_origin[:2])):
+        geom["pattern_origin"] = [float(pattern_origin[0]), float(pattern_origin[1])]
+    assoc_source_handles = raw.get("assoc_source_handles")
+    # Contract (docs/ASSOC_RELINK_DESIGN.md): array-of-arrays aligned to
+    # loops[] -- assoc_source_handles[i] lists the source handles of loop i.
+    # Flat lists (the rejected hatch-level getAssocObjIds shape, 0/66 on the
+    # 1.dwg census) and mixed types are dropped as malformed.
+    if (isinstance(assoc_source_handles, list) and assoc_source_handles
+            and all(isinstance(loop, list)
+                    and all(isinstance(v, str) for v in loop)
+                    for loop in assoc_source_handles)):
+        geom["assoc_source_handles"] = assoc_source_handles
     if isinstance(raw.get("pattern_double"), bool):
         geom["pattern_double"] = raw["pattern_double"]
     if isinstance(raw.get("is_solid_fill"), bool):
@@ -1046,6 +1131,12 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
                 norm_fp.append(pt)
         if norm_fp:
             geom["fit_points"] = norm_fp
+    # Hatch pattern-definition lines are already structured by the native
+    # extractor; keep them verbatim so .pat synthesis remains the single
+    # degrees-conversion site for their angle values.
+    pattern_defs = raw.get("pattern_definitions")
+    if isinstance(pattern_defs, list) and pattern_defs:
+        geom["pattern_definitions"] = pattern_defs
     loops = raw.get("loops")
     if isinstance(loops, list) and loops:
         geom["loops"] = loops
@@ -1140,7 +1231,9 @@ def _entity_from_native(raw: dict, source_block: dict) -> dict:
     if raw.get("block_record_handle"):
         entity["block_record_handle"] = str(raw["block_record_handle"])
     if isinstance(raw.get("xdata"), list) and raw["xdata"]:
-        entity["xdata"] = raw["xdata"]
+        xdata_blocks = _normalize_xdata_blocks(raw["xdata"])
+        if xdata_blocks:
+            entity["xdata"] = xdata_blocks
     if raw.get("extension_dictionary_handle"):
         entity["extension_dictionary_handle"] = str(raw["extension_dictionary_handle"])
     # T3a: a dimension's defining anonymous block (*Dn) id/name -- deliberately
@@ -1232,7 +1325,14 @@ def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
     assign_stable_entity_identity(entities)
 
     entity_count = len(entities)
-    asserted = graph_result.get("modelspace_entities")
+    # entities[] holds model space PLUS every non-Model layout's paper space (the
+    # native inspect.database.graph splices them in), so the realized array length is
+    # modelspace_entities + paperspace_entities -- NOT modelspace_entities alone.
+    # Comparing the realized length against the model-space count only would flag a
+    # false mismatch on every drawing that has any paper-space geometry.
+    asserted_model = graph_result.get("modelspace_entities")
+    asserted_paper = graph_result.get("paperspace_entities") or 0
+    asserted = (asserted_model + asserted_paper) if asserted_model is not None else None
     entities_by_type: dict[str, int] = {}
     proxy_undecoded = 0
     for ent in entities:
@@ -1245,7 +1345,7 @@ def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
     errors: list[str] = []
     if asserted is not None and asserted != entity_count:
         warnings.append(
-            f"native modelspace_entities {asserted} != realized {entity_count}")
+            f"native modelspace+paperspace entities {asserted} != realized {entity_count}")
 
     native_cov = graph_result.get("coverage") or {}
     sections_present = list(native_cov.get("sections_present") or [])
@@ -1294,13 +1394,13 @@ def build_ir_from_database_graph(graph_result: dict, source_meta: dict) -> dict:
 
     diagnostics = {
         "entity_count": entity_count,
-        "count_scope": "modelspace",
+        "count_scope": _derive_count_scope(entities),
         "realized_entity_count": entity_count,
         "entities_by_type": entities_by_type,
         "warnings": warnings,
         "errors": errors,
         "coverage": {
-            "modelspace_count_from_native": asserted,
+            "modelspace_count_from_native": asserted_model,
             "realized_entity_count": entity_count,
             "match": (asserted is None) or (asserted == entity_count),
             "sections_present": sections_present,

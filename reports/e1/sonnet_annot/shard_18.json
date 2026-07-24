@@ -1,0 +1,226 @@
+[
+  {
+    "unit_id": "defannot-x-0-dw1600-341",
+    "answer": {
+      "def": "X-평면도(기본형)$0$dw1600",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [
+        {"handle": "1D32", "reason": "long line spanning nearly the full block width at y=0, could be read as a wall/opening face reference line"}
+      ],
+      "notes": "Single layer 'WID' and name pattern 'dw1600' (drawn width ~1510 vs nominal 1600) suggest a window/door frame symbol. The many short parallel LINE/LWPOLYLINE pairs at 4-unit and 30-unit offsets look like window sash/mullion details rather than structural wall lines."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-dw2100-342",
+    "answer": {
+      "def": "X-평면도(기본형)$0$dw2100",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [
+        {"handle": "53BC", "reason": "long line spanning nearly the full block width at y=0, could be read as a wall/opening face reference line"}
+      ],
+      "notes": "Same 53-entity 'WID' layer pattern as the dw1600/dw2700v family, only scaled wider (drawn width ~2010 vs nominal 2100). Repeated parallel line/LWPOLYLINE bands read as window frame/mullion detail, not building walls."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-dw2700v-343",
+    "answer": {
+      "def": "X-평면도(기본형)$0$DW2700v",
+      "role": "심볼",
+      "wall_likelihood": 0.15,
+      "wall_line_handles": [
+        {"handle": "3F24", "reason": "long line spanning nearly the full block width, could be read as a wall/opening face reference line"}
+      ],
+      "notes": "Same structural family as dw1600/dw2100 (53 entities, single WID layer, drawn width ~2610 vs nominal 2700). The 'v' suffix plus otherwise identical entity pattern still reads as a window/door frame symbol variant."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-esp-344",
+    "answer": {
+      "def": "X-평면도(기본형)$0$esp",
+      "role": "심볼",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "All LINE entities form diagonal X-cross marks (e.g. 1D6E/1D6F, 1D70/1D71, 1D74/1D75) on FUR/MC/피난구(evacuation-opening) layers — a small evacuation/refuge marking symbol, not orthogonal wall geometry."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ev13k-345",
+    "answer": {
+      "def": "X-평면도(기본형)$0$ev13k",
+      "role": "심볼",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [
+        {"handle": "7FD3", "reason": "vertical line at x=780, mirrored on the opposite side, spacing consistent with an elevator shaft side wall"},
+        {"handle": "7FD4", "reason": "mirrored counterpart at x=-780 forming a parallel wall-like pair with 7FD3"}
+      ],
+      "notes": "TEXT '13인승(피난용)' identifies this as an elevator car/shaft plan symbol (ELEV layer, DEFTXT label). Some paired parallel LINE segments could double as shaft-wall representation, but overall this is a fixed-equipment symbol block, not a general floor partial plan."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ev16k-346",
+    "answer": {
+      "def": "X-평면도(기본형)$0$ev16k",
+      "role": "심볼",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [
+        {"handle": "8007", "reason": "vertical line at x=880, mirrored on the opposite side, spacing consistent with an elevator shaft side wall"},
+        {"handle": "8008", "reason": "mirrored counterpart at x=-880 forming a parallel wall-like pair with 8007"}
+      ],
+      "notes": "TEXT '16인승' plus ELEV layer identifies this as an elevator car/shaft plan symbol, structurally identical to ev13k but for a 16-passenger cab. Paired parallel lines could be read as shaft walls but this is fundamentally a fixed-equipment symbol."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ev16x2k-347",
+    "answer": {
+      "def": "X-평면도(기본형)$0$ev16x2k",
+      "role": "심볼",
+      "wall_likelihood": 0.3,
+      "wall_line_handles": [
+        {"handle": "803B", "reason": "vertical line at x=880, mirrored on the opposite side, spacing consistent with an elevator shaft side wall"},
+        {"handle": "803C", "reason": "mirrored counterpart at x=-880 forming a parallel wall-like pair with 803B"}
+      ],
+      "notes": "TEXT '16인승(비상용)' plus ELEV layer and roughly double the entity count of ev16k indicates a paired/emergency elevator symbol block (two cabs side by side, bbox width ~4795). Same shaft-wall-like paired lines as the other ev* blocks; still a fixed-equipment symbol, not a floor partial plan."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-fsd1120-348",
+    "answer": {
+      "def": "X-평면도(기본형)$0$FSD1120",
+      "role": "심볼",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [
+        {"handle": "7E45", "reason": "line at y=100 spanning nearly the full width; could superficially resemble a wall/lintel line but is part of the door frame"}
+      ],
+      "notes": "DOOR layer, single ARC (swing arc) plus LWPOLYLINE leaf outlines — a classic door block; 'FSD' likely denotes a fire/smoke door type, width 1120mm. Lines are door frame/leaf edges, not structural walls."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-fsd1500-2-349",
+    "answer": {
+      "def": "X-평면도(기본형)$0$FSD1500-2",
+      "role": "심볼",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [
+        {"handle": "79F8", "reason": "long line spanning nearly the full width, could be read as a wall/frame reference line"}
+      ],
+      "notes": "A-DOOR layer, 2 ARCs suggest a double-leaf door (each leaf with its own swing arc); '-2' suffix and 1500mm width support a double door symbol. Lines are door frame/leaf edges, not building walls."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-fsdfsdf321-350",
+    "answer": {
+      "def": "X-평면도(기본형)$0$FSDFSDF321",
+      "role": "심볼",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "Layer 'A06-시설물-설비' (facility/equipment) with a small CIRCLE (radius 50) inside a tiny ~100x33 bbox — reads as a floor drain, valve, or small fixture equipment symbol, not a wall segment."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-fu1-351",
+    "answer": {
+      "def": "X-평면도(기본형)$0$FU1",
+      "role": "가구",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "FUR layer, dominated by ARC/ELLIPSE/SPLINE (curved outline) typical of a furniture item drawn in plan (e.g. a chair or stool); the single straight LINE (0,-20)->(0,-550) is likely a centerline/leg reference, not a wall."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-hd1050-352",
+    "answer": {
+      "def": "X-평면도(기본형)$0$hd1050",
+      "role": "심볼",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "DOOR layer with 244 entities, heavy ELLIPSE/short-LINE density clustered in a narrow ~1010x25 bbox — appears to be a decorative hardware/glazing pattern on a door leaf (name 'hd' plus width 1050 suggests a 1050mm door with a hardware/grille detail), not a wall."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-hobgas19-353",
+    "answer": {
+      "def": "X-평면도(기본형)$0$HOBGAS19",
+      "role": "가구",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "KIT (kitchen) layer, 12 CIRCLEs (burners) plus rectangular LWPOLYLINE outlines — a gas hob/cooktop fixture symbol, typically grouped with furniture/fixture blocks; the two long LINE edges form the cooktop cutout outline, not building walls."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ic708-354",
+    "answer": {
+      "def": "X-평면도(기본형)$0$IC708",
+      "role": "가구",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "FUR layer, ARC/SPLINE-heavy curved outline with a few straight edges (e.g. handle 5F8D, length ~802) — consistent with a furniture/fixture plan symbol (e.g. a basin or counter unit). The large absolute-looking coordinates are just the block's far insertion offset, not indicative of walls."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-iw990-355",
+    "answer": {
+      "def": "X-평면도(기본형)$0$IW990",
+      "role": "가구",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "FUR + F-BATH layers, 451 entities dominated by ARC/SPLINE/ELLIPSE — a detailed bathroom fixture (e.g. bathtub, name 'IW990') plan symbol; the many short LINE segments are fixture edge fragments, not wall lines."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-jjbl-356",
+    "answer": {
+      "def": "X-평면도(기본형)$0$jjbl",
+      "role": "기타",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "TILE layer, 36 identical small CIRCLEs (radius 10) plus one rectangular LWPOLYLINE boundary — looks like a floor tile/paving pattern block (e.g. non-slip dot markers), not a wall, symbol, dimension cache, or furniture item."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-kh-530s-1-top-357",
+    "answer": {
+      "def": "X-평면도(기본형)$0$KH-530S-1 TOP",
+      "role": "가구",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [],
+      "notes": "FUR layer, ARC/LINE/SPLINE mix with a 'TOP' suffix suggesting a top-view furniture/fixture block (product code KH-530S-1); several parallel LINE pairs outline the unit's own edges rather than building walls."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-l933-top-358",
+    "answer": {
+      "def": "X-평면도(기본형)$0$L933 TOP",
+      "role": "가구",
+      "wall_likelihood": 0.05,
+      "wall_line_handles": [],
+      "notes": "FUR layer, SPLINE-dominated (139 of 191 entities) curved outline typical of a fixture/sink top-view symbol (product code L933); no orthogonal double-line pattern consistent with walls."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-ng-359",
+    "answer": {
+      "def": "X-평면도(기본형)$0$ng",
+      "role": "심볼",
+      "wall_likelihood": 0.25,
+      "wall_line_handles": [
+        {"handle": "3D63", "reason": "orthogonal line forming part of a closed rectangular base outline"},
+        {"handle": "3D65", "reason": "parallel opposite side of the same rectangular base outline"}
+      ],
+      "notes": "Contains an INSERT of block '국기계양대' (flagpole) plus 2 WIPEOUTs and an orthogonal stepped rectangular outline — a flagpole/site-fixture plan symbol. The rectangular base lines could superficially resemble a small structure's walls but more likely represent a pedestal/foundation footprint, not building walls."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-pd900-360",
+    "answer": {
+      "def": "X-평면도(기본형)$0$pd900",
+      "role": "심볼",
+      "wall_likelihood": 0.1,
+      "wall_line_handles": [
+        {"handle": "1BFB", "reason": "line at y=140 spanning nearly the full width, resembles a lintel/frame line but is the door frame top"}
+      ],
+      "notes": "DOOR layer, bbox width 900 matches the name 'pd900' (900mm plan door); diagonal X-pattern lines (1BF9/1BFA) plus an ARC indicate a door leaf/swing symbol, not a wall."
+    }
+  }
+]

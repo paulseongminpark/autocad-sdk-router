@@ -1,0 +1,104 @@
+{
+  "schema": "ariadne.e2.w3.det_v1_relegislate.measurement.v1",
+  "method_id": "deterministic_v1",
+  "cell_id": "e2.w3.det_v1_relegislate",
+  "spec_sha256": "3c0c755fb5fce7ce5fc9389788aa56e16fd0c12f5700099f5affdf410eddab12",
+  "code_sha256": "3b53479ab448c9c1a4a1d3e690c6baa1588f6dd0c461b3812554b871ae6ce851",
+  "population": {
+    "name": "val-A DEV",
+    "drawing_count": 198,
+    "valid_drawings": 198,
+    "invalid_drawings": [],
+    "split_content_hash": "5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b"
+  },
+  "sentinel_qualification": {
+    "positive_recall_floor": 0.2,
+    "pooled_recall": 0.708384,
+    "macro_recall_mean": 0.703635,
+    "prediction_rate": 0.668511,
+    "near_all_thresh": 0.95,
+    "zero_detector_recall": 0.0,
+    "all_detector_rate": 1.0,
+    "sentinel_pass": true,
+    "total_walls": 19584,
+    "total_true_positive": 13873,
+    "total_pred_wall": 112013,
+    "total_segments": 167556
+  },
+  "cells": {
+    "F01": {
+      "transform": "translate",
+      "measurability": "MEASURABLE",
+      "r_meta": 2.566521995828265e-05,
+      "verdict": "PASS",
+      "n_drawings": 198,
+      "n_params": 3,
+      "drawing_v_min": 0.0,
+      "drawing_v_median": 0.0,
+      "drawing_v_max": 0.0025673940949935813
+    },
+    "F02": {
+      "transform": "rotate",
+      "measurability": "MEASURABLE",
+      "r_meta": 0.0006792539170602653,
+      "verdict": "PASS",
+      "n_drawings": 198,
+      "n_params": 3,
+      "drawing_v_min": 0.0,
+      "drawing_v_median": 0.0,
+      "drawing_v_max": 0.01766953199617956
+    },
+    "F03": {
+      "transform": "uniform-scale",
+      "measurability": "MEASURABLE",
+      "r_meta": 0.2064014390538899,
+      "verdict": "FAIL",
+      "n_drawings": 198,
+      "n_params": 3,
+      "drawing_v_min": 0.16020114942528738,
+      "drawing_v_median": 0.20665356050677153,
+      "drawing_v_max": 0.31367292225201077
+    },
+    "F07": {
+      "transform": "coord-jitter",
+      "measurability": "MEASURABLE",
+      "r_meta": 0.0014183178038027367,
+      "verdict": "PASS",
+      "n_drawings": 198,
+      "n_params": 3,
+      "drawing_v_min": 0.0,
+      "drawing_v_median": 0.0006757983360221407,
+      "drawing_v_max": 0.023809523809523808
+    },
+    "F04": {
+      "transform": "unit-change",
+      "measurability": "BLOCKED_INPUT",
+      "r_meta": null,
+      "verdict": "BLOCKED_INPUT",
+      "reason": "CubiCasa SEG-IR is units='px' with NO $INSUNITS / scale_mm_per_unit metadata; the transform validity certificate ('coordinates, $INSUNITS, scale_mm_per_unit encode the same physical quantities') cannot be certified. doe_P5 sec 3.2 states unit-change is NOT CubiCasa's test-sheet; sec 6.2 rules unit-unknown drawings BLOCKED_DATA. Assigning an arbitrary unit is forbidden (invention)."
+    },
+    "F05": {
+      "transform": "block-explode",
+      "measurability": "BLOCKED_INPUT",
+      "r_meta": null,
+      "verdict": "BLOCKED_INPUT",
+      "reason": "CubiCasa SEG-IR segments carry only {handle, layer, pts}; there is NO INSERT / block / occurrence structure to explode. The transform is a vacuous no-op (no remaining INSERT trivially satisfied), which doe_P5 sec 2.3 forbids treating as a pass. doe_P5 sec 3.2 marks block-explode 'NA' for CubiCasa."
+    },
+    "F06": {
+      "transform": "layer-rename",
+      "measurability": "BLOCKED_INPUT",
+      "r_meta": null,
+      "verdict": "BLOCKED_INPUT",
+      "reason": "every segment has the single constant layer '0' (distinct=1); a bijective shuffle over a singleton is identity and the detector uses no layer feature, so the relation is a vacuous no-op with no truth-bearing substrate. doe_P5 sec 3.2: CubiCasa layers are neutral and NOT the test-sheet for meaningful layer-rename."
+    }
+  },
+  "family_verdict": "FAIL",
+  "telemetry": {
+    "wall_seconds": 62.081,
+    "peak_rss_bytes": 82845696,
+    "peak_vram_bytes": "N/A(no_GPU)",
+    "device": "CPU AMD64 Family 26 Model 68 Stepping 0, AuthenticAMD",
+    "budget_charge_cpu_hours": 0.01724,
+    "cap_cpu_hours": 4.0
+  }
+}

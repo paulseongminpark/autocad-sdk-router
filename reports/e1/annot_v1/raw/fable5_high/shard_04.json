@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-d355-61",
+    "def": "*D355",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: vertical dimension reading 10400 with DIMDOT terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D355) whose geometry is two horizontal extension lines at y=25680.207 and y=36080.207 (gap 10400) with one vertical dimension line 8D8A, all on layer DIM. The two INSERTs reference the dimension terminator block DIMDOT, the single MTEXT reads '10400' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d356-62",
+    "def": "*D356",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: vertical dimension reading 1700 with DIMDOT terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D356) whose geometry is two horizontal extension lines at y=27380.207 and y=25680.207 (gap 1700) with one vertical dimension line 8D93, all on layer DIM. The two INSERTs reference the dimension terminator block DIMDOT, the single MTEXT reads '1700' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d357-63",
+    "def": "*D357",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: vertical dimension reading 865 with DIMDOT terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D357) whose geometry is two horizontal extension lines at y=35420.207 and y=34555.207 (gap 865) with one vertical dimension line 8D9C, all on layer DIM. The two INSERTs reference the dimension terminator block DIMDOT, the single MTEXT reads '865' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d358-64",
+    "def": "*D358",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: vertical dimension reading 2300 with _ArchTick terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D358) whose geometry is two horizontal extension lines at y=33735.207 and y=31435.207 (gap 2300) with one vertical dimension line 8DA5, all on layer DIM. The two INSERTs reference the dimension terminator block _ArchTick, the single MTEXT reads '2300' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d359-65",
+    "def": "*D359",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: vertical dimension reading 150 with _ArchTick terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D359) whose geometry is two horizontal extension lines at y=31435.207 and y=31285.207 (gap 150) with one short vertical dimension line 8DAE, all on layer DIM. The two INSERTs reference the dimension terminator block _ArchTick, the single MTEXT reads '150' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d360-66",
+    "def": "*D360",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: vertical dimension reading 150 with _ArchTick terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D360) whose geometry is two horizontal extension lines at y=31285.207 and y=31135.207 (gap 150) with one short vertical dimension line 8DB7, all on layer DIM. The two INSERTs reference the dimension terminator block _ArchTick, the single MTEXT reads '150' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d361-67",
+    "def": "*D361",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: vertical dimension reading 3600 with _ArchTick terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D361) whose geometry is two horizontal extension lines at y=31135.207 and y=27535.207 (gap 3600) with one vertical dimension line 8DC0, all on layer DIM. The two INSERTs reference the dimension terminator block _ArchTick, the single MTEXT reads '3600' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d362-68",
+    "def": "*D362",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: vertical dimension reading 155 with _ArchTick terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D362) whose geometry is two horizontal extension lines at y=27535.207 and y=27380.207 (gap 155), a vertical dimension line 8DCB plus two short overshoot extension stubs (8DC9, 8DCA), all on layer DIM. The two INSERTs reference the dimension terminator block _ArchTick, the single MTEXT reads '155' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d363-69",
+    "def": "*D363",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: vertical dimension reading 190 with _ArchTick terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D363) whose geometry is two horizontal extension lines at y=33925.207 and y=33735.207 (gap 190), a vertical dimension line 8DD6 plus two short overshoot extension stubs (8DD4, 8DD5), all on layer DIM. The two INSERTs reference the dimension terminator block _ArchTick, the single MTEXT reads '190' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d364-70",
+    "def": "*D364",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: horizontal dimension reading 215 with DIMDOT terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D364) whose geometry is two vertical extension lines at x=48783.83 and x=48998.83 (gap 215), a horizontal dimension line 8DE1 plus two short leader stubs (8DDF, 8DE0), all on layer DIM. The two INSERTs reference the dimension terminator block DIMDOT, the single MTEXT reads '215' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d365-71",
+    "def": "*D365",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: vertical dimension reading 275 with DIMDOT terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D365) whose geometry is two horizontal extension lines at y=25955.207 and y=25680.207 (gap 275), a vertical dimension line 8DEC plus two short overshoot stubs (8DEA, 8DEB), all on layer DIM. The two INSERTs reference the dimension terminator block DIMDOT, the single MTEXT reads '275' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d366-72",
+    "def": "*D366",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: vertical dimension reading 7175 with DIMDOT terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D366) whose geometry is two horizontal extension lines at y=34555.207 and y=27380.207 (gap 7175) with one vertical dimension line 8DF5, all on layer DIM. The two INSERTs reference the dimension terminator block DIMDOT, the single MTEXT reads '7175' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d367-73",
+    "def": "*D367",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: horizontal dimension reading 4750 with DIMDOT terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D367) whose geometry is two vertical extension lines at x=44248.83 and x=48998.83 (gap 4750) with one horizontal dimension line 8DFE, all on layer DIM. The two INSERTs reference the dimension terminator block DIMDOT, the single MTEXT reads '4750' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d368-74",
+    "def": "*D368",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: horizontal dimension reading 10350 with DIMDOT terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D368) whose geometry is two vertical extension lines at x=48998.83 and x=59348.83 (gap 10350) with one horizontal dimension line 8E07, all on layer DIM. The two INSERTs reference the dimension terminator block DIMDOT, the single MTEXT reads '10350' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d369-75",
+    "def": "*D369",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: vertical dimension reading 660 with DIMDOT terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D369) whose geometry is two horizontal extension lines at y=36080.207 and y=35420.207 (gap 660) with one vertical dimension line 8E10, all on layer DIM. The two INSERTs reference the dimension terminator block DIMDOT, the single MTEXT reads '660' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d370-76",
+    "def": "*D370",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: horizontal dimension reading 2070 with DIMDOT terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D370) whose geometry is two vertical extension lines at x=57278.83 and x=59348.83 (gap 2070) with one horizontal dimension line 8E19, all on layer DIM. The two INSERTs reference the dimension terminator block DIMDOT, the single MTEXT reads '2070' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d371-77",
+    "def": "*D371",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: horizontal dimension reading 920 with DIMDOT terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D371) whose geometry is two vertical extension lines at x=58763.83 and x=57843.83 (gap 920) with one horizontal dimension line 8E22, all on layer DIM. The two INSERTs reference the dimension terminator block DIMDOT, the single MTEXT reads '920' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d372-78",
+    "def": "*D372",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: horizontal dimension reading 585 with DIMDOT terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D372) whose geometry is two vertical extension lines at x=58763.83 and x=59348.83 (gap 585) with one horizontal dimension line 8E2B, all on layer DIM. The two INSERTs reference the dimension terminator block DIMDOT, the single MTEXT reads '585' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d373-79",
+    "def": "*D373",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: horizontal dimension reading 495 with DIMDOT terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D373) whose geometry is two vertical extension lines at x=57348.83 and x=57843.83 (gap 495) with one horizontal dimension line 8E34, all on layer DIM. The two INSERTs reference the dimension terminator block DIMDOT, the single MTEXT reads '495' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  },
+  {
+    "unit_id": "defannot-d374-80",
+    "def": "*D374",
+    "role": "치수캐시",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Anonymous *D-series dimension cache: horizontal dimension reading 1620 with DIMDOT terminators on layer DIM.",
+    "rationale": {
+      "evidence": "The block is an anonymous *D-series definition (*D374) whose geometry is two vertical extension lines at x=57348.83 and x=55728.83 (gap 1620) with one horizontal dimension line 8E3D, all on layer DIM. The two INSERTs reference the dimension terminator block DIMDOT, the single MTEXT reads '1620' (a pure measurement value matching the extension-line gap), and the three POINT entities sit on DEFPOINTS, the layer AutoCAD reserves for dimension definition points.",
+      "rule": "An anonymous block named *D<number> containing only DIM-layer lines, arrowhead/tick INSERTs, one numeric MTEXT equal to the measured gap, and DEFPOINTS points is the exploded graphics cache of an associative DIMENSION entity, not model geometry.",
+      "counterfactual": "If the lines sat on a wall/architectural layer, the text were a room or material label instead of a bare number, or the definition name were user-authored rather than *D###, I would reconsider it as a plan fragment or symbol; nothing in this projection supports any role other than a dimension cache.",
+      "uncertainty": "The projection cannot show which model entities this dimension measures or whether its host DIMENSION is still associative, so the measured object (wall, opening, furniture) and the dimension style details remain unknown from this block alone."
+    }
+  }
+]

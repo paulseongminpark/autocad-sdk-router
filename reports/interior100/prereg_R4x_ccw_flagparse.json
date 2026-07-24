@@ -1,0 +1,51 @@
+{
+  "schema": "ariadne.interior100.prereg.v1",
+  "arc": "R4x: m08eFindFlag boolean-literal-first repair (hatch arc-edge ccw) -- full reflight",
+  "registered_at_local": "2026-07-11T02:5x (file mtime is the binding evidence; committed BEFORE launch)",
+  "root_cause_measured": {
+    "defect": "jsonFindNumber (AriadneNativeJob.cpp:315) cannot reject non-numeric values: strtod('true') yields 0.0 and the helper still reports found. m08eFindFlag probed numbers FIRST, so its boolean-literal branch was dead code -- every JSON boolean flag read false.",
+    "blast_radius_measured": [
+      "ccw (hatch arc/ellipse edges): the ONLY live casualty on 1.dwg -- census carries 14 hatch arc edges (3 ccw=false + 11 ccw=true); the R4v post side reads 14/14 ccw=false. The 11 flipped arcs live EXACTLY in the 7 loops real-geometry residue pairs (84a/84b/84c/84a1/84b1/84c1/111a); per-pair field diffs show ccw is the ONLY differing token (2B43 e1, census ccw=false, round-trips clean)",
+      "entity closed: DODGED the bug -- Python sends entity-level closed as numeric 0/1 (b054 histogram: '0' x31, '1' x4), which jsonFindNumber parses correctly; lwpolyline closed=true 539/539 round-trip on R4v",
+      "rational (spline edges): census population 110/110 rational=false -- no live effect",
+      "is_solid_fill: census 17 true, but the handler falls back to setPattern(kPreDefined, 'SOLID') via pattern_name -- same call, no live effect",
+      "is_gradient/pattern_double: census all-false -- no live effect",
+      "is_associative: read false at create on every prior flight -- the R4u observation 'job true -> saved false, 258/258' measured THIS PARSE BUG, not an engine save-reset (comment corrected in-source); the relink pass owns persisted assoc truth either way"
+    ],
+    "fix": "m08eFindFlag now matches boolean literals BEFORE the numeric fallback (same idiom as m08eReadFlagArray, which was already correct). Numeric 0/1 payloads take the strtod path unchanged.",
+    "probe": "runs/ccw_e2e_probe_20260711 (fresh build 2026-07-11 02:36:46 crx): synthetic hatch with [arc ccw=true + line] loop round-trips ccw=true with byte-stable angles; create-time is_associative=true no longer BUILD_FAILs evaluateHatch and the relink contract still lands (srcs [['27E']])"
+  },
+  "baseline": {
+    "report": "reports/interior100/R4w_remeasure_lex0012.json",
+    "diff0_total": 27121,
+    "a_entity_total": 27130,
+    "a_def_count": 294,
+    "interior_diff0_fraction": 0.9996682639144858
+  },
+  "prediction": {
+    "diff0_total": 27128,
+    "band": [27126, 27128],
+    "interior_diff0_fraction_at_center": 0.9999262808698858,
+    "decomposition": [
+      {
+        "family": "hatch arc-edge ccw honored (7 pairs, 11 arcs)",
+        "pairs": 7,
+        "handles": ["20F9", "2283", "24C7", "28C4", "2B43", "6EDC", "741A"],
+        "evidence": "census-wide accounting is complete: every census ccw=true arc (11) sits in these 7 hatches; every arc field except ccw already matches byte-for-byte; the probe round-trips ccw=true end-to-end"
+      }
+    ],
+    "band_rationale": "single mechanism, probe-verified; floor 27,126 absorbs flight noise on the re-flying families (H3 vintage, lw-z, relink, LEX-0012 rotation folds re-derive per flight). Per-def no-regression guard runs vs the R4w baseline.",
+    "risk_register": [
+      "create-time is_associative now actually applies for the 66 assoc hatches BEFORE relink -- probe shows no BUILD_FAILED and relink owns final state; if the earlier flag changes evaluateHatch-derived notation, pairs would surface on loops[] and land below band (FAIL to investigate)",
+      "the LEX-0012 rotation folds assume the relink re-serialization rotates again this flight; if the ccw repair changes the re-derivation's serialization shape, the measured folds could differ -- the floor absorbs, the dissection tool adjudicates",
+      "residual_after_success: 2 spline Bezier re-decomposition pairs (accepted notation residue) -- fingerprint ceiling under current laws = 27,128/27,130"
+    ]
+  },
+  "measurement_contract": "No measurement-law changes this arc: LEX-0008/0009/0011/0012 as legislated. This is a REPAIR arc (native writer honors authored ccw).",
+  "population_pin": {
+    "source_dwg": "D:\\dev\\.build\\1.dwg",
+    "source_dwg_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+    "launch_command": "python tools/full_roundtrip_capstone.py --dwg D:\\dev\\.build\\1.dwg --out-dir runs\\e2e_1dwg_R4x_ccw_20260711 --batch-size 100 --with-records",
+    "required": "census must reproduce 294 defs / 27,130 entities; identity sha must equal the pin (LEX-0006); per-def diff0 >= R4w for every def"
+  }
+}

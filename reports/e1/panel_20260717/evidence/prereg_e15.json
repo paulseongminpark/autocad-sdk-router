@@ -1,0 +1,39 @@
+{
+ "schema": "ariadne.e15_annot.prereg.v1",
+ "title": "E1.5 re-judgment: model x effort ladder over the frozen E1 projections",
+ "committed_before_binding_runs": true,
+ "date": "2026-07-17",
+ "constraint": "No human labels are used anywhere in this experiment (Paul, 2026-07-17). Judge consensus produces SILVER labels only, never truth.",
+ "fixed_materials": {
+  "units": "bench/e1_shards/shard_01..20.jsonl (384 def projections, commit 6772935) - byte-identical to E1 v0",
+  "prompts": "reports/e1/annot_v1/prompts/shard_01..20.txt - sha256 per file in prompts_manifest.json (frozen at this commit)",
+  "prompt_delta_vs_v0": "instruction block only: adds mandatory rationale{evidence,rule,counterfactual,uncertainty}; projections unchanged; role vocabulary unchanged (5 classes)"
+ },
+ "judges": [
+  {"id": "opus48_max", "model": "opus-4.8", "effort": "max", "surface": "in-session Workflow agent", "deviation": "Paul specified aclaude-b/c accounts; octoloop has no opus lane, so runs on the session account"},
+  {"id": "fable5_high", "model": "fable-5", "effort": "high", "surface": "in-session Workflow agent", "deviation": "Paul specified aclaude-d/e; same reason as opus48_max"},
+  {"id": "sol56_xhigh", "model": "gpt-5.6-sol", "effort": "xhigh", "surface": "octoloop lane codex_56sol (oneshot)", "deviation": "runs on main codex account; acodex-b is not wired as an octoloop lane"},
+  {"id": "sonnet5_xhigh", "model": "sonnet-5", "effort": "xhigh", "surface": "octoloop lane sonnet_d = aclaude-d account", "deviation": "Paul said max; packet effort enum tops at xhigh"},
+  {"id": "grok45_xhigh", "model": "grok-4.5-xhigh", "effort": "lane-pinned", "surface": "octoloop lane grok (cursor-agent)", "deviation": "Paul said high; the live lane pin is grok-4.5-xhigh (grok surface ceiling)"},
+  {"id": "ornith35b_v0", "model": "ornith-35b", "effort": "v0", "surface": "reports/e1/ornith_annot_v0.jsonl reused verbatim", "deviation": "no rationale fields (v0 schema); baseline rung only"}
+ ],
+ "canary_policy": "shard_01 canary runs (one per live judge) validate the harness only; canary outputs live under raw_canary/ and are EXCLUDED from analysis; binding data = post-freeze runs of all 20 shards including a fresh shard_01",
+ "validity_gate": {
+  "B3_judge_valid": "a judge run is VALID iff >=95% of its 384 answers parse AND are rationale-complete (all 4 rationale fields non-empty, evidence >=20 chars); one re-run allowed per failed shard, else the judge is reported PARTIAL and flagged in every downstream table"
+ },
+ "primary_metrics": [
+  "pairwise role agreement over commonly-answered defs, all 15 judge pairs (5 live + ornith v0)",
+  "Fleiss kappa across the 5 live judges on role",
+  "wall_likelihood pairwise Pearson + bucket agreement with v0 cutoffs (low<=0.3 < mid < 0.7<=high)",
+  "wall_line_handles pairwise Jaccard",
+  "rationale completeness rate per judge"
+ ],
+ "preregistered_bands": {
+  "B1_task_well_posed": "mean pairwise ROLE agreement among {opus48_max, fable5_high, sol56_xhigh} >= 0.70 -> well-posed; 0.60-0.70 -> marginal; <0.60 -> task/projection ambiguity dominates and projection redesign precedes any further annotation spend",
+  "B2_ladder_visible": "top-tier mean pairwise role agreement minus 0.5491 (E1 v0 ornith x sonnet, calibration_v0.json) >= +0.10 -> capability ladder visible; else judge tier does not explain E1 disagreement",
+  "B4_likelihood_usable": "top-tier mean pairwise Pearson on wall_likelihood >= 0.70 -> LLM consensus qualifies as SILVER for detector crosscheck v1; <0.50 -> likelihood scale unreliable, role-only downstream"
+ },
+ "exploratory_no_bands": ["handle Jaccard structure", "per-role confusion matrices", "rationale typology (what evidence classes judges cite)", "divergence top-20 recomputation per judge pair"],
+ "analysis_code": "tools/e15_collect.py (committed with this prereg)",
+ "outputs": ["reports/e1/annot_v1/raw/<judge>/shard_NN.json", "reports/e1/annot_v1/calibration_v1.json", "reports/e1/annot_v1/calibration_v1.md", "reports/e1/annot_v1/e15_evidence.xlsx"]
+}

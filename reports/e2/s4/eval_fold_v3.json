@@ -1,0 +1,90 @@
+{
+ "driver": "w1_eval_fold.v3",
+ "preds": "reports/e2/s4/eval2_{S,F,M}",
+ "tiers": {
+  "S": {
+   "tier": "S",
+   "metric": "scores.per_handle >= 0.5 vs wall_handles_flat",
+   "arms": {
+    "full": {
+     "n_drawings": 20,
+     "micro": {
+      "tp": 272,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     }
+    },
+    "name_blind": {
+     "n_drawings": 20,
+     "micro": {
+      "tp": 272,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+     }
+    }
+   }
+  },
+  "F": {
+   "tier": "F",
+   "metric": "scores.per_handle >= 0.5 vs wall_handles_flat",
+   "arms": {
+    "full": {
+     "n_drawings": 20,
+     "micro": {
+      "tp": 272,
+      "fp": 20,
+      "fn": 0,
+      "precision": 0.9315,
+      "recall": 1.0,
+      "f1": 0.9645
+     }
+    },
+    "name_blind": {
+     "n_drawings": 20,
+     "micro": {
+      "tp": 272,
+      "fp": 22,
+      "fn": 0,
+      "precision": 0.9252,
+      "recall": 1.0,
+      "f1": 0.9611
+     }
+    }
+   }
+  },
+  "M": {
+   "tier": "M",
+   "metric": "scores.per_handle >= 0.5 vs wall_handles_flat",
+   "arms": {
+    "full": {
+     "n_drawings": 20,
+     "micro": {
+      "tp": 280,
+      "fp": 43,
+      "fn": 0,
+      "precision": 0.8669,
+      "recall": 1.0,
+      "f1": 0.9287
+     }
+    },
+    "name_blind": {
+     "n_drawings": 20,
+     "micro": {
+      "tp": 280,
+      "fp": 45,
+      "fn": 0,
+      "precision": 0.8615,
+      "recall": 1.0,
+      "f1": 0.9256
+     }
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,224 @@
+{
+  "schema": "e2.e6_calibration_ood.prereg.v1",
+  "cell": "e6_calibration_ood",
+  "sealed_at_utc": "2026-07-19T00:21:18.5586105Z",
+  "scope": {
+    "execution_surface": "local NVIDIA RTX; frozen-model inference only",
+    "write_root": "D:\\runs\\e2_program\\cells\\e6_calibration_ood",
+    "repository_mutation": "forbidden",
+    "subagents": "forbidden",
+    "git": "forbidden",
+    "GNN_training_or_refit": "forbidden",
+    "threshold_search": "forbidden",
+    "threshold": 0.5,
+    "temperature_fit_exception": "one scalar T per arm and model seed on cal-fit only",
+    "classical_fit_exception": "sealed W2-02 two-hop HistGradientBoosting protocol, train-only",
+    "RTX_cap_hours": 8.0,
+    "judgment_output": "forbidden; numeric measurements and unresolved items only"
+  },
+  "read_contract": {
+    "GNN_evaluation": "only W2-09 manifest-listed val-A 198 drawings and matching truth",
+    "classical_fit": "sealed train labels and W2-02 train design only",
+    "val_B": "reject before filesystem path construction or read",
+    "test": "reject before filesystem path construction or read",
+    "original_CAD": "forbidden"
+  },
+  "inputs": {
+    "packet": {
+      "path": "D:\\runs\\e2_program\\build\\PACKET_e6_calibration_ood.md",
+      "sha256": "a9ea210148cde7ad6488a0c97ba384b7fd453247925649adb976f3911db2cfc2"
+    },
+    "calibration_dossier": {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\dossiers\\calibration_P3.md",
+      "sha256": "6641dd63044ad22b94d6c2a61baf85f86ca4c9191745659171e8a806864c294d",
+      "read_only_lines": "670-678"
+    },
+    "split_manifest": {
+      "path": "D:\\runs\\e2_program\\cells\\w2_09_valb\\split_manifest.json",
+      "sha256": "8aad64eeda77df55296fc711c21d7befdeada7fe379aeafec81fd1691aea044f",
+      "content_hash": "5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b"
+    },
+    "formal_runner": {
+      "path": "D:\\runs\\e2_program\\cells\\gnn_formal\\gnn_formal.py",
+      "sha256": "0413f1035de76ab8a175c37c291c3fca634a2f1effb8135b5371aa357d5a94c0"
+    },
+    "graph_builder": {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\cells\\graph_builder.py",
+      "sha256": "c95d4a30d30e0db157fe56102053a7884902b7749464f7f4cb8852c0819321f6",
+      "config_sha256": "56911f4633979a3fe00fd56be2d0a39ac06757ed255ed49ed18ca20ba9d4ac49"
+    },
+    "screen_v2": {
+      "path": "D:\\runs\\e2_program\\cells\\gnn_e2_screen_v2\\gnn_e2_v2.py",
+      "sha256": "895249f0b6c77ac8f8a7cfb73e859a0882681ad6bba6e337480b55db269ce120"
+    },
+    "W2_02_source": {
+      "path": "D:\\runs\\e2_program\\cells\\w2_02_twohop\\w2_02_twohop.py",
+      "sha256": "ae81bf8c5311fc19c8ad38f7feca5d1c15bf39a71d41a1fb925775d6e63aafe6"
+    },
+    "train_labels": {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2_ext_cubicasa\\features\\train.npz",
+      "sha256": "8f72d8931c6e08927bf027ee87f1bc5362ab1a85217862e09a0cddd6b0b0d5aa"
+    },
+    "baseline_design_train": {
+      "path": "D:\\runs\\e2_program\\cells\\w2_02_twohop\\_work\\design_full_train.npy",
+      "sha256": "8e2ca80cc52ab9ebcbb9f8f60fb1d4177186cd1e7fafcfee486cfcbc40335a11"
+    },
+    "baseline_context_val_A": {
+      "path": "D:\\runs\\e2_program\\cells\\w2_02_twohop\\_work\\context6_valA.npy",
+      "sha256": "b568bb4c3dffce46629355bf7670cf00f6c86ecbfe14b5feb87f4e6103449a91"
+    },
+    "baseline_twohop_val_A": {
+      "path": "D:\\runs\\e2_program\\cells\\w2_02_twohop\\_work\\twohop_valA.npy",
+      "sha256": "ef0febd1d6da09a2a129c26dcc19028828e80bb4fa19c9db2b3eb5b423cef1df"
+    },
+    "GNN_A_checkpoints": {
+      "17": "612e4bf954ff5967853f7a08e66195b79dfa15250d6e9d42f88a877c92a3952c",
+      "29": "1b4bbd004491609cfe8cfc217d18b0ec5ff344f8fee43c67b392a4c37dbc6877",
+      "43": "ab37cf25894e8ed7f2e96ca287a21da961c68d37bcf2bd9633ae1cb9b663e2a3"
+    },
+    "formal_control_checkpoints": {
+      "17": "7de0cddb8a6d5f8690ecacbd24a1c3a39f4594ffdb5fe2145edbf785189f09df",
+      "29": "3e868c986a68f5a4a97ed481a825ec7b648338b5697bc5d62ccaf0e5253437aa",
+      "43": "797dd0fce30489fa44de585a3b20ef63df3e38038728db5a92addb44d017ad58"
+    }
+  },
+  "universe": {
+    "name": "CubiCasa W2-09 val-A",
+    "drawing_count": 198,
+    "row_count": 167556,
+    "family_count": 198,
+    "family_crossing_count": 0,
+    "source_categories": {
+      "high_quality_architectural": 119,
+      "high_quality": 54,
+      "colorful": 25
+    }
+  },
+  "calibration_split": {
+    "seed": 43,
+    "namespace": "e6.calibration.ood.v1",
+    "family_hash": "SHA-256 of UTF-8 string e6.calibration.ood.v1|43|{family_id}",
+    "rule": "sort the 198 unique val-A families by (family_hash, family_id, drawing_id); first 99 are cal-fit and remaining 99 are cal-eval",
+    "assignment_serialization": "drawing_id,family_id,split ordered by drawing_id, LF terminated",
+    "assignment_sha256": "a3f40d2c61eddc83a434ace020b2bd52c2d448051db78b65ef005aa6b23fa96e",
+    "cal_fit": {
+      "drawing_count": 99,
+      "row_count": 85421,
+      "drawing_ids_sha256": "8606195f96ba2b8df7a9ebe8c5a6065fc7ded30f226ad038bc22a3e84f6d20b7",
+      "category_drawing_counts": {
+        "high_quality_architectural": 61,
+        "high_quality": 27,
+        "colorful": 11
+      }
+    },
+    "cal_eval": {
+      "drawing_count": 99,
+      "row_count": 82135,
+      "drawing_ids_sha256": "a9f1f02e051e9f3eecca2b7966daf96a9a888df5189c0c4c556d786b868e067b",
+      "category_drawing_counts": {
+        "high_quality_architectural": 58,
+        "high_quality": 27,
+        "colorful": 14
+      }
+    },
+    "required_family_intersection_count": 0
+  },
+  "arms": {
+    "GNN_A_no_pretrain": {
+      "seeds": [17, 29, 43],
+      "operation": "load frozen checkpoint and run full-graph val-A inference only",
+      "relation_count": 6,
+      "hidden_dim": 64,
+      "checkpoint_mutation": "forbidden"
+    },
+    "control_twohop_GBDT_full": {
+      "seeds": [17, 29, 43],
+      "operation": "fresh W2-02 30-feature HistGradientBoosting fit on sealed train-only design; predict val-A",
+      "estimator_parameters_except_seed": {
+        "categorical_features": "from_dtype",
+        "class_weight": null,
+        "early_stopping": "auto",
+        "interaction_cst": null,
+        "l2_regularization": 0.0,
+        "learning_rate": 0.1,
+        "loss": "log_loss",
+        "max_bins": 255,
+        "max_depth": null,
+        "max_features": 1.0,
+        "max_iter": 100,
+        "max_leaf_nodes": 31,
+        "min_samples_leaf": 20,
+        "monotonic_cst": null,
+        "n_iter_no_change": 10,
+        "scoring": "loss",
+        "tol": 1e-7,
+        "validation_fraction": 0.1,
+        "verbose": 0,
+        "warm_start": false
+      }
+    }
+  },
+  "temperature_scaling": {
+    "unit": "one positive scalar T per arm and model seed",
+    "fit_universe": "cal-fit rows only",
+    "reported_metric_universe": "cal-eval rows only",
+    "probability_clip": 1e-12,
+    "logit_definition": "log(p/(1-p)) after clipping",
+    "parameterization": "log_T",
+    "optimizer": "scipy.optimize.minimize_scalar",
+    "method": "bounded",
+    "log_T_bounds": [-4.0, 4.0],
+    "xatol": 1e-12,
+    "maxiter": 1000,
+    "objective": "binary NLL on cal-fit",
+    "threshold_after_scaling": 0.5,
+    "optimizer_seed": "none; deterministic"
+  },
+  "metrics": {
+    "evaluation_universe": "cal-eval only",
+    "seed_reporting": "per seed plus arithmetic mean and population SD across seeds",
+    "ECE": "10 equal-width bins [0.0,0.1),...,[0.9,1.0]; sum n_bin/N * abs(mean_probability-positive_rate)",
+    "Brier": "mean squared probability error",
+    "Brier_REL": "sum n_bin/N * (mean_probability-positive_rate)^2",
+    "Brier_RES": "sum n_bin/N * (positive_rate-overall_positive_rate)^2",
+    "Brier_UNC": "overall_positive_rate * (1-overall_positive_rate)",
+    "Brier_decomposition_residual": "Brier - (REL - RES + UNC)",
+    "NLL": "mean binary negative log likelihood with probability clip 1e-12",
+    "classification": "precision, recall, F1 and confusion counts at fixed threshold 0.5",
+    "style_slices": "per source category and pooled cal-eval AUPRC/F1/drawing count, with pooled-minus-category gaps",
+    "style_temperature_note": "positive scalar temperature preserves ranking and the p>=0.5 decision; AUPRC and F1 are computed for both states as an invariant check",
+    "reliability_table": "per arm, seed, state, bin: mean confidence, positive rate, count, signed and absolute gap",
+    "direction_numeric_profile": "recall@0.5, mean_probability-positive_rate, positive/negative signed-gap mass, and row fractions in positive/negative signed-gap bins"
+  },
+  "sealed_band_text": [
+    "temperature 전후 REL≤0.03 ∧ RES≥0.03",
+    "style drop≤0.10",
+    "calibration 실패를 threshold 재탐색으로 덮지 않는다"
+  ],
+  "band_adjudication": "do not emit any band verdict",
+  "style_limit": "This is IID source-category slice measurement of frozen models, not held-out-style retraining OOD; a true OOD arm belongs to a future preregistration.",
+  "selftest": [
+    "split determinism",
+    "cal-fit/cal-eval family intersection equals zero",
+    "all frozen GNN-A checkpoint SHA-256 values unchanged",
+    "val-B blocked before filesystem path construction/read",
+    "test blocked before filesystem path construction/read",
+    "fixed threshold equals 0.5",
+    "temperature fit consumes cal-fit only and every reported metric consumes cal-eval only"
+  ],
+  "evidence_artifact": {
+    "preferred": "evidence.xlsx",
+    "fallback": "single row-complete evidence.csv plus reason in REPORT.md",
+    "current_environment": "@oai/artifact-tool workspace dependency loader unavailable; fallback is authorized if still unavailable at generation time"
+  },
+  "reproducibility_claim": "휘발 필드 제외 수치 전 필드 동일",
+  "outputs": [
+    "prereg.json",
+    "PREREG.csv",
+    "e6_calibration_ood.py",
+    "results.json",
+    "evidence.xlsx or evidence.csv with reason",
+    "REPORT.md"
+  ],
+  "report_last_line": "CELL_COMPLETE: e6_calibration_ood"
+}

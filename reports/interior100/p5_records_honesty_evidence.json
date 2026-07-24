@@ -1,0 +1,67 @@
+{
+  "schema": "ariadne.interior100.p5_records_honesty.v1",
+  "arc": "p5-records-honesty: octoloop v2/v3 were BLOCKED by a headless-CLI stdin trap on two lanes (codex_54med, sonnet_b); the orchestrator pulled the packet inline (the FM8 judgment -- does write.regapp.register persist? -- is not delegable). Re-implemented the L3 records-widening honestly.",
+  "test": "tests/unit/test_records_unreferenced.py 5/5 PASS (real-schema fixture)",
+  "defect_1_app_id_FM8": {
+    "finding": "write.regapp.register is a ROLLBACK-ONLY smoke probe",
+    "evidence": "src/Ariadne.AcadNative/families/m08e_handlers.inc:451-462 (m08eHandleRegappRegister wraps ensureRegApp in an AriadneStagedWriteTransaction it never commits; always emits staged_rolled_back:true) + header lines 20-28 (regapp is among the 6 probe-only ops; only write.block.append_entity graduated).",
+    "path_taken": "(b) EXCLUDE app_id -- recorded in build_meta['excluded_table_kinds'] as a DEFERRAL, never counted applied. Emitting a create op that no-ops and counting it applied would be FM8.",
+    "app_ids_in_census_deferred": 25,
+    "excluded_reason": "write.regapp.register is a rollback-only smoke probe (src/Ariadne.AcadNative/families/m08e_handlers.inc:451-462: AriadneStagedWriteTransaction is never committed, always reports staged_rolled_back:true) -- it cannot persist an APPID record, so replaying app_ids would be a no-op falsely counted as applied (FM8). Deferred until the native op is graduated to a persisting primitive."
+  },
+  "defect_2_false_docstring": {
+    "finding": "v1 docstring falsely claimed include_unreferenced=False 'reproduces the LEGACY referenced-only subset that AutoCAD replay reaches'.",
+    "root_cause_on_real_data": "dwg_graph_ir.v1 records NO entity->style and NO entity->dimstyle edge (verified: all 384 TEXT/MTEXT entities carry no 'style' key), so a reference scan CANNOT reproduce AutoCAD reachability -- option (a) 'complete the scan' is impossible from this IR.",
+    "fix": "referenced_record_names documents EXACTLY the captured edges (entity.layer, layer->linetype, dimstyle->{textstyle,linetype}) and the omitted ones; the docstring states it is a STRICT UNDERAPPROXIMATION, not a faithful reproduction."
+  },
+  "defect_3_test_disconnected": {
+    "finding": "v1 test used a top-level entity 'dimstyle' key the real extractor never emits, so it exercised a non-existent path.",
+    "fix": "fixture uses only real census field names (layers.{name,linetype}, app_ids.{handle,name}, entities.layer, dim_styles.dimtxsty); the entity reference field is 'layer' and TEXT carries no style key -- matching the real schema."
+  },
+  "real_data_behavior": {
+    "census": "runs/e2e_1dwg_R4x_ccw_20260711/census",
+    "named_records": {
+      "layer": 91,
+      "linetype": 18,
+      "textstyle": 8,
+      "dimstyle": 6,
+      "vport": 1
+    },
+    "app_ids_excluded": 25,
+    "include_unreferenced_true_SHIP": {
+      "total_ops": 124,
+      "per_label": {
+        "layer": 91,
+        "dimstyle": 6,
+        "linetype": 18,
+        "textstyle": 8,
+        "vport": 1
+      },
+      "skipped_unreferenced": {},
+      "excluded_table_kinds": [
+        "app_id"
+      ],
+      "any_regapp_op": false
+    },
+    "include_unreferenced_false": {
+      "total_ops": 103,
+      "per_label": {
+        "layer": 91,
+        "dimstyle": 1,
+        "linetype": 9,
+        "textstyle": 1,
+        "vport": 1
+      },
+      "skipped_unreferenced": {
+        "dimstyle": 5,
+        "linetype": 9,
+        "textstyle": 7
+      },
+      "excluded_table_kinds": [
+        "app_id"
+      ],
+      "any_regapp_op": false
+    },
+    "arithmetic_note": "=True replays all 124 named records of the 7 handled kinds; =False keeps 103 (reserved + reference-reachable) and reports 21 skipped (dimstyle 5, linetype 9, textstyle 7) -- the records the IR cannot prove are referenced. app_id (25) is excluded in BOTH modes, never counted applied."
+  }
+}

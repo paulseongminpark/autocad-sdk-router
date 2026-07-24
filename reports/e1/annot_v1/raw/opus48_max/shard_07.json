@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-u110-121",
+    "def": "*U110",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "38 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 38 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 44F5, 44F6); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u111-122",
+    "def": "*U111",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "22 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 22 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 4520, 4521); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u112-123",
+    "def": "*U112",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "12 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 12 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 453B, 453C); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u113-124",
+    "def": "*U113",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "41 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 41 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 454C, 454D); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u114-125",
+    "def": "*U114",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "13 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 13 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 457A, 457B); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u115-126",
+    "def": "*U115",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "149 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 149 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 458C, 458D); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u116-127",
+    "def": "*U116",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "29 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 29 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 4626, 4627); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u117-128",
+    "def": "*U117",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "78 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 78 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 4648, 4649); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u118-129",
+    "def": "*U118",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "16 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 16 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 469B, 469C); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u119-130",
+    "def": "*U119",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "40 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 40 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 46B0, 46B1); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u120-131",
+    "def": "*U120",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "10 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 10 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 46DD, 46DE); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u121-132",
+    "def": "*U121",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "51 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 51 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 46EC, 46ED); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u122-133",
+    "def": "*U122",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "10 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 10 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 4724, 4725); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u123-134",
+    "def": "*U123",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "54 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 54 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 4733, 4734); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u124-135",
+    "def": "*U124",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "69 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 69 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 476E, 476F); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u125-136",
+    "def": "*U125",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "30 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 30 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 47B8, 47B9); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u126-137",
+    "def": "*U126",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "51 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 51 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 47DB, 47DC); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u127-138",
+    "def": "*U127",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "6 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 6 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 4813, 4814); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u128-139",
+    "def": "*U128",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "6 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 6 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 481E, 481F); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-u129-140",
+    "def": "*U129",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.5,
+    "wall_line_handles": [],
+    "notes": "17 insulation LWPOLYLINEs (5-vtx closed cells) on plan $INSUL layer; wall-cavity fill fragment, no wall face-lines present in the block.",
+    "rationale": {
+      "evidence": "All 17 entities are LWPOLYLINE on layer X-평면도(기본형)$0$INSUL (insulation), each a closed 5-vertex quad (e.g. handles 4829, 482A); the dxf histogram is 100% LWPOLYLINE with no LINE entities, so bbox is not derivable. Content is homogeneous insulation fill with no wall-outline, text, or dimension geometry.",
+      "rule": "A definition whose entities are exclusively closed 5-vertex polylines on a plan-view '...$INSUL' layer is wall-cavity insulation hatch — a plan-construction fragment, not a reusable icon, a dimension cache, or furniture. Insulation only occurs inside walls, so the block is wall-associated even though it carries no wall face-lines itself.",
+      "counterfactual": "If these polylines sat on a WALL/벽 layer, or were long 2-point segments instead of small closed quads, they would read as wall lines and push wall_likelihood toward 1; a fixed identical entity_count reused across blocks would instead argue 심볼, and added door/text/furniture geometry would argue a richer 평면 부분도 or 가구.",
+      "uncertainty": "Vertex coordinates and bbox are not exposed, so I cannot confirm the cells trace a linear wall run, measure wall thickness, or separate exterior from party walls; whether a distinct wall-outline layer accompanies this insulation elsewhere is undeterminable from this projection."
+    }
+  }
+]

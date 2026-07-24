@@ -1,0 +1,235 @@
+{
+  "schema": "e2.w2_01.autopsy.prereg.v1",
+  "cell": "w2_01",
+  "sealed_at": "2026-07-19T03:15:06+09:00",
+  "governance": {
+    "mode": "error_autopsy_only",
+    "repair_or_model_selection": false,
+    "output_root": "D:\\runs\\e2_program\\cells\\w2_01_autopsy",
+    "repo_modification": false,
+    "existing_artifact_modification": false,
+    "subagents": 0,
+    "test_reads": 0,
+    "val_b_drawing_reads": 0,
+    "original_cad_reads": 0,
+    "recommendations_or_adoption_judgments": false
+  },
+  "inputs": {
+    "packet": {
+      "path": "D:\\runs\\e2_program\\build\\PACKET_w2_01_error_autopsy.md",
+      "sha256": "bd886f8e8db26d21afda4daee1b81d5776e2d83eaf01a31c1b0e5a924288b243"
+    },
+    "prereg_r2_v1": {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\prereg_r2_v1.json",
+      "sha256": "fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2"
+    },
+    "amendment1": {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\prereg_r2_v1_amendment1.json",
+      "sha256": "30f752db803f7f589d1a8d1f1a2d8557364ae2d624f76a639533161f552b8283"
+    },
+    "amendment2": {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\prereg_r2_v1_amendment2.json",
+      "sha256": "6e29bbd5f8c502a1bc36277a535521c117408b2460e80511907d610321dd442a"
+    },
+    "joint_design": {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\duo\\WAVE2_JOINT_DESIGN.md",
+      "sha256": "a41d4442438b99215af6f38ec362e929499c1e3962dad082c3ce35482dbb82e9"
+    },
+    "w2_09_source": {
+      "path": "D:\\runs\\e2_program\\cells\\w2_09_valb\\w2_09_valb.py",
+      "sha256": "85481aa49f6cf62307588e73ea502160079f1172de8f5f927a1a7c23bb5ef1de"
+    },
+    "split_manifest": {
+      "path": "D:\\runs\\e2_program\\cells\\w2_09_valb\\split_manifest.json",
+      "sha256": "8aad64eeda77df55296fc711c21d7befdeada7fe379aeafec81fd1691aea044f",
+      "content_hash": "5e16541d7191ad01c57a9cee72172f63112ed68590dd371aff5bf0aaaab8e07b"
+    },
+    "clean_incumbent": {
+      "path": "D:\\runs\\e2_program\\cells\\w2_09_valb\\clean_incumbent.joblib",
+      "sha256": "a0f37c1ab89d64773a7adbea871425a7f1bcc945e0b83ccea969e15d54ea1dcc"
+    },
+    "clean_incumbent_manifest": {
+      "path": "D:\\runs\\e2_program\\cells\\w2_09_valb\\clean_incumbent_manifest.json",
+      "sha256": "7f5ee863dc0de5a657442df4970253b735dac920eabcbf85f47908e2bace7263"
+    },
+    "context_source": {
+      "path": "D:\\runs\\e2_program\\cells\\cml_ctx\\cml_ctx.py",
+      "sha256": "ac0ef389ca971a87645763bd4153cf4f564731d17f8689331bc9de04a67e1b98"
+    },
+    "base_feature_source": {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\ext\\cubicasa_ml.py",
+      "sha256": "e9baf9f361ca9cfc1a113e084bf5c34be33cf9b6c14615c2ed080f771cd3b466"
+    },
+    "graph_feature_source": {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\tools\\e2\\cells\\graph_builder.py",
+      "sha256": "c95d4a30d30e0db157fe56102053a7884902b7749464f7f4cb8852c0819321f6"
+    },
+    "calibration": {
+      "path": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e2\\ext\\calibration_v1.json",
+      "sha256": "656692286b6396a318b1b548facec4ac9c3bf21b27260c31fc80deb753b0b9fb"
+    },
+    "data_root_resolution": {
+      "packet_declared_root": "D:\\runs\\e2_ext_cubicasa\\ir",
+      "packet_declared_root_exists_preseal": false,
+      "source_of_truth_root": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2_ext_cubicasa\\ir",
+      "rule": "use the literal W2-09 source-of-truth root; do not substitute or copy data"
+    }
+  },
+  "cohort": {
+    "state": "DEV",
+    "split": "val-A",
+    "drawing_count": 198,
+    "row_count": 167556,
+    "drawing_ids_sha256": "4905890378c4dc3958bcd04876dd4e78f9c8cba0d1511b7c23117b8f12f6a6f7",
+    "selection": "exact split_manifest frozen.splits.A drawing_ids",
+    "file_access": "open only explicit <val_root>/<val_A_id>.segir.json and matching .truth.json; no val directory glob"
+  },
+  "inference": {
+    "arm": "hist_gbdt_context12_clean_valA",
+    "model_seeds": [17, 29, 43],
+    "probability": "arithmetic mean of three predict_proba[:,1] arrays",
+    "threshold": 0.5,
+    "selected_context_radius_px": 20.0,
+    "feature_pipeline": "import W2-09, CubiCasa base extractor dependencies, and cml_ctx read-only; call the same base evidence core, drawing_context, and W2-09 _assemble_context"
+  },
+  "feature_sets": {
+    "context12": [
+      "parallel",
+      "thickness",
+      "junction",
+      "log10_len",
+      "sin2t",
+      "cos2t",
+      "parallel_band_neighbor_count",
+      "nearest_parallel_gap_px",
+      "junction_degree",
+      "drawing_length_percentile",
+      "radius_density_r20_per_px2",
+      "neighbor_angle_entropy_r20"
+    ],
+    "graph17": [
+      "log1p_length_norm",
+      "midpoint_x_drawing_norm",
+      "midpoint_y_drawing_norm",
+      "bbox_width_norm",
+      "bbox_height_norm",
+      "sin_2theta",
+      "cos_2theta",
+      "sagitta_norm",
+      "closed_geometry",
+      "kind_line",
+      "kind_poly_edge",
+      "kind_arc_chord",
+      "log1p_endpoint_degree",
+      "log1p_junction_count",
+      "log1p_parallel_count",
+      "log1p_collinear_count",
+      "block_depth_norm"
+    ]
+  },
+  "analysis_plan": {
+    "error_ledger": {
+      "unit": "one source-of-truth model row",
+      "required_keys": ["drawing_id", "family_id", "drawing_row_index", "handle"],
+      "prediction_fields": ["probability_seed_17", "probability_seed_29", "probability_seed_43", "probability_mean", "y_true", "y_pred", "outcome"],
+      "feature_fields": "context12 + graph17 + sealed 2-hop indicators",
+      "format": "parquet"
+    },
+    "stratified_error_rates": {
+      "definitions": {
+        "fn_rate": "FN / true-positive rows",
+        "fp_rate": "FP / true-negative rows",
+        "auprc": "average precision when both labels exist; otherwise null",
+        "wide": "n_total < 50"
+      },
+      "axes": {
+        "family": "split_manifest family_id",
+        "drawing": "drawing_id",
+        "length_quantile": "global val-A segment-length quintiles with deterministic linear quantiles",
+        "thickness_channel": "present iff finite thickness > 0, else absent",
+        "junction_degree": "0, 1, 2, 3, 4+ using context12 uncapped degree",
+        "parallel_gap_quantile": "missing plus global finite nearest-gap quintiles",
+        "layer_census_bucket": "unique nonempty IR layer count per drawing: 1, 2-4, 5-9, 10+",
+        "drawing_size_quantile": "drawing row-count quintiles"
+      }
+    },
+    "error_clustering": {
+      "separate_populations": ["FN", "FP"],
+      "features": "context12 + graph17",
+      "nonfinite_imputation": "feature median within the error population; all-nonfinite becomes 0",
+      "standardization": "population mean and population standard deviation; zero scale becomes 1",
+      "algorithm": "sklearn KMeans Lloyd",
+      "clusters": "min(8, population row count)",
+      "seed": 20260719,
+      "n_init": 20,
+      "ordering": "descending cluster size, then original cluster label",
+      "witnesses": "five nearest rows to standardized centroid; ties drawing_id then drawing_row_index",
+      "center_reporting": "all 29 center features in original units"
+    },
+    "residual_feature_association": {
+      "indicator": "prediction error on all val-A rows",
+      "features": "each graph17 and each context12 feature",
+      "statistic": "point-biserial Pearson correlation on finite rows",
+      "permutations": 999,
+      "permutation_seed": 20260719,
+      "per_feature_seed_rule": "first 64 bits of SHA-256(seed|feature_name)",
+      "p_value": "two-sided add-one permutation p",
+      "multiple_testing": "Benjamini-Hochberg q across the 29 finite tests"
+    },
+    "calibration": {
+      "bins": 10,
+      "edges": "equal-width [0.0,0.1),...,[0.9,1.0]",
+      "fields": ["n", "mean_probability", "observed_positive_rate", "absolute_gap"],
+      "ece": "sum(n_bin / n_total * absolute_gap)"
+    },
+    "family_auprc": {
+      "distribution": "minimum, q1, median, q3, maximum over families with both classes",
+      "quantile_method": "linear",
+      "bottom_list": "lowest 20 finite family AUPRC, tie family_id; include n and class counts",
+      "undefined": "separately count families lacking either class"
+    },
+    "two_hop_proxy": {
+      "one_hop_bucket": {
+        "parallel_thickness_junction": "three present/absent flags (>0 and finite)",
+        "length": "global decile",
+        "orientation": "12 bins of undirected axial angle derived from sin2t/cos2t",
+        "parallel_neighbor_count": "0,1,2,3,4+",
+        "nearest_parallel_gap": "missing plus global finite quintile",
+        "junction_degree": "0,1,2,3,4+",
+        "drawing_length_percentile": "decile",
+        "radius_density": "global quintile",
+        "neighbor_angle_entropy": "global quintile"
+      },
+      "mixed_pair_ratio": "sum(n_positive*n_negative) / sum(n_bucket choose 2) over buckets with at least two rows",
+      "fn_candidate_ratio": "FN rows in mixed-label one-hop buckets / all FN rows",
+      "two_hop_indicators": {
+        "junction_of_junction_degree": "sum of intersection-junction fanout over unique one-hop junction neighbors",
+        "parallel_second_ring_count": "unique graph-distance-2 nodes reached with a parallel-band second edge, excluding self and direct neighbors",
+        "parallel_second_ring_mean_gap_norm": "mean minimum normal-offset attribute per such second-ring node; 0 when absent"
+      },
+      "pair_difference_statistics": "exact cross-label pair count, exact mean absolute difference, exact nonzero-difference fraction, and pair-weighted label means for each indicator",
+      "two_hop_separable_fn": "FN in a mixed bucket whose 3-indicator vector differs from at least one negative row in that bucket"
+    }
+  },
+  "selftest": {
+    "determinism": "compare a fresh second ledger construction with the stored first construction using all-field canonical digest",
+    "claim_wording": "휘발 필드(runtime·타임스탬프) 제외 수치 전 필드 동일",
+    "val_b_guard": "opened drawing IDs must equal the 198 val-A IDs exactly; a manifest val-B ID must be rejected before filesystem access",
+    "test_guard": "non-val split must be rejected before filesystem access",
+    "source_hash_guard": true
+  },
+  "resource_caps": {
+    "cpu_hours": 8.0,
+    "ram_bytes": 51539607552,
+    "threads": 8,
+    "overrun_status": "BUDGET_KILL",
+    "cap_increase_allowed": false
+  },
+  "reporting": {
+    "numeric_only": true,
+    "judgments": false,
+    "recommendations": false,
+    "unresolved_section": true,
+    "required_final_line": "CELL_COMPLETE: w2_01"
+  }
+}

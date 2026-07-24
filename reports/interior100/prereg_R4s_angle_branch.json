@@ -1,0 +1,60 @@
+{
+  "schema": "ariadne.interior100.prereg.v1",
+  "arc": "R4s angle-branch quotient (LEX-0009) + LEX-0008 gate widening -- measurement-only remeasure, no reflight",
+  "registered_at_local": "2026-07-10T13:15 (file mtime is the binding evidence of pre-registration order)",
+  "baseline": {
+    "report": "reports/interior100/R4r_remeasure_lex0008.json",
+    "diff0_total": 26893,
+    "a_entity_total": 27130,
+    "a_def_count": 294,
+    "interior_diff0_fraction": 0.9912643568744932
+  },
+  "prediction": {
+    "diff0_total": 26916,
+    "band": [26914, 26918],
+    "interior_diff0_fraction_at_center": 0.9921120531514928,
+    "decomposition": [
+      {
+        "family": "ellipse angle principal-branch",
+        "pairs": 16,
+        "evidence": "tmp dissect_families2 part D: start/sweep normalization folds 16/16 residual ellipse pairs; sample -pi/2->0 vs 3pi/2->2pi"
+      },
+      {
+        "family": "hatch pattern row 2*pi-branch (DASH census vintage)",
+        "pairs": 4,
+        "evidence": "dissect_families2 part B: 4 DASH transitions row angle 6.2832 -> 0.0, identical unit offset/dashes; census vintage census part A: DASH classes {0.0 x62, 6.2832 x4}"
+      },
+      {
+        "family": "SOLID orphan-assoc (LEX-0008 implementation gap)",
+        "pairs": 3,
+        "evidence": "dissect_families2 part E: 3 SOLID pairs a_assoc=True b_assoc=False, assoc_source_handles None on BOTH sides, def X-FORM_...$0$dA-logo"
+      }
+    ],
+    "band_rationale": "pair-level exact prediction (23 pairs fold, nothing else touched); +/-2 allows tier-1 fingerprint bucket repacking side effects inside cad_diff matching"
+  },
+  "explicit_non_targets": {
+    "hatch_H3_vintage_clobber": {
+      "pairs": 154,
+      "verdict": "REAL replay defect -- batch-shared per-NAME .pat forces the seed vintage onto heterogeneous census vintages (patch_engine._synthesize_batch_pat_files keyed by name only; census H3 = 4 vintages: X-grid 45/135 x154 + plus-grid x27 in 3 notations). Repair + reflight (R4t), NOT measurement legislation."
+    },
+    "lwpolyline_z_loss": {
+      "pairs": 25,
+      "verdict": "REAL replay defect -- census vertex z=0.4010621945564553 flattened to 0.0 (blocks.py lwpolyline branch passes no elevation; m08e lwpolyline branch never calls setElevation). Repair + reflight (R4t)."
+    },
+    "hatch_loops_geometry": {
+      "pairs": 7,
+      "verdict": "REAL boundary geometry differences (point-cloud max-NN >= 1e-3, loops_residue_analysis_R4s.json). Next arc."
+    },
+    "removed_entities": {
+      "count": 28,
+      "note": "DIMDOT 3 + LWPOLYLINE 4 + LINE 21 removed-side residue; investigated separately in P2."
+    }
+  },
+  "population_pin": {
+    "census_ir": "runs/e2e_1dwg_R4r_assoc_20260710/census/dwg_graph_ir.json",
+    "post_ir": "runs/e2e_1dwg_R4r_assoc_20260710/regen/post/dwg_graph_ir.json",
+    "source_dwg_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+    "identity_file": "runs/e2e_1dwg_R4r_assoc_20260710/identity.json",
+    "required": "a_def_count=294, a_entity_total=27130 must reproduce exactly; per-def diff0 must be >= R4r baseline for every def (no regression)"
+  }
+}

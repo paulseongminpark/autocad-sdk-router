@@ -1,0 +1,282 @@
+[
+ {
+  "unit_id": "defannot-d395-101",
+  "def": "*D395",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "DIM/DEFPOINTS dimension fragment with DIMDOT inserts and MTEXT 700",
+  "rationale": {
+   "evidence": "All geometry sits on DIM or DEFPOINTS. Three LINEs form extension and dimension segments, two INSERT refs to DIMDOT, MTEXT shows numeric value 700, plus three DEFPOINTS POINTs—classic exploded dimension anatomy. No wall/plan layers appear.",
+   "rule": "Anonymous *D* blocks whose entities are confined to DIM/DEFPOINTS with DIMDOT and numeric MTEXT should be classified as dimension caches, not building fabric.",
+   "counterfactual": "If WALL/A-WALL layer polylines or closed room outlines dominated instead of DIMDOT+numeric MTEXT, the role would flip away from 치수캐시.",
+   "uncertainty": "Cannot see what building edge the 700 measure references or whether the parent DIMENSION entity still exists outside this anonymous block."
+  }
+ },
+ {
+  "unit_id": "defannot-d396-102",
+  "def": "*D396",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Horizontal dim cache: DIM lines, DIMDOT, MTEXT 1170",
+  "rationale": {
+   "evidence": "Entity mix is INSERT×2 (DIMDOT), LINE×3 on DIM, MTEXT 1170, POINT×3 on DEFPOINTS—identical dimension-cache pattern. Bbox spans ~1170 in X matching the text value.",
+   "rule": "When layer histogram is only DIM+DEFPOINTS and inserts name DIMDOT with a length MTEXT, label as 치수캐시 with zero wall likelihood.",
+   "counterfactual": "Presence of structural layers (WALL, A-WALL) or furniture blocks would overturn the dimension-only judgment.",
+   "uncertainty": "Projection alone cannot confirm measured object type (opening vs clear span) or units beyond the raw numeral."
+  }
+ },
+ {
+  "unit_id": "defannot-d397-103",
+  "def": "*D397",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "DIM-layer dimension block measuring 1805",
+  "rationale": {
+   "evidence": "Same *D* dimension recipe: two vertical extension LINEs, one horizontal dim LINE, DIMDOT inserts, MTEXT 1805, DEFPOINTS points. No non-dimension layers.",
+   "rule": "*D anonymous blocks with DIMDOT+DEFPOINTS+numeric MTEXT are dimension caches regardless of measured length.",
+   "counterfactual": "If MTEXT were a room name or if LINEs were on a wall layer with thickness pairs, classification would change.",
+   "uncertainty": "Host geometry being dimensioned is outside this definition; only the annotation graphics are visible."
+  }
+ },
+ {
+  "unit_id": "defannot-d398-104",
+  "def": "*D398",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Short horizontal dimension cache MTEXT 910",
+  "rationale": {
+   "evidence": "DIM-layer LINEs with DIMDOT INSERTs and MTEXT 910 plus DEFPOINTS POINTs match exploded linear dimension content. Bbox width ~910 aligns with the label.",
+   "rule": "DIM/DEFPOINTS-only anonymous *D blocks are 치수캐시; their LINEs are extension/dimension lines, not walls.",
+   "counterfactual": "Replacing DIMDOT/MTEXT with hatch or wall-core polylines would flip role toward 평면 부분도 or 심볼.",
+   "uncertainty": "Cannot determine whether 910 is clear opening, wall face-to-face, or another span without model context."
+  }
+ },
+ {
+  "unit_id": "defannot-d399-105",
+  "def": "*D399",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Vertical dim cache: DIMDOT pair and MTEXT 760",
+  "rationale": {
+   "evidence": "Two horizontal extension LINEs and one vertical dimension LINE on DIM, DIMDOT inserts, MTEXT 760, DEFPOINTS points—vertical linear dimension exploded into *D399.",
+   "rule": "Orientation of the dimension line does not change the rule: DIM+DIMDOT+numeric MTEXT ⇒ 치수캐시, wall_likelihood 0.",
+   "counterfactual": "If entities included paired parallel wall outlines on a construction layer, wall_likelihood would rise and role might shift.",
+   "uncertainty": "Only annotation primitives are projected; the measured vertical feature is unknown."
+  }
+ },
+ {
+  "unit_id": "defannot-d400-106",
+  "def": "*D400",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Vertical dimension cache MTEXT 1145 on DIM/DEFPOINTS",
+  "rationale": {
+   "evidence": "Identical dimension anatomy to sibling *D blocks: DIM LINEs, DIMDOT INSERTs, MTEXT 1145, DEFPOINTS POINTs. Span in Y (~1145) matches the text.",
+   "rule": "Treat anonymous *D definitions with only dimension-layer graphics as 치수캐시 and never as wall geometry.",
+   "counterfactual": "Absence of DIMDOT and presence of thick dual-line wall cores would flip the judgment.",
+   "uncertainty": "Whether this is a continued chain dimension or a standalone measure cannot be told from the block alone."
+  }
+ },
+ {
+  "unit_id": "defannot-d401-107",
+  "def": "*D401",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Compact horizontal dim cache labeled 470",
+  "rationale": {
+   "evidence": "Nine entities: DIM LINEs forming a short horizontal dimension, two DIMDOT inserts, MTEXT 470, three DEFPOINTS—pure dimension cache.",
+   "rule": "Small measured values still count as 치수캐시 when the entity/layer signature is DIM/DEFPOINTS+DIMDOT.",
+   "counterfactual": "If the block also contained door/window symbol geometry, role could become mixed 심볼 rather than pure dimension cache.",
+   "uncertainty": "Source of 470 (niche, mullion, clearance) is not recoverable from this projection."
+  }
+ },
+ {
+  "unit_id": "defannot-d402-108",
+  "def": "*D402",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Vertical dim cache MTEXT 1020 with DIMDOT markers",
+  "rationale": {
+   "evidence": "DIM-layer extension/dimension LINEs, DIMDOT INSERTs, MTEXT 1020, DEFPOINTS POINTs only. No plan wall layers.",
+   "rule": "Classify by layer and insert names first: DIMDOT on DIM ⇒ dimension annotation cache.",
+   "counterfactual": "Wall-layer closed polylines or furniture INSERTs would overturn 치수캐시.",
+   "uncertainty": "Parent dimension style and association to model geometry are outside the projection."
+  }
+ },
+ {
+  "unit_id": "defannot-d403-109",
+  "def": "*D403",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Taller vertical dimension cache MTEXT 1620",
+  "rationale": {
+   "evidence": "Same exploded-dimension composition as other *D* entries; MTEXT 1620 matches the long vertical bbox span. Layers exclusive to DIM/DEFPOINTS.",
+   "rule": "Anonymous *D blocks with numeric dim text and DIMDOT are 치수캐시 irrespective of span length.",
+   "counterfactual": "If DEFPOINTS/DIM content were replaced by INSUL or WALL polylines, role would leave 치수캐시.",
+   "uncertainty": "Cannot verify whether 1620 is floor-to-floor or a local plan height from this 2D projection alone."
+  }
+ },
+ {
+  "unit_id": "defannot-d404-110",
+  "def": "*D404",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Horizontal dim cache MTEXT 580 on DIM layer",
+  "rationale": {
+   "evidence": "LINE×3 + DIMDOT×2 + MTEXT 580 + DEFPOINTS POINT×3, all on DIM/DEFPOINTS—standard dimension cache signature.",
+   "rule": "DIM-layer dimension anatomy without construction layers ⇒ role 치수캐시 and empty wall_line_handles.",
+   "counterfactual": "Adding wall-core double lines on a wall layer would raise wall_likelihood and change role.",
+   "uncertainty": "What object interval equals 580 is not present in the sampled entities."
+  }
+ },
+ {
+  "unit_id": "defannot-d405-111",
+  "def": "*D405",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Vertical dim cache MTEXT 1100 with DIMDOT pair",
+  "rationale": {
+   "evidence": "Vertical dimension exploded into DIM LINEs, DIMDOT inserts, MTEXT 1100, and DEFPOINTS points only.",
+   "rule": "When every entity participates in dimension graphics on DIM/DEFPOINTS, assign 치수캐시 and wall_likelihood 0.",
+   "counterfactual": "Non-dimension text or symbol inserts would force reconsideration toward 심볼 or 기타.",
+   "uncertainty": "Link to the measured building element is not shown in this anonymous definition."
+  }
+ },
+ {
+  "unit_id": "defannot-d406-112",
+  "def": "*D406",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Short dim cache with five DIM LINEs and MTEXT 215",
+  "rationale": {
+   "evidence": "Still DIM/DEFPOINTS only: five LINEs (extensions, dim line, short ticks), DIMDOT×2, MTEXT 215, POINT×3—more line segments but same dimension-cache type.",
+   "rule": "Extra extension/tick LINEs on DIM do not change classification from 치수캐시 when DIMDOT and numeric MTEXT remain.",
+   "counterfactual": "If the five LINEs formed a closed wall outline on a wall layer without DIMDOT/MTEXT, role would flip to 평면 부분도.",
+   "uncertainty": "Why five lines versus three (style/ticks) is clear as dimension graphics, but the measured feature is unknown."
+  }
+ },
+ {
+  "unit_id": "defannot-d407-113",
+  "def": "*D407",
+  "role": "치수캐시",
+  "wall_likelihood": 0.0,
+  "wall_line_handles": [],
+  "notes": "Horizontal dim cache MTEXT 950 sibling to nearby *D blocks",
+  "rationale": {
+   "evidence": "Standard *D dimension payload: DIM LINEs, DIMDOT inserts, MTEXT 950, DEFPOINTS points; bbox width ~950 matches the label.",
+   "rule": "Sibling *D anonymous blocks sharing DIM+DIMDOT+DEFPOINTS pattern are uniformly 치수캐시.",
+   "counterfactual": "Introduction of plan insulation or wall layers would invalidate the pure dimension-cache label.",
+   "uncertainty": "Chain relationship to adjacent dimensions (*D406 etc.) cannot be proven from this isolated projection."
+  }
+ },
+ {
+  "unit_id": "defannot-u103-114",
+  "def": "*U103",
+  "role": "심볼",
+  "wall_likelihood": 0.12,
+  "wall_line_handles": [],
+  "notes": "159 identical 5-vert INSUL LWPOLYLINEs—batt insulation symbol cluster",
+  "rationale": {
+   "evidence": "All 159 entities are LWPOLYLINE on X-평면도(기본형)$0$INSUL with 5 vertices each—repetitive batt-insulation glyph fill, not dimension or furniture content. Layer name explicitly tags insulation under a floor-plan xref path.",
+   "rule": "Anonymous *U clusters of many small same-vertex-count LWPOLYLINEs on an INSUL plan layer are insulation symbols (심볼), not walls.",
+   "counterfactual": "If the layer were WALL/A-WALL with long parallel centerlines or thick cores instead of INSUL, role would shift to 평면 부분도 with high wall_likelihood.",
+   "uncertainty": "Vertex coordinates and overall arrangement are not given, so exact batt orientation and whether any polyline coincides with a wall face cannot be confirmed."
+  }
+ },
+ {
+  "unit_id": "defannot-u104-115",
+  "def": "*U104",
+  "role": "심볼",
+  "wall_likelihood": 0.12,
+  "wall_line_handles": [],
+  "notes": "25 INSUL 5-vert LWPOLYLINEs—smaller insulation symbol set",
+  "rationale": {
+   "evidence": "Homogeneous LWPOLYLINE×25 on INSUL plan layer, each with 5 vertices—same insulation-symbol pattern as *U103 at smaller count. No DIM, furniture, or wall-layer entities.",
+   "rule": "Uniform INSUL-layer multi-polyline *U blocks are 심볼 (insulation) with low wall_likelihood because insulation is adjacent to walls but is not wall geometry.",
+   "counterfactual": "Mixed layers including WALL plus long orthognal pairs would flip toward 평면 부분도 and populate wall_line_handles.",
+   "uncertainty": "Without coordinates or adjacent wall entities, cannot judge how these batts attach to structure."
+  }
+ },
+ {
+  "unit_id": "defannot-u105-116",
+  "def": "*U105",
+  "role": "심볼",
+  "wall_likelihood": 0.12,
+  "wall_line_handles": [],
+  "notes": "38 INSUL LWPOLYLINE insulation symbols on plan layer",
+  "rationale": {
+   "evidence": "38 LWPOLYLINEs exclusively on X-평면도(기본형)$0$INSUL, sampled ones all 5-vertex—insulation hatch/symbol geometry in a floor-plan context.",
+   "rule": "Exclusive INSUL-layer anonymous *U polyline sets classify as 심볼; do not list them as wall lines.",
+   "counterfactual": "If entities were INSERT furniture blocks or DIM dimensions, role would become 가구 or 치수캐시 instead.",
+   "uncertainty": "Full vertex paths and spatial extent are unavailable, so wall co-linearity remains speculative."
+  }
+ },
+ {
+  "unit_id": "defannot-u106-117",
+  "def": "*U106",
+  "role": "심볼",
+  "wall_likelihood": 0.12,
+  "wall_line_handles": [],
+  "notes": "24 five-vertex INSUL polylines—insulation symbol pack",
+  "rationale": {
+   "evidence": "Only LWPOLYLINE on INSUL under 평면도 layer path; 24 copies of 5-vertex polys match batt insulation drafting symbols.",
+   "rule": "Repeated small closed/open polys on INSUL ⇒ 심볼; wall_likelihood stays low unless wall-layer geometry appears.",
+   "counterfactual": "Renaming/moving content to a WALL layer with long parallel pairs would raise wall_likelihood sharply.",
+   "uncertainty": "Cannot see whether these batts fill a cavity, run along exterior, or are detail callouts."
+  }
+ },
+ {
+  "unit_id": "defannot-u107-118",
+  "def": "*U107",
+  "role": "심볼",
+  "wall_likelihood": 0.12,
+  "wall_line_handles": [],
+  "notes": "74 INSUL LWPOLYLINEs—dense insulation symbol cluster",
+  "rationale": {
+   "evidence": "74 identical-class LWPOLYLINEs on INSUL plan layer (sampled all vertices=5) indicate a denser insulation symbol region, still not dimension or furniture.",
+   "rule": "Count scales density but not role: INSUL-only *U polyline packs remain 심볼 with empty wall_line_handles.",
+   "counterfactual": "Presence of door/window swings or casework inserts would push classification toward 평면 부분도 or 가구.",
+   "uncertainty": "BBox not derivable from LINE data here; spatial footprint and wall adjacency unknown."
+  }
+ },
+ {
+  "unit_id": "defannot-u108-119",
+  "def": "*U108",
+  "role": "심볼",
+  "wall_likelihood": 0.12,
+  "wall_line_handles": [],
+  "notes": "15 INSUL 5-vert LWPOLYLINEs—compact insulation symbols",
+  "rationale": {
+   "evidence": "Fifteen LWPOLYLINEs solely on X-평면도(기본형)$0$INSUL with 5 vertices each—compact insulation symbol set consistent with other *U* defs in this shard.",
+   "rule": "Plan-layer INSUL polyline clusters are insulation 심볼; do not treat them as wall outlines.",
+   "counterfactual": "If the histogram included LINE/ARC on WALL plus these polys, wall_line_handles could be filled from the WALL entities.",
+   "uncertainty": "Sample lacks coordinates, so no specific handle can be justified as a wall line."
+  }
+ },
+ {
+  "unit_id": "defannot-u109-120",
+  "def": "*U109",
+  "role": "심볼",
+  "wall_likelihood": 0.12,
+  "wall_line_handles": [],
+  "notes": "13 INSUL LWPOLYLINE insulation symbols",
+  "rationale": {
+   "evidence": "Thirteen LWPOLYLINEs on INSUL floor-plan layer, all sampled with 5 vertices—same insulation-symbol family as *U103–*U108. No DIM/DEFPOINTS or furniture cues.",
+   "rule": "Anonymous *U definitions that are 100% INSUL LWPOLYLINE sets map to 심볼 with near-zero wall confidence.",
+   "counterfactual": "Replacing INSUL with WALL/A-WALL long parallel polylines would flip role to 평면 부분도 and raise wall_likelihood above 0.7.",
+   "uncertainty": "Exact geometry and any co-located wall cores are invisible in this layer-only projection."
+  }
+ }
+]

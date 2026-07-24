@@ -58,8 +58,9 @@ class TestPolicyHygieneLiveRegistry(unittest.TestCase):
 
     def test_live_registry_has_expected_status_histogram(self):
         by_status = Counter(op.get("status") for op in self.registry["operations"])
-        self.assertEqual(dict(by_status), {"implemented": 488, "blocked": 62})
-        self.assertEqual(len(self.registry["operations"]), 550)
+        # +1 implemented: write.block.relink_hatch_assoc (P3 assoc-relink arc).
+        self.assertEqual(dict(by_status), {"implemented": 489, "blocked": 62})
+        self.assertEqual(len(self.registry["operations"]), 551)
 
     def test_zero_drift_after_fix_on_live_registry(self):
         report = ph.check_registry(self.registry, self.policy_doc)

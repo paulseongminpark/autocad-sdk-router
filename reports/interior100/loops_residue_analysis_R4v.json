@@ -1,0 +1,1639 @@
+{
+  "schema": "ariadne.loops_residue_analysis.v1",
+  "inputs": {
+    "census_ir": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4v_assoc_20260711\\census\\dwg_graph_ir.json",
+    "post_ir": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2e_1dwg_R4v_assoc_20260711\\regen\\post\\dwg_graph_ir.json",
+    "interior_diff": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\interior100\\R4v_remeasure_assoc.json"
+  },
+  "baseline": {
+    "totals": {
+      "a_def_count": 294,
+      "b_def_count": 294,
+      "a_entity_total": 27130,
+      "b_entity_total": 27130,
+      "diff0_total": 27116,
+      "interior_diff0_fraction": 0.9994839660892001,
+      "spline_fit_authored_a": 432,
+      "spline_fit_authored_b": 0,
+      "derived_cache_excluded": {
+        "name_pattern": "^\\*D\\d+$",
+        "a_def_count": 113,
+        "b_def_count": 113,
+        "a_entity_total": 1053,
+        "b_entity_total": 1130,
+        "reason": "*D anonymous blocks are per-dimension rendered caches; a rebuild's dimensions mint fresh *D names, so a name-matched def compare is a category error. The dimension entities themselves are verified by the L5 dim_semantic_gate."
+      }
+    },
+    "reproduce_errors": [],
+    "captured_modified_pairs": 14
+  },
+  "classification": {
+    "loops_only": 14,
+    "loops_plus_other_keys": 0,
+    "non_loops": 0
+  },
+  "loops_only_verdict": {
+    "pointcloud_geometry_equal": 7,
+    "pointcloud_geometry_diff": 7,
+    "geometry_eq_tolerance": 0.001,
+    "canon_folds": 0,
+    "canon_resistant": 14,
+    "max_pointcloud_dist_among_folded": 0.0,
+    "folded_but_geometry_diff": []
+  },
+  "arc_angle_range_seen": [
+    0.7330293865029381,
+    6.283185307179586
+  ],
+  "collision_test": {
+    "census_hatch_loops": 310,
+    "distinct_canonical_forms": 212,
+    "notation_variants_merged": 16,
+    "geometry_collisions": []
+  },
+  "pairs_loops_only": [
+    {
+      "def": "X-FORM_청주$0$dA로고",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "1BDF",
+      "b_handle": "762B",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 0.000915805,
+      "pointcloud_notes": [
+        "spline-control-proxy"
+      ],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 5,
+          "closed": true,
+          "n_edges": 3,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 3
+          }
+        },
+        {
+          "loop_type": 20,
+          "closed": true,
+          "n_edges": 1,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 1
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 5,
+          "closed": true,
+          "n_edges": 9,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 9
+          }
+        },
+        {
+          "loop_type": 20,
+          "closed": true,
+          "n_edges": 3,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 3
+          }
+        }
+      ]
+    },
+    {
+      "def": "X-FORM_청주$0$dA로고",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "1BE6",
+      "b_handle": "7632",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 0.000915805,
+      "pointcloud_notes": [
+        "spline-control-proxy"
+      ],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 5,
+          "closed": true,
+          "n_edges": 3,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 3
+          }
+        },
+        {
+          "loop_type": 20,
+          "closed": true,
+          "n_edges": 1,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 1
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 5,
+          "closed": true,
+          "n_edges": 9,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 9
+          }
+        },
+        {
+          "loop_type": 20,
+          "closed": true,
+          "n_edges": 3,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 3
+          }
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$104co1",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "809B",
+      "b_handle": "621C",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 0.0,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$111a",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "2B43",
+      "b_handle": "2CCB",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 79.305996214,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 26,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 26
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 2
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 26,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 26
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 2
+          }
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84a",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "20F9",
+      "b_handle": "4436",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 100.003472162,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 30,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 30
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 30,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 30
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84a1",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "28C4",
+      "b_handle": "2518",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 100.003472162,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 30,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 30
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 30,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 30
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84b",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "2283",
+      "b_handle": "5046",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 75.66629407,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 26,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 26
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 26,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 26
+          }
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84b",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "2464",
+      "b_handle": "51C4",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 0.0,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84b",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "2465",
+      "b_handle": "51C5",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 0.0,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84b1",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "6EDC",
+      "b_handle": "57ED",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 75.66629407,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 26,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 26
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 26,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 26
+          }
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84b1",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "6D11",
+      "b_handle": "56DF",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 0.0,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84b1",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "6D12",
+      "b_handle": "56E0",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 0.0,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84c",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "24C7",
+      "b_handle": "1B90",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 6.664189788,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 14,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 12,
+            "arc": 2
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 14,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 14
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 14,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 12,
+            "arc": 2
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 14,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 14
+          }
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84c1",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "741A",
+      "b_handle": "5A4E",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 6.664189788,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 14,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 12,
+            "arc": 2
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 14,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 14
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 14,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 12,
+            "arc": 2
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 14,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 14
+          }
+        }
+      ]
+    }
+  ],
+  "pairs_loops_plus": [],
+  "pairs_non_loops": [],
+  "resistant_pairs": [
+    {
+      "def": "X-FORM_청주$0$dA로고",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "1BDF",
+      "b_handle": "762B",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 0.000915805,
+      "pointcloud_notes": [
+        "spline-control-proxy"
+      ],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 5,
+          "closed": true,
+          "n_edges": 3,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 3
+          }
+        },
+        {
+          "loop_type": 20,
+          "closed": true,
+          "n_edges": 1,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 1
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 5,
+          "closed": true,
+          "n_edges": 9,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 9
+          }
+        },
+        {
+          "loop_type": 20,
+          "closed": true,
+          "n_edges": 3,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 3
+          }
+        }
+      ]
+    },
+    {
+      "def": "X-FORM_청주$0$dA로고",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "1BE6",
+      "b_handle": "7632",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 0.000915805,
+      "pointcloud_notes": [
+        "spline-control-proxy"
+      ],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 5,
+          "closed": true,
+          "n_edges": 3,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 3
+          }
+        },
+        {
+          "loop_type": 20,
+          "closed": true,
+          "n_edges": 1,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 1
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 5,
+          "closed": true,
+          "n_edges": 9,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 9
+          }
+        },
+        {
+          "loop_type": 20,
+          "closed": true,
+          "n_edges": 3,
+          "n_vertices": null,
+          "edge_types": {
+            "spline": 3
+          }
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$104co1",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "809B",
+      "b_handle": "621C",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 0.0,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$111a",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "2B43",
+      "b_handle": "2CCB",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 79.305996214,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 26,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 26
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 2
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 26,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 26
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 2
+          }
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84a",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "20F9",
+      "b_handle": "4436",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 100.003472162,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 30,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 30
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 30,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 30
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84a1",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "28C4",
+      "b_handle": "2518",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 100.003472162,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 30,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 30
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 30,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 30
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84b",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "2283",
+      "b_handle": "5046",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 75.66629407,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 26,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 26
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 26,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 26
+          }
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84b",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "2464",
+      "b_handle": "51C4",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 0.0,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84b",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "2465",
+      "b_handle": "51C5",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 0.0,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84b1",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "6EDC",
+      "b_handle": "57ED",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 75.66629407,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 26,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 26
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 17,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 26,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 26
+          }
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84b1",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "6D11",
+      "b_handle": "56DF",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 0.0,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84b1",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "6D12",
+      "b_handle": "56E0",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 0.0,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 7,
+          "closed": true,
+          "n_edges": null,
+          "n_vertices": 5,
+          "edge_types": {}
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84c",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "24C7",
+      "b_handle": "1B90",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 6.664189788,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 14,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 12,
+            "arc": 2
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 14,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 14
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 14,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 12,
+            "arc": 2
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 14,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 14
+          }
+        }
+      ]
+    },
+    {
+      "def": "X-평면도(기본형)$0$84c1",
+      "kind": "hatch",
+      "dxf_name": "HATCH",
+      "a_handle": "741A",
+      "b_handle": "5A4E",
+      "changed_geometry_keys": [
+        "loops"
+      ],
+      "changed_nongeometry_fields": [],
+      "pointcloud_max_nn": 6.664189788,
+      "pointcloud_notes": [],
+      "canon_folds": false,
+      "a_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 14,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 12,
+            "arc": 2
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 14,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 14
+          }
+        }
+      ],
+      "b_loop_shape": [
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 14,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 12,
+            "arc": 2
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 2,
+          "n_vertices": null,
+          "edge_types": {
+            "arc": 1,
+            "line": 1
+          }
+        },
+        {
+          "loop_type": 1,
+          "closed": true,
+          "n_edges": 14,
+          "n_vertices": null,
+          "edge_types": {
+            "line": 14
+          }
+        }
+      ]
+    }
+  ],
+  "dryrun": {
+    "totals": {
+      "a_def_count": 294,
+      "b_def_count": 294,
+      "a_entity_total": 27130,
+      "b_entity_total": 27130,
+      "diff0_total": 27116,
+      "interior_diff0_fraction": 0.9994839660892001,
+      "spline_fit_authored_a": 432,
+      "spline_fit_authored_b": 0,
+      "derived_cache_excluded": {
+        "name_pattern": "^\\*D\\d+$",
+        "a_def_count": 113,
+        "b_def_count": 113,
+        "a_entity_total": 1053,
+        "b_entity_total": 1130,
+        "reason": "*D anonymous blocks are per-dimension rendered caches; a rebuild's dimensions mint fresh *D names, so a name-matched def compare is a category error. The dimension entities themselves are verified by the L5 dim_semantic_gate."
+      }
+    },
+    "per_def_regressions": [],
+    "dirty_defs_after": [
+      {
+        "name": "X-FORM_청주$0$dA로고",
+        "a_total": 30,
+        "diff0": 28,
+        "modified": 2,
+        "removed": 0,
+        "added": 0
+      },
+      {
+        "name": "X-평면도(기본형)$0$104co1",
+        "a_total": 106,
+        "diff0": 105,
+        "modified": 1,
+        "removed": 0,
+        "added": 0
+      },
+      {
+        "name": "X-평면도(기본형)$0$111a",
+        "a_total": 639,
+        "diff0": 638,
+        "modified": 1,
+        "removed": 0,
+        "added": 0
+      },
+      {
+        "name": "X-평면도(기본형)$0$84a",
+        "a_total": 527,
+        "diff0": 526,
+        "modified": 1,
+        "removed": 0,
+        "added": 0
+      },
+      {
+        "name": "X-평면도(기본형)$0$84a1",
+        "a_total": 533,
+        "diff0": 532,
+        "modified": 1,
+        "removed": 0,
+        "added": 0
+      },
+      {
+        "name": "X-평면도(기본형)$0$84b",
+        "a_total": 525,
+        "diff0": 522,
+        "modified": 3,
+        "removed": 0,
+        "added": 0
+      },
+      {
+        "name": "X-평면도(기본형)$0$84b1",
+        "a_total": 527,
+        "diff0": 524,
+        "modified": 3,
+        "removed": 0,
+        "added": 0
+      },
+      {
+        "name": "X-평면도(기본형)$0$84c",
+        "a_total": 571,
+        "diff0": 570,
+        "modified": 1,
+        "removed": 0,
+        "added": 0
+      },
+      {
+        "name": "X-평면도(기본형)$0$84c1",
+        "a_total": 577,
+        "diff0": 576,
+        "modified": 1,
+        "removed": 0,
+        "added": 0
+      }
+    ]
+  }
+}

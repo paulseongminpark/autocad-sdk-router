@@ -1,0 +1,200 @@
+{
+  "schema": "ariadne.e2.f04_common_judge.prereg.local.v1",
+  "sealed_utc": "2026-07-20T02:15:35Z",
+  "sealed_before_numeric_computation": true,
+  "packet": {
+    "path": "D:/runs/e2_program/build/PACKET_f04_common_judge.md",
+    "sha256": "03ace40a101894eb0bd5d2ff3fd124c342485ef3221e0d382f5e4946645ec35b",
+    "scope": "F04 CPU tranche: doe_P5 F01-F14; common registry and judge; method-specific admissibility; transform-by-family table"
+  },
+  "roots": {
+    "repository": "D:/dev/99_tools/autocad-sdk-router",
+    "raw_output": "D:/runs/e2_program/cells/f04_completion"
+  },
+  "inputs": [
+    {
+      "role": "legacy_independence_projection",
+      "path": "reports/e2/w2_independence_audit_v1.json",
+      "sha256": "9000f4e36246e7d450e358251cad9aa44f788536cdc6bec8669f5aac2f4996ad"
+    },
+    {
+      "role": "corrected_strict_metamorphic_fold",
+      "path": "reports/e2/s5/b4_fold_v2.json",
+      "sha256": "866fadf11fa93fa5f8bd6c185c63124f3b7ef40cac0d7b7e12cbace4be6472dc"
+    },
+    {
+      "role": "F04_system_of_truth",
+      "path": "reports/e2/synthesis/FINAL_PROGRAM_PLAN.md",
+      "sha256": "53efc08a96d8b0a770b5f0b5eaf9ae2d9ca8b5ce7db6422dce64e86afb75fda0"
+    },
+    {
+      "role": "upstream_program_prereg",
+      "path": "reports/e2/prereg_r2_v1.json",
+      "sha256": "fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2"
+    },
+    {
+      "role": "relation_and_family_design",
+      "path": "reports/e2/dossiers/doe_P5.md",
+      "sha256": "4a55c843c7224a2e5800f116e360dfe327e13d1fc04e78e882099cfe96f32fc3"
+    }
+  ],
+  "plan_f04_verbatim": "승계 — 공용 relation registry/judge + 방법별 게이트 분리(C11). doe_P5의 **effects/confirmation(발견 기능)을 명시 산출물로 복원**: transform×family 상호작용 표는 F04의 필수 보고서다 (판정 기능에 흡수 금지). CPU part = doe_P5 F01–F14(결정론+고전ML)",
+  "relation_registry": [
+    {
+      "id": "translate",
+      "parameters": [
+        {"dx_over_bbox_diagonal": 0.1, "dy_over_bbox_diagonal": -0.2},
+        {"dx_over_bbox_diagonal": 10.0, "dy_over_bbox_diagonal": 10.0},
+        {"dx_over_bbox_diagonal": -10.0, "dy_over_bbox_diagonal": 3.0}
+      ],
+      "binary_relation": "invariant",
+      "structured_relation": "axis translated by the same vector; thickness unchanged",
+      "validity_gate": "inverse transform restores endpoints and topology"
+    },
+    {
+      "id": "rotate",
+      "parameters": [
+        {"angle_degrees": 17.0, "center": "bbox_centroid"},
+        {"angle_degrees": 90.0, "center": "bbox_centroid"},
+        {"angle_degrees": 173.0, "center": "bbox_centroid"}
+      ],
+      "binary_relation": "invariant",
+      "structured_relation": "axis rotated about bbox centroid; thickness unchanged",
+      "validity_gate": "inverse rotation restores endpoints and topology"
+    },
+    {
+      "id": "uniform-scale",
+      "parameters": [
+        {"factor": 0.5, "center": "bbox_centroid"},
+        {"factor": 2.0, "center": "bbox_centroid"},
+        {"factor": 10.0, "center": "bbox_centroid"}
+      ],
+      "binary_relation": "invariant",
+      "structured_relation": "axis scaled about bbox centroid; thickness multiplied by absolute factor",
+      "validity_gate": "factor is positive and inverse scaling restores geometry"
+    },
+    {
+      "id": "unit-change",
+      "parameters": [
+        {"from": "mm", "to": "m", "coordinate_factor": 0.001},
+        {"from": "m", "to": "mm", "coordinate_factor": 1000.0}
+      ],
+      "binary_relation": "invariant",
+      "structured_relation": "raw coordinates and thickness scale while canonical millimetre quantities remain unchanged",
+      "validity_gate": "coordinates, $INSUNITS, and scale_mm_per_unit encode the same physical quantities"
+    },
+    {
+      "id": "block-explode",
+      "parameters": [{"mode": "full_recursive_to_fixpoint"}],
+      "binary_relation": "invariant",
+      "structured_relation": "world geometry unchanged with occurrence-level LID mapping",
+      "validity_gate": "no remaining INSERT; occurrence mapping bijective; world topology unchanged"
+    },
+    {
+      "id": "layer-rename",
+      "parameters": [
+        {"scheme": "anonymize", "seed": null},
+        {"scheme": "bijective_shuffle", "seed": 11},
+        {"scheme": "bijective_shuffle", "seed": 47}
+      ],
+      "binary_relation": "invariant",
+      "structured_relation": "geometry and LID unchanged; layer map bijective",
+      "validity_gate": "layer map bijective and geometry hash unchanged"
+    },
+    {
+      "id": "coord-jitter",
+      "parameters": [
+        {"q_over_bbox_diagonal": 1e-9, "seed": 101},
+        {"q_over_bbox_diagonal": 1e-7, "seed": 211},
+        {"q_over_bbox_diagonal": 1e-5, "seed": 307}
+      ],
+      "binary_relation": "invariant",
+      "structured_relation": "shared logical vertices receive the same deterministic bounded dither",
+      "validity_gate": "nonzero segments, unchanged incidence/topology, certified parallel-band margin, and input-only decision-margin certificate"
+    }
+  ],
+  "legacy_transform_mapping": {
+    "translate": {"registry_relation": "translate", "status": "MAPPABLE"},
+    "rotate": {"registry_relation": "rotate", "status": "MAPPABLE"},
+    "scale": {"registry_relation": "uniform-scale", "status": "MAPPABLE"},
+    "units": {"registry_relation": "unit-change", "status": "MAPPABLE"},
+    "mirror": {"registry_relation": null, "status": "LEGACY_OUT_OF_CATALOG", "reason": "T-META v1 explicitly excludes mirror"}
+  },
+  "families": [
+    {
+      "id": "deterministic_v0",
+      "cell_ids": ["F01", "F02", "F03", "F04", "F05", "F06", "F07"],
+      "owner_axis": "F04",
+      "execution_class": "CPU",
+      "required_artifact": "exact frozen v0 method manifest; current v1 must not substitute"
+    },
+    {
+      "id": "classical_ml",
+      "cell_ids": ["F08", "F09", "F10", "F11", "F12", "F13", "F14"],
+      "owner_axis": "F04",
+      "execution_class": "CPU",
+      "required_artifact": "frozen HGBDT model, six-feature schema, threshold, and training manifest"
+    },
+    {
+      "id": "gnn",
+      "cell_ids": ["F15", "F16", "F17", "F18", "F19", "F20", "F21"],
+      "owner_axis": "F04G",
+      "execution_class": "GPU_LOCAL_SERIAL",
+      "current_packet_status": "DEFERRED_SCOPE"
+    },
+    {
+      "id": "vlm",
+      "cell_ids": ["F22", "F23", "F24", "F25", "F26", "F27", "F28"],
+      "owner_axis": "F04V",
+      "execution_class": "DGX_QUEUE",
+      "current_packet_status": "DEFERRED_SCOPE"
+    }
+  ],
+  "admissibility_gates": {
+    "common_required": [
+      "source input SHA matches prereg",
+      "family and method_id are explicitly identified",
+      "artifact, config, threshold, preprocessing, and dependency hashes are frozen",
+      "relation is supported by the method representation and route",
+      "transform validity certificate passes without consulting detector outcomes",
+      "occurrence-level LID map is complete and bijective with zero collisions",
+      "prediction schema is complete on a nonempty LID population",
+      "repeat normalized-prediction checksum is identical",
+      "zero and near-all sentinels are detected and truth-bearing positive recall is at least 0.20"
+    ],
+    "family_specific": {
+      "deterministic_v0": ["exact v0 artifact is present", "pipeline and detector readouts are not averaged"],
+      "classical_ml": ["frozen persisted model is present", "feature schema and threshold match the manifest"],
+      "gnn": ["F04G owns execution", "Graph-IR adjacency and LID order audit passes"],
+      "vlm": ["F04V owns execution", "vision support and exact pixel-to-LID inverse projection pass"]
+    },
+    "decision": "A cell receives a numeric band verdict only when every applicable gate is proven. Existing numbers without family/method identity or certificates remain preserved as legacy observations and do not populate a canonical family cell."
+  },
+  "verdict_band": {
+    "metric": "R-META drawing-macro violation rate = 1 - invariance",
+    "PASS": "R-META <= 0.02",
+    "INCONCLUSIVE": "0.02 < R-META <= 0.10",
+    "FAIL": "R-META > 0.10",
+    "UNKNOWN": "no admissible numeric measurement; never coerce to zero or PASS",
+    "INADMISSIBLE": "numeric observation exists but one or more method/relation gates are unproven or failed"
+  },
+  "family_verdict_rule": "After sentinel qualification, all seven cells PASS => PASS; any cell FAIL => FAIL; otherwise any INCONCLUSIVE => INCONCLUSIVE; any UNKNOWN or INADMISSIBLE prevents a complete family verdict.",
+  "effects_rule": "Compute exact transform main effects, family main effects, and transform-by-family interactions only when all 28 canonical cells are admissible and numeric. Never impute missing cells.",
+  "evidence_precedence": [
+    "b4_fold_v2 is the corrected strict fold for overlapping legacy transform observations",
+    "w2_independence_audit_v1 is retained as an older projection and is never averaged with or allowed to override b4_fold_v2",
+    "source strict verdicts and sentinel failures are preserved alongside any derived R-META value",
+    "mirror remains visible in the legacy evidence table but cannot populate T-META v1"
+  ],
+  "execution_prohibitions": [
+    "model API calls",
+    "test-set access",
+    "writes to original CAD files",
+    "modification of existing source files",
+    "post-outcome edits to this preregistration"
+  ],
+  "terminal_markers": {
+    "success": "AXIS_MEASUREMENT_COMPLETE",
+    "missing_required_input": "BLOCKED_INPUT"
+  }
+}

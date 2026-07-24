@@ -1,0 +1,422 @@
+[
+  {
+    "unit_id": "defannot-x-0-a-c059766ab-301",
+    "def": "X-평면도(기본형)$0$A$C059766AB",
+    "role": "가구",
+    "wall_likelihood": 0.12,
+    "wall_line_handles": [
+      {
+        "handle": "3283",
+        "reason": "870mm horizontal, paired 20mm with 3284 (counter edge)"
+      },
+      {
+        "handle": "3291",
+        "reason": "870mm horizontal, paired 20mm with 3292 (counter edge)"
+      },
+      {
+        "handle": "3287",
+        "reason": "475mm vertical counter divider"
+      },
+      {
+        "handle": "328C",
+        "reason": "370mm vertical, paired 20mm with 328B (cabinet side)"
+      }
+    ],
+    "notes": "Kitchen sink/cooktop counter unit on KIT layer (concentric circles + counter double-lines).",
+    "rationale": {
+      "evidence": "307 of 308 entities sit on the $0$KIT (kitchen) layer, including three concentric CIRCLEs r=81/91/95 (sink bowl or cooktop burner) and 40 ARCs. LINE pairs 3283/3284 and 3291/3292 are 870mm horizontals spaced only 20mm apart, i.e. counter-edge double-lines, not wall thickness.",
+      "rule": "A block whose entities lie entirely on a furniture/kitchen layer and whose parallel line pairs are spaced at panel thickness (~20mm) rather than wall thickness (100-200mm) is furniture, not architecture.",
+      "counterfactual": "If these lines lay on a WALL/벽 layer or the parallel pairs were spaced 100-200mm, the block would read as a plan fragment containing real walls.",
+      "uncertainty": "Whether the circles depict a sink versus a cooktop cannot be resolved from geometry alone without a text label or the block's insertion context."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c072c115f-302",
+    "def": "X-평면도(기본형)$0$A$C072C115F",
+    "role": "가구",
+    "wall_likelihood": 0.12,
+    "wall_line_handles": [
+      {
+        "handle": "4136",
+        "reason": "1650mm vertical, paired 20mm with 4137 (cabinet side)"
+      },
+      {
+        "handle": "4137",
+        "reason": "1650mm vertical cabinet carcass side"
+      },
+      {
+        "handle": "413C",
+        "reason": "800mm vertical cabinet inner edge"
+      }
+    ],
+    "notes": "Tall built-in cabinet/wardrobe (1650mm carcass, X panel marks) on I-FL-FUR(B).",
+    "rationale": {
+      "evidence": "21 of 23 entities are on I-FL-FUR(B) (built-in furniture) plus 2 on F-FUR-FIX. Verticals 4136/4137 are 1650mm long spaced 20mm forming a tall narrow carcass; crossed diagonals 4146/4147 and 4149/414A are appliance/panel 'X' marks. Aspect 148x1650 fits a tall cabinet.",
+      "rule": "Built-in-furniture layers carrying tall parallel carcass lines at ~20mm spacing plus diagonal 'X' panel marks indicate a cabinet, not a partition.",
+      "counterfactual": "Absent the furniture layer and the X panel marks, a 1650mm double-line at 100-200mm spacing would instead read as a partition wall.",
+      "uncertainty": "The specific appliance or storage type behind the X-marked panels is not determinable from vertex counts alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c0a097a0c-303",
+    "def": "X-평면도(기본형)$0$A$C0A097A0C",
+    "role": "가구",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [
+      {
+        "handle": "31FB",
+        "reason": "2310mm vertical furniture-extent boundary"
+      },
+      {
+        "handle": "3210",
+        "reason": "400mm vertical single edge (unpaired)"
+      }
+    ],
+    "notes": "Furniture arrangement (chairs/fixtures, 30 arcs) on I-FL-FUR(S).",
+    "rationale": {
+      "evidence": "All 125 entities on I-FL-FUR(S); 30 ARCs and many short LINE segments (e.g. 31FF, 3200, 3202) form curved detail typical of chairs or sanitary fixtures. The only long lines (31FB 2310mm, 3210 400mm) are single unpaired boundaries, not wall-thickness double-lines.",
+      "rule": "A furniture-layer block dominated by short segments and arcs with only isolated long boundary lines is a furniture/fixture cluster, not a wall assembly.",
+      "counterfactual": "If the long boundary lines were paired at wall spacing and the arcs removed, the outline could be misread as a room boundary.",
+      "uncertainty": "The exact furniture items (dining set, bathroom fittings) cannot be identified from the arc/line histogram without visual rendering."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c0c1f5443-304",
+    "def": "X-평면도(기본형)$0$A$C0C1F5443",
+    "role": "가구",
+    "wall_likelihood": 0.13,
+    "wall_line_handles": [
+      {
+        "handle": "2AE2",
+        "reason": "1650mm vertical, paired 20mm with 2AE3 (cabinet side)"
+      },
+      {
+        "handle": "2AF7",
+        "reason": "1265mm vertical furniture boundary"
+      }
+    ],
+    "notes": "Mixed built-in furniture unit (B+S+FIX layers), 1650mm cabinet plus S-detail.",
+    "rationale": {
+      "evidence": "93 entities split across I-FL-FUR(B)=21, I-FL-FUR(S)=70 and F-FUR-FIX=2. Verticals 2AE2/2AE3 are 1650mm spaced 20mm (cabinet carcass) with X panel marks 2AF2/2AF3; the S-layer portion (2AF7 onward) adds curved fixture detail. No line pair at wall spacing.",
+      "rule": "Coexistence of built-in (B) carcass double-lines and soft (S) fixture arcs on furniture layers marks a composite furniture unit rather than architecture.",
+      "counterfactual": "If the 2AE2/2AE3 pair were 100-200mm apart on a wall layer it would indicate a real wall segment.",
+      "uncertainty": "Which fixture the S-layer arcs represent (basin, appliance) is not resolvable from the projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c0e9d10f9-305",
+    "def": "X-평면도(기본형)$0$A$C0E9D10F9",
+    "role": "가구",
+    "wall_likelihood": 0.12,
+    "wall_line_handles": [
+      {
+        "handle": "33B8",
+        "reason": "1819mm vertical, paired 20mm with 33B7 (cabinet side)"
+      },
+      {
+        "handle": "33C0",
+        "reason": "2344mm vertical furniture boundary"
+      }
+    ],
+    "notes": "Tall built-in cabinet run (1819mm verticals) with fixed-furniture caps.",
+    "rationale": {
+      "evidence": "40 of 46 entities on I-FL-FUR(B) plus 6 on F-FUR-FIX. Verticals 33B7/33B8 run 1819mm spaced 20mm (cabinet side) and 33C0 spans 2344mm; diagonals 33C4/33C5 and 33C7/33C8 are panel X marks. Many 370mm horizontal shelves (33BB, 33BC) confirm shelving.",
+      "rule": "Regularly spaced horizontal shelf lines between 20mm-spaced vertical carcass lines on a built-in layer denote a tall storage cabinet, not a wall.",
+      "counterfactual": "Remove the shelf ladder and X marks and place the verticals on a wall layer at wall spacing, and it would read as a partition.",
+      "uncertainty": "Open vs closed (doored) cabinet cannot be told from the LWPOLYLINE counts alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c0ef505d0-306",
+    "def": "X-평면도(기본형)$0$A$C0EF505D0",
+    "role": "가구",
+    "wall_likelihood": 0.13,
+    "wall_line_handles": [
+      {
+        "handle": "1E3F",
+        "reason": "1650mm vertical, paired 20mm with 1E40 (cabinet side)"
+      },
+      {
+        "handle": "1E48",
+        "reason": "1476mm vertical furniture boundary"
+      }
+    ],
+    "notes": "Built-in cabinet unit (1650mm carcass) on I-FL-FUR(B)+F-FUR-FIX.",
+    "rationale": {
+      "evidence": "28 of 32 entities on I-FL-FUR(B) plus 4 on F-FUR-FIX. Verticals 1E3F/1E40 are 1650mm spaced 20mm; 1E48 is a 1476mm inner boundary; horizontals 1E43/1E44/1E45 (380mm) with X marks 1E4C/1E4D are shelf and panel detail.",
+      "rule": "A 20mm-spaced vertical pair enclosing regular short horizontal shelves on a built-in-furniture layer is a cabinet carcass, distinct from a wall.",
+      "counterfactual": "If layer were a wall layer and the 1E3F/1E40 gap were 100mm+, the block would be a plan wall fragment.",
+      "uncertainty": "Depth and door configuration of the cabinet are not encoded in this 2D projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c17c8346b-307",
+    "def": "X-평면도(기본형)$0$A$C17C8346B",
+    "role": "가구",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [
+      {
+        "handle": "4204",
+        "reason": "1660mm vertical furniture boundary"
+      },
+      {
+        "handle": "4206",
+        "reason": "980mm horizontal boundary line"
+      }
+    ],
+    "notes": "Large furniture/fixture cluster (48 arcs) on I-FL-FUR(S).",
+    "rationale": {
+      "evidence": "All 188 entities on I-FL-FUR(S) with 48 ARCs and dense short segments (4208-4221) forming repeated curved fittings. Bounding lines 4204 (1660mm vertical) and 4206 (980mm horizontal) are single edges; no 100-200mm-spaced parallel pair appears.",
+      "rule": "High arc count plus dense small segments on a soft-furniture layer signals a fixtures cluster (e.g. sanitary or seating), with lone perimeter lines that are boundaries, not walls.",
+      "counterfactual": "Paired perimeter lines at wall spacing on a wall layer would reclassify this as a room enclosure.",
+      "uncertainty": "The count and type of fixtures inside the cluster cannot be enumerated from the histogram without rendering."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c200833b1-308",
+    "def": "X-평면도(기본형)$0$A$C200833B1",
+    "role": "가구",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [
+      {
+        "handle": "3423",
+        "reason": "900mm horizontal counter top edge"
+      }
+    ],
+    "notes": "Long fixed kitchen counter run (900mm top edge) on FUR-FIX/FUR-KIT.",
+    "rationale": {
+      "evidence": "21 entities on FUR-FIX and 3 on FUR-KIT; bbox 1030x152 is a long shallow strip. Horizontal 3423 (900mm) caps the run with short verticals 3421/3422 (150mm) and diagonal tick lines (3419, 341B); LWPOLYLINEs are fitting outlines.",
+      "rule": "A long shallow strip on kitchen-furniture layers with a single long top edge and short end verticals is a counter/base-cabinet run, not a wall.",
+      "counterfactual": "If the strip were on a wall layer with a paired inner line 100mm+ away it would be a wall.",
+      "uncertainty": "Which appliances sit within the counter run is not derivable from this projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c24b0555e-309",
+    "def": "X-평면도(기본형)$0$A$C24B0555E",
+    "role": "가구",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [
+      {
+        "handle": "4F89",
+        "reason": "800mm horizontal counter top edge"
+      }
+    ],
+    "notes": "Fixed kitchen counter run (800mm top edge, mirror of def 8) on FUR-KIT/FUR-FIX.",
+    "rationale": {
+      "evidence": "20 entities on FUR-KIT and 4 on FUR-FIX; bbox 920x152 shallow strip. Horizontal 4F89 (800mm) caps the run with 150mm end verticals 4F87/4F88 and diagonal ticks 4F7F/4F81; geometry mirrors definition 8.",
+      "rule": "A shallow kitchen-furniture strip with one long top edge between short end verticals denotes a base-cabinet/counter run, not architecture.",
+      "counterfactual": "A wall-layer placement with a wall-thickness paired line would flip this to a wall.",
+      "uncertainty": "Sink or hob placement within the run cannot be confirmed from the sampled entities."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c41d360df-310",
+    "def": "X-평면도(기본형)$0$A$C41D360DF",
+    "role": "가구",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Curved decorative furniture object (splines + ellipses) on FUR.",
+    "rationale": {
+      "evidence": "All 107 entities on FUR, composed of 45 SPLINEs, 31 ARCs and 15 ELLIPSEs with only 16 LINEs; bbox 49x538 with a non-zero z (36.5). The single long LINE 6C5D is an internal center line of a curved object, not an orthogonal wall segment.",
+      "rule": "A furniture-layer block dominated by splines and ellipses is a decorative/organic object (plant, faucet, ornament) and contains no wall geometry.",
+      "counterfactual": "Only orthogonal wall-thickness line pairs on a structural layer would raise wall likelihood; none are present here.",
+      "uncertainty": "The precise object (planter, faucet, decorative fixture) is ambiguous from spline/ellipse counts alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c48ba1cd6-311",
+    "def": "X-평면도(기본형)$0$A$C48BA1CD6",
+    "role": "가구",
+    "wall_likelihood": 0.11,
+    "wall_line_handles": [
+      {
+        "handle": "1E64",
+        "reason": "1490mm vertical furniture boundary"
+      }
+    ],
+    "notes": "Large built-in furniture unit (1490mm boundary) on B+S+FIX layers.",
+    "rationale": {
+      "evidence": "127 entities split I-FL-FUR(S)=104, I-FL-FUR(B)=21, F-FUR-FIX=2 with 24 ARCs. Vertical 1E64 spans 1490mm as a single perimeter edge; the S-layer entities (1E65 onward) form curved fixture detail. No wall-spaced parallel pair.",
+      "rule": "Mixed built-in and soft furniture layers with a dominant arc-rich soft portion mark a composite furniture/fixture unit, not a wall.",
+      "counterfactual": "A wall-layer, wall-thickness parallel pair replacing 1E64 would indicate a wall.",
+      "uncertainty": "The fixture type driving the 24 arcs is not resolvable from the projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c49112a41-312",
+    "def": "X-평면도(기본형)$0$A$C49112A41",
+    "role": "가구",
+    "wall_likelihood": 0.13,
+    "wall_line_handles": [
+      {
+        "handle": "31D6",
+        "reason": "1940mm vertical cabinet boundary"
+      },
+      {
+        "handle": "31DE",
+        "reason": "1766mm vertical inner cabinet edge"
+      }
+    ],
+    "notes": "Tall built-in cabinet (1940mm) on I-FL-FUR(B)+F-FUR-FIX.",
+    "rationale": {
+      "evidence": "28 entities on I-FL-FUR(B) and 4 on F-FUR-FIX. Verticals 31D6 (1940mm) and 31DE (1766mm) bound a tall carcass with regular horizontals 31DA/31DB/31DC (380mm shelves) and X panel marks 31E2/31E3, 31E5/31E6.",
+      "rule": "A tall carcass with a shelf ladder and diagonal panel marks on a built-in-furniture layer is a wardrobe/pantry cabinet, not a wall.",
+      "counterfactual": "Move the bounding verticals to a wall layer at wall spacing and drop the shelves, and it would read as a partition.",
+      "uncertainty": "Number of doors/drawers behind the panel marks is not encoded in the histogram."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c4b913e7c-313",
+    "def": "X-평면도(기본형)$0$A$C4B913E7C",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [
+      {
+        "handle": "8251",
+        "reason": "920mm vertical door-leaf edge (3mm pair, not wall)"
+      },
+      {
+        "handle": "8252",
+        "reason": "920mm vertical door-leaf edge"
+      }
+    ],
+    "notes": "Door leaf + swing arc on DOOR layer (920mm leaf, 3mm pair).",
+    "rationale": {
+      "evidence": "All 14 entities on the DOOR layer: LINEs 8251/8252 are 920mm verticals spaced only 3mm (the drawn door leaf), one ARC (8248) is the swing, and 11 LWPOLYLINEs (5-19 vertices) form leaf/hardware detail. Bbox 3x920 is a single door width.",
+      "rule": "A DOOR-layer block of two closely spaced long lines plus a swing arc is an architectural door, which belongs to neither furniture, symbol, dimension nor a multi-element plan fragment, hence 기타.",
+      "counterfactual": "If the block also carried adjacent wall-thickness lines or reveals it would edge toward a plan fragment (평면 부분도); with only leaf+swing it is a standalone door.",
+      "uncertainty": "Swing direction and hand, and whether it is a single or double door, are not fully determinable from the sampled entities."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c4d747d6b-314",
+    "def": "X-평면도(기본형)$0$A$C4D747D6B",
+    "role": "가구",
+    "wall_likelihood": 0.13,
+    "wall_line_handles": [
+      {
+        "handle": "1EE8",
+        "reason": "1650mm vertical, paired 20mm with 1EE9 (cabinet side)"
+      },
+      {
+        "handle": "1EF1",
+        "reason": "1476mm vertical furniture boundary"
+      }
+    ],
+    "notes": "Built-in cabinet unit (1650mm carcass) on I-FL-FUR(B).",
+    "rationale": {
+      "evidence": "28 entities on I-FL-FUR(B) and 4 on F-FUR-FIX. Verticals 1EE8/1EE9 are 1650mm spaced 20mm; 1EF1 is a 1476mm inner boundary; horizontals 1EED/1EEE/1EEF (380mm) with X marks 1EF5/1EF6 are shelf and panel detail (same family as defs 5/6/12).",
+      "rule": "A 20mm-spaced vertical carcass pair with a shelf ladder and X panel marks on a built-in layer is a cabinet, not a wall.",
+      "counterfactual": "Wall-layer placement with a 100-200mm gap would reclassify the pair as a wall.",
+      "uncertainty": "Cabinet contents/door layout are not derivable from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c57321cdf-315",
+    "def": "X-평면도(기본형)$0$A$C57321CDF",
+    "role": "가구",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [
+      {
+        "handle": "41FD",
+        "reason": "800mm vertical edge of tall fixed unit"
+      }
+    ],
+    "notes": "Tall fixed furniture unit (930mm) on FUR-FIX/FUR-KIT.",
+    "rationale": {
+      "evidence": "21 entities on FUR-FIX and 3 on FUR-KIT; bbox 152x930 is a tall narrow unit. Vertical 41FD (800mm) with 150mm horizontals 41EA/41FB/41FC and diagonal ticks 41F3/41F5 mark a slim fixed cabinet (rotated relative to defs 8/9).",
+      "rule": "A slim tall block on kitchen/fixed-furniture layers with one long edge and short cross-lines is a narrow fixed cabinet, not a wall.",
+      "counterfactual": "A wall-layer paired line at wall thickness would flip it to a wall.",
+      "uncertainty": "Whether this is a tall pantry, fridge enclosure or utility cabinet is not distinguishable from the histogram."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c5aa0109c-316",
+    "def": "X-평면도(기본형)$0$A$C5AA0109C",
+    "role": "심볼",
+    "wall_likelihood": 0.05,
+    "wall_line_handles": [],
+    "notes": "Pipe/floor-drain symbol (concentric circles r=37.5/45/62.5) on PIPE layer.",
+    "rationale": {
+      "evidence": "Only 9 entities on the PIPE layer: three CIRCLEs r=37.5/62.5 (concentric pipe section) and r=45, crossed LINEs 1E32 (139mm horizontal) and 1E33 (139mm vertical) through the circle center (drain crosshair), plus a small 45mm-spaced line pair 1E37/1E38.",
+      "rule": "A PIPE-layer block built from concentric circles with a centered crosshair is a schematic plumbing/drain symbol, not a scaled furniture or wall object.",
+      "counterfactual": "Replacing the concentric circles with a rectangular carcass would push it toward furniture; wall-thickness paired lines on a wall layer would make it a wall.",
+      "uncertainty": "Whether this denotes a floor drain, pipe riser or cleanout cannot be settled without the layer's plotting style or a label."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c5c7666b6-317",
+    "def": "X-평면도(기본형)$0$A$C5C7666B6",
+    "role": "가구",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Highly detailed decorative furniture (362 splines) on FUR.",
+    "rationale": {
+      "evidence": "865 entities all on FUR, with 362 SPLINEs, 109 ARCs, 18 ELLIPSEs and 364 LINEs that are sub-millimeter segments (e.g. 6528 spans 0.1mm). This micro-segment-plus-spline signature is ornate decorative furniture, not orthogonal construction.",
+      "rule": "A furniture-layer block whose lines are tiny segments interleaved with hundreds of splines is a detailed decorative object and contains no wall lines.",
+      "counterfactual": "Long orthogonal wall-thickness line pairs on a structural layer would be required to indicate walls; none exist here.",
+      "uncertainty": "The specific piece (upholstered sofa, bed, planter) is not identifiable from entity counts without rendering."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c5fea68fe-318",
+    "def": "X-평면도(기본형)$0$A$C5FEA68FE",
+    "role": "가구",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Detailed curved furniture object (166 splines) on FUR.",
+    "rationale": {
+      "evidence": "402 entities all on FUR, with 166 SPLINEs, 103 ARCs and 110 short LINEs; bbox 167x78 is a small curved object. Sampled lines (6969-6985) are short sub-unit segments approximating curves, not straight walls.",
+      "rule": "Dominance of splines and arcs with only short line segments on a furniture layer marks a curved decorative/appliance object, not a wall.",
+      "counterfactual": "Presence of long orthogonal wall-thickness pairs on a wall layer would flip the judgment.",
+      "uncertainty": "The exact object (faucet set, decorative fitting, small appliance) cannot be pinned down from the projection alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c60d55377-319",
+    "def": "X-평면도(기본형)$0$A$C60D55377",
+    "role": "가구",
+    "wall_likelihood": 0.12,
+    "wall_line_handles": [
+      {
+        "handle": "5650",
+        "reason": "1890mm horizontal furniture baseline"
+      },
+      {
+        "handle": "5651",
+        "reason": "1010mm horizontal line"
+      }
+    ],
+    "notes": "Furniture layout with 1890mm baseline on I-FL-FUR(S).",
+    "rationale": {
+      "evidence": "All 146 entities on I-FL-FUR(S) with 36 ARCs. Long lines 5650 (1890mm) and 5651 (1010mm) are single horizontal baselines; surrounding short segments and arcs (5655-5668) form repeated fittings. No 100-200mm-spaced parallel wall pair appears.",
+      "rule": "A soft-furniture layer with isolated long baselines carrying arc-rich fitting detail is a furniture layout, not a wall enclosure.",
+      "counterfactual": "If the long baselines were paired at wall thickness on a wall layer the block would read as a room boundary.",
+      "uncertainty": "The furniture set represented by the repeated arc fittings is not identifiable from counts alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c610442a9-320",
+    "def": "X-평면도(기본형)$0$A$C610442A9",
+    "role": "가구",
+    "wall_likelihood": 0.12,
+    "wall_line_handles": [
+      {
+        "handle": "42E9",
+        "reason": "1270mm horizontal furniture baseline"
+      },
+      {
+        "handle": "42FC",
+        "reason": "400mm vertical inner boundary"
+      }
+    ],
+    "notes": "Furniture layout with 1270mm baseline on I-FL-FUR(S).",
+    "rationale": {
+      "evidence": "All 136 entities on I-FL-FUR(S) with 35 ARCs. Line 42E9 is a 1270mm horizontal baseline; 42EA/42FC are 400mm verticals bounding an alcove; short segments and arcs (42EB-4306) form repeated fittings similar to definition 19.",
+      "rule": "Isolated long baselines plus arc-rich fitting clusters on a soft-furniture layer denote a furniture layout rather than architecture.",
+      "counterfactual": "Wall-thickness paired baselines on a wall layer would reclassify it as a wall enclosure.",
+      "uncertainty": "The specific fittings within the layout cannot be enumerated from the entity histogram."
+    }
+  }
+]

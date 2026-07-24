@@ -1,0 +1,19 @@
+axis,metric,status,value,unit,band_or_formula,evidence_or_decision
+INPUT,sealed_input_files,RESOLVED,672,count,all SHA-256 MATCH,D:\runs\e2_program\cells\c71_stk_hybrid\input_manifest_verified.csv
+INPUT,independent_project_assets,RESOLVED,1,count,cross-project requires >=2,D:\runs\e2_program\cells\c70_pid_lexicon\measurement.json
+XP,cross_project_auc,BLOCKED_INPUT,UNKNOWN,AUC,>=0.75 support / <=0.55 kill not applied,BLOCKED_INPUT: 독립 프로젝트 자산 <2
+E1C,joined_definitions,RESOLVED,384,count,exact one-to-one join required,D:\runs\e2_program\cells\c71_stk_hybrid\correlation_rows.csv
+E1C,pearson_r,RESOLVED,0.253443069177,correlation,>=0.70 => downgrade,DOWNGRADE_TRIGGER_NOT_MET
+E1C,score_unique,RESOLVED,6,count,descriptive,D:\runs\e2_program\cells\c70_pid_lexicon\probe_predictions.csv
+E1C,token_covered_definitions,RESOLVED,115,count,descriptive,D:\runs\e2_program\cells\c70_pid_lexicon\probe_predictions.csv
+TAU,kendall_tau_b,RESOLVED,0.124797191506,correlation,descriptive only,D:\runs\e2_program\cells\c71_stk_hybrid\correlation_rows.csv
+TAU,concordant_pairs,RESOLVED,25933,pairs,exact count,D:\runs\e2_program\cells\c71_stk_hybrid\correlation_rows.csv
+TAU,discordant_pairs,RESOLVED,18835,pairs,exact count,D:\runs\e2_program\cells\c71_stk_hybrid\correlation_rows.csv
+SHUF,permutations,RESOLVED,10000,count,seed=710071,D:\runs\e2_program\cells\c71_stk_hybrid\shuffle_distribution.csv
+SHUF,two_sided_empirical_p,RESOLVED,0.000199980002,p,diagnostic only,D:\runs\e2_program\cells\c71_stk_hybrid\shuffle_distribution.csv
+SHUF,null_q025,RESOLVED,-0.098117118051,correlation,diagnostic only,D:\runs\e2_program\cells\c71_stk_hybrid\shuffle_distribution.csv
+SHUF,null_q975,RESOLVED,0.101426024952,correlation,diagnostic only,D:\runs\e2_program\cells\c71_stk_hybrid\shuffle_distribution.csv
+STK,hybrid,BLOCKED_INPUT,UNKNOWN,score,authorized frozen M30(STK) required,"The C71 dependency names M30(STK), but no frozen M30(STK) prediction artifact is present in the packet-authorized input list."
+UPSTREAM,single_project_auc,RESOLVED,0.568475997948,AUC,C71 cross-project band not applied,18841/33143
+INTEGRITY,staged_dxf_unchanged,RESOLVED,MATCH,SHA-256,5a6035721630cddc6d753b1b97b898e7a4ce4d5988342ce85e2c465cdb81deff,D:\dev\99_tools\autocad-sdk-router\runs\e2_b3_dxfout_20260717\1_export.dxf
+ARTIFACT,evidence_xlsx,BLOCKED_TOOLING,CSV_FALLBACK,artifact,packet fallback used,D:\dev\99_tools\autocad-sdk-router\reports\e2\cells\c71_stk_hybrid\EVIDENCE_XLSX_UNAVAILABLE.txt

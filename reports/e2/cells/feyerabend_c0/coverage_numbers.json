@@ -1,0 +1,249 @@
+{
+  "build_numbers": {
+    "entity_profile_filler_count": 5100,
+    "entity_profile_target_total": 8000,
+    "fidelity_gap_sample_target": 1200
+  },
+  "determinism_and_scale_numbers": {
+    "four_scale_normalized_geometry_mismatch_base_scene_count": 0,
+    "four_scale_source_handle_mismatch_base_scene_count": 0,
+    "four_scale_topology_mismatch_base_scene_count": 0,
+    "seed_collision_count": 0,
+    "unique_seed_count": 50
+  },
+  "fidelity_numbers_kappa_1": {
+    "entity_mix_tv": 0.00021191458340744963,
+    "histogram_bin_count": 25,
+    "histogram_edges": [
+      0,
+      1,
+      2,
+      5,
+      10,
+      25,
+      50,
+      75,
+      100,
+      125,
+      150,
+      175,
+      200,
+      250,
+      300,
+      400,
+      500,
+      750,
+      1000,
+      1500,
+      2500,
+      5000,
+      10000,
+      20000,
+      50000,
+      300000
+    ],
+    "reference_entity_mix": {
+      "3DFACE": 34,
+      "ARC": 2198,
+      "CIRCLE": 141,
+      "ELLIPSE": 201,
+      "HATCH": 264,
+      "INSERT": 1158,
+      "LINE": 12110,
+      "LWPOLYLINE": 7400,
+      "MTEXT": 113,
+      "POINT": 341,
+      "POLYLINE": 1,
+      "SPLINE": 3973,
+      "TEXT": 154,
+      "WIPEOUT": 33
+    },
+    "reference_entity_total": 28121,
+    "reference_parallel_pair_offset_count": 4877,
+    "reference_thickness_histogram_counts": [
+      39,
+      75,
+      144,
+      140,
+      535,
+      226,
+      318,
+      193,
+      155,
+      208,
+      97,
+      77,
+      88,
+      183,
+      233,
+      146,
+      298,
+      347,
+      316,
+      264,
+      289,
+      298,
+      178,
+      9,
+      21
+    ],
+    "synthetic_entity_mix": {
+      "3DFACE": 10,
+      "ARC": 625,
+      "CIRCLE": 40,
+      "ELLIPSE": 57,
+      "HATCH": 75,
+      "INSERT": 330,
+      "LINE": 3445,
+      "LWPOLYLINE": 2105,
+      "MTEXT": 32,
+      "POINT": 97,
+      "SPLINE": 1130,
+      "TEXT": 44,
+      "WIPEOUT": 10
+    },
+    "synthetic_entity_total": 8000,
+    "synthetic_parallel_pair_offset_count": 1333,
+    "synthetic_parallel_pair_offsets_in_histogram_count": 1333,
+    "synthetic_thickness_histogram_counts": [
+      10,
+      19,
+      35,
+      34,
+      132,
+      56,
+      78,
+      51,
+      65,
+      71,
+      43,
+      37,
+      35,
+      65,
+      62,
+      36,
+      73,
+      85,
+      78,
+      73,
+      71,
+      73,
+      44,
+      2,
+      5
+    ],
+    "thickness_histogram_ks": 0.040287855437306064
+  },
+  "mutation_family_coverage": {
+    "all_wall_sentinel": {
+      "scene_count": 1,
+      "scene_ratio": 0.02
+    },
+    "arc_spline_adjacent_or_distractor": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    },
+    "door_window_dimension_long_parallel_distractor": {
+      "scene_count": 49,
+      "scene_ratio": 0.98
+    },
+    "hatch_boundary_distractor": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    },
+    "lwpolyline_segmentation": {
+      "scene_count": 25,
+      "scene_ratio": 0.5
+    },
+    "multiple_reference_span_regions": {
+      "scene_count": 25,
+      "scene_ratio": 0.5
+    },
+    "nested_insert_nonuniform_accumulated_transform": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    },
+    "partial_overlap_near_parallel_fragment": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    },
+    "pure_line_parallel_pair": {
+      "scene_count": 21,
+      "scene_ratio": 0.42
+    },
+    "single_reference_span_region": {
+      "scene_count": 25,
+      "scene_ratio": 0.5
+    },
+    "zero_wall_sentinel": {
+      "scene_count": 1,
+      "scene_ratio": 0.02
+    }
+  },
+  "phenomenon_coverage": {
+    "ARC": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    },
+    "HATCH": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    },
+    "SPLINE": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    },
+    "nested_block": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    },
+    "nonparallel_fragment": {
+      "scene_count": 50,
+      "scene_ratio": 1.0
+    }
+  },
+  "reference_sha256": {
+    "entity_mix_json": "cc95a55852932cc41eb5dfdc5fc9df560f6ada94625969e9284c581e809608ea",
+    "fidelity_histogram_json": "afec84ebf141d8bc29ef6b0ee8fe615c7e6c2bf19b1e4df10c64d11951691ae3",
+    "fidelity_stats_py": "00acec150c65d05a82641d1ab0ac0466cd68e4a424670dd849c3211b2f3c96df",
+    "gen2_py": "a8c2468b696b9271610e38bd87cec1402e9153bc464a5d9cf1429595f26dab55"
+  },
+  "scene_counts": {
+    "base_scene_count": 50,
+    "ir_scene_count": 200,
+    "kappa_1_scene_count": 50,
+    "positive_base_scene_count": 49,
+    "positive_ir_scene_count": 196,
+    "scale_count": 4
+  },
+  "schema": "ariadne.e2.feyerabend_c0.coverage_numbers.v1",
+  "sentinel_truth_integrity": {
+    "all_wall_candidate_pair_count": 3,
+    "all_wall_candidate_truth_coverage_ratio": 1.0,
+    "all_wall_candidate_truth_intersection_count": 3,
+    "all_wall_scene_count": 1,
+    "all_wall_truth_pair_count": 3,
+    "all_wall_validation_error_count": 0,
+    "zero_wall_candidate_pair_count": 2,
+    "zero_wall_scene_count": 1,
+    "zero_wall_truth_pair_count": 0,
+    "zero_wall_validation_error_count": 0,
+    "zero_wall_wall_face_handle_count": 0
+  },
+  "truth_pair_numbers": {
+    "base_scene_truth_pair_ratio": 0.98,
+    "base_scenes_with_truth_pair_count": 49,
+    "base_truth_pair_count": 51,
+    "ir_scene_truth_pair_ratio": 0.98,
+    "ir_scenes_with_truth_pair_count": 196,
+    "ir_truth_pair_count": 204,
+    "positive_base_scene_truth_pair_ratio": 1.0,
+    "positive_base_scenes_with_truth_pair_count": 49,
+    "positive_ir_scene_truth_pair_ratio": 1.0,
+    "positive_ir_scenes_with_truth_pair_count": 196
+  },
+  "truth_validator": {
+    "error_count": 0,
+    "validated_ir_scene_count": 200
+  }
+}

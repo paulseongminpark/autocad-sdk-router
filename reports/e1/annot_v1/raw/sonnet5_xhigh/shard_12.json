@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-u282-221",
+    "def": "*U282",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "42 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 42 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u283-222",
+    "def": "*U283",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "70 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 70 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u290-223",
+    "def": "*U290",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "30 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 30 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u45-224",
+    "def": "*U45",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "38 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 38 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u47-225",
+    "def": "*U47",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "38 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 38 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u48-226",
+    "def": "*U48",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "12 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 12 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u49-227",
+    "def": "*U49",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "105 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 105 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u50-228",
+    "def": "*U50",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "41 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 41 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u51-229",
+    "def": "*U51",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "101 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 101 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u52-230",
+    "def": "*U52",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "102 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 102 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u53-231",
+    "def": "*U53",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "19 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 19 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u54-232",
+    "def": "*U54",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "68 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 68 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u55-233",
+    "def": "*U55",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "23 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 23 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u56-234",
+    "def": "*U56",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "130 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 130 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u57-235",
+    "def": "*U57",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "112 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 112 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u58-236",
+    "def": "*U58",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "19 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 19 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u59-237",
+    "def": "*U59",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "63 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 63 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u60-238",
+    "def": "*U60",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "18 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 18 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u61-239",
+    "def": "*U61",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "16 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 16 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  },
+  {
+    "unit_id": "defannot-u62-240",
+    "def": "*U62",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "23 closed 5-vertex LWPOLYLINEs, 100% on layer X-평면도(기본형)$0$INSUL (INSUL fill cells) -- no LINE/TEXT/INSERT entities present.",
+    "rationale": {
+      "evidence": "All 23 entities in this definition are LWPOLYLINE with exactly 5 vertices, 100% on the single layer X-평면도(기본형)$0$INSUL, whose xref-resolved base layer name is INSUL (insulation). Handles run in a tight contiguous hex block, consistent with a single batch-drawn insulation fill pattern. There are no LINE, TEXT, or block-INSERT entities that would indicate a wall centerline/boundary, a dimension object, or a furniture symbol.",
+      "rule": "A block whose entire content is uniform small closed polylines on a layer suffixed INSUL represents insulation fill/hatch-boundary geometry embedded in a floor-plan namespace; such homogeneous polygon sets should be scored with low wall_likelihood and empty wall_line_handles even though the layer sits under an X-평면도 (floor plan) prefix, because insulation fill cells are not themselves wall centerline/boundary entities.",
+      "counterfactual": "If any of these entities were plain 2-point LINEs (or long thin closed polylines spanning a full room-length run) on a layer named 벽체/WALL rather than INSUL, or if the layer histogram showed a mix including wall-typical entities, wall_likelihood would rise sharply toward 1.0.",
+      "uncertainty": "Without absolute vertex coordinates or the parent drawing's wall layer for cross-reference, it cannot be confirmed whether this insulation cell run traces an actual wall path in this drawing or is a standalone insulation swatch/legend; this projection provides no bbox and no coordinate data."
+    }
+  }
+]

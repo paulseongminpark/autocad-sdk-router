@@ -338,7 +338,7 @@ def render_md(matrix):
         lines.append(f"| {r['operation']} | {r['family']} | {r['status']} | {r['risk_class']} | "
                      f"{r['write_level']} | {r['agent_exposed']} | {r['handler'][:48]} | {br} |")
     lines.append("")
-    lines.append(f"> Full 517-operation detail (all 13 fields per op) is in "
+    lines.append(f"> Full {t['total']}-operation detail (all 13 fields per op) is in "
                  f"`reports/operation_coverage_full_matrix.json` — this table lists only the "
                  f"{t['v1_target_total']} v1-target ops. The {t['catalogued']} catalogued ops are "
                  f"classified future-version native capability (v1_target=false), not omitted.")
@@ -393,9 +393,12 @@ def write_reports():
         "v1_target_implemented": t["v1_target_implemented"],
         "v1_target_blocked": t["v1_target_blocked"],
         "v1_target_deferred": t["v1_target_deferred"],
-        "catalog_total_ops": 480,
-        "catalog_classified_ops": 480,
-        "catalog_unclassified_ops": 0,
+        # Derived from the live registry (was a stale hardcoded 480 snapshot that
+        # predated the M08 + w6/w7 waves -- FM9). catalog_total_ops == every op
+        # in operations.v2.json; classified == those with a known status.
+        "catalog_total_ops": t["total"],
+        "catalog_classified_ops": t["total"] - t["unknown"],
+        "catalog_unclassified_ops": t["unknown"],
         "existing_29_ops_mapped": gate["existing_29_frozen"],
         "inspect_database_graph_status": "implemented",
         "consistent": True,
@@ -432,10 +435,10 @@ def write_reports():
 # M08A-T01 — catalog reopen + honest full-coverage closure gate (ADDITIVE).
 #
 # Removes the v1_target=false escape: the legacy `gate` above only ever scored
-# the {implemented, blocked} subset, so the 474 `catalogued` ops never counted.
+# the {implemented, blocked} subset, so the `catalogued` ops never counted.
 # Here every op is brought into scope — assigned an owner_ticket, an
 # implementation_strategy, and an evidence_required — and a SEPARATE closure_gate
-# scores ALL 517 ops (honestly False while any op is catalogued/stub). The legacy
+# scores ALL ops (honestly False while any op is catalogued/stub). The legacy
 # `gate` is left byte-for-byte unchanged so the frozen coverage tests still hold.
 # ===========================================================================
 

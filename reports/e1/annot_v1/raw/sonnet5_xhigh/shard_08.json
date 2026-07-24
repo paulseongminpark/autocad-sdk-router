@@ -1,0 +1,321 @@
+[
+  {
+    "unit_id": "defannot-u130-141",
+    "def": "*U130",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "6 adjacent insulation-fill LWPOLYLINE quads (5 vertices each) on the INSUL xref layer; no wall-line candidates in the sample.",
+    "rationale": {
+      "evidence": "All 6 entities in this definition are LWPOLYLINE with 5 vertices (closed quads) on the single layer X-평면도(기본형)$0$INSUL, sampled handles 483F-4844 (all shown); no LINE, INSERT, or WIPEOUT entities are present, and the layer suffix INSUL is the standard abbreviation for insulation material in this xref-bound naming scheme.",
+      "rule": "When every sampled entity in a definition is a closed LWPOLYLINE on a layer literally named for a material fill (INSUL/HATCH-type suffix), classify it as a floor-plan material component rather than wall geometry, since wall runs are normally drawn as open 2-point LINE segments or parallel line pairs, not small closed polygons.",
+      "counterfactual": "If the layer name instead used a structural/wall naming convention (e.g. 벽체, WALL) or if the polylines were open 2-vertex segments chained end-to-end into a long run, the wall_likelihood judgment would rise substantially and some entities would qualify as wall_line_handles.",
+      "uncertainty": "The projection gives no vertex coordinates or bbox for LWPOLYLINE entities (bbox is only derived from LINE start/end), so the actual size, shape, and spatial adjacency of these quads to any real wall centerline cannot be confirmed from this data alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u131-142",
+    "def": "*U131",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "6 adjacent insulation-fill LWPOLYLINE quads (5 vertices each) on the INSUL xref layer; no wall-line candidates in the sample.",
+    "rationale": {
+      "evidence": "All 6 entities in this definition are LWPOLYLINE with 5 vertices (closed quads) on the single layer X-평면도(기본형)$0$INSUL, sampled handles 484A-484F (all shown); no LINE, INSERT, or WIPEOUT entities are present, and the layer suffix INSUL is the standard abbreviation for insulation material in this xref-bound naming scheme.",
+      "rule": "When every sampled entity in a definition is a closed LWPOLYLINE on a layer literally named for a material fill (INSUL/HATCH-type suffix), classify it as a floor-plan material component rather than wall geometry, since wall runs are normally drawn as open 2-point LINE segments or parallel line pairs, not small closed polygons.",
+      "counterfactual": "If the layer name instead used a structural/wall naming convention (e.g. 벽체, WALL) or if the polylines were open 2-vertex segments chained end-to-end into a long run, the wall_likelihood judgment would rise substantially and some entities would qualify as wall_line_handles.",
+      "uncertainty": "The projection gives no vertex coordinates or bbox for LWPOLYLINE entities (bbox is only derived from LINE start/end), so the actual size, shape, and spatial adjacency of these quads to any real wall centerline cannot be confirmed from this data alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u132-143",
+    "def": "*U132",
+    "role": "심볼",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [
+      {
+        "handle": "4858",
+        "reason": "longest straight axis-aligned frame segment (~1076 units), duplicated/coincident with a parallel line -- wall-like geometry but part of a flagpole plinth footprint"
+      },
+      {
+        "handle": "485A",
+        "reason": "longest straight axis-aligned frame segment (~1076 units), duplicated/coincident with a parallel line -- wall-like geometry but part of a flagpole plinth footprint"
+      },
+      {
+        "handle": "4868",
+        "reason": "longest straight axis-aligned frame segment (~1076 units), duplicated/coincident with a parallel line -- wall-like geometry but part of a flagpole plinth footprint"
+      }
+    ],
+    "notes": "Flagpole (국기계양대) plan symbol: 1 INSERT + 20 stepped-frame LINEs + 2 WIPEOUT masks; longest frame lines flagged as low-confidence wall-like candidates.",
+    "rationale": {
+      "evidence": "23 entities: 1 INSERT of the nested block X-평면도(기본형)$0$국기계양대 (flagpole) plus 20 axis-aligned LINE segments forming a stepped rectangular frame with bbox (-560,-103.5)-(560,22.5), and 2 WIPEOUT entities (layer 0) that mask background hatching behind the symbol; the frame's longest straight segments (4858, 485A, 4868) each span ~1076 units and are duplicated/coincident pairs, a pattern typical of a small curb or plinth outline rather than a building wall run.",
+      "rule": "A block that INSERTs a named site-fixture block (here 국기계양대=flagpole) and pairs it with WIPEOUT masking is a discrete plan symbol; even when it contains long straight rectilinear LINE segments, those should be read as the fixture's own footprint/plinth outline rather than building wall lines, especially when the overall footprint (roughly 1076x126 drawing units, i.e. sub-meter to ~1m scale) is far smaller than a typical wall run.",
+      "counterfactual": "If the INSERT referenced a wall/structural block instead of 국기계양대, or if these frame lines connected to other wall-scaled runs beyond this definition's small footprint, the wall_likelihood would need to be raised and the long lines reclassified as genuine wall candidates.",
+      "uncertainty": "Without the parent layout's full geometry it cannot be confirmed whether this stepped frame abuts an actual building wall (e.g. a flagpole set into a wall niche) or sits freestanding in open ground, so a small residual wall_likelihood is kept for the longest duplicated lines rather than zero."
+    }
+  },
+  {
+    "unit_id": "defannot-u133-144",
+    "def": "*U133",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "14 adjacent insulation-fill LWPOLYLINE quads (5 vertices each) on the INSUL xref layer; no wall-line candidates in the sample.",
+    "rationale": {
+      "evidence": "All 14 entities in this definition are LWPOLYLINE with 5 vertices (closed quads) on the single layer X-평면도(기본형)$0$INSUL, sampled handles 4871-487E (all shown); no LINE, INSERT, or WIPEOUT entities are present, and the layer suffix INSUL is the standard abbreviation for insulation material in this xref-bound naming scheme.",
+      "rule": "When every sampled entity in a definition is a closed LWPOLYLINE on a layer literally named for a material fill (INSUL/HATCH-type suffix), classify it as a floor-plan material component rather than wall geometry, since wall runs are normally drawn as open 2-point LINE segments or parallel line pairs, not small closed polygons.",
+      "counterfactual": "If the layer name instead used a structural/wall naming convention (e.g. 벽체, WALL) or if the polylines were open 2-vertex segments chained end-to-end into a long run, the wall_likelihood judgment would rise substantially and some entities would qualify as wall_line_handles.",
+      "uncertainty": "The projection gives no vertex coordinates or bbox for LWPOLYLINE entities (bbox is only derived from LINE start/end), so the actual size, shape, and spatial adjacency of these quads to any real wall centerline cannot be confirmed from this data alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u134-145",
+    "def": "*U134",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "7 adjacent insulation-fill LWPOLYLINE quads (5 vertices each) on the INSUL xref layer; no wall-line candidates in the sample.",
+    "rationale": {
+      "evidence": "All 7 entities in this definition are LWPOLYLINE with 5 vertices (closed quads) on the single layer X-평면도(기본형)$0$INSUL, sampled handles 4884-488A (all shown); no LINE, INSERT, or WIPEOUT entities are present, and the layer suffix INSUL is the standard abbreviation for insulation material in this xref-bound naming scheme.",
+      "rule": "When every sampled entity in a definition is a closed LWPOLYLINE on a layer literally named for a material fill (INSUL/HATCH-type suffix), classify it as a floor-plan material component rather than wall geometry, since wall runs are normally drawn as open 2-point LINE segments or parallel line pairs, not small closed polygons.",
+      "counterfactual": "If the layer name instead used a structural/wall naming convention (e.g. 벽체, WALL) or if the polylines were open 2-vertex segments chained end-to-end into a long run, the wall_likelihood judgment would rise substantially and some entities would qualify as wall_line_handles.",
+      "uncertainty": "The projection gives no vertex coordinates or bbox for LWPOLYLINE entities (bbox is only derived from LINE start/end), so the actual size, shape, and spatial adjacency of these quads to any real wall centerline cannot be confirmed from this data alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u135-146",
+    "def": "*U135",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "20 adjacent insulation-fill LWPOLYLINE quads (5 vertices each) on the INSUL xref layer; no wall-line candidates in the sample.",
+    "rationale": {
+      "evidence": "All 20 entities in this definition are LWPOLYLINE with 5 vertices (closed quads) on the single layer X-평면도(기본형)$0$INSUL, sampled handles 4890-48A3 (all shown); no LINE, INSERT, or WIPEOUT entities are present, and the layer suffix INSUL is the standard abbreviation for insulation material in this xref-bound naming scheme.",
+      "rule": "When every sampled entity in a definition is a closed LWPOLYLINE on a layer literally named for a material fill (INSUL/HATCH-type suffix), classify it as a floor-plan material component rather than wall geometry, since wall runs are normally drawn as open 2-point LINE segments or parallel line pairs, not small closed polygons.",
+      "counterfactual": "If the layer name instead used a structural/wall naming convention (e.g. 벽체, WALL) or if the polylines were open 2-vertex segments chained end-to-end into a long run, the wall_likelihood judgment would rise substantially and some entities would qualify as wall_line_handles.",
+      "uncertainty": "The projection gives no vertex coordinates or bbox for LWPOLYLINE entities (bbox is only derived from LINE start/end), so the actual size, shape, and spatial adjacency of these quads to any real wall centerline cannot be confirmed from this data alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u136-147",
+    "def": "*U136",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "32 adjacent insulation-fill LWPOLYLINE quads (5 vertices each) on the INSUL xref layer; no wall-line candidates in the sample.",
+    "rationale": {
+      "evidence": "All 32 entities in this definition are LWPOLYLINE with 5 vertices (closed quads) on the single layer X-평면도(기본형)$0$INSUL, sampled handles 48A9-48C6 (30 of 32 sampled, remainder truncated); no LINE, INSERT, or WIPEOUT entities are present, and the layer suffix INSUL is the standard abbreviation for insulation material in this xref-bound naming scheme.",
+      "rule": "When every sampled entity in a definition is a closed LWPOLYLINE on a layer literally named for a material fill (INSUL/HATCH-type suffix), classify it as a floor-plan material component rather than wall geometry, since wall runs are normally drawn as open 2-point LINE segments or parallel line pairs, not small closed polygons.",
+      "counterfactual": "If the layer name instead used a structural/wall naming convention (e.g. 벽체, WALL) or if the polylines were open 2-vertex segments chained end-to-end into a long run, the wall_likelihood judgment would rise substantially and some entities would qualify as wall_line_handles.",
+      "uncertainty": "The projection gives no vertex coordinates or bbox for LWPOLYLINE entities (bbox is only derived from LINE start/end), so the actual size, shape, and spatial adjacency of these quads to any real wall centerline cannot be confirmed from this data alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u137-148",
+    "def": "*U137",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "9 adjacent insulation-fill LWPOLYLINE quads (5 vertices each) on the INSUL xref layer; no wall-line candidates in the sample.",
+    "rationale": {
+      "evidence": "All 9 entities in this definition are LWPOLYLINE with 5 vertices (closed quads) on the single layer X-평면도(기본형)$0$INSUL, sampled handles 48CE-48D6 (all shown); no LINE, INSERT, or WIPEOUT entities are present, and the layer suffix INSUL is the standard abbreviation for insulation material in this xref-bound naming scheme.",
+      "rule": "When every sampled entity in a definition is a closed LWPOLYLINE on a layer literally named for a material fill (INSUL/HATCH-type suffix), classify it as a floor-plan material component rather than wall geometry, since wall runs are normally drawn as open 2-point LINE segments or parallel line pairs, not small closed polygons.",
+      "counterfactual": "If the layer name instead used a structural/wall naming convention (e.g. 벽체, WALL) or if the polylines were open 2-vertex segments chained end-to-end into a long run, the wall_likelihood judgment would rise substantially and some entities would qualify as wall_line_handles.",
+      "uncertainty": "The projection gives no vertex coordinates or bbox for LWPOLYLINE entities (bbox is only derived from LINE start/end), so the actual size, shape, and spatial adjacency of these quads to any real wall centerline cannot be confirmed from this data alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u138-149",
+    "def": "*U138",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "10 adjacent insulation-fill LWPOLYLINE quads (5 vertices each) on the INSUL xref layer; no wall-line candidates in the sample.",
+    "rationale": {
+      "evidence": "All 10 entities in this definition are LWPOLYLINE with 5 vertices (closed quads) on the single layer X-평면도(기본형)$0$INSUL, sampled handles 48DC-48E5 (all shown); no LINE, INSERT, or WIPEOUT entities are present, and the layer suffix INSUL is the standard abbreviation for insulation material in this xref-bound naming scheme.",
+      "rule": "When every sampled entity in a definition is a closed LWPOLYLINE on a layer literally named for a material fill (INSUL/HATCH-type suffix), classify it as a floor-plan material component rather than wall geometry, since wall runs are normally drawn as open 2-point LINE segments or parallel line pairs, not small closed polygons.",
+      "counterfactual": "If the layer name instead used a structural/wall naming convention (e.g. 벽체, WALL) or if the polylines were open 2-vertex segments chained end-to-end into a long run, the wall_likelihood judgment would rise substantially and some entities would qualify as wall_line_handles.",
+      "uncertainty": "The projection gives no vertex coordinates or bbox for LWPOLYLINE entities (bbox is only derived from LINE start/end), so the actual size, shape, and spatial adjacency of these quads to any real wall centerline cannot be confirmed from this data alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u139-150",
+    "def": "*U139",
+    "role": "심볼",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [
+      {
+        "handle": "48EE",
+        "reason": "longest straight axis-aligned frame segment (~1076 units), duplicated/coincident with a parallel line -- wall-like geometry but part of a flagpole plinth footprint"
+      },
+      {
+        "handle": "48F0",
+        "reason": "longest straight axis-aligned frame segment (~1076 units), duplicated/coincident with a parallel line -- wall-like geometry but part of a flagpole plinth footprint"
+      },
+      {
+        "handle": "48FE",
+        "reason": "longest straight axis-aligned frame segment (~1076 units), duplicated/coincident with a parallel line -- wall-like geometry but part of a flagpole plinth footprint"
+      }
+    ],
+    "notes": "Flagpole (국기계양대) plan symbol: 1 INSERT + 20 stepped-frame LINEs + 2 WIPEOUT masks; longest frame lines flagged as low-confidence wall-like candidates.",
+    "rationale": {
+      "evidence": "23 entities: 1 INSERT of the nested block X-평면도(기본형)$0$국기계양대 (flagpole) plus 20 axis-aligned LINE segments forming a stepped rectangular frame with bbox (-560,-103.5)-(560,22.5), and 2 WIPEOUT entities (layer 0) that mask background hatching behind the symbol; the frame's longest straight segments (48EE, 48F0, 48FE) each span ~1076 units and are duplicated/coincident pairs, a pattern typical of a small curb or plinth outline rather than a building wall run.",
+      "rule": "A block that INSERTs a named site-fixture block (here 국기계양대=flagpole) and pairs it with WIPEOUT masking is a discrete plan symbol; even when it contains long straight rectilinear LINE segments, those should be read as the fixture's own footprint/plinth outline rather than building wall lines, especially when the overall footprint (roughly 1076x126 drawing units, i.e. sub-meter to ~1m scale) is far smaller than a typical wall run.",
+      "counterfactual": "If the INSERT referenced a wall/structural block instead of 국기계양대, or if these frame lines connected to other wall-scaled runs beyond this definition's small footprint, the wall_likelihood would need to be raised and the long lines reclassified as genuine wall candidates.",
+      "uncertainty": "Without the parent layout's full geometry it cannot be confirmed whether this stepped frame abuts an actual building wall (e.g. a flagpole set into a wall niche) or sits freestanding in open ground, so a small residual wall_likelihood is kept for the longest duplicated lines rather than zero."
+    }
+  },
+  {
+    "unit_id": "defannot-u140-151",
+    "def": "*U140",
+    "role": "심볼",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [
+      {
+        "handle": "490A",
+        "reason": "longest straight axis-aligned frame segment (~976 units), duplicated/coincident with a parallel line -- wall-like geometry but part of a flagpole plinth footprint"
+      },
+      {
+        "handle": "490C",
+        "reason": "longest straight axis-aligned frame segment (~976 units), duplicated/coincident with a parallel line -- wall-like geometry but part of a flagpole plinth footprint"
+      },
+      {
+        "handle": "491A",
+        "reason": "longest straight axis-aligned frame segment (~976 units), duplicated/coincident with a parallel line -- wall-like geometry but part of a flagpole plinth footprint"
+      }
+    ],
+    "notes": "Flagpole (국기계양대) plan symbol: 1 INSERT + 20 stepped-frame LINEs + 2 WIPEOUT masks; longest frame lines flagged as low-confidence wall-like candidates.",
+    "rationale": {
+      "evidence": "23 entities: 1 INSERT of the nested block X-평면도(기본형)$0$국기계양대 (flagpole) plus 20 axis-aligned LINE segments forming a stepped rectangular frame with bbox (-510,-103.5)-(510,22.5), and 2 WIPEOUT entities (layer 0) that mask background hatching behind the symbol; the frame's longest straight segments (490A, 490C, 491A) each span ~976 units and are duplicated/coincident pairs, a pattern typical of a small curb or plinth outline rather than a building wall run.",
+      "rule": "A block that INSERTs a named site-fixture block (here 국기계양대=flagpole) and pairs it with WIPEOUT masking is a discrete plan symbol; even when it contains long straight rectilinear LINE segments, those should be read as the fixture's own footprint/plinth outline rather than building wall lines, especially when the overall footprint (roughly 976x126 drawing units, i.e. sub-meter to ~1m scale) is far smaller than a typical wall run.",
+      "counterfactual": "If the INSERT referenced a wall/structural block instead of 국기계양대, or if these frame lines connected to other wall-scaled runs beyond this definition's small footprint, the wall_likelihood would need to be raised and the long lines reclassified as genuine wall candidates.",
+      "uncertainty": "Without the parent layout's full geometry it cannot be confirmed whether this stepped frame abuts an actual building wall (e.g. a flagpole set into a wall niche) or sits freestanding in open ground, so a small residual wall_likelihood is kept for the longest duplicated lines rather than zero."
+    }
+  },
+  {
+    "unit_id": "defannot-u141-152",
+    "def": "*U141",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "15 adjacent insulation-fill LWPOLYLINE quads (5 vertices each) on the INSUL xref layer; no wall-line candidates in the sample.",
+    "rationale": {
+      "evidence": "All 15 entities in this definition are LWPOLYLINE with 5 vertices (closed quads) on the single layer X-평면도(기본형)$0$INSUL, sampled handles 4923-4931 (all shown); no LINE, INSERT, or WIPEOUT entities are present, and the layer suffix INSUL is the standard abbreviation for insulation material in this xref-bound naming scheme.",
+      "rule": "When every sampled entity in a definition is a closed LWPOLYLINE on a layer literally named for a material fill (INSUL/HATCH-type suffix), classify it as a floor-plan material component rather than wall geometry, since wall runs are normally drawn as open 2-point LINE segments or parallel line pairs, not small closed polygons.",
+      "counterfactual": "If the layer name instead used a structural/wall naming convention (e.g. 벽체, WALL) or if the polylines were open 2-vertex segments chained end-to-end into a long run, the wall_likelihood judgment would rise substantially and some entities would qualify as wall_line_handles.",
+      "uncertainty": "The projection gives no vertex coordinates or bbox for LWPOLYLINE entities (bbox is only derived from LINE start/end), so the actual size, shape, and spatial adjacency of these quads to any real wall centerline cannot be confirmed from this data alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u142-153",
+    "def": "*U142",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "95 adjacent insulation-fill LWPOLYLINE quads (5 vertices each) on the INSUL xref layer; no wall-line candidates in the sample.",
+    "rationale": {
+      "evidence": "All 95 entities in this definition are LWPOLYLINE with 5 vertices (closed quads) on the single layer X-평면도(기본형)$0$INSUL, sampled handles 4937-4954 (30 of 95 sampled, remainder truncated); no LINE, INSERT, or WIPEOUT entities are present, and the layer suffix INSUL is the standard abbreviation for insulation material in this xref-bound naming scheme.",
+      "rule": "When every sampled entity in a definition is a closed LWPOLYLINE on a layer literally named for a material fill (INSUL/HATCH-type suffix), classify it as a floor-plan material component rather than wall geometry, since wall runs are normally drawn as open 2-point LINE segments or parallel line pairs, not small closed polygons.",
+      "counterfactual": "If the layer name instead used a structural/wall naming convention (e.g. 벽체, WALL) or if the polylines were open 2-vertex segments chained end-to-end into a long run, the wall_likelihood judgment would rise substantially and some entities would qualify as wall_line_handles.",
+      "uncertainty": "The projection gives no vertex coordinates or bbox for LWPOLYLINE entities (bbox is only derived from LINE start/end), so the actual size, shape, and spatial adjacency of these quads to any real wall centerline cannot be confirmed from this data alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u144-154",
+    "def": "*U144",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "14 adjacent insulation-fill LWPOLYLINE quads (5 vertices each) on the INSUL xref layer; no wall-line candidates in the sample.",
+    "rationale": {
+      "evidence": "All 14 entities in this definition are LWPOLYLINE with 5 vertices (closed quads) on the single layer X-평면도(기본형)$0$INSUL, sampled handles 4D9F-4DAC (all shown); no LINE, INSERT, or WIPEOUT entities are present, and the layer suffix INSUL is the standard abbreviation for insulation material in this xref-bound naming scheme.",
+      "rule": "When every sampled entity in a definition is a closed LWPOLYLINE on a layer literally named for a material fill (INSUL/HATCH-type suffix), classify it as a floor-plan material component rather than wall geometry, since wall runs are normally drawn as open 2-point LINE segments or parallel line pairs, not small closed polygons.",
+      "counterfactual": "If the layer name instead used a structural/wall naming convention (e.g. 벽체, WALL) or if the polylines were open 2-vertex segments chained end-to-end into a long run, the wall_likelihood judgment would rise substantially and some entities would qualify as wall_line_handles.",
+      "uncertainty": "The projection gives no vertex coordinates or bbox for LWPOLYLINE entities (bbox is only derived from LINE start/end), so the actual size, shape, and spatial adjacency of these quads to any real wall centerline cannot be confirmed from this data alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u145-155",
+    "def": "*U145",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "16 adjacent insulation-fill LWPOLYLINE quads (5 vertices each) on the INSUL xref layer; no wall-line candidates in the sample.",
+    "rationale": {
+      "evidence": "All 16 entities in this definition are LWPOLYLINE with 5 vertices (closed quads) on the single layer X-평면도(기본형)$0$INSUL, sampled handles 4DB2-4DC1 (all shown); no LINE, INSERT, or WIPEOUT entities are present, and the layer suffix INSUL is the standard abbreviation for insulation material in this xref-bound naming scheme.",
+      "rule": "When every sampled entity in a definition is a closed LWPOLYLINE on a layer literally named for a material fill (INSUL/HATCH-type suffix), classify it as a floor-plan material component rather than wall geometry, since wall runs are normally drawn as open 2-point LINE segments or parallel line pairs, not small closed polygons.",
+      "counterfactual": "If the layer name instead used a structural/wall naming convention (e.g. 벽체, WALL) or if the polylines were open 2-vertex segments chained end-to-end into a long run, the wall_likelihood judgment would rise substantially and some entities would qualify as wall_line_handles.",
+      "uncertainty": "The projection gives no vertex coordinates or bbox for LWPOLYLINE entities (bbox is only derived from LINE start/end), so the actual size, shape, and spatial adjacency of these quads to any real wall centerline cannot be confirmed from this data alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u146-156",
+    "def": "*U146",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "159 adjacent insulation-fill LWPOLYLINE quads (5 vertices each) on the INSUL xref layer; no wall-line candidates in the sample.",
+    "rationale": {
+      "evidence": "All 159 entities in this definition are LWPOLYLINE with 5 vertices (closed quads) on the single layer X-평면도(기본형)$0$INSUL, sampled handles 4DC7-4DE4 (30 of 159 sampled, remainder truncated); no LINE, INSERT, or WIPEOUT entities are present, and the layer suffix INSUL is the standard abbreviation for insulation material in this xref-bound naming scheme.",
+      "rule": "When every sampled entity in a definition is a closed LWPOLYLINE on a layer literally named for a material fill (INSUL/HATCH-type suffix), classify it as a floor-plan material component rather than wall geometry, since wall runs are normally drawn as open 2-point LINE segments or parallel line pairs, not small closed polygons.",
+      "counterfactual": "If the layer name instead used a structural/wall naming convention (e.g. 벽체, WALL) or if the polylines were open 2-vertex segments chained end-to-end into a long run, the wall_likelihood judgment would rise substantially and some entities would qualify as wall_line_handles.",
+      "uncertainty": "The projection gives no vertex coordinates or bbox for LWPOLYLINE entities (bbox is only derived from LINE start/end), so the actual size, shape, and spatial adjacency of these quads to any real wall centerline cannot be confirmed from this data alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u147-157",
+    "def": "*U147",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "12 adjacent insulation-fill LWPOLYLINE quads (5 vertices each) on the INSUL xref layer; no wall-line candidates in the sample.",
+    "rationale": {
+      "evidence": "All 12 entities in this definition are LWPOLYLINE with 5 vertices (closed quads) on the single layer X-평면도(기본형)$0$INSUL, sampled handles 4E6B-4E76 (all shown); no LINE, INSERT, or WIPEOUT entities are present, and the layer suffix INSUL is the standard abbreviation for insulation material in this xref-bound naming scheme.",
+      "rule": "When every sampled entity in a definition is a closed LWPOLYLINE on a layer literally named for a material fill (INSUL/HATCH-type suffix), classify it as a floor-plan material component rather than wall geometry, since wall runs are normally drawn as open 2-point LINE segments or parallel line pairs, not small closed polygons.",
+      "counterfactual": "If the layer name instead used a structural/wall naming convention (e.g. 벽체, WALL) or if the polylines were open 2-vertex segments chained end-to-end into a long run, the wall_likelihood judgment would rise substantially and some entities would qualify as wall_line_handles.",
+      "uncertainty": "The projection gives no vertex coordinates or bbox for LWPOLYLINE entities (bbox is only derived from LINE start/end), so the actual size, shape, and spatial adjacency of these quads to any real wall centerline cannot be confirmed from this data alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u148-158",
+    "def": "*U148",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "28 adjacent insulation-fill LWPOLYLINE quads (5 vertices each) on the INSUL xref layer; no wall-line candidates in the sample.",
+    "rationale": {
+      "evidence": "All 28 entities in this definition are LWPOLYLINE with 5 vertices (closed quads) on the single layer X-평면도(기본형)$0$INSUL, sampled handles 4E7C-4E97 (all shown); no LINE, INSERT, or WIPEOUT entities are present, and the layer suffix INSUL is the standard abbreviation for insulation material in this xref-bound naming scheme.",
+      "rule": "When every sampled entity in a definition is a closed LWPOLYLINE on a layer literally named for a material fill (INSUL/HATCH-type suffix), classify it as a floor-plan material component rather than wall geometry, since wall runs are normally drawn as open 2-point LINE segments or parallel line pairs, not small closed polygons.",
+      "counterfactual": "If the layer name instead used a structural/wall naming convention (e.g. 벽체, WALL) or if the polylines were open 2-vertex segments chained end-to-end into a long run, the wall_likelihood judgment would rise substantially and some entities would qualify as wall_line_handles.",
+      "uncertainty": "The projection gives no vertex coordinates or bbox for LWPOLYLINE entities (bbox is only derived from LINE start/end), so the actual size, shape, and spatial adjacency of these quads to any real wall centerline cannot be confirmed from this data alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u149-159",
+    "def": "*U149",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "77 adjacent insulation-fill LWPOLYLINE quads (5 vertices each) on the INSUL xref layer; no wall-line candidates in the sample.",
+    "rationale": {
+      "evidence": "All 77 entities in this definition are LWPOLYLINE with 5 vertices (closed quads) on the single layer X-평면도(기본형)$0$INSUL, sampled handles 4E9D-4EBA (30 of 77 sampled, remainder truncated); no LINE, INSERT, or WIPEOUT entities are present, and the layer suffix INSUL is the standard abbreviation for insulation material in this xref-bound naming scheme.",
+      "rule": "When every sampled entity in a definition is a closed LWPOLYLINE on a layer literally named for a material fill (INSUL/HATCH-type suffix), classify it as a floor-plan material component rather than wall geometry, since wall runs are normally drawn as open 2-point LINE segments or parallel line pairs, not small closed polygons.",
+      "counterfactual": "If the layer name instead used a structural/wall naming convention (e.g. 벽체, WALL) or if the polylines were open 2-vertex segments chained end-to-end into a long run, the wall_likelihood judgment would rise substantially and some entities would qualify as wall_line_handles.",
+      "uncertainty": "The projection gives no vertex coordinates or bbox for LWPOLYLINE entities (bbox is only derived from LINE start/end), so the actual size, shape, and spatial adjacency of these quads to any real wall centerline cannot be confirmed from this data alone."
+    }
+  },
+  {
+    "unit_id": "defannot-u150-160",
+    "def": "*U150",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.2,
+    "wall_line_handles": [],
+    "notes": "25 adjacent insulation-fill LWPOLYLINE quads (5 vertices each) on the INSUL xref layer; no wall-line candidates in the sample.",
+    "rationale": {
+      "evidence": "All 25 entities in this definition are LWPOLYLINE with 5 vertices (closed quads) on the single layer X-평면도(기본형)$0$INSUL, sampled handles 4EEF-4F07 (all shown); no LINE, INSERT, or WIPEOUT entities are present, and the layer suffix INSUL is the standard abbreviation for insulation material in this xref-bound naming scheme.",
+      "rule": "When every sampled entity in a definition is a closed LWPOLYLINE on a layer literally named for a material fill (INSUL/HATCH-type suffix), classify it as a floor-plan material component rather than wall geometry, since wall runs are normally drawn as open 2-point LINE segments or parallel line pairs, not small closed polygons.",
+      "counterfactual": "If the layer name instead used a structural/wall naming convention (e.g. 벽체, WALL) or if the polylines were open 2-vertex segments chained end-to-end into a long run, the wall_likelihood judgment would rise substantially and some entities would qualify as wall_line_handles.",
+      "uncertainty": "The projection gives no vertex coordinates or bbox for LWPOLYLINE entities (bbox is only derived from LINE start/end), so the actual size, shape, and spatial adjacency of these quads to any real wall centerline cannot be confirmed from this data alone."
+    }
+  }
+]

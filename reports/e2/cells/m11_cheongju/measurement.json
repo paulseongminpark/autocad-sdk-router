@@ -1,0 +1,79 @@
+{
+  "schema": "e2.m11.measurement.v1",
+  "cell": "m11_cheongju",
+  "generated_at": "2026-07-20T16:32:42.100918+09:00",
+  "parent_prereg_sha_prefix": "1348c40b",
+  "sample_size": 39,
+  "parsed_sheets": 39,
+  "extraction_coverage": 1.0,
+  "axis1_definition_vocabulary": {
+    "M1a_frac_sheets_hit": 1.0,
+    "M1b_distinct_categories": 9,
+    "categories_matched": [
+      "column",
+      "dimension",
+      "finish_hatch",
+      "grid_axis",
+      "opening",
+      "room_space",
+      "slab_floor",
+      "text_note",
+      "wall"
+    ],
+    "verdict": "PASS"
+  },
+  "axis2_handle_system": {
+    "M2a_all_handle": 1.0,
+    "M2b_unique_handle": 1.0,
+    "M2c_owner_resolvable": 1.0,
+    "verdict": "PASS"
+  },
+  "axis3_annotation_feasibility": {
+    "M3a_median_entities": 1267,
+    "M3b_frac_wallcand_ge20": 0.9487,
+    "M3c_frac_text_ge1": 1.0,
+    "verdict": "PASS"
+  },
+  "overall_qualification": "QUALIFIED",
+  "encoding_note": {
+    "sheets_with_hangul_names": 39,
+    "sheets_with_mojibake": 0
+  },
+  "thresholds_sealed": {
+    "axis1_definition_vocabulary": {
+      "M1a": "fraction of extracted sheets with >=1 layer OR block name matching lexicon (case-insensitive substring)",
+      "M1b": "count of DISTINCT semantic categories (of 10) matched across the sample",
+      "PASS": "M1a >= 0.50 AND M1b >= 5",
+      "FAIL": "M1a < 0.20",
+      "INCONCLUSIVE": "otherwise, or extraction_coverage < 0.60"
+    },
+    "axis2_handle_system": {
+      "M2a": "fraction of extracted sheets where every extracted entity has a non-empty handle",
+      "M2b": "fraction of extracted sheets with no duplicate handle among extracted entities",
+      "M2c": "fraction of extracted sheets where entities carry a resolvable owner (layout/space non-null)",
+      "PASS": "M2a >= 0.95 AND M2b >= 0.95 AND M2c >= 0.95",
+      "FAIL": "M2a < 0.80",
+      "INCONCLUSIVE": "otherwise"
+    },
+    "axis3_annotation_feasibility": {
+      "wall_candidates": "LINE + LWPOLYLINE + POLYLINE (+ ARC) counts per sheet",
+      "text_count": "TEXT + MTEXT per sheet",
+      "M3a": "median n_entities over extracted sheets",
+      "M3b": "fraction of sheets with wall_candidates >= 20",
+      "M3c": "fraction of sheets with text_count >= 1",
+      "PASS": "M3a >= 100 AND M3b >= 0.60 AND M3c >= 0.80",
+      "FAIL": "M3a < 30 OR M3c < 0.30",
+      "INCONCLUSIVE": "otherwise"
+    }
+  },
+  "telemetry_extraction": {
+    "cell": "m11_cheongju",
+    "phase": "extraction_batch_S01_S38_cli",
+    "s00_via": "mcp cad_inspect_drawing (proven)",
+    "wall_seconds": 2000.506,
+    "peak_rss_bytes": 5140905984,
+    "peak_rss_method": "background sampler max WorkingSet64 over accoreconsole/acad/python at 400ms",
+    "device": "DESKTOP-PAUL / windows",
+    "files_attempted": 39
+  }
+}

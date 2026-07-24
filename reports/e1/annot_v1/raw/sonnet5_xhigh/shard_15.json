@@ -1,0 +1,334 @@
+[
+  {
+    "unit_id": "defannot-x-0-104co2-281",
+    "def": "X-평면도(기본형)$0$104co2",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.92,
+    "wall_line_handles": [
+      {"handle": "8113", "reason": "vertical W1 segment near grid line"},
+      {"handle": "8114", "reason": "vertical W1 segment parallel to 8113"},
+      {"handle": "8115", "reason": "long vertical W1 run along west edge"},
+      {"handle": "8117", "reason": "vertical W1 segment aligned with CEN 8119"},
+      {"handle": "8118", "reason": "horizontal W1 segment closing corner"},
+      {"handle": "811A", "reason": "long horizontal W1 run along CEN 811C"},
+      {"handle": "811B", "reason": "horizontal W1 segment at south edge"},
+      {"handle": "811D", "reason": "horizontal W1 segment mid-plan"},
+      {"handle": "8121", "reason": "short vertical W1 stub near opening"},
+      {"handle": "8124", "reason": "short vertical W1 stub mirroring 8121"}
+    ],
+    "notes": "Small unit floor plan (104co2): W1 layer supplies 54/85 LINE entities in clear axis-aligned wall pairs against CEN centerlines, plus 설비OPEN hatch/polyline cutouts — a genuine wall-bearing plan fragment.",
+    "rationale": {
+      "evidence": "54 of the 85 LINE entities (and the plurality of all 102 entities) sit on the X-평면도(기본형)$0$W1 layer, drawn as short orthogonal segments such as 8113 (2690,11030)->(2690,10530) and 811A (-4450,2530)->(-200,2530) that run parallel to same-position CEN centerlines (e.g. 8112, 8119), the standard double-line-plus-centerline wall convention. LWPOLYLINE/HATCH pairs on 설비OPEN mark equipment cutouts through those walls rather than free-standing objects, and the single TEXT/DEFTXT entity is only the unit label.",
+      "rule": "A block whose plurality-layer is a named wall layer (W1/W2/벽체) and whose entities on that layer are short orthogonal LINE segments paired with matching CEN centerlines is a wall-bearing plan fragment, transferable to any drawing using the same CEN+W-layer convention.",
+      "counterfactual": "If the W1-tagged entities were instead symbol INSERTs (as seen in this shard's *RF roof-overlay definitions) rather than raw LINE segments, or if W1 were a minor fraction of entities, wall_likelihood would drop toward the low values assigned to those roof/furniture blocks.",
+      "uncertainty": "Only 30 of 102 entities are sampled, so it cannot be confirmed the W1 lines close into a fully continuous perimeter loop or whether any W1 segments actually belong to a non-wall fixture that happens to share the layer."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-105co2-282",
+    "def": "X-평면도(기본형)$0$105co2",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.92,
+    "wall_line_handles": [
+      {"handle": "817B", "reason": "horizontal W1 segment at south wing"},
+      {"handle": "817D", "reason": "horizontal W1 segment parallel to 817B"},
+      {"handle": "817E", "reason": "long vertical W1 run east side"},
+      {"handle": "817F", "reason": "vertical W1 continuation of 817E"},
+      {"handle": "8180", "reason": "horizontal W1 run north wing"},
+      {"handle": "8183", "reason": "horizontal W1 segment closing corner"},
+      {"handle": "8184", "reason": "vertical W1 segment west edge"},
+      {"handle": "8185", "reason": "long vertical W1 run mid-plan"},
+      {"handle": "8189", "reason": "horizontal W1 segment near CEN 8187"},
+      {"handle": "818A", "reason": "horizontal W1 segment parallel to 8189"}
+    ],
+    "notes": "Sibling small unit plan (105co2) to 104co2: 59/90 LINE entities on W1 form a rectangular wall envelope with matching CEN centerlines and 설비OPEN cutouts.",
+    "rationale": {
+      "evidence": "59 of 90 LINE entities are tagged X-평면도(기본형)$0$W1, appearing as paired orthogonal segments (e.g. 817E (-4750,-5600)->(-4750,-2420) continuing at 817F, and 8180/8183 forming a rectangular corner) that track alongside CEN centerlines such as 817C and 8187 at consistent offsets — the same wall+centerline convention as sibling definition 104co2. HATCH/LWPOLYLINE on 설비OPEN again mark equipment openings, not standalone objects.",
+      "rule": "Consistent pairing of the majority LINE layer with matching CEN centerlines at a fixed offset is strong, transferable evidence of a wall network regardless of the specific drawing.",
+      "counterfactual": "Absence of the CEN-paired offset pattern, or a shift of the dominant layer from W1 to a furniture/finish layer, would flip this toward a non-wall classification.",
+      "uncertainty": "The full 90-line set is not shown (only 30 sampled), so the true perimeter closure and whether every W1 segment forms part of the exterior envelope versus an interior partition cannot be fully verified from this projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111a-283",
+    "def": "X-평면도(기본형)$0$111a",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.85,
+    "wall_line_handles": [],
+    "notes": "Large full-unit floor plan (639 entities): W1=129 and W2=105 are the two largest LINE-bearing layers (234/514 lines), alongside insulation (INSUL/INS), finish (FIN/TIL), and furniture layers — a comprehensive plan, though no W1/W2 LINE entities happen to fall in the 30-entity sample.",
+    "rationale": {
+      "evidence": "The layer histogram shows W1=129 and W2=105 as the two largest contributors to the 514 LINE entities (~45% combined), far outweighing any single furniture/finish/symbol layer, alongside supporting INSUL/INS/FIN/TIL/DOOR/설비OPEN layers typical of a complete apartment-unit plan. However the specific 30 sampled entities in this projection happen to be TIL hatches, INSUL block INSERTs (*U-prefixed anonymous blocks), and INS-layer lines rather than W1/W2 lines themselves.",
+      "rule": "When W1/W2-style wall layers hold the largest share of LINE entities in the layer histogram, the block should be scored high wall_likelihood even if the specific entity sample shown does not happen to include those layers — histogram share is the primary signal, per-entity sampling is corroborating evidence.",
+      "counterfactual": "If W1+W2 combined were a minor fraction of the 514 lines (e.g. under 10%), or if INS/INSUL/FIN clearly outnumbered them, the likelihood would drop; conversely, seeing actual W1/W2 LINE coordinates in the sample would raise confidence further.",
+      "uncertainty": "Because none of the 30 sampled entities are on W1/W2, no concrete wall-line handles or coordinates can be cited from this projection alone — the wall network's exact geometry and closure cannot be confirmed without a wider or targeted sample."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111arf-284",
+    "def": "X-평면도(기본형)$0$111ARF",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Small roof-plan overlay (21 entities) sharing 111a's footprint bbox: content is roof outline (7RF), rainwater-pipe and non-powered-fan INSERTs, and CEN reference lines — the 'W1' layer here holds fan symbol INSERTs, not wall LINE segments.",
+    "rationale": {
+      "evidence": "The bbox [0,-9055,0,19495,3515,0] closely matches unit 111a's plan bbox, indicating this is a roof-plan companion drawing for the same footprint, not an independent unit. Its layer histogram lists W1=2, but the two W1 entities in the sample (handles 7BF8, 7BF9) are INSERT references to block '무동력휀300' (a non-powered roof fan), not LINE wall segments; the real geometric content is 7RF roof-outline LWPOLYLINEs, M_2 drain-marker polylines, and 우수관_100A rainwater-pipe INSERTs.",
+      "rule": "A layer name matching the wall convention (W1) is only wall evidence when its entities are LINE/LWPOLYLINE geometry; when that layer instead holds equipment INSERTs, the layer name is a red herring and the block should be scored as a non-wall roof/equipment overlay even though it shares a floor plan's coordinate system.",
+      "counterfactual": "If the W1 layer here contained actual perimeter LINE segments matching the parent unit's wall footprint (rather than fan INSERTs), or if a larger fraction of entities were on W1, this would be reclassified as wall-bearing.",
+      "uncertainty": "Whether this roof overlay is meant to be merged with 111a's wall geometry at insert time, or is a fully separate roof-only drawing, cannot be determined from the projection alone since parent/child INSERT relationships are not shown here."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111arf2-285",
+    "def": "X-평면도(기본형)$0$111ARF2",
+    "role": "기타",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Minimal roof-plan variant (11 entities, no INSERT blocks): only CEN reference lines, two 8RF roof-outline LWPOLYLINEs, and the definition-name TEXT — no wall layer present at all.",
+    "rationale": {
+      "evidence": "The layer histogram contains only X-평면도(기본형)$0$8RF (2), CEN (8), and DEFTXT (1) — there is no W1, W2, or any wall-convention layer whatsoever. All LINE entities (7C02-7C0C) are CEN reference/grid lines identical in coordinates to sibling definition 111ARF, and the two LWPOLYLINEs (7C0A, 7C0B) are the roof outline on layer 8RF.",
+      "rule": "A block with zero entities on any wall-named layer (W1/W2/벽체) cannot be scored as wall-bearing regardless of how plan-like its coordinate system looks, since wall detection depends on entity presence on those layers, not on the presence of a floor/roof outline.",
+      "counterfactual": "Adding even a few LINE entities on a W-prefixed layer, or the fan/pipe INSERTs seen in sibling 111ARF, would raise the likelihood off its floor value.",
+      "uncertainty": "It cannot be determined from this projection whether 111ARF2 is an alternate roof-plan revision of 111ARF or a distinct roof type (e.g. a different pitch/material variant named '...RF2'), since no distinguishing content beyond the outline and label is present."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111b-286",
+    "def": "X-평면도(기본형)$0$111b",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.85,
+    "wall_line_handles": [
+      {"handle": "2F5A", "reason": "W2 horizontal segment at counter/sink area"},
+      {"handle": "2F5C", "reason": "W2 vertical segment adjoining 2F5A"}
+    ],
+    "notes": "Full-unit plan variant '111b' (546 entities) mirroring 111a's structure: W1=122, W2=77 dominate the 438 LINE entities; two W2 wall-line handles (2F5A, 2F5C) are directly visible in the sample alongside dense INSUL/TIL/kitchen fixtures.",
+    "rationale": {
+      "evidence": "The layer histogram shows W1=122 and W2=77 (199/438 LINE entities, ~45%) as the two largest LINE-bearing layers, matching the same wall-plus-centerline convention family as 111a. Two W2 lines are directly visible in the sample — 2F5A (9430,-1170)->(9760,-1170) and 2F5C (9430,-410)->(9430,-1170) — forming a short right-angle wall corner near a kitchen fixture (LWPOLYLINE on KITC, handle 2F55), consistent with a partition wall abutting a counter.",
+      "rule": "Directly-observed W1/W2 LINE entities forming a right-angle corner, corroborated by a dominant layer share in the histogram, gives high-confidence wall_likelihood; this generalizes to any drawing following the W1/W2 wall-layer naming convention.",
+      "counterfactual": "If 2F5A/2F5C had instead been on INS or 4GYP (finish/insulation layers seen elsewhere in this same block) rather than W2, this would be reclassified as a wall-adjacent finish line rather than the wall itself, lowering confidence slightly.",
+      "uncertainty": "Only 2 of the 77 W2 lines and none of the 122 W1 lines are directly visible, so the full wall network's continuity and whether it fully encloses the unit cannot be confirmed from this sample alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111brf-287",
+    "def": "X-평면도(기본형)$0$111BRF",
+    "role": "기타",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Roof-plan overlay for unit 111b (24 entities), structurally identical to 111ARF: 7RF outline, M_2 drain markers, rainwater-pipe/fan INSERTs; its 'W1' layer again holds two fan-symbol INSERTs (7C26, 7C27), not wall lines.",
+    "rationale": {
+      "evidence": "Bbox [-460,-10565,0,13975,7490,0] matches unit 111b's plan footprint, and the entity mix — CEN=11, 7RF=2, M_2=4, W1=2 — mirrors 111ARF exactly. The two W1-layer entities visible in the sample (7C26, 7C27) are INSERT references to '무동력휀300' fan blocks, not LINE wall segments; the geometric content is roof-outline LWPOLYLINEs (7C1D, 7C1E) and 우수관_100A rainwater-pipe INSERTs (7C20, 7C23).",
+      "rule": "As with 111ARF, a wall-named layer populated by equipment INSERTs rather than LINE geometry should be scored as low wall_likelihood despite matching the parent unit's coordinate footprint.",
+      "counterfactual": "Replacing the fan INSERTs on W1 with actual perimeter LINE segments, or a larger W1/W2 LINE share, would raise this toward the values assigned to the true wall-bearing unit plans in this shard.",
+      "uncertainty": "As with 111ARF, whether this roof overlay is later merged with 111b's wall geometry at insertion time cannot be determined from this isolated block-definition projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-111brf2-288",
+    "def": "X-평면도(기본형)$0$111BRF2",
+    "role": "기타",
+    "wall_likelihood": 0.03,
+    "wall_line_handles": [],
+    "notes": "Minimal roof-plan variant for 111b (14 entities): only CEN lines, two 8RF outline LWPOLYLINEs, and the label TEXT — no wall-named layer present, mirroring sibling 111ARF2.",
+    "rationale": {
+      "evidence": "Layer histogram contains only 8RF (2), CEN (11), and DEFTXT (1) — identical composition pattern to 111ARF2, with no W1/W2/벽체 layer at all. All 11 LINE entities are CEN reference lines whose coordinates match sibling 111BRF's CEN grid, and the two LWPOLYLINEs form the roof outline on 8RF.",
+      "rule": "Same rule as 111ARF2: zero entities on any wall-convention layer means wall_likelihood must stay near the floor regardless of apparent plan-scale coordinates.",
+      "counterfactual": "Any LINE presence on a W-prefixed layer, or reintroduction of the fan/pipe INSERTs seen in 111BRF, would raise the score.",
+      "uncertainty": "Whether '...RF2' denotes an alternate roof revision or a distinct roof material/pitch cannot be resolved from this minimal projection."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-130a-289",
+    "def": "X-평면도(기본형)$0$130a",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.85,
+    "wall_line_handles": [
+      {"handle": "6FF2", "reason": "W2 horizontal segment"},
+      {"handle": "6FF3", "reason": "W2 horizontal segment collinear with 6FF2"},
+      {"handle": "6FF4", "reason": "W2 horizontal segment collinear with 6FF3"},
+      {"handle": "6FF5", "reason": "W2 vertical segment at corner"},
+      {"handle": "6FFA", "reason": "W2 vertical segment parallel to 6FF5"},
+      {"handle": "6FFB", "reason": "W2 horizontal segment continuing wall run"},
+      {"handle": "6FFC", "reason": "W2 horizontal segment further along same run"},
+      {"handle": "7003", "reason": "W2 horizontal segment closing corner"}
+    ],
+    "notes": "Largest full-unit plan in shard (784 entities, incl. ARC=49): W1=113, W2=103 (216/582 lines) dominate; 8 W2 wall-line handles directly visible forming a long collinear wall run with corner turns, plus extensive FUR=153 furniture layer.",
+    "rationale": {
+      "evidence": "W1 (113) and W2 (103) together account for 216 of 582 LINE entities, the largest layer grouping alongside a very large FUR=153 (furniture) layer reflecting a fully furnished unit plan. Eight W2 LINE entities are directly visible in the sample forming a long collinear run (6FF2 (4070,330)->(5520,330), 6FF3, 6FF4 all at y=330) that turns a corner via verticals (6FF5, 6FFA) into a parallel continuation (6FFB, 6FFC, 7003) — a textbook multi-segment partition wall with jogs.",
+      "rule": "A long run of collinear, then perpendicular, LINE segments on the wall-convention layer is strong direct evidence of a real wall path, independent of the drawing's furniture content.",
+      "counterfactual": "If these same coordinates instead sat on 4GYP/INS (the parallel finish/insulation lines seen at nearly identical y-offsets in the sample, e.g. 4GYP at y=190/200), they would be wall-adjacent finish lines rather than the structural wall itself, which would change which specific lines are cited as evidence.",
+      "uncertainty": "With FUR=153 comprising the single largest layer by entity count, it cannot be ruled out from this sample that some walls are partially furniture-obscured or that certain W2 segments are short returns around built-in furniture rather than full partitions."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-130a1-290",
+    "def": "X-평면도(기본형)$0$130a1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.85,
+    "wall_line_handles": [
+      {"handle": "49C2", "reason": "W1 horizontal segment"},
+      {"handle": "49E5", "reason": "W2 short horizontal segment near 49C2"},
+      {"handle": "49E6", "reason": "W1 vertical segment"}
+    ],
+    "notes": "Variant 'a1' of unit 130a (780 entities): W1=114, W2=103 dominate (217/580 lines); W1/W2 handles 49C2, 49E5, 49E6 directly visible, alongside kitchen/closet furniture INSERTs (KITC, I-CL-FUR).",
+    "rationale": {
+      "evidence": "W1 (114) and W2 (103) again form the largest LINE-bearing layer group (217/580, ~37%), matching sibling 130a's proportions. Three wall-layer LINE entities are directly visible: 49C2 (W1, (17590,945)->(15250,945)), 49E6 (W1, (4670,-290)->(4670,-2790)), and 49E5 (W2, (15910,945)->(15800,945)) sitting immediately adjacent to 49C2's endpoint — consistent with a partition wall abutting a load-bearing wall.",
+      "rule": "Two different wall-convention layers (W1, W2) meeting at shared or adjacent coordinates is strong evidence of a real structural/partition wall junction, reusable as a detection heuristic across drawings using this same layer scheme.",
+      "counterfactual": "If 49C2/49E6 (W1) were isolated with no W2 lines nearby, confidence in a load-bearing/partition junction would be lower though the block would still be wall-bearing overall; a much smaller W1+W2 histogram share would lower the score more substantially.",
+      "uncertainty": "The precise room layout and whether all W1/W2 segments close into a full perimeter cannot be confirmed since only 3 of 217 wall-layer lines are directly sampled here."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-130b-291",
+    "def": "X-평면도(기본형)$0$130b",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.8,
+    "wall_line_handles": [],
+    "notes": "Variant 'b' of unit 130 (776 entities, incl. WIN=1 window layer and a 0체크사항 check-note layer): W1=104, W2=83 (187/595 lines) is the largest layer group, though no W1/W2 lines fall within the 30-entity sample shown.",
+    "rationale": {
+      "evidence": "Layer histogram shows W1=104 and W2=83 (187 of 595 LINE entities) as the largest combined layer group, consistent with the wall-bearing unit plans elsewhere in this shard, alongside FUR=171 furniture and a unique WIN=1/0체크사항=1 layer suggesting a marked-up window or QA note. The 30 sampled entities, however, are entirely INSUL block INSERTs, 4GYP finish lines, MC/CEN lines, and equipment 설비OPEN entities — none on W1/W2.",
+      "rule": "As in definition 111a, histogram-level layer share drives the wall_likelihood score when the specific sample doesn't surface the wall layer directly; this keeps the score consistent for structurally identical unit-plan variants even when random sampling misses the wall entities.",
+      "counterfactual": "Direct visibility of even a couple of W1/W2 lines in the sample would raise confidence to the ~0.85-0.9 level assigned to sibling variants (130a, 130a1) where such lines were visible.",
+      "uncertainty": "Because zero W1/W2 entities are directly observed, no specific wall-line handles can be honestly cited from this projection, and the presence/purpose of the unique WIN and 0체크사항 layers (a window callout? a QA flag?) cannot be determined without further context."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84a-292",
+    "def": "X-평면도(기본형)$0$84a",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.88,
+    "wall_line_handles": [
+      {"handle": "1F0C", "reason": "W2 vertical segment near door/vestibule"},
+      {"handle": "1F0D", "reason": "W2 vertical segment parallel to 1F0C"},
+      {"handle": "1F11", "reason": "W2 horizontal segment closing corner with 1F0C"},
+      {"handle": "1F12", "reason": "W2 horizontal segment mirroring 1F11"}
+    ],
+    "notes": "Full-unit plan '84a' (527 entities) with an explicit masonry wall layer (A02-벽체-조적=2) in addition to W1=112/W2=87; four W2 handles (1F0C,1F0D,1F11,1F12) directly visible forming a small rectangular wall nook.",
+    "rationale": {
+      "evidence": "Beyond the usual W1=112/W2=87 (199/417 lines, ~48%), this block uniquely also carries an explicit '벽체' (wall)-named layer, X-평면도(기본형)$0$A02-벽체-조적=2 (조적 = masonry), directly confirming wall-type content by name rather than convention alone. Four W2 LINE entities are visible forming a small enclosed nook: 1F0C/1F0D run vertical and parallel, closed by horizontal 1F11/1F12 — a short wall return, likely around a door reveal or shaft.",
+      "rule": "An explicit Korean wall-type layer name (containing 벽체/조적/콘크리트) is even stronger, less ambiguous evidence of wall content than the generic W1/W2 convention, and should raise confidence further when both signals co-occur.",
+      "counterfactual": "Without the A02-벽체-조적 layer corroborating it, the W1/W2 evidence alone would still support a high score similar to sibling '84' variants (~0.85), so this extra explicit layer nudges the estimate slightly higher rather than being solely responsible for it.",
+      "uncertainty": "The A02-벽체-조적 layer's own 2 entities are not shown in the sample, so it cannot be confirmed whether that layer's geometry overlaps with or is distinct from the W1/W2 network described here."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84a1-293",
+    "def": "X-평면도(기본형)$0$84a1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.9,
+    "wall_line_handles": [
+      {"handle": "27FB", "reason": "W1 vertical segment"},
+      {"handle": "27FC", "reason": "W1 vertical continuation of 27FB"},
+      {"handle": "2800", "reason": "W1 long vertical run along east edge"},
+      {"handle": "280A", "reason": "W1 horizontal segment"},
+      {"handle": "280B", "reason": "W1 horizontal segment collinear with 280A"},
+      {"handle": "280C", "reason": "W1 horizontal segment collinear with 280B"},
+      {"handle": "280D", "reason": "W1 horizontal segment paired with 280A"},
+      {"handle": "280E", "reason": "W1 horizontal segment paired with 280B"}
+    ],
+    "notes": "Variant 'a1' of unit 84a (533 entities): W1=109, W2=89 dominate; 8 W1 handles directly visible forming a long east-edge vertical wall run plus a paired double-line horizontal wall section, the clearest direct wall evidence in this shard.",
+    "rationale": {
+      "evidence": "W1=109/W2=89 (198/424 lines) again form the dominant layer group. Eight W1 LINE entities are directly visible and form two clear wall structures: a long vertical run along the east edge (27FB→27FC→2800, roughly x=15045-15445 spanning y=-7490 to 2250), and a paired double-line horizontal wall section at y=-7490/-7240 (280A-280E) with matching short segments at each x-offset — the clearest double-line wall pattern with direct handle evidence anywhere in this shard.",
+      "rule": "A visible pair of parallel LINE runs at a small fixed offset on the wall-convention layer, repeated at multiple positions, is the highest-confidence direct signal of a real wall assembly and should be weighted above histogram share alone when both agree.",
+      "counterfactual": "If these 8 segments were single unpaired lines rather than double-line pairs, or on a non-wall layer, confidence would drop toward the histogram-only estimates used for other '84' siblings in this shard.",
+      "uncertainty": "The full perimeter's closure beyond this east-edge/south-edge section is not shown, so whether the entire unit envelope is fully wall-enclosed cannot be confirmed from this partial sample."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84b-294",
+    "def": "X-평면도(기본형)$0$84b",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.78,
+    "wall_line_handles": [],
+    "notes": "Variant 'b' of unit 84 (525 entities): W1=115, W2=89 (204/409 lines) dominate the histogram; sampled entities show INSERT door/window symbols ('is', 'is2') placed on the W1 layer rather than raw wall lines.",
+    "rationale": {
+      "evidence": "W1=115 and W2=89 (204 of 409 LINE entities, ~50%) form the largest layer group, matching the wall-bearing pattern of sibling unit plans. However, the entities actually sampled on W1 are three INSERT block references (2202, 2205, 2206 — blocks 'is'/'is2', likely door/window swing symbols) rather than LINE wall segments; the LINE entities visible are all on the INS (insulation) layer instead.",
+      "rule": "When a wall-convention layer's sampled entities are symbol INSERTs rather than raw LINE geometry, treat the histogram share as the primary (but slightly discounted) evidence, since some of that layer's entity count is consumed by door/window symbols rather than wall segments themselves.",
+      "counterfactual": "If the sample had shown actual W1/W2 LINE coordinates (as in sibling 84a1), confidence would rise toward 0.9; if W1's entities turned out to be predominantly symbol INSERTs rather than a minority, the score should fall further, closer to the roof-overlay blocks in this shard.",
+      "uncertainty": "It cannot be determined from this sample what fraction of the 115 W1 entities are wall LINEs versus door/window INSERTs like 'is'/'is2', so the true wall-segment count on W1 is uncertain."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84b1-295",
+    "def": "X-평면도(기본형)$0$84b1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.78,
+    "wall_line_handles": [],
+    "notes": "Variant 'b1' of unit 84b (527 entities, TEXT=2/DEFTXT=2 — carries an extra label): W1=111, W2=93 (204/413 lines) dominate the histogram, but sampled entities on W1/W2-adjacent layers (MC, CEN, INS) do not include direct W1/W2 lines; a DOOR-layer INSERT (pd900) is visible.",
+    "rationale": {
+      "evidence": "W1=111/W2=93 (204 of 413 LINE entities, ~49%) form the largest layer group, mirroring sibling 84b's proportions closely (same bbox, same layer set). The sampled entities are CEN/MC lines, 설비OPEN hatch/polyline cutouts, an INSUL INSERT, a DOOR INSERT (6D1C, block 'pd900' — a door swing symbol), and INS lines — none directly on W1/W2.",
+      "rule": "Consistent layer-share evidence across near-duplicate unit-plan variants (same bbox, same layer histogram shape) supports carrying the same wall_likelihood confidence even when the specific sampled entities differ between variants.",
+      "counterfactual": "Direct visibility of W1/W2 LINE coordinates, as seen in sibling 84a1, would raise this score; a much smaller W1+W2 share would lower it toward the roof/furniture-block range.",
+      "uncertainty": "As with 84b, the exact split between wall LINE segments and door/window symbol INSERTs on the W1/W2 layers cannot be determined from this sample."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84c-296",
+    "def": "X-평면도(기본형)$0$84c",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.78,
+    "wall_line_handles": [],
+    "notes": "Variant 'c' of unit 84 (571 entities, incl. bathroom fixture layer DS-F-BATH): W1=105, W2=92 (197/451 lines) dominate; sampled W1 entity is a door/window symbol INSERT ('is2'), not a raw wall line.",
+    "rationale": {
+      "evidence": "W1=105/W2=92 (197 of 451 LINE entities, ~44%) form the largest layer group. The one W1-layer entity in the sample (254D) is an INSERT reference to block 'is2' (a door/window swing symbol), not a LINE wall segment; the surrounding sampled LINEs are on INS (insulation) and TIL (tile, bathroom-related, matching the new DS-F-BATH layer) instead.",
+      "rule": "Same discounting rule as 84b/84b1: a wall-convention layer represented in-sample only by symbol INSERTs still supports a high but slightly discounted wall_likelihood, driven primarily by histogram share.",
+      "counterfactual": "Seeing actual W1/W2 LINE coordinates would raise confidence; a materially smaller W1+W2 histogram share would lower it toward the low scores given to the pure-furniture/roof-overlay blocks in this shard.",
+      "uncertainty": "The presence of a new DS-F-BATH (bathroom fixture) layer and matching KITC/FUR-K layers hints this unit variant reorganizes room layout versus 84a/84b, but its effect (if any) on the wall network's shape cannot be assessed from this sample."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-84c1-297",
+    "def": "X-평면도(기본형)$0$84c1",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.78,
+    "wall_line_handles": [],
+    "notes": "Variant 'c1' of unit 84c (577 entities): W1=106, W2=92 (198/456 lines) dominate the histogram; sample shows only INS/MC/CEN lines and INSUL/수전/door INSERTs, no direct W1/W2 lines.",
+    "rationale": {
+      "evidence": "W1=106/W2=92 (198 of 456 LINE entities, ~43%) form the largest layer group, nearly identical to sibling 84c's proportions and bbox. Sampled entities are CEN/MC reference lines, INS insulation lines, 수전 (faucet) fixture INSERTs (7412-7416), and door/window INSERTs (740B 'wd170750', 740F 'ba18601500') — none on W1/W2 directly.",
+      "rule": "Same histogram-share-driven rule applied consistently across the 84c/84c1 pair, since both share bbox, layer composition, and entity-type ratios closely enough to be treated as the same wall-detection confidence tier.",
+      "counterfactual": "Direct W1/W2 LINE visibility would raise the score; a much lower W1+W2 share would push it down toward the furniture/roof-overlay range.",
+      "uncertainty": "As with 84c, whether this 'c1' revision changes the wall layout versus 'c' (beyond fixture/door block substitutions like wd170750 vs. is2) cannot be determined from the sampled entities."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c019c01bd-298",
+    "def": "X-평면도(기본형)$0$A$C019C01BD",
+    "role": "가구",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Small anonymous furniture block (117 entities, all on FUR layer): dense ARC/LINE/HATCH geometry within a ~192x1200-unit bbox describing a single curved fixture (e.g. a toilet/sink outline), not a floor plan.",
+    "rationale": {
+      "evidence": "100% of the 117 entities (LINE=67, ARC=43, HATCH=2, LWPOLYLINE=4, INSERT=1) sit on the single layer X-평면도(기본형)$0$FUR (furniture), with a small local bbox of roughly 192x1200 drawing units rather than a room-scale footprint. The entity mix — many short LINE/ARC segments clustering around a small local region (e.g. handles 62D3-62E9 all within x=331-523, y=0-1200) plus two SOLID HATCH fills (62DA, 62EE) — is characteristic of a single detailed fixture outline (e.g. a toilet or sink), not a wall network.",
+      "rule": "A block whose entities are exclusively on a furniture-named layer (FUR/가구), with no CEN, W1, or W2 layer present and a small local (sub-room-scale) bounding box, should be classified as furniture with near-zero wall_likelihood, since anonymous-name '$A$<hash>' block names typically denote furniture/fixture components inserted repeatedly across unit plans.",
+      "counterfactual": "The presence of any W1/W2/CEN-layer LINE entities, or a room-scale bbox (thousands of units on both axes matching a unit plan), would flip this toward a plan-fragment classification instead.",
+      "uncertainty": "Without a symbol/preview render, the exact fixture type (toilet vs. sink vs. other bathroom fixture) implied by the curved ARC geometry cannot be confirmed from coordinate data alone."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c01a306ae-299",
+    "def": "X-평면도(기본형)$0$A$C01A306AE",
+    "role": "가구",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Small anonymous furniture block (22 entities, all FUR layer): simple rectangular outline with corner arcs in a ~500x104-unit bbox, likely a small fixture or trim profile.",
+    "rationale": {
+      "evidence": "All 22 entities (LINE=18, ARC=4) are on the single X-평면도(기본형)$0$FUR layer, with a small elongated bbox of 500x104.228 units suggesting a narrow fixture or trim strip rather than a room. The geometry (e.g. 1DF0-1DF6 forming a rectangular notch with corner arcs 1DF7,1DFA,1DFC,1DFE) reads as a simple hardware/fixture outline.",
+      "rule": "Same rule as sibling furniture block C019C01BD: exclusively FUR-layer content with a small, non-room-scale bbox and no wall/centerline layers is scored as furniture with minimal wall_likelihood.",
+      "counterfactual": "Any CEN/W1/W2 content or a room-scale bbox would overturn this classification.",
+      "uncertainty": "The specific real-world object (window sill, threshold strip, or other small fixture) cannot be identified from geometry and layer name alone without a rendered preview."
+    }
+  },
+  {
+    "unit_id": "defannot-x-0-a-c04b05b29-300",
+    "def": "X-평면도(기본형)$0$A$C04B05B29",
+    "role": "가구",
+    "wall_likelihood": 0.02,
+    "wall_line_handles": [],
+    "notes": "Small anonymous furniture block (24 entities) on FUR-FIX/FUR-KIT layers only: an L-shaped ~920x152-unit outline, likely a kitchen counter/sink fixture footprint.",
+    "rationale": {
+      "evidence": "All 24 entities (LINE=16, LWPOLYLINE=8) split between FUR-FIX (21) and FUR-KIT (3) — both furniture/fixture sub-layers, with no CEN, W1, or W2 present. The bbox (-880,-132)-(40,20), roughly 920x152 units, and the L-shaped step pattern in the sampled LWPOLYLINEs/LINEs (e.g. 42CE-42D6 forming a stepped rectangular notch) match a kitchen counter or sink-cabinet footprint rather than a wall or room.",
+      "rule": "FUR-KIT/FUR-FIX-only layer content with a narrow, counter-scale bbox and no wall/centerline evidence is furniture, following the same rule applied to the other two FUR-layer blocks in this shard.",
+      "counterfactual": "Introduction of W1/W2/CEN layer entities or a room-scale bbox would overturn the furniture classification.",
+      "uncertainty": "Whether this specific footprint is a sink base, counter run, or kitchen island cannot be confirmed from the LWPOLYLINE/LINE geometry alone without a rendered view."
+    }
+  }
+]

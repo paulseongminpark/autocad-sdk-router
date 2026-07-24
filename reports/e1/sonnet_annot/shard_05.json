@@ -1,0 +1,202 @@
+[
+  {
+    "unit_id": "defannot-d375-81",
+    "answer": {
+      "def": "*D375",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines (8E44, 8E45) perpendicular to a dimension line (8E46) whose length (325) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d376-82",
+    "answer": {
+      "def": "*D376",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines (8E4D, 8E4E) perpendicular to a dimension line (8E4F) whose length (3320) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d377-83",
+    "answer": {
+      "def": "*D377",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines (8E56, 8E57) perpendicular to a dimension line (8E58) whose length (725) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d378-84",
+    "answer": {
+      "def": "*D378",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines (8E5F, 8E60) perpendicular to a dimension line (8E61) whose length (725) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d379-85",
+    "answer": {
+      "def": "*D379",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines (8E68, 8E69) perpendicular to a dimension line (8E6A) whose length (1620) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d380-86",
+    "answer": {
+      "def": "*D380",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines (8E71, 8E72) perpendicular to a dimension line (8E73) whose length (775) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d381-87",
+    "answer": {
+      "def": "*D381",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines (8E7A, 8E7B) perpendicular to a dimension line (8E7C) whose length (710) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d382-88",
+    "answer": {
+      "def": "*D382",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines (8E83, 8E84) perpendicular to a dimension line (8E85) whose length (1620) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d383-89",
+    "answer": {
+      "def": "*D383",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines (8E8C, 8E8D) perpendicular to a dimension line (8E8E) whose length (760) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d384-90",
+    "answer": {
+      "def": "*D384",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines () perpendicular to a dimension line (8E97) whose length (900) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d385-91",
+    "answer": {
+      "def": "*D385",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines (8E9E, 8E9F) perpendicular to a dimension line (8EA0) whose length (820) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d386-92",
+    "answer": {
+      "def": "*D386",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines (8EA7, 8EA8) perpendicular to a dimension line (8EA9) whose length (1280) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d387-93",
+    "answer": {
+      "def": "*D387",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines (8EB0, 8EB1) perpendicular to a dimension line (8EB2) whose length (350) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d388-94",
+    "answer": {
+      "def": "*D388",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines (8EB9, 8EBA) perpendicular to a dimension line (8EBB) whose length (1020) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d389-95",
+    "answer": {
+      "def": "*D389",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines () perpendicular to a dimension line (8EC4) whose length (710) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d390-96",
+    "answer": {
+      "def": "*D390",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines (8ECB, 8ECC) perpendicular to a dimension line (8ECD) whose length (320) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d391-97",
+    "answer": {
+      "def": "*D391",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines (8ED4, 8ED5) perpendicular to a dimension line (8ED6) whose length (1820) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d392-98",
+    "answer": {
+      "def": "*D392",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines (8EDD, 8EDE) perpendicular to a dimension line (8EDF) whose length (1125) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d393-99",
+    "answer": {
+      "def": "*D393",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines (8EE6, 8EE7) perpendicular to a dimension line (8EE8) whose length (1220) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  },
+  {
+    "unit_id": "defannot-d394-100",
+    "answer": {
+      "def": "*D394",
+      "role": "치수캐시",
+      "wall_likelihood": 0.03,
+      "wall_line_handles": [],
+      "notes": "All entities on layer DIM: 2 extension lines (8EEF, 8EF0) perpendicular to a dimension line (8EF1) whose length (985) matches the MTEXT dimension text value; 2 INSERT=DIMDOT arrow/dot markers at the dimension line ends; 3 POINT on DEFPOINTS layer are the associative dimension definition points. This is a standard AutoCAD linear-dimension associativity block (dimension cache), not architectural wall geometry -- the 'LINE' entities are dimension extension/witness lines and the dimension line itself, not wall centerlines or faces."
+    }
+  }
+]

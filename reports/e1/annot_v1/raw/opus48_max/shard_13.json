@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-u63-241",
+    "def": "*U63",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "151 uniform 5-vertex LWPOLYLINEs on the X-평면도(기본형)$0$INSUL sublayer: insulation batting/hatch (material indication), co-located with walls but containing no wall boundary lines.",
+    "rationale": {
+      "evidence": "Every one of the 151 entities is an LWPOLYLINE with vertices=5 on the single layer X-평면도(기본형)$0$INSUL (sampled handles begin at 3C70). The dxf histogram is 100% LWPOLYLINE with zero LINE/INSERT/HATCH, the LINE-based bbox is not derivable, and the vertex count is uniform — the signature of a repeated insulation-batting/fill motif, not distinct architectural linework.",
+      "rule": "A block made entirely of many uniform low-vertex LWPOLYLINEs on a dedicated insulation ('INSUL') sublayer is material hatch/batting: insulation is a wall component and therefore co-locates with walls, but the hatch geometry itself is not a wall boundary line, which is authored on a separate wall/structure layer.",
+      "counterfactual": "If these polylines instead formed wall-thickness rectangles on a wall/structure sublayer, or if long paired parallel LINE edges ~100-200mm apart were present, wall_likelihood would rise and those specific handles would be reported in wall_line_handles.",
+      "uncertainty": "The projection exposes no vertex coordinates, so batting-zigzag vs small-rectangle geometry cannot be confirmed and the exact wall each run hugs is unknown; a stricter taxonomy that reserves '평면 부분도' for composed plan geometry (walls/rooms) would instead file pure material hatch under '기타'."
+    }
+  },
+  {
+    "unit_id": "defannot-u64-242",
+    "def": "*U64",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "25 uniform 5-vertex LWPOLYLINEs on the X-평면도(기본형)$0$INSUL sublayer: insulation batting/hatch (material indication), co-located with walls but containing no wall boundary lines.",
+    "rationale": {
+      "evidence": "Every one of the 25 entities is an LWPOLYLINE with vertices=5 on the single layer X-평면도(기본형)$0$INSUL (sampled handles begin at 3D0C). The dxf histogram is 100% LWPOLYLINE with zero LINE/INSERT/HATCH, the LINE-based bbox is not derivable, and the vertex count is uniform — the signature of a repeated insulation-batting/fill motif, not distinct architectural linework.",
+      "rule": "A block made entirely of many uniform low-vertex LWPOLYLINEs on a dedicated insulation ('INSUL') sublayer is material hatch/batting: insulation is a wall component and therefore co-locates with walls, but the hatch geometry itself is not a wall boundary line, which is authored on a separate wall/structure layer.",
+      "counterfactual": "If these polylines instead formed wall-thickness rectangles on a wall/structure sublayer, or if long paired parallel LINE edges ~100-200mm apart were present, wall_likelihood would rise and those specific handles would be reported in wall_line_handles.",
+      "uncertainty": "The projection exposes no vertex coordinates, so batting-zigzag vs small-rectangle geometry cannot be confirmed and the exact wall each run hugs is unknown; a stricter taxonomy that reserves '평면 부분도' for composed plan geometry (walls/rooms) would instead file pure material hatch under '기타'."
+    }
+  },
+  {
+    "unit_id": "defannot-u67-243",
+    "def": "*U67",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Masked marker box: WIPEOUT x2 + nested 국기계양대(flagpole-stand) INSERT + 20 LINEs forming a ~3320mm-wide, ~126-unit-tall bordered frame; an annotation/symbol overlay, not a wall.",
+    "rationale": {
+      "evidence": "The block mixes 2 WIPEOUT masks (handles 3D7C,3D7D), 20 LINEs that trace a thin bordered frame with end mounting-tabs (bbox [-1660, -103.5, 0, 1660, 22.5, 0]: width ~3320, height ~126), and 1 nested INSERT (handle 3D7E) of block 'X-평면도(기본형)$0$국기계양대' (flagpole stand). WIPEOUT masking plus a nested named symbol is the hallmark of an overlay marker, and the inner frame gap is only ~50 units — far thinner than a structural wall.",
+      "rule": "A block that carries WIPEOUT masks and a nested named symbol inside a thin, fixed-height / variable-width bordered frame is a symbol/label marker rather than architectural wall geometry; genuine wall boundary lines never carry wipeouts.",
+      "counterfactual": "Remove the WIPEOUTs and the nested symbol, and make the two long parallel edges ~100-200mm apart on a wall layer, and the frame would instead read as a wall/parapet, pushing wall_likelihood up and populating wall_line_handles.",
+      "uncertainty": "Metadata cannot confirm whether the depicted 국기계양대 sits on a real parapet/handrail; even if it does, the ~50-unit edge spacing is too thin for a structural wall, and the block could alternatively be tagged '가구'/'기타' as a fixture rather than '심볼'."
+    }
+  },
+  {
+    "unit_id": "defannot-u68-244",
+    "def": "*U68",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Masked marker box: WIPEOUT x2 + nested 국기계양대(flagpole-stand) INSERT + 20 LINEs forming a ~920mm-wide, ~126-unit-tall bordered frame; an annotation/symbol overlay, not a wall.",
+    "rationale": {
+      "evidence": "The block mixes 2 WIPEOUT masks (handles 3D98,3D99), 20 LINEs that trace a thin bordered frame with end mounting-tabs (bbox [-460, -103.5, 0, 460, 22.5, 0]: width ~920, height ~126), and 1 nested INSERT (handle 3D9A) of block 'X-평면도(기본형)$0$국기계양대' (flagpole stand). WIPEOUT masking plus a nested named symbol is the hallmark of an overlay marker, and the inner frame gap is only ~50 units — far thinner than a structural wall.",
+      "rule": "A block that carries WIPEOUT masks and a nested named symbol inside a thin, fixed-height / variable-width bordered frame is a symbol/label marker rather than architectural wall geometry; genuine wall boundary lines never carry wipeouts.",
+      "counterfactual": "Remove the WIPEOUTs and the nested symbol, and make the two long parallel edges ~100-200mm apart on a wall layer, and the frame would instead read as a wall/parapet, pushing wall_likelihood up and populating wall_line_handles.",
+      "uncertainty": "Metadata cannot confirm whether the depicted 국기계양대 sits on a real parapet/handrail; even if it does, the ~50-unit edge spacing is too thin for a structural wall, and the block could alternatively be tagged '가구'/'기타' as a fixture rather than '심볼'."
+    }
+  },
+  {
+    "unit_id": "defannot-u70-245",
+    "def": "*U70",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "53 uniform 5-vertex LWPOLYLINEs on the X-평면도(기본형)$0$INSUL sublayer: insulation batting/hatch (material indication), co-located with walls but containing no wall boundary lines.",
+    "rationale": {
+      "evidence": "Every one of the 53 entities is an LWPOLYLINE with vertices=5 on the single layer X-평면도(기본형)$0$INSUL (sampled handles begin at 3DBC). The dxf histogram is 100% LWPOLYLINE with zero LINE/INSERT/HATCH, the LINE-based bbox is not derivable, and the vertex count is uniform — the signature of a repeated insulation-batting/fill motif, not distinct architectural linework.",
+      "rule": "A block made entirely of many uniform low-vertex LWPOLYLINEs on a dedicated insulation ('INSUL') sublayer is material hatch/batting: insulation is a wall component and therefore co-locates with walls, but the hatch geometry itself is not a wall boundary line, which is authored on a separate wall/structure layer.",
+      "counterfactual": "If these polylines instead formed wall-thickness rectangles on a wall/structure sublayer, or if long paired parallel LINE edges ~100-200mm apart were present, wall_likelihood would rise and those specific handles would be reported in wall_line_handles.",
+      "uncertainty": "The projection exposes no vertex coordinates, so batting-zigzag vs small-rectangle geometry cannot be confirmed and the exact wall each run hugs is unknown; a stricter taxonomy that reserves '평면 부분도' for composed plan geometry (walls/rooms) would instead file pure material hatch under '기타'."
+    }
+  },
+  {
+    "unit_id": "defannot-u71-246",
+    "def": "*U71",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "41 uniform 5-vertex LWPOLYLINEs on the X-평면도(기본형)$0$INSUL sublayer: insulation batting/hatch (material indication), co-located with walls but containing no wall boundary lines.",
+    "rationale": {
+      "evidence": "Every one of the 41 entities is an LWPOLYLINE with vertices=5 on the single layer X-평면도(기본형)$0$INSUL (sampled handles begin at 3DF6). The dxf histogram is 100% LWPOLYLINE with zero LINE/INSERT/HATCH, the LINE-based bbox is not derivable, and the vertex count is uniform — the signature of a repeated insulation-batting/fill motif, not distinct architectural linework.",
+      "rule": "A block made entirely of many uniform low-vertex LWPOLYLINEs on a dedicated insulation ('INSUL') sublayer is material hatch/batting: insulation is a wall component and therefore co-locates with walls, but the hatch geometry itself is not a wall boundary line, which is authored on a separate wall/structure layer.",
+      "counterfactual": "If these polylines instead formed wall-thickness rectangles on a wall/structure sublayer, or if long paired parallel LINE edges ~100-200mm apart were present, wall_likelihood would rise and those specific handles would be reported in wall_line_handles.",
+      "uncertainty": "The projection exposes no vertex coordinates, so batting-zigzag vs small-rectangle geometry cannot be confirmed and the exact wall each run hugs is unknown; a stricter taxonomy that reserves '평면 부분도' for composed plan geometry (walls/rooms) would instead file pure material hatch under '기타'."
+    }
+  },
+  {
+    "unit_id": "defannot-u72-247",
+    "def": "*U72",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "15 uniform 5-vertex LWPOLYLINEs on the X-평면도(기본형)$0$INSUL sublayer: insulation batting/hatch (material indication), co-located with walls but containing no wall boundary lines.",
+    "rationale": {
+      "evidence": "Every one of the 15 entities is an LWPOLYLINE with vertices=5 on the single layer X-평면도(기본형)$0$INSUL (sampled handles begin at 3E24). The dxf histogram is 100% LWPOLYLINE with zero LINE/INSERT/HATCH, the LINE-based bbox is not derivable, and the vertex count is uniform — the signature of a repeated insulation-batting/fill motif, not distinct architectural linework.",
+      "rule": "A block made entirely of many uniform low-vertex LWPOLYLINEs on a dedicated insulation ('INSUL') sublayer is material hatch/batting: insulation is a wall component and therefore co-locates with walls, but the hatch geometry itself is not a wall boundary line, which is authored on a separate wall/structure layer.",
+      "counterfactual": "If these polylines instead formed wall-thickness rectangles on a wall/structure sublayer, or if long paired parallel LINE edges ~100-200mm apart were present, wall_likelihood would rise and those specific handles would be reported in wall_line_handles.",
+      "uncertainty": "The projection exposes no vertex coordinates, so batting-zigzag vs small-rectangle geometry cannot be confirmed and the exact wall each run hugs is unknown; a stricter taxonomy that reserves '평면 부분도' for composed plan geometry (walls/rooms) would instead file pure material hatch under '기타'."
+    }
+  },
+  {
+    "unit_id": "defannot-u73-248",
+    "def": "*U73",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Masked marker box: WIPEOUT x2 + nested 국기계양대(flagpole-stand) INSERT + 20 LINEs forming a ~1820mm-wide, ~126-unit-tall bordered frame; an annotation/symbol overlay, not a wall.",
+    "rationale": {
+      "evidence": "The block mixes 2 WIPEOUT masks (handles 3E38,3E39), 20 LINEs that trace a thin bordered frame with end mounting-tabs (bbox [-910, -103.5, 0, 910, 22.5, 0]: width ~1820, height ~126), and 1 nested INSERT (handle 3E3A) of block 'X-평면도(기본형)$0$국기계양대' (flagpole stand). WIPEOUT masking plus a nested named symbol is the hallmark of an overlay marker, and the inner frame gap is only ~50 units — far thinner than a structural wall.",
+      "rule": "A block that carries WIPEOUT masks and a nested named symbol inside a thin, fixed-height / variable-width bordered frame is a symbol/label marker rather than architectural wall geometry; genuine wall boundary lines never carry wipeouts.",
+      "counterfactual": "Remove the WIPEOUTs and the nested symbol, and make the two long parallel edges ~100-200mm apart on a wall layer, and the frame would instead read as a wall/parapet, pushing wall_likelihood up and populating wall_line_handles.",
+      "uncertainty": "Metadata cannot confirm whether the depicted 국기계양대 sits on a real parapet/handrail; even if it does, the ~50-unit edge spacing is too thin for a structural wall, and the block could alternatively be tagged '가구'/'기타' as a fixture rather than '심볼'."
+    }
+  },
+  {
+    "unit_id": "defannot-u74-249",
+    "def": "*U74",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "8 uniform 5-vertex LWPOLYLINEs on the X-평면도(기본형)$0$INSUL sublayer: insulation batting/hatch (material indication), co-located with walls but containing no wall boundary lines.",
+    "rationale": {
+      "evidence": "Every one of the 8 entities is an LWPOLYLINE with vertices=5 on the single layer X-평면도(기본형)$0$INSUL (sampled handles begin at 3E54). The dxf histogram is 100% LWPOLYLINE with zero LINE/INSERT/HATCH, the LINE-based bbox is not derivable, and the vertex count is uniform — the signature of a repeated insulation-batting/fill motif, not distinct architectural linework.",
+      "rule": "A block made entirely of many uniform low-vertex LWPOLYLINEs on a dedicated insulation ('INSUL') sublayer is material hatch/batting: insulation is a wall component and therefore co-locates with walls, but the hatch geometry itself is not a wall boundary line, which is authored on a separate wall/structure layer.",
+      "counterfactual": "If these polylines instead formed wall-thickness rectangles on a wall/structure sublayer, or if long paired parallel LINE edges ~100-200mm apart were present, wall_likelihood would rise and those specific handles would be reported in wall_line_handles.",
+      "uncertainty": "The projection exposes no vertex coordinates, so batting-zigzag vs small-rectangle geometry cannot be confirmed and the exact wall each run hugs is unknown; a stricter taxonomy that reserves '평면 부분도' for composed plan geometry (walls/rooms) would instead file pure material hatch under '기타'."
+    }
+  },
+  {
+    "unit_id": "defannot-u75-250",
+    "def": "*U75",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Masked marker box: WIPEOUT x2 + nested 국기계양대(flagpole-stand) INSERT + 20 LINEs forming a ~3920mm-wide, ~126-unit-tall bordered frame; an annotation/symbol overlay, not a wall.",
+    "rationale": {
+      "evidence": "The block mixes 2 WIPEOUT masks (handles 3E61,3E62), 20 LINEs that trace a thin bordered frame with end mounting-tabs (bbox [-1960, -103.5, 0, 1960, 22.5, 0]: width ~3920, height ~126), and 1 nested INSERT (handle 3E63) of block 'X-평면도(기본형)$0$국기계양대' (flagpole stand). WIPEOUT masking plus a nested named symbol is the hallmark of an overlay marker, and the inner frame gap is only ~50 units — far thinner than a structural wall.",
+      "rule": "A block that carries WIPEOUT masks and a nested named symbol inside a thin, fixed-height / variable-width bordered frame is a symbol/label marker rather than architectural wall geometry; genuine wall boundary lines never carry wipeouts.",
+      "counterfactual": "Remove the WIPEOUTs and the nested symbol, and make the two long parallel edges ~100-200mm apart on a wall layer, and the frame would instead read as a wall/parapet, pushing wall_likelihood up and populating wall_line_handles.",
+      "uncertainty": "Metadata cannot confirm whether the depicted 국기계양대 sits on a real parapet/handrail; even if it does, the ~50-unit edge spacing is too thin for a structural wall, and the block could alternatively be tagged '가구'/'기타' as a fixture rather than '심볼'."
+    }
+  },
+  {
+    "unit_id": "defannot-u76-251",
+    "def": "*U76",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "Masked marker box: WIPEOUT x2 + nested 국기계양대(flagpole-stand) INSERT + 20 LINEs forming a ~2420mm-wide, ~126-unit-tall bordered frame; an annotation/symbol overlay, not a wall.",
+    "rationale": {
+      "evidence": "The block mixes 2 WIPEOUT masks (handles 3E7D,3E7E), 20 LINEs that trace a thin bordered frame with end mounting-tabs (bbox [-1210, -103.5, 0, 1210, 22.5, 0]: width ~2420, height ~126), and 1 nested INSERT (handle 3E7F) of block 'X-평면도(기본형)$0$국기계양대' (flagpole stand). WIPEOUT masking plus a nested named symbol is the hallmark of an overlay marker, and the inner frame gap is only ~50 units — far thinner than a structural wall.",
+      "rule": "A block that carries WIPEOUT masks and a nested named symbol inside a thin, fixed-height / variable-width bordered frame is a symbol/label marker rather than architectural wall geometry; genuine wall boundary lines never carry wipeouts.",
+      "counterfactual": "Remove the WIPEOUTs and the nested symbol, and make the two long parallel edges ~100-200mm apart on a wall layer, and the frame would instead read as a wall/parapet, pushing wall_likelihood up and populating wall_line_handles.",
+      "uncertainty": "Metadata cannot confirm whether the depicted 국기계양대 sits on a real parapet/handrail; even if it does, the ~50-unit edge spacing is too thin for a structural wall, and the block could alternatively be tagged '가구'/'기타' as a fixture rather than '심볼'."
+    }
+  },
+  {
+    "unit_id": "defannot-u77-252",
+    "def": "*U77",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "42 uniform 5-vertex LWPOLYLINEs on the X-평면도(기본형)$0$INSUL sublayer: insulation batting/hatch (material indication), co-located with walls but containing no wall boundary lines.",
+    "rationale": {
+      "evidence": "Every one of the 42 entities is an LWPOLYLINE with vertices=5 on the single layer X-평면도(기본형)$0$INSUL (sampled handles begin at 3E99). The dxf histogram is 100% LWPOLYLINE with zero LINE/INSERT/HATCH, the LINE-based bbox is not derivable, and the vertex count is uniform — the signature of a repeated insulation-batting/fill motif, not distinct architectural linework.",
+      "rule": "A block made entirely of many uniform low-vertex LWPOLYLINEs on a dedicated insulation ('INSUL') sublayer is material hatch/batting: insulation is a wall component and therefore co-locates with walls, but the hatch geometry itself is not a wall boundary line, which is authored on a separate wall/structure layer.",
+      "counterfactual": "If these polylines instead formed wall-thickness rectangles on a wall/structure sublayer, or if long paired parallel LINE edges ~100-200mm apart were present, wall_likelihood would rise and those specific handles would be reported in wall_line_handles.",
+      "uncertainty": "The projection exposes no vertex coordinates, so batting-zigzag vs small-rectangle geometry cannot be confirmed and the exact wall each run hugs is unknown; a stricter taxonomy that reserves '평면 부분도' for composed plan geometry (walls/rooms) would instead file pure material hatch under '기타'."
+    }
+  },
+  {
+    "unit_id": "defannot-u79-253",
+    "def": "*U79",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "33 uniform 5-vertex LWPOLYLINEs on the X-평면도(기본형)$0$INSUL sublayer: insulation batting/hatch (material indication), co-located with walls but containing no wall boundary lines.",
+    "rationale": {
+      "evidence": "Every one of the 33 entities is an LWPOLYLINE with vertices=5 on the single layer X-평면도(기본형)$0$INSUL (sampled handles begin at 3F00). The dxf histogram is 100% LWPOLYLINE with zero LINE/INSERT/HATCH, the LINE-based bbox is not derivable, and the vertex count is uniform — the signature of a repeated insulation-batting/fill motif, not distinct architectural linework.",
+      "rule": "A block made entirely of many uniform low-vertex LWPOLYLINEs on a dedicated insulation ('INSUL') sublayer is material hatch/batting: insulation is a wall component and therefore co-locates with walls, but the hatch geometry itself is not a wall boundary line, which is authored on a separate wall/structure layer.",
+      "counterfactual": "If these polylines instead formed wall-thickness rectangles on a wall/structure sublayer, or if long paired parallel LINE edges ~100-200mm apart were present, wall_likelihood would rise and those specific handles would be reported in wall_line_handles.",
+      "uncertainty": "The projection exposes no vertex coordinates, so batting-zigzag vs small-rectangle geometry cannot be confirmed and the exact wall each run hugs is unknown; a stricter taxonomy that reserves '평면 부분도' for composed plan geometry (walls/rooms) would instead file pure material hatch under '기타'."
+    }
+  },
+  {
+    "unit_id": "defannot-u81-254",
+    "def": "*U81",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "39 uniform 5-vertex LWPOLYLINEs on the X-평면도(기본형)$0$INSUL sublayer: insulation batting/hatch (material indication), co-located with walls but containing no wall boundary lines.",
+    "rationale": {
+      "evidence": "Every one of the 39 entities is an LWPOLYLINE with vertices=5 on the single layer X-평면도(기본형)$0$INSUL (sampled handles begin at 3F5E). The dxf histogram is 100% LWPOLYLINE with zero LINE/INSERT/HATCH, the LINE-based bbox is not derivable, and the vertex count is uniform — the signature of a repeated insulation-batting/fill motif, not distinct architectural linework.",
+      "rule": "A block made entirely of many uniform low-vertex LWPOLYLINEs on a dedicated insulation ('INSUL') sublayer is material hatch/batting: insulation is a wall component and therefore co-locates with walls, but the hatch geometry itself is not a wall boundary line, which is authored on a separate wall/structure layer.",
+      "counterfactual": "If these polylines instead formed wall-thickness rectangles on a wall/structure sublayer, or if long paired parallel LINE edges ~100-200mm apart were present, wall_likelihood would rise and those specific handles would be reported in wall_line_handles.",
+      "uncertainty": "The projection exposes no vertex coordinates, so batting-zigzag vs small-rectangle geometry cannot be confirmed and the exact wall each run hugs is unknown; a stricter taxonomy that reserves '평면 부분도' for composed plan geometry (walls/rooms) would instead file pure material hatch under '기타'."
+    }
+  },
+  {
+    "unit_id": "defannot-u82-255",
+    "def": "*U82",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "19 uniform 5-vertex LWPOLYLINEs on the X-평면도(기본형)$0$INSUL sublayer: insulation batting/hatch (material indication), co-located with walls but containing no wall boundary lines.",
+    "rationale": {
+      "evidence": "Every one of the 19 entities is an LWPOLYLINE with vertices=5 on the single layer X-평면도(기본형)$0$INSUL (sampled handles begin at 3F8A). The dxf histogram is 100% LWPOLYLINE with zero LINE/INSERT/HATCH, the LINE-based bbox is not derivable, and the vertex count is uniform — the signature of a repeated insulation-batting/fill motif, not distinct architectural linework.",
+      "rule": "A block made entirely of many uniform low-vertex LWPOLYLINEs on a dedicated insulation ('INSUL') sublayer is material hatch/batting: insulation is a wall component and therefore co-locates with walls, but the hatch geometry itself is not a wall boundary line, which is authored on a separate wall/structure layer.",
+      "counterfactual": "If these polylines instead formed wall-thickness rectangles on a wall/structure sublayer, or if long paired parallel LINE edges ~100-200mm apart were present, wall_likelihood would rise and those specific handles would be reported in wall_line_handles.",
+      "uncertainty": "The projection exposes no vertex coordinates, so batting-zigzag vs small-rectangle geometry cannot be confirmed and the exact wall each run hugs is unknown; a stricter taxonomy that reserves '평면 부분도' for composed plan geometry (walls/rooms) would instead file pure material hatch under '기타'."
+    }
+  },
+  {
+    "unit_id": "defannot-u83-256",
+    "def": "*U83",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "9 uniform 5-vertex LWPOLYLINEs on the X-평면도(기본형)$0$INSUL sublayer: insulation batting/hatch (material indication), co-located with walls but containing no wall boundary lines.",
+    "rationale": {
+      "evidence": "Every one of the 9 entities is an LWPOLYLINE with vertices=5 on the single layer X-평면도(기본형)$0$INSUL (sampled handles begin at 3FA2). The dxf histogram is 100% LWPOLYLINE with zero LINE/INSERT/HATCH, the LINE-based bbox is not derivable, and the vertex count is uniform — the signature of a repeated insulation-batting/fill motif, not distinct architectural linework.",
+      "rule": "A block made entirely of many uniform low-vertex LWPOLYLINEs on a dedicated insulation ('INSUL') sublayer is material hatch/batting: insulation is a wall component and therefore co-locates with walls, but the hatch geometry itself is not a wall boundary line, which is authored on a separate wall/structure layer.",
+      "counterfactual": "If these polylines instead formed wall-thickness rectangles on a wall/structure sublayer, or if long paired parallel LINE edges ~100-200mm apart were present, wall_likelihood would rise and those specific handles would be reported in wall_line_handles.",
+      "uncertainty": "The projection exposes no vertex coordinates, so batting-zigzag vs small-rectangle geometry cannot be confirmed and the exact wall each run hugs is unknown; a stricter taxonomy that reserves '평면 부분도' for composed plan geometry (walls/rooms) would instead file pure material hatch under '기타'."
+    }
+  },
+  {
+    "unit_id": "defannot-u84-257",
+    "def": "*U84",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "71 uniform 5-vertex LWPOLYLINEs on the X-평면도(기본형)$0$INSUL sublayer: insulation batting/hatch (material indication), co-located with walls but containing no wall boundary lines.",
+    "rationale": {
+      "evidence": "Every one of the 71 entities is an LWPOLYLINE with vertices=5 on the single layer X-평면도(기본형)$0$INSUL (sampled handles begin at 3FB0). The dxf histogram is 100% LWPOLYLINE with zero LINE/INSERT/HATCH, the LINE-based bbox is not derivable, and the vertex count is uniform — the signature of a repeated insulation-batting/fill motif, not distinct architectural linework.",
+      "rule": "A block made entirely of many uniform low-vertex LWPOLYLINEs on a dedicated insulation ('INSUL') sublayer is material hatch/batting: insulation is a wall component and therefore co-locates with walls, but the hatch geometry itself is not a wall boundary line, which is authored on a separate wall/structure layer.",
+      "counterfactual": "If these polylines instead formed wall-thickness rectangles on a wall/structure sublayer, or if long paired parallel LINE edges ~100-200mm apart were present, wall_likelihood would rise and those specific handles would be reported in wall_line_handles.",
+      "uncertainty": "The projection exposes no vertex coordinates, so batting-zigzag vs small-rectangle geometry cannot be confirmed and the exact wall each run hugs is unknown; a stricter taxonomy that reserves '평면 부분도' for composed plan geometry (walls/rooms) would instead file pure material hatch under '기타'."
+    }
+  },
+  {
+    "unit_id": "defannot-u85-258",
+    "def": "*U85",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "18 uniform 5-vertex LWPOLYLINEs on the X-평면도(기본형)$0$INSUL sublayer: insulation batting/hatch (material indication), co-located with walls but containing no wall boundary lines.",
+    "rationale": {
+      "evidence": "Every one of the 18 entities is an LWPOLYLINE with vertices=5 on the single layer X-평면도(기본형)$0$INSUL (sampled handles begin at 3FFC). The dxf histogram is 100% LWPOLYLINE with zero LINE/INSERT/HATCH, the LINE-based bbox is not derivable, and the vertex count is uniform — the signature of a repeated insulation-batting/fill motif, not distinct architectural linework.",
+      "rule": "A block made entirely of many uniform low-vertex LWPOLYLINEs on a dedicated insulation ('INSUL') sublayer is material hatch/batting: insulation is a wall component and therefore co-locates with walls, but the hatch geometry itself is not a wall boundary line, which is authored on a separate wall/structure layer.",
+      "counterfactual": "If these polylines instead formed wall-thickness rectangles on a wall/structure sublayer, or if long paired parallel LINE edges ~100-200mm apart were present, wall_likelihood would rise and those specific handles would be reported in wall_line_handles.",
+      "uncertainty": "The projection exposes no vertex coordinates, so batting-zigzag vs small-rectangle geometry cannot be confirmed and the exact wall each run hugs is unknown; a stricter taxonomy that reserves '평면 부분도' for composed plan geometry (walls/rooms) would instead file pure material hatch under '기타'."
+    }
+  },
+  {
+    "unit_id": "defannot-u86-259",
+    "def": "*U86",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "16 uniform 5-vertex LWPOLYLINEs on the X-평면도(기본형)$0$INSUL sublayer: insulation batting/hatch (material indication), co-located with walls but containing no wall boundary lines.",
+    "rationale": {
+      "evidence": "Every one of the 16 entities is an LWPOLYLINE with vertices=5 on the single layer X-평면도(기본형)$0$INSUL (sampled handles begin at 4013). The dxf histogram is 100% LWPOLYLINE with zero LINE/INSERT/HATCH, the LINE-based bbox is not derivable, and the vertex count is uniform — the signature of a repeated insulation-batting/fill motif, not distinct architectural linework.",
+      "rule": "A block made entirely of many uniform low-vertex LWPOLYLINEs on a dedicated insulation ('INSUL') sublayer is material hatch/batting: insulation is a wall component and therefore co-locates with walls, but the hatch geometry itself is not a wall boundary line, which is authored on a separate wall/structure layer.",
+      "counterfactual": "If these polylines instead formed wall-thickness rectangles on a wall/structure sublayer, or if long paired parallel LINE edges ~100-200mm apart were present, wall_likelihood would rise and those specific handles would be reported in wall_line_handles.",
+      "uncertainty": "The projection exposes no vertex coordinates, so batting-zigzag vs small-rectangle geometry cannot be confirmed and the exact wall each run hugs is unknown; a stricter taxonomy that reserves '평면 부분도' for composed plan geometry (walls/rooms) would instead file pure material hatch under '기타'."
+    }
+  },
+  {
+    "unit_id": "defannot-u87-260",
+    "def": "*U87",
+    "role": "평면 부분도",
+    "wall_likelihood": 0.25,
+    "wall_line_handles": [],
+    "notes": "68 uniform 5-vertex LWPOLYLINEs on the X-평면도(기본형)$0$INSUL sublayer: insulation batting/hatch (material indication), co-located with walls but containing no wall boundary lines.",
+    "rationale": {
+      "evidence": "Every one of the 68 entities is an LWPOLYLINE with vertices=5 on the single layer X-평면도(기본형)$0$INSUL (sampled handles begin at 4028). The dxf histogram is 100% LWPOLYLINE with zero LINE/INSERT/HATCH, the LINE-based bbox is not derivable, and the vertex count is uniform — the signature of a repeated insulation-batting/fill motif, not distinct architectural linework.",
+      "rule": "A block made entirely of many uniform low-vertex LWPOLYLINEs on a dedicated insulation ('INSUL') sublayer is material hatch/batting: insulation is a wall component and therefore co-locates with walls, but the hatch geometry itself is not a wall boundary line, which is authored on a separate wall/structure layer.",
+      "counterfactual": "If these polylines instead formed wall-thickness rectangles on a wall/structure sublayer, or if long paired parallel LINE edges ~100-200mm apart were present, wall_likelihood would rise and those specific handles would be reported in wall_line_handles.",
+      "uncertainty": "The projection exposes no vertex coordinates, so batting-zigzag vs small-rectangle geometry cannot be confirmed and the exact wall each run hugs is unknown; a stricter taxonomy that reserves '평면 부분도' for composed plan geometry (walls/rooms) would instead file pure material hatch under '기타'."
+    }
+  }
+]

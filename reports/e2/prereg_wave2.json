@@ -1,0 +1,36 @@
+{
+  "prereg": "e2.wave2.v1",
+  "sealed_at": "2026-07-18",
+  "sealed_before": "any S6 learning-ladder evaluation run (feature extraction and training-code authoring are not evaluations)",
+  "eval_pack": "WSD_EVAL_v1.manifest.json (frozen @4d42948) - any drift = new pack version, results non-comparable",
+  "bands": {
+    "W2-B1_classical_beats_detector": {
+      "metric": "per-handle F1 of GBDT (and logistic reported) vs detector v1 F1, threshold 0.5, on held-out drawings (deterministic 70/30 split by drawing id, seed 7) per tier F and M; S reported (detector already 1.0/1.0)",
+      "pass": "GBDT F1 >= detector F1 on the same held-out drawings for BOTH F and M tiers",
+      "note": "ladder rule G3: a rung must beat the rung below on the frozen pack to earn its place"
+    },
+    "W2-B2_nameblind_gap": {
+      "metric": "full-features GBDT F1 minus name-blind GBDT F1 (layer feature removed) on the same held-out split",
+      "pass": null,
+      "note": "REPORT_ONLY - measures how much of the learned skill is reading names vs geometry (tautology risk); synth layers are generator-assigned so a large gap flags name leakage in the generator"
+    },
+    "W2-B3_anti_silver_control": {
+      "metric": "GBDT trained on label-permuted training data (seed 7), test ROC-AUC on true labels",
+      "pass": "AUC <= 0.55",
+      "note": "sanity: pipeline must NOT extract signal from permuted labels; failure = leakage in features/split"
+    },
+    "W2-B4_pu_learning": {
+      "metric": "S6-2 PU (silver positives + unlabeled) evaluated against synth truth per-handle",
+      "pass": null,
+      "note": "REPORT_ONLY in W2 - exploratory; graduates to banded in W3 if promising"
+    }
+  },
+  "independence_audit": "w2_independence_audit_v1.json recorded BEFORE these experiments; silver counts as ~2 independent families, not 5 judges",
+  "constraints": [
+    "no human labels",
+    "originals READ-ONLY (staged copies only)",
+    "no fake PASS - failed bands reported as FAIL with evidence",
+    "name-blind twin arm mandatory on every learned model",
+    "compute: local only in W2 (no DGX, no paid APIs)"
+  ]
+}

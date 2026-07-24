@@ -1,0 +1,171 @@
+{
+  "schema": "ariadne.roundtrip_runs_index.v1",
+  "generated_from": "D:\\dev\\99_tools\\autocad-sdk-router\\runs",
+  "runs": [
+    {
+      "run_dir": "e2e_1dwg_R3b_full_20260708",
+      "source_dwg": "D:\\dev\\.build\\1.dwg",
+      "original_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+      "status": "ok",
+      "regen": {
+        "op_count": 14449,
+        "apply_status": "ok"
+      },
+      "verdict_totals": {
+        "regen_attempted_count": 375,
+        "diff0_count": 375,
+        "modified_count": 0,
+        "removed_count": 0,
+        "added_count": 0
+      },
+      "staged_at": "2026-07-08T12:04:02.102662+00:00",
+      "parse_error": null
+    },
+    {
+      "run_dir": "e2e_1dwg_R3_full_20260708",
+      "source_dwg": "D:\\dev\\.build\\1.dwg",
+      "original_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+      "status": "blocked",
+      "regen": {
+        "op_count": 0,
+        "apply_status": "blocked"
+      },
+      "verdict_totals": null,
+      "staged_at": "2026-07-08T11:40:01.078343+00:00",
+      "parse_error": null
+    },
+    {
+      "run_dir": "e2e_1dwg_R1c_batched_20260708",
+      "source_dwg": "D:\\dev\\.build\\1.dwg",
+      "original_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+      "status": "blocked",
+      "regen": {
+        "op_count": 17,
+        "apply_status": "ok"
+      },
+      "verdict_totals": {
+        "regen_attempted_count": 16,
+        "diff0_count": 14,
+        "modified_count": 0,
+        "removed_count": 2,
+        "added_count": 0
+      },
+      "staged_at": "2026-07-08T11:35:08.394489+00:00",
+      "parse_error": null
+    },
+    {
+      "run_dir": "e2e_1dwg_R1c_perop_20260708",
+      "source_dwg": "D:\\dev\\.build\\1.dwg",
+      "original_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+      "status": "blocked",
+      "regen": {
+        "op_count": 17,
+        "apply_status": "ok"
+      },
+      "verdict_totals": {
+        "regen_attempted_count": 16,
+        "diff0_count": 14,
+        "modified_count": 0,
+        "removed_count": 2,
+        "added_count": 0
+      },
+      "staged_at": "2026-07-08T11:27:18.592115+00:00",
+      "parse_error": null
+    },
+    {
+      "run_dir": "e2e_1dwg_R2_20260708",
+      "source_dwg": "D:\\dev\\.build\\1.dwg",
+      "original_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+      "status": "blocked",
+      "regen": {
+        "op_count": 560,
+        "apply_status": "ok"
+      },
+      "verdict_totals": {
+        "regen_attempted_count": 375,
+        "diff0_count": 374,
+        "modified_count": 0,
+        "removed_count": 1,
+        "added_count": 0
+      },
+      "staged_at": "2026-07-08T09:23:39.173003+00:00",
+      "parse_error": null
+    },
+    {
+      "run_dir": "e2e_1dwg_R1b2_20260708",
+      "source_dwg": "D:\\dev\\.build\\1.dwg",
+      "original_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+      "status": "blocked",
+      "regen": {
+        "op_count": 17,
+        "apply_status": "ok"
+      },
+      "verdict_totals": {
+        "regen_attempted_count": 16,
+        "diff0_count": 14,
+        "modified_count": 0,
+        "removed_count": 2,
+        "added_count": 0
+      },
+      "staged_at": "2026-07-08T09:14:07.055151+00:00",
+      "parse_error": null
+    },
+    {
+      "run_dir": "e2e_1dwg_R1a_20260708",
+      "source_dwg": "D:\\dev\\.build\\1.dwg",
+      "original_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+      "status": "mismatch",
+      "regen": {
+        "op_count": 9,
+        "apply_status": "ok"
+      },
+      "verdict_totals": {
+        "regen_attempted_count": 9,
+        "diff0_count": 9,
+        "modified_count": 0,
+        "removed_count": 0,
+        "added_count": 0
+      },
+      "staged_at": "2026-07-08T08:52:15.884762+00:00",
+      "parse_error": null
+    },
+    {
+      "run_dir": "capstone_composed_20260706",
+      "source_dwg": "D:\\dev\\99_tools\\autocad-sdk-router\\tests\\fixtures\\native_sample.dwg",
+      "original_sha256": "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+      "status": "ok",
+      "regen": {
+        "op_count": 221,
+        "apply_status": "ok"
+      },
+      "verdict_totals": {
+        "regen_attempted_count": 7,
+        "diff0_count": 7,
+        "modified_count": 0,
+        "removed_count": 0,
+        "added_count": 0
+      },
+      "staged_at": "2026-07-06T03:08:14.153246+00:00",
+      "parse_error": null
+    },
+    {
+      "run_dir": "capstone_final_20260706_062040",
+      "source_dwg": "D:\\dev\\99_tools\\autocad-sdk-router\\tests\\fixtures\\native_sample.dwg",
+      "original_sha256": "eac5d4b13d67d89106e503321412539df7b39b8a7f4e44c033448e9295fe3f76",
+      "status": "ok",
+      "regen": {
+        "op_count": 14,
+        "apply_status": "ok"
+      },
+      "verdict_totals": {
+        "regen_attempted_count": 14,
+        "diff0_count": 10,
+        "modified_count": 0,
+        "removed_count": 4,
+        "added_count": 2
+      },
+      "staged_at": "2026-07-05T21:20:40.575355+00:00",
+      "parse_error": null
+    }
+  ]
+}

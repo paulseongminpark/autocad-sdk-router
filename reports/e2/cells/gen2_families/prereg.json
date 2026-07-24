@@ -1,0 +1,90 @@
+{
+  "schema": "e2.gen2-families.prereg.v1",
+  "cell": "gen2_families",
+  "sealed_utc": "2026-07-18T18:28:37.8836210Z",
+  "sealed_before_generation": true,
+  "packet": {
+    "path": "D:\\runs\\e2_program\\build\\PACKET_gen2_families.md",
+    "sha256": "b44be950a1237dfc4cb863021ac5a26bb6472c4fe82d718738ad86f7f00d5c06"
+  },
+  "blocked_screen_input": {
+    "path": "D:\\runs\\e2_program\\cells\\gnn_e2_screen\\REPORT.md",
+    "sha256": "75d73f658032fdda87824eaa687ecf4bec6e1a7e46940051cb19f1872f8e4c42",
+    "recorded_blocker": "one canonical w01-w08 core template family; family-disjoint split unavailable"
+  },
+  "governance": {
+    "calibration_p3_section": "6.1",
+    "calibration_p3_sha256": "6641dd63044ad22b94d6c2a61baf85f86ca4c9191745659171e8a806864c294d",
+    "prereg_r2_v1_sha256": "fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2",
+    "amendment1_sha256": "30f752db803f7f589d1a8d1f1a2d8557364ae2d624f76a639533161f552b8283",
+    "amendment2_sha256": "6e29bbd5f8c502a1bc36277a535521c117408b2460e80511907d610321dd442a",
+    "family_fold_rule": "Each synthetic template and every parameter or seed variant remains in one fold.",
+    "outcome_dependent_changes_allowed": false
+  },
+  "read_only_sources": {
+    "gen2.py": "a8c2468b696b9271610e38bd87cec1402e9153bc464a5d9cf1429595f26dab55",
+    "fidelity_stats.py": "00acec150c65d05a82641d1ab0ac0466cd68e4a424670dd849c3211b2f3c96df",
+    "grammar.py": "68c435a20fa352333ce8038ba612353f2a85efff368290cec8b04d5048f8ad54",
+    "fidelity_full_run_cell.py": "d19564e053fe9c665301b209d400cd051859ab6e4d5c20945c1e572297346940",
+    "graph_builder.py": "c95d4a30d30e0db157fe56102053a7884902b7749464f7f4cb8852c0819321f6",
+    "frozen_graph_config_digest": "56911f4633979a3fe00fd56be2d0a39ac06757ed255ed49ed18ca20ba9d4ac49",
+    "existing_single_family_manifest_sha256": "115fe18acaba7c474319cca86b004a7b90e5ba6d0e4dc03ec9eae44c25241c28"
+  },
+  "design": {
+    "family_count_k": 8,
+    "drawings_per_family": 25,
+    "total_drawings": 200,
+    "tiers": ["S", "F", "M"],
+    "tier_allocation": "For family ordinal f in [0,7] and local drawing ordinal i in [0,24], tier = [S,F,M][(f+i) mod 3].",
+    "base_seed": 20260719,
+    "seed_rule": "base_seed + family_ordinal*1000000 + gen2.TIER_SEED_OFFSETS[tier] + local_ordinal",
+    "entity_target_count": 1400,
+    "reference_parallel_pairs": 600,
+    "family_specs": [
+      {"family_id": "F01", "name": "compact_five_room_spine", "grammar_seed": 101, "n_rooms": 5, "extent_mm": [7600, 5400], "outer_thickness_mm": 260, "inner_thickness_cycle_mm": [120, 160, 200], "oblique_inner_ordinals": [], "opening_wall_ids": ["w05"]},
+      {"family_id": "F02", "name": "six_room_offset_cross", "grammar_seed": 211, "n_rooms": 6, "extent_mm": [8400, 6200], "outer_thickness_mm": 300, "inner_thickness_cycle_mm": [100, 180, 220], "oblique_inner_ordinals": [2], "opening_wall_ids": ["w06", "w03"]},
+      {"family_id": "F03", "name": "seven_room_diagonal_branch", "grammar_seed": 307, "n_rooms": 7, "extent_mm": [9200, 6500], "outer_thickness_mm": 280, "inner_thickness_cycle_mm": [110, 170, 240], "oblique_inner_ordinals": [1, 3], "opening_wall_ids": ["w05", "w08"]},
+      {"family_id": "F04", "name": "eight_room_longitudinal_bays", "grammar_seed": 419, "n_rooms": 8, "extent_mm": [10400, 5800], "outer_thickness_mm": 320, "inner_thickness_cycle_mm": [120, 150, 210, 250], "oblique_inner_ordinals": [], "opening_wall_ids": ["w07", "w09", "w02"]},
+      {"family_id": "F05", "name": "nine_room_single_slant_court", "grammar_seed": 523, "n_rooms": 9, "extent_mm": [9800, 7600], "outer_thickness_mm": 340, "inner_thickness_cycle_mm": [100, 140, 190, 230], "oblique_inner_ordinals": [4], "opening_wall_ids": ["w05", "w10"]},
+      {"family_id": "F06", "name": "ten_room_double_slant_grid", "grammar_seed": 631, "n_rooms": 10, "extent_mm": [11200, 7200], "outer_thickness_mm": 360, "inner_thickness_cycle_mm": [110, 160, 200, 260], "oblique_inner_ordinals": [2, 5], "opening_wall_ids": ["w06", "w11", "w04"]},
+      {"family_id": "F07", "name": "eleven_room_fan_branch", "grammar_seed": 743, "n_rooms": 11, "extent_mm": [11800, 8200], "outer_thickness_mm": 380, "inner_thickness_cycle_mm": [120, 170, 220, 280], "oblique_inner_ordinals": [1, 4, 7], "opening_wall_ids": ["w05", "w09", "w12"]},
+      {"family_id": "F08", "name": "twelve_room_mixed_angle_mesh", "grammar_seed": 857, "n_rooms": 12, "extent_mm": [12600, 8800], "outer_thickness_mm": 400, "inner_thickness_cycle_mm": [100, 150, 210, 270, 310], "oblique_inner_ordinals": [2, 5, 7, 8], "opening_wall_ids": ["w06", "w10", "w13", "w03"]}
+    ],
+    "collision_retry_policy": "Before pack generation, compute the sealed core signature for all family designs. If a collision occurs, increment only the later colliding family's grammar_seed by 10000*attempt and rebuild that design; maximum three total attempts. Record every attempt and any remaining collision."
+  },
+  "distinctness": {
+    "signature_method": "For each truth ledger, canonical-SHA256 the ordered w01-w08 rows with fields id, axis, geometry_kind, thickness, thickness_range, variant, exactly matching the blocked GNN screen core audit.",
+    "criterion": "Each family has exactly one invariant core signature across its 25 drawings and all 28 off-diagonal family pairs have different signatures.",
+    "matrix_shape": [8, 8],
+    "required_split": {"train_family_count": 6, "development_family_count": 2, "family_overlap": 0},
+    "maximum_design_attempts": 3
+  },
+  "fidelity_measurement": {
+    "engine": "read-only import of tools/e2/gen2/fidelity_stats.py",
+    "metrics": ["parallel-pair-offset histogram KS", "entity-type total variation"],
+    "scopes": ["pooled 200-drawing pack versus the sealed real aggregates", "each family versus the sealed real aggregates", "pooled new pack versus the existing single-family gen2 pack", "existing single-family pack versus the sealed real aggregates"],
+    "band_adjudication": false,
+    "verdict_output_forbidden": true
+  },
+  "selftest": {
+    "determinism_claim_wording": "All numeric and other nonvolatile truth-ledger fields are identical after same-seed regeneration; volatile runtime and timestamp fields are excluded.",
+    "determinism_scope": "all 200 truth ledgers",
+    "family_id_integrity_scope": "all manifest entries and all 200 truth ledgers",
+    "graph_builder_scope": "one representative drawing from each of the eight families with the frozen GraphConfig"
+  },
+  "resource_caps": {"cpu_hours": 8, "peak_ram_gb": 48, "gpu_required": false},
+  "scope_guards": {
+    "output_root": "D:\\runs\\e2_program\\cells\\gen2_families",
+    "repository_modification": false,
+    "git_operations": false,
+    "original_cad_contact": false,
+    "cubicasa_val_test_contact": false,
+    "existing_output_modification": false,
+    "subagents": false
+  },
+  "evidence_workbook_fallback": {
+    "artifact_tool_dependency_loader_exposed": false,
+    "fallback_artifact": "PREREG.csv",
+    "reason": "The required load_workspace_dependencies capability is not exposed in this executor; amendment2's packet-authorized CSV fallback is used, and no alternate spreadsheet library is used."
+  }
+}

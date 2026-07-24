@@ -1,0 +1,282 @@
+[
+  {
+    "unit_id": "defannot-u197-201",
+    "def": "*U197",
+    "role": "심볼",
+    "wall_likelihood": 0.1,
+    "wall_line_handles": [],
+    "notes": "국기계양대 INSERT + WIPEOUT 2개를 감싸는 1220x126 이중선 테두리 -- 벽체가 아닌 범례/심볼 프레임",
+    "rationale": {
+      "evidence": "LINE 20개가 외곽 X=±610과 내곽 X=±600 사이 10단위 간격의 이중 테두리를 형성하고, 그 안에 'X-평면도(기본형)$0$국기계양대' 블록을 참조하는 INSERT 1개(handle=57AE)와 WIPEOUT 2개(57AC,57AD)가 배치되어 있다. 전체 bbox는 1220x126.5로 얇고 긴 띠 형태이며, WIPEOUT은 심볼 배경을 가리는 용도로 보인다.",
+      "rule": "이름이 명시된 하위 심볼(예: 국기계양대)을 INSERT로 참조하고 WIPEOUT으로 배경을 마스킹하는 얇고 긴 이중선 프레임은 벽체 라인이 아니라 범례/심볼 항목 프레임으로 판단한다.",
+      "counterfactual": "만약 INSERT/WIPEOUT 없이 LINE만으로 건물 외곽 치수에 맞는 두께의 평행 이중선이 반복됐다면 벽체로 재분류했을 것이다.",
+      "uncertainty": "이 투영에는 이 블록이 실제 도면 어디에 몇 번 삽입되는지(범례표 vs 실제 배치)에 대한 정보가 없어 정확한 용도를 완전히 확정할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u199-202",
+    "def": "*U199",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 17개로만 구성된 익명 블록 -- 단열재 해치 패턴의 경계 캐시로 판단됨",
+    "rationale": {
+      "evidence": "entity_count 17개가 전부 LWPOLYLINE이며 단일 레이어 'X-평면도(기본형)$0$INSUL'에 속하고, 모든 폴리라인이 동일하게 vertices=5인 작은 폐곡선이다(handle 5802~5812). LINE 타입이 전혀 없어 bbox도 산출되지 않는다.",
+      "rule": "*U 접두사의 익명 블록이 단일 INSUL 레이어의 동일 정점 수를 가진 다수의 작은 폐곡선 LWPOLYLINE으로만 구성되면, 벽체 자체가 아니라 단열재 해치 패턴의 경계를 저장한 내부 캐시 블록으로 판단한다.",
+      "counterfactual": "만약 이 블록에 LINE 엔티티가 섞여 벽체 두께에 해당하는 평행선 쌍을 형성했다면 벽체 가능성을 높게 재평가했을 것이다.",
+      "uncertainty": "폴리라인의 실제 정점 좌표가 제공되지 않아 이 폐곡선들이 정말 단열재 배팅 형상인지, 다른 해치 패턴인지 형태적으로 직접 확인할 수는 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u200-203",
+    "def": "*U200",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 11개 -- U199와 동일 패턴의 단열재 해치 경계 캐시",
+    "rationale": {
+      "evidence": "entity_count 11개 전부 LWPOLYLINE, 레이어는 단일하게 'X-평면도(기본형)$0$INSUL', handle 5818~5822 범위의 연속된 핸들로 vertices=5 폐곡선이 반복된다. LINE/INSERT 등 다른 엔티티 타입이 전혀 섞여 있지 않다.",
+      "rule": "동일 INSUL 레이어에 균일한 정점 수(5)의 소형 폐곡선 LWPOLYLINE만 반복되는 *U 익명 블록은 벽체가 아니라 단열재 해치 인스턴스의 경계 저장소로 취급한다.",
+      "counterfactual": "폴리라인 수가 훨씬 적고(예: 4개 이하) 큰 사각형 하나로만 이루어졌다면 방/영역 경계선(평면 부분도)일 가능성을 고려했을 것이다.",
+      "uncertainty": "entity_count 11이 벽체 캐비티 하나의 면적에서 온 것인지 여러 개의 짧은 세그먼트가 합쳐진 것인지는 좌표 정보 없이 판단할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u201-204",
+    "def": "*U201",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 7개 -- 소면적 단열재 해치 경계 캐시",
+    "rationale": {
+      "evidence": "entity_count가 7로 이 샤드 내에서 가장 작은 축에 속하며, 전부 LWPOLYLINE, 레이어는 'X-평면도(기본형)$0$INSUL' 하나뿐이고 handle 5828~582E로 연속한다. 모든 폴리라인이 vertices=5로 동일하다.",
+      "rule": "entity_count가 작더라도 레이어/타입/정점수가 다른 INSUL 블록들과 동일한 패턴을 따르면 같은 해치-경계 캐시 계열로 분류하는 것이 일관성 있다.",
+      "counterfactual": "만약 이 7개 폴리라인의 정점 수가 4(단순 사각형)이고 서로 나란히 배열되어 벽 두께를 형성했다면 평면 부분도/벽체로 재고했을 것이다.",
+      "uncertainty": "이 블록이 커버하는 실제 물리적 면적(작은 틈새 캐비티인지 짧은 벽 구간인지)은 좌표가 없어 추정할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u202-205",
+    "def": "*U202",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 12개 -- 동일 계열 단열재 해치 경계 캐시",
+    "rationale": {
+      "evidence": "entity_count 12개 모두 LWPOLYLINE, 단일 레이어 'X-평면도(기본형)$0$INSUL', handle 5834~583F로 연속하며 vertices=5로 균일하다. U199~U202가 handle 순서상 인접해 같은 해치 처리 배치에서 생성된 것으로 보인다.",
+      "rule": "handle 번호가 서로 인접하고 동일한 INSUL 레이어/정점수 패턴을 공유하는 다수의 *U 블록은 같은 도면 작업(해치 적용) 세션에서 일괄 생성된 경계 캐시 군집으로 본다.",
+      "counterfactual": "이 블록의 레이어가 INSUL이 아니라 벽체 전용 레이어(예: A-WALL)였다면 역할과 wall_likelihood를 모두 상향 조정했을 것이다.",
+      "uncertainty": "U199~U202가 동일한 물리적 벽 구간에 속한 여러 해치 조각인지, 서로 다른 방의 독립된 캐비티인지는 이 투영만으로 알 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u232-206",
+    "def": "*U232",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 27개 -- 중간 면적의 단열재 해치 경계 캐시",
+    "rationale": {
+      "evidence": "entity_count 27개 전부 LWPOLYLINE이며 레이어는 'X-평면도(기본형)$0$INSUL' 단일, handle 6CE9~6D03으로 연속하고 vertices=5로 균일하다. U199~U202 그룹과 handle 대역이 크게 떨어져 있어 도면의 다른 구역(별도 벽체 캐비티)에서 생성된 것으로 추정된다.",
+      "rule": "INSUL 레이어에서 폴리라인 개수가 커질수록 해당 해치가 채우는 캐비티/벽 구간의 면적이 크다는 신호로 해석하되, 이는 여전히 벽체 라인 자체가 아니라 채움 패턴임을 유지한다.",
+      "counterfactual": "만약 이 27개 폴리라인이 서로 다른 레이어(예: 0 또는 A-WALL)에 나뉘어 있었다면 복합 조립체(해치+벽체 혼재) 가능성을 열어두고 wall_likelihood를 높였을 것이다.",
+      "uncertainty": "27개라는 개수만으로는 이 블록이 커버하는 실제 벽 길이나 두께를 역산할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u236-207",
+    "def": "*U236",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 61개(샘플 30개 표시) -- 대면적 단열재 해치 경계 캐시",
+    "rationale": {
+      "evidence": "entity_count 61개 모두 LWPOLYLINE, 단일 INSUL 레이어, 샘플로 제공된 30개(handle 7727~7744)가 모두 vertices=5로 균일하다. 개수가 이전 정의들보다 크게 늘어나 더 넓은 캐비티 영역을 채우는 해치로 보인다.",
+      "rule": "샘플이 max 30으로 잘린 경우에도 균일한 레이어/타입/정점수 패턴이 확인되면 전체 entity_count에 대해서도 동일 패턴이 이어진다고 일반화할 수 있다.",
+      "counterfactual": "샘플 30개 중 일부라도 LINE이거나 다른 레이어였다면 이 블록이 순수 해치 캐시가 아니라 혼합 조립체일 가능성을 재검토했을 것이다.",
+      "uncertainty": "샘플에 포함되지 않은 나머지 31개 엔티티의 레이어/타입이 실제로 동일한지는 이 투영만으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u237-208",
+    "def": "*U237",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 23개 -- 동일 계열 단열재 해치 경계 캐시",
+    "rationale": {
+      "evidence": "entity_count 23개 전부 LWPOLYLINE, 레이어는 'X-평면도(기본형)$0$INSUL' 단일, handle 7769~777F로 연속하며 vertices=5로 균일하다. U236(handle 77xx대 시작)과 handle이 인접해 같은 구역의 해치군일 가능성이 있다.",
+      "rule": "동일 handle 대역에 몰려있는 다수의 INSUL 익명 블록은 같은 평면도 구역에서 순차적으로 처리된 해치 인스턴스 묶음으로 해석한다.",
+      "counterfactual": "만약 entity_count가 매우 작고(1~2개) 정점 수가 4인 단순 사각형이었다면 창/개구부 표시 심볼일 가능성도 고려했을 것이다.",
+      "uncertainty": "이 블록과 U236이 동일한 물리적 벽 구간을 나눠 채우는 것인지 서로 다른 독립 캐비티인지는 좌표 데이터 없이 알 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u238-209",
+    "def": "*U238",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 214개(샘플 30개 표시) -- 이 샤드 내 최대 규모의 단열재 해치 경계 캐시",
+    "rationale": {
+      "evidence": "entity_count 214개로 이 샤드에서 가장 크며, 전부 LWPOLYLINE에 단일 INSUL 레이어, 샘플(handle 7785~77A2)이 모두 vertices=5로 균일하다. 매우 큰 개수는 상당히 긴 벽 구간 또는 여러 벽이 이어진 캐비티 전체를 채우는 해치로 추정된다.",
+      "rule": "entity_count가 극단적으로 크더라도(수백 단위) 레이어와 정점수 패턴이 나머지 INSUL 블록군과 동일하면 같은 해치-경계 캐시 범주로 분류를 유지한다.",
+      "counterfactual": "이 블록이 여러 레이어에 걸쳐 있었거나 INSERT로 다른 블록을 참조했다면 단순 해치 캐시가 아니라 복합 조립 유닛으로 재분류했을 것이다.",
+      "uncertainty": "214개 폴리라인이 하나의 연속된 벽 구간에서 온 것인지, 여러 불연속 구간이 하나의 익명 블록으로 병합된 것인지는 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u239-210",
+    "def": "*U239",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 159개(샘플 30개 표시) -- 대면적 단열재 해치 경계 캐시",
+    "rationale": {
+      "evidence": "entity_count 159개 전부 LWPOLYLINE, 단일 INSUL 레이어, 샘플(handle 7860~787D)이 vertices=5로 균일하다. U238(handle 77xx대)과 handle 대역이 떨어져 있어 별도 벽 구간의 해치로 보인다.",
+      "rule": "큰 entity_count와 균일한 레이어/정점수는 여전히 '벽체 라인'이 아니라 '벽 인접 채움 패턴'의 신호로 해석하며 개수 자체를 wall_likelihood 상향 근거로 쓰지 않는다.",
+      "counterfactual": "만약 이 폴리라인들의 정점 좌표가 실제로 긴 직선 두 줄의 반복(두께 있는 벽 윤곽)을 이뤘다면 평면 부분도로 재분류했을 것이다.",
+      "uncertainty": "정점 좌표가 제공되지 않아 이 159개 폐곡선이 실제로 어떤 기하학적 모양(물방울형/지그재그형 등)인지 시각적으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u240-211",
+    "def": "*U240",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 106개(샘플 30개 표시) -- 대면적 단열재 해치 경계 캐시",
+    "rationale": {
+      "evidence": "entity_count 106개 전부 LWPOLYLINE, 단일 INSUL 레이어, 샘플(handle 7904~7921)이 vertices=5로 균일하다. U239 바로 다음 handle 대역에 위치해 인접한 벽 구간의 연속 처리로 추정된다.",
+      "rule": "handle 순서가 바로 이어지는 동일 패턴의 INSUL 블록들은 같은 평면도 작업(해치 일괄 적용) 배치에서 생성된 형제 블록군으로 취급한다.",
+      "counterfactual": "이 블록에 텍스트(TEXT/MTEXT)나 치수(DIMENSION) 엔티티가 섞여 있었다면 치수캐시 역할일 가능성을 검토했을 것이다.",
+      "uncertainty": "U239와 U240이 같은 벽의 서로 다른 구간인지 서로 다른 벽인지는 좌표/공간 정보 없이 판단할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u241-212",
+    "def": "*U241",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 19개 -- 동일 계열 단열재 해치 경계 캐시",
+    "rationale": {
+      "evidence": "entity_count 19개 전부 LWPOLYLINE, 단일 INSUL 레이어, handle 7973~7985로 연속하며 vertices=5로 균일하다. U240 그룹(79xx대)과 handle이 인접해 같은 구역 연속 처리로 보인다.",
+      "rule": "동일 handle 클러스터 내에서 반복되는 균일 정점수 LWPOLYLINE-only INSUL 블록은 예외 없이 해치 경계 캐시로 일관 분류한다.",
+      "counterfactual": "만약 dxf_name histogram에 HATCH 엔티티 자체가 포함되어 있었다면 이 블록이 해치의 부속물임을 직접 확인할 수 있었을 것이다.",
+      "uncertainty": "이 익명 블록을 참조하는 상위 HATCH 또는 INSERT 엔티티가 도면 내 어디에 있는지는 이 투영에 나타나지 않아 알 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u272-213",
+    "def": "*U272",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 45개(샘플 30개 표시) -- 중대형 단열재 해치 경계 캐시",
+    "rationale": {
+      "evidence": "entity_count 45개 전부 LWPOLYLINE, 단일 INSUL 레이어, 샘플(handle 7DD0~7DED)이 vertices=5로 균일하다. handle이 U241(79xx대)과 크게 떨어진 7Dxx대로, 도면의 다른 구역(별도 층/구간)에서 생성된 것으로 추정된다.",
+      "rule": "handle 대역의 큰 도약은 도면 작업 세션이나 구역이 바뀌었음을 시사하지만, 패턴 자체(레이어/타입/정점수)가 동일하면 역할 분류는 동일하게 유지한다.",
+      "counterfactual": "이 블록이 서로 다른 여러 레이어에 걸쳐 있었다면 단일 해치가 아니라 여러 재료(단열재+마감재)가 혼합된 조립체로 재해석했을 것이다.",
+      "uncertainty": "handle 도약이 실제로 다른 층/동을 의미하는지, 단순히 같은 도면 내 다른 시점에 작업된 것인지는 알 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u273-214",
+    "def": "*U273",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 17개 -- 동일 계열 단열재 해치 경계 캐시",
+    "rationale": {
+      "evidence": "entity_count 17개 전부 LWPOLYLINE, 단일 INSUL 레이어, handle 7E02~7E12로 연속하며 vertices=5로 균일하다. U272(handle 7Dxx대) 바로 다음 구역에 위치해 인접 벽 구간으로 추정된다.",
+      "rule": "짧은 handle 간격으로 이어지는 동일 패턴 INSUL 블록들은 동일한 벽체 계열(같은 층/같은 유닛)의 연속 캐비티로 그룹핑해 해석한다.",
+      "counterfactual": "만약 vertices 수가 블록마다 들쭉날쭉했다면 단일 해치 패턴이 아니라 여러 종류의 채움 요소가 섞였을 가능성을 검토했을 것이다.",
+      "uncertainty": "U272와 U273이 같은 방의 인접한 두 벽인지, 서로 다른 방의 벽인지는 이 투영의 정보로는 구분할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u274-215",
+    "def": "*U274",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 7개 -- 소면적 단열재 해치 경계 캐시",
+    "rationale": {
+      "evidence": "entity_count 7개로 U201과 동일하게 이 샤드에서 가장 작은 축이며, 전부 LWPOLYLINE, 단일 INSUL 레이어, handle 7E18~7E1E로 연속하고 vertices=5로 균일하다.",
+      "rule": "entity_count가 작은 INSUL 블록도 레이어/타입/정점수 패턴이 동일하면 대형 블록들과 같은 해치-경계 캐시 범주로 취급해 크기에 따라 역할을 바꾸지 않는다.",
+      "counterfactual": "만약 이 7개 폴리라인이 서로 다른 레이어(예: 창호 레이어)에 있었다면 개구부 표시 심볼로 재검토했을 것이다.",
+      "uncertainty": "이 블록이 짧은 벽 구간 하나를 채우는 것인지, 모서리/코너의 작은 캐비티를 채우는 것인지는 좌표 없이 알 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u275-216",
+    "def": "*U275",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 18개 -- 동일 계열 단열재 해치 경계 캐시",
+    "rationale": {
+      "evidence": "entity_count 18개 전부 LWPOLYLINE, 단일 INSUL 레이어, handle 7E24~7E35로 연속하며 vertices=5로 균일하다. U274 바로 다음 handle 대역에 위치해 같은 구역의 인접 캐비티로 추정된다.",
+      "rule": "연속된 handle과 동일한 레이어/정점수 시그니처를 가진 INSUL 블록 군집은 같은 도면 작업 배치의 형제 캐시로 해석한다.",
+      "counterfactual": "만약 이 블록에 WIPEOUT이나 TEXT가 포함돼 있었다면 순수 해치 캐시가 아니라 주석/마스킹이 결합된 복합 심볼로 재분류를 고려했을 것이다.",
+      "uncertainty": "18개 폴리라인의 전체 배치 형태(선형으로 나열되는지, 격자형인지)는 좌표 정보 없이 판단할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u278-217",
+    "def": "*U278",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 79개(샘플 30개 표시) -- 대면적 단열재 해치 경계 캐시",
+    "rationale": {
+      "evidence": "entity_count 79개 전부 LWPOLYLINE, 단일 INSUL 레이어, 샘플(handle 7E51~7E6E)이 vertices=5로 균일하다. U275(handle 7E2x대)와 handle이 비교적 가까워 같은 층/구역의 다른 벽 구간으로 추정된다.",
+      "rule": "entity_count가 U275 대비 크게 늘어난 것은 더 긴 벽 캐비티를 채우기 위함이며, 이는 여전히 채움 패턴이지 벽 경계선 자체가 아니라는 원칙을 유지한다.",
+      "counterfactual": "만약 79개 중 일부가 다른 정점수(예: 4)를 가진 사각형 LWPOLYLINE이었다면 해치와 별개의 경계 요소가 혼합되어 있을 가능성을 검토했을 것이다.",
+      "uncertainty": "샘플로 제공되지 않은 나머지 49개 엔티티가 동일한 vertices=5 패턴을 유지하는지는 이 투영으로 확인할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u279-218",
+    "def": "*U279",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 42개(샘플 30개 표시) -- 중대형 단열재 해치 경계 캐시",
+    "rationale": {
+      "evidence": "entity_count 42개 전부 LWPOLYLINE, 단일 INSUL 레이어, 샘플(handle 7EA5~7EC2)이 vertices=5로 균일하다. U278 바로 다음 handle 대역으로 같은 작업 배치의 연속 캐비티로 추정된다.",
+      "rule": "짧은 간격으로 반복되는 handle과 동일한 시그니처를 가진 INSUL 블록들은 하나의 벽 계열을 순차적으로 채운 해치 인스턴스 집합으로 해석한다.",
+      "counterfactual": "이 블록의 레이어명이 INSUL이 아니라 명시적으로 벽체를 뜻하는 이름(예: WALL, 벽체)이었다면 wall_likelihood를 크게 상향했을 것이다.",
+      "uncertainty": "U278과 U279가 같은 방의 두 인접 벽인지 서로 다른 방의 벽인지는 공간 좌표 없이 알 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u280-219",
+    "def": "*U280",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 95개(샘플 30개 표시) -- 대면적 단열재 해치 경계 캐시",
+    "rationale": {
+      "evidence": "entity_count 95개 전부 LWPOLYLINE, 단일 INSUL 레이어, 샘플(handle 7ED4~7EF1)이 vertices=5로 균일하다. U279 바로 다음 handle 대역에 위치해 연속된 벽 캐비티로 추정된다.",
+      "rule": "큰 entity_count(수십~백 단위)라도 레이어/타입/정점수가 나머지 INSUL 계열과 일치하면 동일하게 해치-경계 캐시로 분류하고 크기만으로 벽체 승격을 하지 않는다.",
+      "counterfactual": "만약 이 95개 폴리라인 중 다수가 서로 다른 레이어에 흩어져 있었다면 단일 해치가 아니라 여러 재료층이 겹친 복합 벽 단면으로 재해석했을 것이다.",
+      "uncertainty": "이 블록이 표현하는 벽의 실제 길이나 방향(직선/절곡)은 좌표 정보가 없어 산출할 수 없다."
+    }
+  },
+  {
+    "unit_id": "defannot-u281-220",
+    "def": "*U281",
+    "role": "기타",
+    "wall_likelihood": 0.15,
+    "wall_line_handles": [],
+    "notes": "INSUL 레이어의 vertices=5 LWPOLYLINE 23개 -- 동일 계열 단열재 해치 경계 캐시로 샤드 마감",
+    "rationale": {
+      "evidence": "entity_count 23개로 U237과 동일한 개수이며, 전부 LWPOLYLINE, 단일 INSUL 레이어, handle 7F38~7F4E로 연속하고 vertices=5로 균일하다. U280 바로 다음 handle 대역에 위치한다.",
+      "rule": "샤드 내 U199부터 U281까지 handle 순서를 따라 반복되는 INSUL LWPOLYLINE-only 패턴은 하나의 일관된 해치-경계 캐시 계열로 취급하며 개별 개수 차이는 채움 면적 차이일 뿐 역할을 바꾸지 않는다.",
+      "counterfactual": "만약 이 블록의 dxf_name histogram에 LINE이 섞여 명확한 벽 두께 평행선을 형성했다면 wall_likelihood를 0.6 이상으로 크게 올렸을 것이다.",
+      "uncertainty": "이 샤드에 포함된 20개 정의만으로는 U197(심볼 프레임)을 제외한 19개 INSUL 블록들이 도면 전체에서 몇 개의 물리적 벽에 대응하는지 집계할 수 없다."
+    }
+  }
+]

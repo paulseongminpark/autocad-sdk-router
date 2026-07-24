@@ -1,0 +1,135 @@
+{
+  "schema": "e2.f03.real_probe.prereg.v1",
+  "sealed_utc": "2026-07-20T02:16:30Z",
+  "sealed_before_outcome_metrics": true,
+  "sealed_by": "Codex /root; packet-required single worker; no subagents",
+  "scope": {
+    "axis": "F03 P6 C4 raw-DXF canonical-world reconstruction probe only",
+    "raw_dxf_read_only": "D:\\dev\\99_tools\\autocad-sdk-router\\runs\\e2_b3_dxfout_20260717\\1_export.dxf",
+    "annotation_root_read_only": "D:\\dev\\99_tools\\autocad-sdk-router\\reports\\e1\\annot_v1\\raw",
+    "staging_output_only": "D:\\runs\\e2_program\\cells\\f03_real_probe",
+    "forbidden": [
+      "model APIs",
+      "test-set access",
+      "writes to original CAD/DXF",
+      "git commands",
+      "subagents"
+    ]
+  },
+  "source_of_truth": {
+    "plan_path": "reports/e2/synthesis/FINAL_PROGRAM_PLAN.md",
+    "plan_line": 26,
+    "f03_band_verbatim": "INSERT 전개가 적격 def 중 ≥30%에서 신규 cross-scope pair를 생성 (최소 3/10)",
+    "zero_rule_verbatim": "0건이면 현 코퍼스에서 world-assembly 이득 주장 금지 (인프라 PASS와 별도 판정)",
+    "infrastructure_status_is_separate": true
+  },
+  "inputs": {
+    "packet": {
+      "path": "D:/runs/e2_program/build/PACKET_f03_real_probe.md",
+      "sha256": "fcb176f8dad1ccd2242b00a66ad69c32cfebb406dc7591657b7f6b88d82906db",
+      "bytes": 1782
+    },
+    "raw_dxf": {
+      "path": "D:/dev/99_tools/autocad-sdk-router/runs/e2_b3_dxfout_20260717/1_export.dxf",
+      "sha256": "5a6035721630cddc6d753b1b97b898e7a4ce4d5988342ce85e2c465cdb81deff",
+      "bytes": 15305576
+    },
+    "worldir_report": {
+      "path": "reports/e2/instruments/worldir_REPORT.md",
+      "sha256": "cd5b92fbfb217b8faf997c63b97c8959103b83280e9d8e8bfe9934ccce7a8936",
+      "bytes": 9279
+    },
+    "final_program_plan": {
+      "path": "reports/e2/synthesis/FINAL_PROGRAM_PLAN.md",
+      "sha256": "53efc08a96d8b0a770b5f0b5eaf9ae2d9ca8b5ce7db6422dce64e86afb75fda0",
+      "bytes": 24089
+    },
+    "prereg_r2": {
+      "path": "reports/e2/prereg_r2_v1.json",
+      "sha256": "fc93dad9232cfd877802c1d53996357eccc710daff8cfb2cf7c865bf7f78bcd2",
+      "bytes": 5790
+    },
+    "worldir_oracle": {
+      "path": "tools/e2/instruments/worldir_oracle.py",
+      "sha256": "f49417843726413667ead2be2b1e249100ddbce961d67a4d6f3600de78550a18",
+      "bytes": 53730
+    },
+    "insert_expand": {
+      "path": "tools/e2/detect/insert_expand.py",
+      "sha256": "5e450d29026d9dcb78a702cb6859a6beed3a3ec07b984ec741c96be6e897e732",
+      "bytes": 18917
+    },
+    "normalize": {
+      "path": "tools/e2/detect/normalize.py",
+      "sha256": "fbc4c86e88aca06e6be465ba131bbe839de1570b20582941a6162ff08549c1be",
+      "bytes": 17412
+    },
+    "evidence_grid": {
+      "path": "tools/e2/detect/evidence_grid.py",
+      "sha256": "918c6754c0b3d5608613c189240629dc419d94a42e167ef6ce0d298a08660b6a",
+      "bytes": 20152
+    },
+    "w1_real_defs": {
+      "path": "tools/e2/w1_real_defs.py",
+      "sha256": "5cf700d55522242560ef720392cc837178ec895885d85ddf0989bbd5bd23ac97",
+      "bytes": 24157
+    },
+    "raw_annotations": {
+      "root": "reports/e1/annot_v1/raw",
+      "file_count": 100,
+      "manifest_record": "relative_posix_path<TAB>lowercase_file_sha256<LF>, sorted by relative_posix_path",
+      "manifest_sha256": "82be103a69fd55b89f5a8672f1c00f81be8474b29cdc9bf1ae5343cb73c5020d"
+    }
+  },
+  "pair_selection_rule": {
+    "annotation_sources": [
+      "fable5_high",
+      "grok45_xhigh",
+      "opus48_max",
+      "sol56_xhigh",
+      "sonnet5_xhigh"
+    ],
+    "record_key": [
+      "unit_id",
+      "def"
+    ],
+    "handle_normalization": "trim ASCII whitespace and uppercase hexadecimal handle text; empty/null handles are excluded",
+    "consensus_wall_handle": "the same normalized handle is present in wall_line_handles for at least 3 distinct annotation sources for the same (unit_id, def)",
+    "eligible_definition": "a unique (unit_id, def) with at least one consensus wall handle that maps exactly to a raw-DXF block name and whose handle resolves to a supported non-degenerate primitive in that block",
+    "trial_order": "sort eligible definitions by UTF-8 byte order of unit_id, then def; take the first 10 without replacement",
+    "required_trial_count": 10,
+    "placement_domain": "all modelspace-reachable INSERT placements of annotation-eligible definitions in the sealed raw DXF",
+    "candidate_pair": "two placed consensus wall segments with different source_def_handle values; at least one segment belongs to the trial definition; both placements share the modelspace root",
+    "witness_choice": "among successful candidates for a trial definition, choose the lexicographically smallest canonical (placed_uid_a, placed_uid_b); one witness maximum per trial definition",
+    "no_outcome_adaptation": "no reselection, threshold tuning, fallback annotator, or alternate ordering after metrics are computed"
+  },
+  "world_pair_predicate": {
+    "source": "tools/e2/detect/evidence_grid.py DEFAULTS and geometry helpers",
+    "angle_difference_deg_max_inclusive": 2.0,
+    "longitudinal_overlap_ratio_min_inclusive": 0.5,
+    "lateral_offset_mm_min_inclusive": 50.0,
+    "lateral_offset_mm_max_inclusive": 400.0,
+    "unit_resolution": "use raw DXF $INSUNITS to derive millimetres per drawing unit; if absent/unitless/unmapped, predicate status is UNKNOWN_UNIT_SCALE and cannot count as success",
+    "local_scope_status": "UNKNOWN_SCOPE_INCOMPARABLE for cross-definition local coordinates; local coordinates are never compared as if they shared a frame",
+    "new_pair_definition": "a cross-definition relation that is UNKNOWN before assembly and TRUE only after both segments are mapped into the common modelspace world frame"
+  },
+  "reconstruction_success": {
+    "required_all": [
+      "worldir_oracle status=PASS",
+      "worldir_oracle conservation_ledger.conservation_ok=true",
+      "both source handles and source definition handles exactly match raw DXF and annotation consensus",
+      "both placed endpoint pairs match the independent tools/e2/detect/insert_expand.py plus normalize.py raw-DXF expansion for the identical source handle and insert path",
+      "maximum absolute endpoint-coordinate error <= 1e-9 * max(1, absolute coordinate extent of the compared endpoint set)",
+      "world_pair_predicate is TRUE",
+      "no UNKNOWN field participates in the success"
+    ],
+    "arrays": "if an array placement cannot be uniquely aligned to the independent reference expansion, mark UNKNOWN_REFERENCE_ARRAY and do not count it as success",
+    "unsupported_or_ambiguous": "preserve as UNKNOWN with reason; never coerce to PASS or FAIL"
+  },
+  "decision_rule": {
+    "band_pass": "exactly 10 eligible trial definitions are decidable and at least 3 have a reconstruction-success witness; success_rate >= 0.30",
+    "below_band": "10 trials are decidable but fewer than 3 reconstruction-success witnesses; prohibit a world-assembly benefit claim while keeping infrastructure PASS separate",
+    "blocked_input": "the allowed inputs cannot supply 10 eligible trials or cannot supply at least 3 constructible cross-scope witness pairs; report BLOCKED_INPUT with the available counts",
+    "unknowns": "UNKNOWN rows do not enter the numerator; if they prevent the required decidable trial/pair counts, status is BLOCKED_INPUT"
+  }
+}

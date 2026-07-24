@@ -1,0 +1,38 @@
+{
+  "family": "handle_provisioned",
+  "_note": "Handle-provisioning fixtures: args reference REAL entity handles that exist in tests/fixtures/native_sample.dwg (sha eac5d4b...). The probe stages a COPY (handles preserved), so resolveHandle() succeeds and the op does real work. Handle catalog (MIN handle per type): LINE=11935, ARC=11BF8, CIRCLE=12B4C, 2dPolyline=119F5, INSERT=11995, HATCH=119F4, MTEXT=1199B, TEXT=19166. Mechanism PROVEN 2026-07-14 via cad.run_operation(inspect.entity.common,{handle:11935}) -> {class:AcDbLine,...}.",
+  "fixtures": {
+    "inspect.entity.common": {
+      "args": {"handle": "11935"},
+      "evidence": "m08d_handlers.inc (m08dFindHandle 'handle'); PROVEN RUNNABLE via cad.run_operation -> AcDbLine props"
+    },
+    "inspect.entity.geomextents": {
+      "args": {"handle": "11935"},
+      "evidence": "m08d_handlers.inc (m08dFindHandle 'handle'); geomExtents of LINE 11935"
+    },
+    "inspect.entity.osnap": {
+      "args": {"handle": "11935"},
+      "evidence": "m08d_handlers.inc (m08dFindHandle 'handle'); getOsnapPoints of LINE 11935"
+    },
+    "inspect.curve.protocol": {
+      "args": {"handle": "11935"},
+      "evidence": "m08d_handlers.inc (m08dFindHandle 'handle'); AcDbCurve protocol on LINE 11935 (a curve)"
+    },
+    "modify.curve.offset": {
+      "args": {"handle": "11935", "distance": 5.0},
+      "evidence": "m08g_handlers.inc:1908-1917 (m08gFindHandle 'handle' + jsonFindNumber nonzero 'distance'); getOffsetCurves of LINE 11935"
+    },
+    "modify.entity.transform": {
+      "args": {"handle": "11935", "translate": {"x": 10.0, "y": 5.0, "z": 0.0}},
+      "evidence": "m08g_handlers.inc:1603-1618 (m08gFindHandle 'handle' + m08gReadTransform reads translate/scale/rotate/pivot); transformBy on LINE 11935"
+    },
+    "modify.entity.explode": {
+      "args": {"handle": "11995"},
+      "evidence": "m08g_handlers.inc:1848 (m08gFindHandle 'handle'); explode INSERT 11995 (block reference -> constituent entities)"
+    },
+    "compute.entity.intersect": {
+      "args": {"handle_a": "11935", "handle_b": "11BF8"},
+      "evidence": "m08d_handlers.inc:710-717 (jsonFindString 'handle_a'/'handle_b'); intersectWith LINE 11935 x ARC 11BF8 (may need an intersecting pair to be non-degenerate)"
+    }
+  }
+}
