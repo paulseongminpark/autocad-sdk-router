@@ -524,6 +524,43 @@ def _derive_count_scope(entities: list) -> str:
     return "modelspace_and_paperspace" if "paper" in spaces else "modelspace"
 
 
+def _normalize_xdata_blocks(raw_xdata: list) -> list:
+    """Normalize entity XDATA into the schema's $defs.xdata_block form.
+
+    Extractors ship XDATA in two shapes: the native database-graph emitter
+    sends already-grouped blocks ({"app", "items": [{"code", "value"}]}),
+    which pass through unchanged; the geometry-extract emitter sends a flat
+    resbuf stream ({"type_code"|"code": <int>, "value": ...}) where group
+    code 1001 -- the DXF XDATA registered-app marker -- opens one app's
+    block. Items arriving before any 1001 marker are kept under an empty
+    app name rather than dropped (no-fake-success).
+    """
+    blocks: list = []
+    current = None
+    for item in raw_xdata:
+        if not isinstance(item, dict):
+            continue
+        if "app" in item:
+            current = None
+            blocks.append(item)
+            continue
+        code = item.get("type_code", item.get("code"))
+        try:
+            code = int(code)
+        except (TypeError, ValueError):
+            continue
+        value = item.get("value")
+        if code == 1001:
+            current = {"app": "" if value is None else str(value), "items": []}
+            blocks.append(current)
+            continue
+        if current is None:
+            current = {"app": "", "items": []}
+            blocks.append(current)
+        current["items"].append({"code": code, "value": value})
+    return blocks
+
+
 def _normalize_entity(raw, source_block):
     """Map one dwg_geometry_extract entity to one IR entity (all required fields)."""
     handle = str(raw.get("handle", "") or "")
@@ -566,9 +603,12 @@ def _normalize_entity(raw, source_block):
     layout = raw.get("layout")
     if layout:
         entity["layout"] = str(layout)
-    # carry XDATA through untouched if the extractor attached it
+    # XDATA arrives as a flat resbuf stream from this extractor; the IR
+    # legislates the per-app grouped form, so normalize on the way in.
     if isinstance(raw.get("xdata"), list) and raw["xdata"]:
-        entity["xdata"] = raw["xdata"]
+        xdata_blocks = _normalize_xdata_blocks(raw["xdata"])
+        if xdata_blocks:
+            entity["xdata"] = xdata_blocks
 
     return entity
 
@@ -1191,7 +1231,9 @@ def _entity_from_native(raw: dict, source_block: dict) -> dict:
     if raw.get("block_record_handle"):
         entity["block_record_handle"] = str(raw["block_record_handle"])
     if isinstance(raw.get("xdata"), list) and raw["xdata"]:
-        entity["xdata"] = raw["xdata"]
+        xdata_blocks = _normalize_xdata_blocks(raw["xdata"])
+        if xdata_blocks:
+            entity["xdata"] = xdata_blocks
     if raw.get("extension_dictionary_handle"):
         entity["extension_dictionary_handle"] = str(raw["extension_dictionary_handle"])
     # T3a: a dimension's defining anonymous block (*Dn) id/name -- deliberately

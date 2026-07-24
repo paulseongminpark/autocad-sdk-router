@@ -133,6 +133,67 @@ class TestBuildIrMapping(unittest.TestCase):
         self.assertEqual(cov["realized_entity_count"], 3)
 
 
+class TestXdataNormalization(unittest.TestCase):
+    """Flat resbuf XDATA from the geometry extract is grouped into xdata_block form.
+
+    Intent (WHY):
+      * The dwg_geometry_extract emitter ships XDATA as a flat resbuf stream
+        ({"type_code": 1001, "value": "APP"} opens one registered app's block --
+        DXF XDATA framing), but dwg_graph_ir.v1 legislates the grouped
+        $defs.xdata_block form ({"app", "items": [{"code", "value"}]}).
+        Carrying the stream through untouched made EVERY drawing that carries
+        XDATA fail IR conformance (live hit 2026-07-24: A20 finish-detail
+        census, 212/1853 entities with XDATA -> IRConformanceError).
+      * The native database-graph emitter already ships grouped blocks; the
+        normalizer must pass those through unchanged (idempotence).
+    """
+
+    def _build(self, xdata):
+        import ir_builder
+        extract = _fake_extract(summary_count=3)
+        extract["entities"][0]["xdata"] = xdata
+        ir = ir_builder.build_ir_from_extract(extract, summary=None,
+                                              source_meta=_SOURCE_META)
+        return ir_builder, ir, {e["handle"]: e for e in ir["entities"]}
+
+    def test_flat_resbuf_stream_is_grouped_per_app(self):
+        # Real-world shape from the A20 live hit: three apps in one stream.
+        ir_builder, ir, by_handle = self._build([
+            {"type_code": 1001, "value": "GradientColor1ACI"},
+            {"type_code": 1070, "value": "5"},
+            {"type_code": 1001, "value": "GradientColor2ACI"},
+            {"type_code": 1070, "value": "2"},
+            {"type_code": 1001, "value": "ACAD"},
+            {"type_code": 1010, "value": "(604.25,2432.37,0)"},
+        ])
+        self.assertEqual(by_handle["100"]["xdata"], [
+            {"app": "GradientColor1ACI", "items": [{"code": 1070, "value": "5"}]},
+            {"app": "GradientColor2ACI", "items": [{"code": 1070, "value": "2"}]},
+            {"app": "ACAD", "items": [{"code": 1010, "value": "(604.25,2432.37,0)"}]},
+        ])
+        ok, method, errs = ir_builder._validate_ir(ir)
+        self.assertTrue(ok, "IR with grouped xdata must validate "
+                            "(method=%s): %r" % (method, errs))
+
+    def test_grouped_blocks_pass_through_unchanged(self):
+        grouped = [{"app": "ACAD", "items": [{"code": 1000, "value": "tag"}]}]
+        _, ir, by_handle = self._build(list(grouped))
+        self.assertEqual(by_handle["100"]["xdata"], grouped)
+
+    def test_stream_without_leading_app_marker_is_preserved(self):
+        # Defensive: items before any 1001 marker must not be dropped --
+        # they land under an empty app name (preserve-don't-drop).
+        _, _, by_handle = self._build([
+            {"type_code": 1070, "value": "7"},
+            {"type_code": 1001, "value": "ACAD"},
+            {"type_code": 1010, "value": "(0,0,0)"},
+        ])
+        self.assertEqual(by_handle["100"]["xdata"], [
+            {"app": "", "items": [{"code": 1070, "value": "7"}]},
+            {"app": "ACAD", "items": [{"code": 1010, "value": "(0,0,0)"}]},
+        ])
+
+
 class TestCoverageMismatchWarns(unittest.TestCase):
     """A summary/realized count mismatch WARNS and sets coverage.match=False."""
 
