@@ -37,3 +37,15 @@
   > recorded extrusion and preserve mirror (negative-Z) normals — is sign
   > preservation of the normal the correct convention?)
 - **참조**: repo 이슈 #46 (재현 수치 포함), 646/648 왕복 검증 데이터
+
+## Case 3 — AcDbOle2Frame embedded payload accessor (ObjectARX 2027)
+
+- **Title**: How to programmatically extract the embedded OLE payload (compound document bytes) from AcDbOle2Frame in ObjectARX 2027? No public getCompoundDocument accessor found
+- **Body (영문 초안)**:
+  > We serialize drawings to a JSON IR for faithful regeneration. AcDbOle2Frame
+  > exposes position/type via public API, but we found no public accessor for
+  > the embedded compound-document bytes in the 2027 SDK headers — so embedded
+  > logos cannot round-trip. Is there a supported path (public API, protocol
+  > extension, or documented workaround) to read the OLE payload for archival
+  > purposes? RealDWG-only APIs acceptable if that is the intended surface.
+- **참조**: repo 이슈 #43 — 현재 corners/type/meta만 emit, payload는 명시적 null + 사유 필드

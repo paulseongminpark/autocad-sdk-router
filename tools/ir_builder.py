@@ -856,6 +856,7 @@ _NATIVE_CLASS_TO_DXF_KIND = {
     "AcDbRasterImage": ("IMAGE", "rasterimage"),
     "AcDbWipeout": ("WIPEOUT", "wipeout"),
     "AcDbMPolygon": ("MPOLYGON", "mpolygon"),
+    "AcDbOle2Frame": ("OLE2FRAME", "ole2frame"),
 }
 
 
@@ -903,7 +904,7 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     caller).
     """
     geom: dict = {"kind": kind}
-    for key in ("start", "end", "center", "position", "scale", "normal",
+    for key in ("start", "end", "center", "position", "alignment_point", "scale", "normal",
                 "major_axis", "xline1_point", "xline2_point", "dim_line_point",
                 "chord_point", "far_chord_point", "defining_point", "leader_end_point",
                 "arc_point", "xline1_start", "xline1_end", "xline2_start", "xline2_end",
@@ -977,7 +978,9 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
                    # dimension text, which is middle-anchored).
                    ("attachment_point", "attachment_point"),
                    ("width", "width"),
-                   ("loop_count", "loop_count")):
+                   ("loop_count", "loop_count"),
+                   ("ole_type", "ole_type"),
+                   ("ole_version", "ole_version")):
         num = _to_number(raw.get(nk))
         if num is not None:
             geom[ik] = num
@@ -995,6 +998,19 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     # gradient_name above use).
     if raw.get("source_file_name") is not None:
         geom["source_file_name"] = str(raw.get("source_file_name"))
+    if raw.get("ole_user_type") is not None:
+        geom["ole_user_type"] = str(raw.get("ole_user_type"))
+    if "ole_data_b64" in raw:
+        geom["ole_data_b64"] = (
+            None if raw["ole_data_b64"] is None else str(raw["ole_data_b64"]))
+    if "ole_data_sha256" in raw:
+        geom["ole_data_sha256"] = (
+            None if raw["ole_data_sha256"] is None else str(raw["ole_data_sha256"]))
+    if "ole_data_bytes" in raw:
+        value = _to_number(raw["ole_data_bytes"])
+        geom["ole_data_bytes"] = None if value is None else int(value)
+    if raw.get("ole_data_unavailable_reason") is not None:
+        geom["ole_data_unavailable_reason"] = str(raw["ole_data_unavailable_reason"])
     # p3-insattr: ATTDEF/ATTRIB-specific fields (kind == "attribute", both
     # AcDbAttributeDefinition and AcDbAttribute per _NATIVE_CLASS_TO_DXF_KIND
     # above) -- tag/prompt are plain strings; the four ATTDEF/ATTRIB mode
@@ -1165,6 +1181,12 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
     clip_boundary = raw.get("clip_boundary")
     if isinstance(clip_boundary, list) and clip_boundary:
         geom["clip_boundary"] = clip_boundary
+    frame_corners = raw.get("frame_corners")
+    if isinstance(frame_corners, list) and frame_corners:
+        geom["frame_corners"] = [
+            point for point in (_as_point3(value) for value in frame_corners)
+            if point is not None
+        ]
     return geom
 
 

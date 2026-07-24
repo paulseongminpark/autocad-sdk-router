@@ -44,8 +44,24 @@
       "properties": {
         "header_vars": {
           "type": "object",
-          "description": "Raw DWG/DXF header system variables (e.g. ACADVER, DWGCODEPAGE, LUNITS, AUNITS, PDMODE). Keys are variable names; values are scalar/array as stored.",
-          "additionalProperties": true
+          "description": "Raw DWG/DXF header system variables. Keys are variable names; values retain the AcDbDatabase getter type.",
+          "additionalProperties": true,
+          "properties": {
+            "XCLIPFRAME": { "type": "integer" },
+            "DGNFRAME": { "type": "integer" },
+            "PDFFRAME": { "type": "integer" },
+            "LTSCALE": { "type": "number" },
+            "PSLTSCALE": { "type": "boolean" },
+            "MSLTSCALE": { "type": "boolean" },
+            "CELTSCALE": { "type": "number" },
+            "FILLMODE": { "type": "boolean" },
+            "PLINEGEN": { "type": "boolean" },
+            "INSUNITS": { "type": "integer" },
+            "MIRRTEXT": { "type": "boolean" },
+            "ATTMODE": { "type": "integer" },
+            "PDMODE": { "type": "integer" },
+            "PDSIZE": { "type": "number" }
+          }
         },
         "units": {
           "type": "object",
@@ -430,6 +446,16 @@
           "type": "integer",
           "minimum": 0,
           "description": "Number of entities owned by this BTR (definition geometry)."
+        },
+        "sortents": {
+          "type": "array",
+          "description": "Faithful ACAD_SORTENTS entries as [object_handle, sort_handle] pairs in extractor-returned order.",
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": { "$ref": "#/$defs/handle" }
+          }
         }
       }
     },
@@ -694,6 +720,7 @@
             "image",
             "wipeout",
             "mpolygon",
+            "ole2frame",
             "proxy",
             "unsupported"
           ]
@@ -702,6 +729,7 @@
         "end": { "$ref": "#/$defs/point3" },
         "center": { "$ref": "#/$defs/point3" },
         "position": { "$ref": "#/$defs/point3" },
+        "alignment_point": { "$ref": "#/$defs/point3", "description": "DXF group 11 alignment anchor for TEXT when horizontal or vertical alignment mode is nonzero." },
         "radius": { "type": "number" },
         "major_axis": { "$ref": "#/$defs/point3" },
         "minor_ratio": { "type": "number" },
@@ -785,7 +813,21 @@
         "is_gradient": { "type": "boolean" },
         "gradient_name": { "type": "string" },
         "gradient_type": { "type": "number", "description": "AcDbHatch::GradientPatternType ordinal (0 predefined, 1 user-defined). Only meaningful when is_gradient is true." },
-        "gradient_angle": { "type": "number" }
+        "gradient_angle": { "type": "number" },
+        "frame_corners": {
+          "type": "array",
+          "description": "OLE2FRAME WCS corners in upper-left, upper-right, lower-left, lower-right order.",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": { "$ref": "#/$defs/point3" }
+        },
+        "ole_type": { "type": "number", "description": "AcDbOle2Frame OLE item type (1 linked, 2 embedded, 3 static)." },
+        "ole_version": { "type": "number", "description": "OLE container generation; 2 for AcDbOle2Frame." },
+        "ole_user_type": { "type": "string" },
+        "ole_data_b64": { "type": ["string", "null"], "description": "Base64-encoded compound-document bytes, or null when the extractor API cannot access them." },
+        "ole_data_sha256": { "type": ["string", "null"], "pattern": "^[0-9a-fA-F]{64}$" },
+        "ole_data_bytes": { "type": ["integer", "null"], "minimum": 0 },
+        "ole_data_unavailable_reason": { "type": "string" }
       }
     },
     "entity": {

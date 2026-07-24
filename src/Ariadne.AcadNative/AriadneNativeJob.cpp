@@ -44,6 +44,7 @@
 #include "imgent.h"    // wA-cert: AcDbRasterImage (rasterimage read branch)
 #include "dbwipe.h"    // wA-cert: AcDbWipeout (wipeout read branch -- IS-A AcDbRasterImage)
 #include "dbmpolygon.h" // wA-cert: AcDbMPolygon (mpolygon read branch)
+#include "dbole.h"     // #43: AcDbOle2Frame geometry + OLE metadata
 #include "dbelipse.h"  // T3a: AcDbEllipse (collectModelSpaceGraph read branch)
 #include "dbdim.h"     // T3a: AcDbRotatedDimension; T3a-batch2: AcDbAlignedDimension/
                        // AcDbRadialDimension/AcDbDiametricDimension; T3a-batch3:
@@ -76,6 +77,7 @@
 #include "dbbody.h"    // wS-solids/S8: AcDbBody (same reason as dbsol3d.h above)
 #include "dbxrecrd.h"
 #include "dbsymtb.h"
+#include "sorttab.h"   // #38: AcDbSortentsTable (ACAD_SORTENTS draw-order pairs)
 #include "dbcolor.h"
 #include "dbapserv.h"
 #include "dblayout.h"
@@ -2041,6 +2043,26 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
                 << ",\"clip_boundary\":[" << clipArr.str() << "]"
                 << ",\"source_file_name\":\"" << jsonEscape(sourceFileName) << "\"";
         }
+        // #43: OLE2FRAME geometry and metadata. ObjectARX 2027's public
+        // AcDbOle2Frame API exposes no public getCompoundDocument accessor,
+        // so embedded bytes cannot be extracted faithfully here. Emit explicit
+        // nulls plus the reason instead of silently dropping the logo payload.
+        else if (AcDbOle2Frame* pOle = AcDbOle2Frame::cast(pEnt)) {
+            CRectangle3d corners;
+            pOle->position(corners);
+            arr << ",\"frame_corners\":["
+                << "[" << corners.upLeft.x << "," << corners.upLeft.y << "," << corners.upLeft.z << "],"
+                << "[" << corners.upRight.x << "," << corners.upRight.y << "," << corners.upRight.z << "],"
+                << "[" << corners.lowLeft.x << "," << corners.lowLeft.y << "," << corners.lowLeft.z << "],"
+                << "[" << corners.lowRight.x << "," << corners.lowRight.y << "," << corners.lowRight.z << "]]"
+                << ",\"ole_type\":" << pOle->getType()
+                << ",\"ole_version\":2"
+                << ",\"ole_data_b64\":null"
+                << ",\"ole_data_sha256\":null"
+                << ",\"ole_data_bytes\":null"
+                << ",\"ole_data_unavailable_reason\":"
+                << "\"ObjectARX 2027 AcDbOle2Frame has no public getCompoundDocument accessor\"";
+        }
         // wA-cert: AcDbMPolygon -- derives directly from AcDbEntity (dbmpolygon.h),
         // no relation to AcDbHatch despite sharing the AcDbHatch::HatchPatternType
         // enum for setPattern() in the write handler, so ordering relative to the
@@ -3413,6 +3435,34 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
                 }
             }
             const std::string handle = handleOf(pBTR);
+            std::string sortentsJson;
+            AcDbSortentsTable* pSortents = nullptr;
+            if (pBTR->getSortentsTable(
+                    pSortents, AcDb::kForRead,
+                    /* createIfNecessary=false */ false) == Acad::eOk) {
+                AcDbObjectIdArray drawOrder;
+                if (pSortents->getFullDrawOrder(drawOrder) == Acad::eOk) {
+                    std::ostringstream pairs; pairs.precision(kJsonDoublePrecision);
+                    pairs << "[";
+                    bool pairFirst = true;
+                    for (int i = 0; i < drawOrder.length(); ++i) {
+                        AcDbHandle sortHandle;
+                        if (!pSortents->sortAs(drawOrder[i], sortHandle))
+                            continue;
+                        ACHAR sortHandleBuf[AcDbHandle::kStrSiz] = {};
+                        if (!sortHandle.getIntoAsciiBuffer(sortHandleBuf))
+                            continue;
+                        if (!pairFirst)
+                            pairs << ",";
+                        pairFirst = false;
+                        pairs << "[\"" << jsonEscape(handleOfId(drawOrder[i])) << "\",\""
+                              << jsonEscape(acharToAscii(sortHandleBuf)) << "\"]";
+                    }
+                    pairs << "]";
+                    sortentsJson = pairs.str();
+                }
+                pSortents->close();
+            }
             if (!first)
                 arr << ",";
             first = false;
@@ -3421,7 +3471,10 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
                 << ",\"is_layout\":" << (isLayout ? "true" : "false")
                 << ",\"is_anonymous\":" << (isAnon ? "true" : "false")
                 << ",\"is_xref\":" << (isXref ? "true" : "false")
-                << ",\"entity_count\":" << entityCount << "}";
+                << ",\"entity_count\":" << entityCount;
+            if (!sortentsJson.empty())
+                arr << ",\"sortents\":" << sortentsJson;
+            arr << "}";
             ++btrCount;
             if (emitBlockDef) {
                 ++capturedBlockDefs;
@@ -3604,7 +3657,23 @@ static std::string databaseMetaJson(AcDbDatabase* pDb)
       << ",\"linear_units\":" << static_cast<int>(pDb->lunits())
       << ",\"angular_units\":" << static_cast<int>(pDb->aunits())
       << ",\"linear_precision\":" << static_cast<int>(pDb->luprec())
-      << ",\"angular_precision\":" << static_cast<int>(pDb->auprec()) << "}}";
+      << ",\"angular_precision\":" << static_cast<int>(pDb->auprec()) << "}"
+      // AcDbDatabase has no getter for WIPEOUTFRAME, IMAGEFRAME, or FRAME;
+      // omit those three rather than silently switching to host-only sysvars.
+      << ",\"header_vars\":{\"XCLIPFRAME\":" << static_cast<int>(pDb->xclipFrame())
+      << ",\"DGNFRAME\":" << static_cast<int>(pDb->dgnframe())
+      << ",\"PDFFRAME\":" << static_cast<int>(pDb->pdfframe())
+      << ",\"LTSCALE\":" << pDb->ltscale()
+      << ",\"PSLTSCALE\":" << (pDb->psltscale() ? "true" : "false")
+      << ",\"MSLTSCALE\":" << (pDb->msltscale() ? "true" : "false")
+      << ",\"CELTSCALE\":" << pDb->celtscale()
+      << ",\"FILLMODE\":" << (pDb->fillmode() ? "true" : "false")
+      << ",\"PLINEGEN\":" << (pDb->plinegen() ? "true" : "false")
+      << ",\"INSUNITS\":" << static_cast<int>(pDb->insunits())
+      << ",\"MIRRTEXT\":" << (pDb->mirrtext() ? "true" : "false")
+      << ",\"ATTMODE\":" << static_cast<int>(pDb->attmode())
+      << ",\"PDMODE\":" << static_cast<int>(pDb->pdmode())
+      << ",\"PDSIZE\":" << pDb->pdsize() << "}}";
     return o.str();
 }
 

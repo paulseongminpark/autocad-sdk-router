@@ -123,8 +123,12 @@ fact of staging; it does not authorize any write.
 
 Drawing-wide settings that scope the whole file.
 
-- `header_vars` — raw DWG/DXF header system variables (`ACADVER`, `DWGCODEPAGE`, `LUNITS`,
-  `AUNITS`, `PDMODE`, …). Keys are variable names; values are scalar/array as stored.
+- `header_vars` — raw DWG/DXF header system variables. The native extractor emits
+  `XCLIPFRAME`, `DGNFRAME`, `PDFFRAME`, `LTSCALE`, `PSLTSCALE`, `MSLTSCALE`,
+  `CELTSCALE`, `FILLMODE`, `PLINEGEN`, `INSUNITS`, `MIRRTEXT`, `ATTMODE`, `PDMODE`,
+  and `PDSIZE`, preserving each `AcDbDatabase` getter's number/boolean type.
+  `WIPEOUTFRAME`, `IMAGEFRAME`, and `FRAME` are omitted because `AcDbDatabase` exposes
+  no getter for them; absence is not a synthesized default.
 - `units` — resolved units: `insunits` (+`insunits_text`), `linear_units` (LUNITS),
   `angular_units` (AUNITS), and precisions.
 - `insbase` — `INSBASE` system variable: the insertion base point used when this drawing is
@@ -145,7 +149,7 @@ every other table is present at richer coverage levels.
 | `linetypes` | `linetype_record` | `name` (req), `description`, `pattern_length`, `dash_lengths[]` |
 | `text_styles` | `text_style_record` | `name` (req), `font_file`, `big_font_file` (CJK SHX bigfont), `height`, `width_factor`, `oblique_angle` |
 | `dim_styles` | `dim_style_record` | `name` (req), `dim_vars{}` (DIMSCALE, DIMTXT, …) |
-| `block_table_records` | `block_table_record` | `name` (req), `is_layout`, `is_anonymous`, `is_xref`, `is_xref_overlay`, `has_attribute_definitions`, `origin`, `entity_count` |
+| `block_table_records` | `block_table_record` | `name` (req), `is_layout`, `is_anonymous`, `is_xref`, `is_xref_overlay`, `has_attribute_definitions`, `origin`, `entity_count`, `sortents` |
 | `viewports` | `viewport_record` | `name` (req), `center`, `height`, `width`, `view_target`, `view_direction` (VPORT named configs) |
 | `views` | object | named VIEW records |
 | `ucs_table` | object | named UCS records |
@@ -154,6 +158,10 @@ every other table is present at richer coverage levels.
 `block_table_records` is the **registry** of block table records (`*Model_Space`,
 `*Paper_Space`, named blocks, `*U###`/`*D###` anonymous blocks). Their **geometry** lives in
 `block_definitions` (Section 4.3) keyed by the same `handle`.
+When a BTR owns an `ACAD_SORTENTS` extension-dictionary table, `sortents` carries its
+explicit draw-order entries as `[object_handle_hex, sort_handle_hex]` pairs in the order
+returned by ObjectARX. The extractor neither sorts nor interprets these pairs; when no table
+exists, the field is absent.
 
 ### 4.3 Blocks — definitions and references
 
@@ -263,13 +271,22 @@ OCS normals, spline knots). `kind` enum:
 
 `line, polyline, lwpolyline, arc, circle, ellipse, spline, point, text, mtext,
 block_reference, attribute, dimension, leader, hatch, solid, region, viewport, ray, xline,
-proxy, unsupported`.
+ole2frame, proxy, unsupported`.
 
-Common geometry fields: `start`, `end`, `center`, `position`, `radius`, `major_axis`,
+Common geometry fields: `start`, `end`, `center`, `position`, `alignment_point`, `radius`, `major_axis`,
 `minor_ratio`, `start_angle`, `end_angle`, `normal` (OCS), `closed`,
 `vertices[]` (each `{point, bulge, start_width, end_width}` for polyline family),
 `text`, `height`, `rotation`, `block_name`, `scale`, `dimension_type`, `measurement`,
 `control_points[]`, `degree`, `loops[]` (hatch boundaries), `pattern_name`.
+
+For `text`, `alignment_point` is DXF group 11 and is the placement anchor whenever
+horizontal or vertical alignment mode is nonzero; an absent group 11 remains absent.
+
+For `ole2frame`, `frame_corners` contains four WCS points in upper-left, upper-right,
+lower-left, lower-right order; `ole_type` is 1 linked, 2 embedded, or 3 static, and
+`ole_version` is 2. Embedded compound-document bytes use `ole_data_b64`,
+`ole_data_sha256`, and `ole_data_bytes`. When the active ObjectARX API cannot expose the
+compound document, all three fields are `null` and `ole_data_unavailable_reason` states why.
 
 #### Stable entity identity
 

@@ -211,6 +211,13 @@ _KNOWN_GEOMETRY_LEAF_FIELDS = frozenset({
     # v1.schema.json's geometry.properties).
     "tag", "prompt", "constant", "invisible", "verifiable", "preset",
     "attributes",
+    # pack-a (#42/#43): TEXT alignment anchor (DXF code 11) + OLE2FRAME
+    # embedded-object payload/meta (schemas/dwg_graph_ir.v1.schema.json
+    # geometry properties).
+    "alignment_point",
+    "ole_type", "ole_version", "ole_user_type", "frame_corners",
+    "ole_data_b64", "ole_data_sha256", "ole_data_bytes",
+    "ole_data_unavailable_reason",
 })
 
 # Entity keys that are IDENTITY / PROVENANCE, not oracle-asserted DATA: they
