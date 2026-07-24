@@ -19,6 +19,7 @@
 #include <ios>
 #include <iomanip>
 #include <limits>
+#include <cmath>
 #include <tchar.h>
 #include <windows.h>
 
@@ -1184,7 +1185,37 @@ static std::string extensionDictionaryJson(const std::string& ownerHandle,
 // discipline. Coordinates are the curve's own 2D (loop-plane) values -- the
 // hatch's elevation/normal already places that plane in space, so no z is
 // fabricated here.
-static std::string hatchEdgeJson(void* edgePtr, int /*edgeType*/)
+static double hatchWcsAngleDegrees(double angle,
+                                   const AcGeVector2d& parameterX,
+                                   const AcGeVector2d& parameterY,
+                                   const AcGeVector3d& extrusion)
+{
+    // #41: AutoCAD arbitrary axis algorithm. Python-isomorphic coverage lives
+    // in test_extractor_hatch_arc_wcs.py.
+    const AcGeVector3d normal = extrusion.normal();
+    AcGeVector3d ocsX;
+    if (std::fabs(normal.x) < 1.0 / 64.0 && std::fabs(normal.y) < 1.0 / 64.0)
+        ocsX = AcGeVector3d(0.0, 1.0, 0.0).crossProduct(normal);
+    else
+        ocsX = AcGeVector3d(0.0, 0.0, 1.0).crossProduct(normal);
+    ocsX.normalize();
+    AcGeVector3d ocsY = normal.crossProduct(ocsX);
+    ocsY.normalize();
+
+    const double cosine = std::cos(angle);
+    const double sine = std::sin(angle);
+    const double localX = parameterX.x * cosine + parameterY.x * sine;
+    const double localY = parameterX.y * cosine + parameterY.y * sine;
+    const AcGeVector3d worldDirection = ocsX * localX + ocsY * localY;
+    double degrees = std::atan2(worldDirection.y, worldDirection.x)
+        * (180.0 / 3.14159265358979323846);
+    if (degrees < 0.0)
+        degrees += 360.0;
+    return degrees;
+}
+
+static std::string hatchEdgeJson(void* edgePtr, int /*edgeType*/,
+                                 const AcGeVector3d& extrusion)
 {
     std::ostringstream o; o.precision(kJsonDoublePrecision);
     AcGeCurve2d* curve = static_cast<AcGeCurve2d*>(edgePtr);
@@ -1203,12 +1234,19 @@ static std::string hatchEdgeJson(void* edgePtr, int /*edgeType*/)
     case AcGe::kCircArc2d: {
         AcGeCircArc2d* a = static_cast<AcGeCircArc2d*>(curve);
         const AcGePoint2d c = a->center();
+        const AcGeVector2d parameterX(1.0, 0.0);
+        const AcGeVector2d parameterY(0.0, 1.0);
         o << "{\"type\":\"arc\""
           << ",\"center\":[" << c.x << "," << c.y << "]"
           << ",\"radius\":" << a->radius()
           << ",\"start_angle\":" << a->startAng()
           << ",\"end_angle\":" << a->endAng()
-          << ",\"ccw\":" << (a->isClockWise() ? "false" : "true") << "}";
+          << ",\"ccw\":" << (a->isClockWise() ? "false" : "true")
+          << ",\"extrusion\":[" << extrusion.x << "," << extrusion.y << "," << extrusion.z << "]"
+          << ",\"start_angle_wcs_deg\":"
+          << hatchWcsAngleDegrees(a->startAng(), parameterX, parameterY, extrusion)
+          << ",\"end_angle_wcs_deg\":"
+          << hatchWcsAngleDegrees(a->endAng(), parameterX, parameterY, extrusion) << "}";
         delete a;
         break;
     }
@@ -1225,7 +1263,12 @@ static std::string hatchEdgeJson(void* edgePtr, int /*edgeType*/)
           << ",\"ratio\":" << ratio
           << ",\"start_angle\":" << e->startAng()
           << ",\"end_angle\":" << e->endAng()
-          << ",\"ccw\":" << (e->isClockWise() ? "false" : "true") << "}";
+          << ",\"ccw\":" << (e->isClockWise() ? "false" : "true")
+          << ",\"extrusion\":[" << extrusion.x << "," << extrusion.y << "," << extrusion.z << "]"
+          << ",\"start_angle_wcs_deg\":"
+          << hatchWcsAngleDegrees(e->startAng(), majorAxis, e->minorAxis(), extrusion)
+          << ",\"end_angle_wcs_deg\":"
+          << hatchWcsAngleDegrees(e->endAng(), majorAxis, e->minorAxis(), extrusion) << "}";
         delete e;
         break;
     }
@@ -1288,6 +1331,7 @@ static std::string hatchLoopsJson(AcDbHatch* pHatch, int& loopCount, int& vertex
     bool firstLoop = true;
     const int loops = pHatch->numLoops();
     const double elevation = pHatch->elevation();
+    const AcGeVector3d extrusion = pHatch->normal();
     for (int li = 0; li < loops; ++li) {
         const Adesk::Int32 loopType = pHatch->loopTypeAt(li);
         const bool isPolylineLoop = (loopType & AcDbHatch::kPolyline) != 0;
@@ -1341,7 +1385,7 @@ static std::string hatchLoopsJson(AcDbHatch* pHatch, int& loopCount, int& vertex
                 for (int ei = 0; ei < n; ++ei) {
                     if (ei != 0)
                         arr << ",";
-                    arr << hatchEdgeJson(edgePtrs[ei], edgeTypes[ei]);
+                    arr << hatchEdgeJson(edgePtrs[ei], edgeTypes[ei], extrusion);
                     ++vertexCount;  // rough boundary-geometry-item tally, same
                                     // counter the polyline branch above uses
                                     // for its per-vertex count.
@@ -1568,8 +1612,16 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
         // here purely to group the curve-ish primitives together.
         else if (AcDbEllipse* pEl = AcDbEllipse::cast(pEnt)) {
             const AcGePoint3d c = pEl->center();
-            const AcGeVector3d major = pEl->majorAxis();
-            const AcGeVector3d nrm = pEl->normal();
+            AcGeVector3d major = pEl->majorAxis();
+            AcGeVector3d nrm = pEl->normal();
+            // #46: Python-isomorphic coverage lives in
+            // test_extractor_ellipse_normal.py. Project against the exact
+            // normalized normal emitted below, then restore the major radius.
+            nrm.normalize();
+            const double majorLength = major.length();
+            major -= nrm * major.dotProduct(nrm);
+            major.normalize();
+            major *= majorLength;
             arr << ",\"center\":[" << c.x << "," << c.y << "," << c.z << "]"
                 << ",\"major_axis\":[" << major.x << "," << major.y << "," << major.z << "]"
                 << ",\"radius_ratio\":" << pEl->radiusRatio()

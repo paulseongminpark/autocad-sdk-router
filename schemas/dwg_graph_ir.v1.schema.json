@@ -790,8 +790,25 @@
         "degree": { "type": "integer" },
         "loops": {
           "type": "array",
-          "description": "Hatch boundary loops. Each loop item carries index/loop_type/closed/status plus EITHER vertices (kPolyline loops: point+bulge, same shape as polyline-family vertices above) OR edges (non-polyline loops: an ordered array of {type: line|circ_arc|ellipse_arc|spline, ...type-specific params}, 2D loop-plane coordinates -- see elevation/normal for how that plane sits in space). Read-only: this shape has no write.entity.hatch equivalent to roundtrip against on this build (loop authoring there is attended-gated), so it is additionalProperties:true rather than a fully enumerated sub-schema.",
-          "items": { "type": "object", "additionalProperties": true }
+          "description": "Hatch boundary loops. Each loop item carries index/loop_type/closed/status plus EITHER vertices (kPolyline loops: point+bulge, same shape as polyline-family vertices above) OR edges (non-polyline loops: an ordered array of {type: line|arc|ellipse|spline, ...type-specific params}, 2D loop-plane coordinates -- see elevation/normal for how that plane sits in space). Read-only: this shape has no write.entity.hatch equivalent to roundtrip against on this build (loop authoring there is attended-gated), so it is additionalProperties:true rather than a fully enumerated sub-schema.",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "edges": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "extrusion": { "$ref": "#/$defs/point3", "description": "OCS extrusion for arc and ellipse hatch-boundary edges." },
+                    "start_angle_wcs_deg": { "type": "number", "description": "Start angle in WCS-referenced degrees after applying AutoCAD's arbitrary axis algorithm; additive to the unchanged OCS/radian start_angle." },
+                    "end_angle_wcs_deg": { "type": "number", "description": "End angle in WCS-referenced degrees after applying AutoCAD's arbitrary axis algorithm; additive to the unchanged OCS/radian end_angle." }
+                  }
+                }
+              }
+            }
+          }
         },
         "pattern_name": { "type": "string" },
         "p0": { "$ref": "#/$defs/point3", "description": "1st vertex of a flat 4-point entity (3DFACE/SOLID/TRACE)." },

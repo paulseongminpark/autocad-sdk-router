@@ -279,6 +279,18 @@ Common geometry fields: `start`, `end`, `center`, `position`, `alignment_point`,
 `text`, `height`, `rotation`, `block_name`, `scale`, `dimension_type`, `measurement`,
 `control_points[]`, `degree`, `loops[]` (hatch boundaries), `pattern_name`.
 
+For `ellipse`, the native producer normalizes `normal` without changing its sign, projects
+`major_axis` onto the plane perpendicular to that exact emitted normal, and restores the
+original major-axis length. Thus mirrored ellipses retain a negative normal while emitted
+`major_axis · normal` is below `1e-12`.
+
+For circular and elliptical edges inside hatch `loops[].edges[]`, the existing
+`start_angle`/`end_angle` remain OCS radians. The additive `extrusion` field records the
+edge's OCS extrusion, while `start_angle_wcs_deg`/`end_angle_wcs_deg` give WCS-referenced
+degrees computed with AutoCAD's arbitrary axis algorithm. Elliptical edge conversion applies
+the same basis transform to its `major`/minor parameter axes, so a negative extrusion reflects
+the major axis correctly instead of silently reversing or inflating the boundary sweep.
+
 For `text`, `alignment_point` is DXF group 11 and is the placement anchor whenever
 horizontal or vertical alignment mode is nonzero; an absent group 11 remains absent.
 
