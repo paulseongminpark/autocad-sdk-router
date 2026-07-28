@@ -35,6 +35,14 @@ HEADER_VARS = {
     "PDSIZE": 2.5,
 }
 
+# #48: no AcDbDatabase getter -- read from the NOD "AcDbVariableDictionary",
+# emitted only when the dictionary entry is actually readable.
+DICTIONARY_VARS = {
+    "WIPEOUTFRAME": 1,
+    "IMAGEFRAME": 1,
+    "FRAME": 3,
+}
+
 
 def test_native_database_emits_supported_header_vars_and_names_omissions():
     source = NATIVE_SOURCE.read_text(encoding="utf-8")
@@ -44,7 +52,27 @@ def test_native_database_emits_supported_header_vars_and_names_omissions():
     assert '\\"header_vars\\":{' in region
     for name in HEADER_VARS:
         assert f'\\"{name}\\":' in region
-    assert "AcDbDatabase has no getter for WIPEOUTFRAME, IMAGEFRAME, or FRAME" in region
+    # #48: the trio is emitted through the dictionary-variable reader, never a
+    # synthesized default.
+    for name in DICTIONARY_VARS:
+        assert f'dictionaryVarInt(pDb, ACRX_T("{name}"), dv)' in region
+        assert f'\\"{name}\\":' in region
+    assert '"AcDbVariableDictionary"' in source
+
+
+def test_ir_builder_preserves_dictionary_var_trio_and_schema_accepts_them():
+    merged = {**HEADER_VARS, **DICTIONARY_VARS}
+    graph = {
+        "modelspace_entities": 0,
+        "entities": [],
+        "database": {"header_vars": merged},
+    }
+
+    ir = build_ir_from_database_graph(graph, {"dwg_path": "fixture.dwg"})
+
+    assert ir["database"]["header_vars"] == merged
+    schema = json.loads(SCHEMA.read_text(encoding="utf-8-sig"))
+    jsonschema.Draft7Validator(schema).validate(ir)
 
 
 def test_ir_builder_preserves_header_var_types_and_schema_accepts_them():

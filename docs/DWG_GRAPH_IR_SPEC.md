@@ -127,8 +127,11 @@ Drawing-wide settings that scope the whole file.
   `XCLIPFRAME`, `DGNFRAME`, `PDFFRAME`, `LTSCALE`, `PSLTSCALE`, `MSLTSCALE`,
   `CELTSCALE`, `FILLMODE`, `PLINEGEN`, `INSUNITS`, `MIRRTEXT`, `ATTMODE`, `PDMODE`,
   and `PDSIZE`, preserving each `AcDbDatabase` getter's number/boolean type.
-  `WIPEOUTFRAME`, `IMAGEFRAME`, and `FRAME` are omitted because `AcDbDatabase` exposes
-  no getter for them; absence is not a synthesized default.
+  `WIPEOUTFRAME`, `IMAGEFRAME`, and `FRAME` have no `AcDbDatabase` getter (and the
+  SDK ships no public DICTIONARYVAR class); the extractor reads them from the NOD's
+  `AcDbVariableDictionary` via an entget snapshot (#48) and emits them as integers.
+  They appear only when the dictionary entry exists AND the drawing is the working
+  database — when unreadable the field is absent, never a synthesized default.
 - `units` — resolved units: `insunits` (+`insunits_text`), `linear_units` (LUNITS),
   `angular_units` (AUNITS), and precisions.
 - `insbase` — `INSBASE` system variable: the insertion base point used when this drawing is

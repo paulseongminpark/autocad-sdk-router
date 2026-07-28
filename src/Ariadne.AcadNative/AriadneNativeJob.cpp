@@ -3696,6 +3696,49 @@ static std::string namedObjectDictJson(AcDbDatabase* pDb, int& entryCount,
     return entries.str();
 }
 
+// #48: WIPEOUTFRAME / IMAGEFRAME / FRAME have no AcDbDatabase getter and the
+// SDK ships no public DICTIONARYVAR class. Read them from the NOD's
+// "AcDbVariableDictionary" via an entget snapshot (the value rides DXF group 1
+// as text). Working-database only: on a side database the caller omits the
+// field -- absent beats a wrong default (the pre-#48 behavior for all three).
+static bool dictionaryVarInt(AcDbDatabase* pDb, const ACHAR* varName, int& out)
+{
+    if (acdbHostApplicationServices()->workingDatabase() != pDb)
+        return false;
+    AcDbDictionary* pNOD = nullptr;
+    if (pDb->getNamedObjectsDictionary(pNOD, AcDb::kForRead) != Acad::eOk || pNOD == nullptr)
+        return false;
+    AcDbObjectId varsId = AcDbObjectId::kNull;
+    Acad::ErrorStatus es = pNOD->getAt(ACRX_T("AcDbVariableDictionary"), varsId);
+    pNOD->close();
+    if (es != Acad::eOk || varsId.isNull())
+        return false;
+    AcDbDictionary* pVars = nullptr;
+    if (acdbOpenObject(pVars, varsId, AcDb::kForRead) != Acad::eOk || pVars == nullptr)
+        return false;
+    AcDbObjectId varId = AcDbObjectId::kNull;
+    es = pVars->getAt(varName, varId);
+    pVars->close();
+    if (es != Acad::eOk || varId.isNull())
+        return false;
+    ads_name en;
+    if (acdbGetAdsName(en, varId) != Acad::eOk)
+        return false;
+    resbuf* rb = acdbEntGet(en);
+    if (rb == nullptr)
+        return false;
+    bool found = false;
+    for (const resbuf* cur = rb; cur != nullptr; cur = cur->rbnext) {
+        if (cur->restype == 1 && cur->resval.rstring != nullptr) {
+            out = _wtoi(cur->resval.rstring);
+            found = true;
+            break;
+        }
+    }
+    acutRelRb(rb);
+    return found;
+}
+
 static std::string databaseMetaJson(AcDbDatabase* pDb)
 {
     const AcGePoint3d ins = pDb->insbase();
@@ -3710,8 +3753,6 @@ static std::string databaseMetaJson(AcDbDatabase* pDb)
       << ",\"angular_units\":" << static_cast<int>(pDb->aunits())
       << ",\"linear_precision\":" << static_cast<int>(pDb->luprec())
       << ",\"angular_precision\":" << static_cast<int>(pDb->auprec()) << "}"
-      // AcDbDatabase has no getter for WIPEOUTFRAME, IMAGEFRAME, or FRAME;
-      // omit those three rather than silently switching to host-only sysvars.
       << ",\"header_vars\":{\"XCLIPFRAME\":" << static_cast<int>(pDb->xclipFrame())
       << ",\"DGNFRAME\":" << static_cast<int>(pDb->dgnframe())
       << ",\"PDFFRAME\":" << static_cast<int>(pDb->pdfframe())
@@ -3725,7 +3766,16 @@ static std::string databaseMetaJson(AcDbDatabase* pDb)
       << ",\"MIRRTEXT\":" << (pDb->mirrtext() ? "true" : "false")
       << ",\"ATTMODE\":" << static_cast<int>(pDb->attmode())
       << ",\"PDMODE\":" << static_cast<int>(pDb->pdmode())
-      << ",\"PDSIZE\":" << pDb->pdsize() << "}}";
+      << ",\"PDSIZE\":" << pDb->pdsize();
+    // #48: dictionary-variable trio -- emitted only when actually readable.
+    int dv = 0;
+    if (dictionaryVarInt(pDb, ACRX_T("WIPEOUTFRAME"), dv))
+        o << ",\"WIPEOUTFRAME\":" << dv;
+    if (dictionaryVarInt(pDb, ACRX_T("IMAGEFRAME"), dv))
+        o << ",\"IMAGEFRAME\":" << dv;
+    if (dictionaryVarInt(pDb, ACRX_T("FRAME"), dv))
+        o << ",\"FRAME\":" << dv;
+    o << "}}";
     return o.str();
 }
 
