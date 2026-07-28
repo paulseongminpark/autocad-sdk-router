@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
+"""#47: the canonical batched lane (batch_options) must harvest the census->
+rebuilt handle ledger from per-op native result files (handle_map.json) and
+translate relink-op census handles through it right before each batch's job
+docs are written. These tests drive apply_staged through the REAL
+patch_batch_executor with an injected run_router_write_batch (no native host).
+"""
 from __future__ import annotations
 
 import importlib
 import json
 import os
-import shutil
 import sys
 import types
 from pathlib import Path
@@ -15,6 +20,8 @@ if _TOOLS_DIR not in sys.path:
     sys.path.insert(0, _TOOLS_DIR)
 
 pe = importlib.import_module("patch_engine")
+pbe = importlib.import_module("patch_batch_executor")
+run_job_mod = importlib.import_module("run_job")
 
 
 def _make_patch(original_path: Path, out_dir: Path, operations: list[dict]) -> dict:
@@ -31,185 +38,100 @@ def _make_patch(original_path: Path, out_dir: Path, operations: list[dict]) -> d
     }
 
 
-def _applied_records(operations: list[dict],
-                     source_handles: list[str | None]) -> list[dict]:
+def _applied_records(specs: list[dict]) -> list[dict]:
+    """specs: [{patch_op, native_op, args, source_handle?}] -> resolver output."""
     records = []
-    for index, op in enumerate(operations):
+    for index, spec in enumerate(specs):
         record = {
             "index": index,
-            "step_id": op.get("step_id"),
-            "patch_op": op["operation"],
-            "native_op": "native.%s" % op["operation"],
-            "args": op.get("args", {}),
+            "step_id": "s%d" % index,
+            "patch_op": spec["patch_op"],
+            "native_op": spec["native_op"],
+            "args": spec.get("args", {}),
         }
-        source_handle = source_handles[index]
-        if source_handle is not None:
-            record["source_handle"] = source_handle
+        if spec.get("source_handle") is not None:
+            record["source_handle"] = spec["source_handle"]
         records.append(record)
     return records
 
 
-class _FakeRunJob:
-    def run_router_cad_job(self, staged_dwg, run_dir, operation, *,
-                           intent="dwg", write_mode="read",
-                           job_path=None, timeout=600):
-        run_dir_p = Path(run_dir)
-        run_dir_p.mkdir(parents=True, exist_ok=True)
-        stdout_path = run_dir_p / "stdout.txt"
-        stderr_path = run_dir_p / "stderr.txt"
-        stdout_path.write_text("{}", encoding="utf-8")
-        stderr_path.write_text("", encoding="utf-8")
-        staged_used = run_dir_p / "router_stage.dwg"
-        shutil.copy2(staged_dwg, staged_used)
-        result_json = run_dir_p / "result.json"
-        result_json.write_text(json.dumps({"status": "ok"}), encoding="utf-8")
-        return {
-            "command": ["fake"],
-            "exit_code": 0,
-            "stdout_path": str(stdout_path),
-            "stderr_path": str(stderr_path),
-            "envelope": {"status": "ok"},
-            "result_json": str(result_json),
-            "result": {"status": "ok"},
-            "staged_used": str(staged_used),
-            "timed_out": False,
-            "error": None,
-            "job_path": job_path,
-            "timeout": timeout,
-            "intent": intent,
-            "operation": operation,
-            "write_mode": write_mode,
+def _make_write_batch_runner(payload_by_index: dict[int, dict]):
+    """Fake run_job.run_router_write_batch: writes each op's native result file
+    ({"result": {"status": "ok", ...payload...}}), mutates the staged DWG in
+    place, and persists a PASS+qsave envelope (resume contract)."""
+
+    def run_router_write_batch(staged_dwg, run_dir, job_list_path, *,
+                               batch_timeout_ms=0):
+        entries = json.loads(Path(job_list_path).read_text(encoding="utf-8"))
+        for e in entries:
+            payload = {"status": "ok"}
+            payload.update(payload_by_index.get(e["index"], {}))
+            Path(e["result_file"]).parent.mkdir(parents=True, exist_ok=True)
+            Path(e["result_file"]).write_text(
+                json.dumps({"result": payload}), encoding="utf-8")
+        with open(staged_dwg, "ab") as fh:
+            fh.write(b"BATCHED")
+        env = {
+            "schema": "ariadne.autocad_native_write_batch.v1",
+            "status": "PASS", "qsave_done": True, "engine_exit_code": 0,
+            "results": [{"index": e["index"], "operation": e["operation"],
+                         "status": "ok", "error_code": "",
+                         "result_file": e["result_file"]} for e in entries],
         }
+        Path(run_dir).mkdir(parents=True, exist_ok=True)
+        (Path(run_dir) / "write_batch_result.json").write_text(
+            json.dumps(env), encoding="utf-8")
+        return {"envelope": env, "error": None, "exit_code": 0}
+
+    return run_router_write_batch
 
 
-def _fake_native_full_ir(_ir_builder, run_res, staged_path, original_path, ir_out_path, phase):
-    Path(ir_out_path).parent.mkdir(parents=True, exist_ok=True)
-    Path(ir_out_path).write_text(json.dumps({
-        "phase": phase,
-        "source": staged_path,
-        "original": original_path,
-        "entities": [],
-    }), encoding="utf-8")
-    return {
-        "ok": True,
-        "ir_path": ir_out_path,
-        "entity_count": 0,
-        "stdout": run_res.get("stdout_path"),
-        "stderr": run_res.get("stderr_path"),
-        "exit_code": run_res.get("exit_code"),
-    }
-
-
-def _wire_apply_success(monkeypatch, operations: list[dict],
-                        source_handles: list[str | None]) -> None:
-    run_job = _FakeRunJob()
+def _wire_batched_apply(monkeypatch, specs: list[dict],
+                        payload_by_index: dict[int, dict]) -> None:
     modules = {
         "ir_builder": types.SimpleNamespace(build_ir_from_database_graph=object()),
-        "run_job": run_job,
-        "cad_diff": types.SimpleNamespace(
-            compute_diff=lambda pre_ir, post_ir: {"summary": {"by_type": {}}}
-        ),
-        "validator": types.SimpleNamespace(validate_target=object()),
+        "run_job": run_job_mod,
+        "patch_batch_executor": pbe,
     }
 
     def _fake_import_optional(name: str):
         mod = modules.get(name)
         return mod, (None if mod is not None else "missing")
 
-    def _plan_batches(ops, *, max_ops_per_batch):
-        return {
-            "schema": "ariadne.patch_batch_plan.v1",
-            "batches": [{
-                "batch_id": "b000",
-                "op_indices": list(range(len(ops))),
-            }],
-            "atomic_groups": [],
-            "totals": {
-                "op_count": len(ops),
-                "batch_count": 1,
-            },
-            "max_ops_per_batch": max_ops_per_batch,
-        }
-
     monkeypatch.setattr(pe, "_import_optional", _fake_import_optional)
     monkeypatch.setattr(pe, "_resolve_native_write_ops",
-                        lambda patch: (_applied_records(operations, source_handles), [], None))
-    monkeypatch.setattr(pe, "_native_full_ir", _fake_native_full_ir)
-    monkeypatch.setattr(pe, "_call_validator", lambda *args, **kwargs: {
-        "ok": True,
-        "report": {"status": "pass"},
-        "passed_kwargs": {},
-        "diff_aware": True,
-    })
-    monkeypatch.setattr(pe.patch_batch_planner, "plan_batches", _plan_batches)
-    monkeypatch.setattr(pe.patch_batch_planner, "validate_plan",
-                        lambda plan, ops: [])
+                        lambda patch: (_applied_records(specs), [], None))
+    monkeypatch.setattr(run_job_mod, "run_router_write_batch",
+                        _make_write_batch_runner(payload_by_index))
 
 
-def _make_batch_runner(result_payloads: dict[int, dict]):
-    def _runner(run_job, staged_dwg: str, batch_dir: str, batch_id: str, op_records: list[dict]):
-        batch_dir_p = Path(batch_dir)
-        batch_dir_p.mkdir(parents=True, exist_ok=True)
-        results_dir = batch_dir_p / "results"
-        results_dir.mkdir(parents=True, exist_ok=True)
-        stdout_path = batch_dir_p / "stdout.txt"
-        stderr_path = batch_dir_p / "stderr.txt"
-        staged_used = batch_dir_p / "staged_step_input.dwg"
-        shutil.copy2(staged_dwg, staged_used)
-        with open(staged_used, "ab") as fh:
-            fh.write(b"BATCHED")
-
-        lines = []
-        result_paths = {}
-        for seq, record in enumerate(op_records):
-            marker_id = record["batch_marker_id"]
-            lines.append("ARIADNE_OP_START %s" % marker_id)
-            result_path = results_dir / ("%02d_%s.json" % (seq, marker_id))
-            result_paths[marker_id] = str(result_path)
-            result_obj = {"status": "ok"}
-            result_obj.update(result_payloads.get(record["index"], {}))
-            result_path.write_text(json.dumps({"result": result_obj}), encoding="utf-8")
-            lines.append("ARIADNE_OP_END %s STATUS=OK" % marker_id)
-
-        stdout_path.write_text("\n".join(lines), encoding="utf-8")
-        stderr_path.write_text("", encoding="utf-8")
-        return {
-            "command": ["fake-batch"],
-            "exit_code": 0,
-            "stdout_path": str(stdout_path),
-            "stderr_path": str(stderr_path),
-            "router_stdout_path": str(stdout_path),
-            "router_stderr_path": str(stderr_path),
-            "staged_used": str(staged_used),
-            "timed_out": False,
-            "error": None,
-            "elapsed_seconds": 0.25,
-            "script_timeout_ms": 600000,
-            "result_paths": result_paths,
-        }
-
-    return _runner
-
-
-def test_batched_apply_writes_handle_map_pairs(monkeypatch, tmp_path):
-    operations = [
-        {"step_id": "s0", "operation": "append_block_entity", "args": {"block_name": "DOOR"}},
-        {"step_id": "s1", "operation": "append_block_entity", "args": {"block_name": "DOOR"}},
-    ]
+def _apply(tmp_path, monkeypatch, specs, payload_by_index):
     original = tmp_path / "input.dwg"
     original.write_bytes(b"ORIGINAL")
     out_dir = tmp_path / "run"
+    operations = [{"step_id": "s%d" % i, "operation": s["patch_op"],
+                   "args": s.get("args", {})} for i, s in enumerate(specs)]
     patch = _make_patch(original, out_dir, operations)
+    _wire_batched_apply(monkeypatch, specs, payload_by_index)
+    result = pe.apply_staged(patch, str(original), str(out_dir),
+                             batch_options={"enabled": True})
+    return result, out_dir
 
-    _wire_apply_success(monkeypatch, operations, ["OLD_A", "OLD_B"])
-    monkeypatch.setattr(pe, "_run_batched_native_ops", _make_batch_runner({
-        0: {"new_handle": "NEW_A"},
-        1: {"new_handle": "NEW_B"},
-    }))
 
-    result = pe.apply_staged(patch, str(original), str(out_dir), batch_size=10)
+def _append_spec(source_handle, block="DOOR"):
+    return {"patch_op": "append_block_entity",
+            "native_op": "write.block.append_entity",
+            "args": {"block_name": block},
+            "source_handle": source_handle}
 
-    assert result["status"] == "ok"
+
+def test_batched_apply_writes_handle_map_pairs(monkeypatch, tmp_path):
+    result, out_dir = _apply(
+        tmp_path, monkeypatch,
+        [_append_spec("OLD_A"), _append_spec("OLD_B")],
+        {0: {"new_handle": "NEW_A"}, 1: {"new_handle": "NEW_B"}})
+
+    assert result["status"] == "ok", result.get("reason")
     assert json.loads((out_dir / "handle_map.json").read_text(encoding="utf-8")) == {
         "schema": pe.HANDLE_MAP_SCHEMA_ID,
         "pairs": {
@@ -226,24 +148,17 @@ def test_batched_apply_writes_handle_map_pairs(monkeypatch, tmp_path):
 
 def test_batched_apply_writes_empty_handle_map_when_source_handles_are_missing(
         monkeypatch, tmp_path):
-    operations = [
-        {"step_id": "s0", "operation": "append_block_entity", "args": {"block_name": "DOOR"}},
-        {"step_id": "s1", "operation": "create_block", "args": {"name": "DOOR"}},
+    specs = [
+        _append_spec(None),
+        {"patch_op": "create_block_simple",
+         "native_op": "write.block.simple_create",
+         "args": {"block_name": "DOOR"}, "source_handle": "OLD_B"},
     ]
-    original = tmp_path / "input.dwg"
-    original.write_bytes(b"ORIGINAL")
-    out_dir = tmp_path / "run"
-    patch = _make_patch(original, out_dir, operations)
+    result, out_dir = _apply(
+        tmp_path, monkeypatch, specs,
+        {0: {"new_handle": "NEW_A"}, 1: {"names": ["DOOR"]}})
 
-    _wire_apply_success(monkeypatch, operations, [None, "OLD_B"])
-    monkeypatch.setattr(pe, "_run_batched_native_ops", _make_batch_runner({
-        0: {"new_handle": "NEW_A"},
-        1: {"names": ["DOOR"]},
-    }))
-
-    result = pe.apply_staged(patch, str(original), str(out_dir), batch_size=10)
-
-    assert result["status"] == "ok"
+    assert result["status"] == "ok", result.get("reason")
     assert json.loads((out_dir / "handle_map.json").read_text(encoding="utf-8")) == {
         "schema": pe.HANDLE_MAP_SCHEMA_ID,
         "pairs": {},
@@ -253,3 +168,50 @@ def test_batched_apply_writes_empty_handle_map_when_source_handles_are_missing(
             "mapped": 0,
         },
     }
+
+
+def test_batched_apply_translates_relink_census_handles_via_ledger(
+        monkeypatch, tmp_path):
+    # The planner's relink barrier puts the relink op in its OWN batch after
+    # the appends, so the ledger the appends filled is complete before the
+    # relink batch's job doc is written.
+    specs = [
+        _append_spec("OLD_H"),
+        _append_spec("OLD_L1"),
+        {"patch_op": "relink_hatch_assoc",
+         "native_op": pe._RELINK_NATIVE_OP,
+         "args": {"block_name": "B", "hatch_handle": "OLD_H",
+                  "loops_source_handles": [["OLD_L1"]]}},
+    ]
+    result, out_dir = _apply(
+        tmp_path, monkeypatch, specs,
+        {0: {"new_handle": "NEW_H"}, 1: {"new_handle": "NEW_L1"}})
+
+    assert result["status"] == "ok", result.get("reason")
+    relink_job = (out_dir / "apply_batches" / "b001" / "jobs"
+                  / "op_00002_write.block.relink_hatch_assoc.json")
+    assert relink_job.is_file()
+    job = json.loads(relink_job.read_text(encoding="utf-8"))
+    assert job["args"]["hatch_handle"] == "NEW_H"
+    assert job["args"]["loops_source_handles"] == [["NEW_L1"]]
+
+
+def test_batched_apply_refuses_relink_with_unresolved_census_handle(
+        monkeypatch, tmp_path):
+    specs = [
+        _append_spec("OLD_H"),
+        {"patch_op": "relink_hatch_assoc",
+         "native_op": pe._RELINK_NATIVE_OP,
+         "args": {"block_name": "B", "hatch_handle": "OLD_H",
+                  "loops_source_handles": [["OLD_MISSING"]]}},
+    ]
+    result, out_dir = _apply(
+        tmp_path, monkeypatch, specs, {0: {"new_handle": "NEW_H"}})
+
+    # the append batch persisted, so the pipeline stops truthfully as partial
+    # -- never a fake relink against guessed object ids.
+    assert result["status"] == "partial"
+    assert "ASSOC_RELINK_UNRESOLVED" in (result.get("reason") or "")
+    relink_job = (out_dir / "apply_batches" / "b001" / "jobs"
+                  / "op_00001_write.block.relink_hatch_assoc.json")
+    assert not relink_job.exists()

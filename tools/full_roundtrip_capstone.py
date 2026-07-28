@@ -1134,12 +1134,14 @@ def run_regen_batch(filtered_ir: Dict[str, Any], blank_seed_path: str, run_dir: 
     ir_to_patch.build_patch_from_ir) and apply it in ONE patch_engine.
     apply_staged call against a copy of ``blank_seed_path``.
 
-    "Batch the ops" means one staged-write session carrying every op in this
-    filtered_ir, not one apply_staged call per entity -- patch_engine still
-    launches one accoreconsole invocation PER OP internally (chaining each
-    op's mutated staged copy into the next), so op_count is the real
-    throughput unit; see the elapsed/seconds_per_op fields and build_log.md's
-    throughput section for the measured floor and full-scale extrapolation.
+    ``batch_size=None`` keeps patch_engine's per-op lane (one accoreconsole
+    invocation PER OP, chaining each op's mutated staged copy into the next).
+    A positive ``batch_size`` routes to the canonical batched lane (#40/#47)
+    as batch_options.max_ops_per_batch -- one accoreconsole session per
+    planned batch -- with pre/post inspects forced to 'full' because this
+    driver's verdict depends on the pre/post IR pair the batch lane would
+    otherwise skip. op_count stays the real throughput unit; see the
+    elapsed/seconds_per_op fields and build_log.md's throughput section.
     """
     ir_to_patch_mod = ir_to_patch_mod or importlib.import_module("ir_to_patch")
     patch_engine_mod = patch_engine_mod or importlib.import_module("patch_engine")
@@ -1150,8 +1152,13 @@ def run_regen_batch(filtered_ir: Dict[str, Any], blank_seed_path: str, run_dir: 
     patch, deferred = ir_to_patch_mod.build_patch_from_ir(filtered_ir, target_dwg, patch_id)
     ops_report = resolvable_ops_report(patch)
     t0 = time.time()
-    result = patch_engine_mod.apply_staged(
-        patch, blank_seed_path, run_dir, batch_size=batch_size)
+    if batch_size is None:
+        result = patch_engine_mod.apply_staged(patch, blank_seed_path, run_dir)
+    else:
+        result = patch_engine_mod.apply_staged(
+            patch, blank_seed_path, run_dir,
+            batch_options={"enabled": True, "max_ops_per_batch": batch_size,
+                           "pre_inspect": "full", "post_inspect": "full"})
     elapsed = time.time() - t0
     op_count = len(patch.get("operations") or [])
     return {
@@ -1163,14 +1170,19 @@ def run_regen_batch(filtered_ir: Dict[str, Any], blank_seed_path: str, run_dir: 
 
 def build_regen_summary(batch: Dict[str, Any], gate: Dict[str, Any]) -> Dict[str, Any]:
     apply_result = (batch or {}).get("apply_result") or {}
+    # Batched-lane runs carry their plan in apply_result["batch"] (#47:
+    # patch_batch_executor envelope); per-op runs have no batch block and both
+    # fields stay None.
+    batch_env = apply_result.get("batch") or {}
+    plan = batch_env.get("plan") or {}
     return {
         "op_count": batch["op_count"], "deferred_count": len(batch["deferred"]),
         "resolvable_ops": batch["resolvable_ops"],
         "elapsed_seconds": batch["elapsed_seconds"], "seconds_per_op": batch["seconds_per_op"],
         "apply_status": apply_result.get("status"),
         "apply_reason": apply_result.get("reason"),
-        "batch_size": apply_result.get("batch_size"),
-        "batch_count": apply_result.get("batch_count"),
+        "batch_size": plan.get("max_ops_per_batch"),
+        "batch_count": (plan.get("totals") or {}).get("batch_count"),
         "gate": gate,
     }
 
@@ -1276,7 +1288,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
     ap.add_argument("--limit", type=int, default=None, help="global op cap for this batch")
     ap.add_argument("--per-kind-limit", type=int, default=None, help="per-kind op cap for this batch")
     ap.add_argument("--batch-size", type=int, default=None,
-                   help="EXPERIMENTAL flag-gated native batching size for the regen apply_staged call")
+                   help="max ops per accoreconsole write batch; routes the regen "
+                        "apply_staged call to the canonical batched lane "
+                        "(batch_options, #40/#47) with full pre/post inspects")
     ap.add_argument("--max-def-entities-per-block", type=int, default=None,
                    help="drop block_definitions entries with more def_entities than this "
                         "from the regen input; their INSERTs then defer honestly in "

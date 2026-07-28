@@ -177,6 +177,81 @@ def test_execute_no_records_is_blocked(tmp_path):
 
 
 # --------------------------------------------------------------------------- #
+# #47 injection points: pre_batch_cb (transform/refuse) + op_result_cb (harvest)
+# --------------------------------------------------------------------------- #
+
+def test_pre_batch_cb_transforms_recs_before_job_docs(tmp_path):
+    recs = _records(4)
+    seen = []
+
+    def pre_batch(batch_recs, batch_id, batch_dir):
+        seen.append({"batch_id": batch_id,
+                     "indices": [r["index"] for r in batch_recs]})
+        return [dict(r, args=dict(r["args"], end=[123.0, 456.0, 0.0]))
+                for r in batch_recs], None
+
+    run = _runner(lambda n, jl: _pass_envelope(jl))
+    out = pbe.execute_write_batches(recs, "staged.dwg", str(tmp_path / "b"),
+                                    max_ops_per_batch=2, run_batch=run,
+                                    pre_batch_cb=pre_batch)
+    assert out["status"] == "ok"
+    assert [s["batch_id"] for s in seen] == ["b000", "b001"]
+    job_paths = list((tmp_path / "b" / "b000" / "jobs").glob("*.json"))
+    assert job_paths
+    for job_path in job_paths:
+        job = json.loads(job_path.read_text(encoding="utf-8"))
+        assert job["args"]["end"] == [123.0, 456.0, 0.0]
+
+
+def test_pre_batch_cb_refusal_stops_truthfully(tmp_path):
+    recs = _records(4)
+
+    def pre_batch(batch_recs, batch_id, batch_dir):
+        if batch_id == "b001":
+            return batch_recs, "REFUSED: ledger incomplete"
+        return batch_recs, None
+
+    run = _runner(lambda n, jl: _pass_envelope(jl))
+    out = pbe.execute_write_batches(recs, "staged.dwg", str(tmp_path / "b"),
+                                    max_ops_per_batch=2, run_batch=run,
+                                    pre_batch_cb=pre_batch)
+    assert out["status"] == "partial"  # batch 0 DID persist
+    assert out["stopped_at_batch"] == "b001"
+    assert "REFUSED" in out["reason"]
+    assert len(run.calls) == 1  # only batch 0 ran
+    # nothing from the refused batch was written as a job doc
+    assert not list((tmp_path / "b" / "b001" / "jobs").glob("*.json"))
+
+
+def test_op_result_cb_fires_live_and_replays_on_resume_skip(tmp_path):
+    recs = _records(4)
+    live = []
+    run1 = _runner(lambda n, jl: _pass_envelope(jl))
+    out1 = pbe.execute_write_batches(
+        recs, "staged.dwg", str(tmp_path / "b"),
+        max_ops_per_batch=2, run_batch=run1,
+        op_result_cb=lambda rec, r: live.append(
+            (rec["index"], r["status"], bool(r["result_file"]))))
+    assert out1["status"] == "ok"
+    assert live == [(0, "ok", True), (1, "ok", True),
+                    (2, "ok", True), (3, "ok", True)]
+
+    # resume: every batch is skipped, yet the harvest replays from the
+    # persisted envelopes so a downstream consumer (handle ledger) still
+    # sees every op (#47).
+    replay = []
+    run2 = _runner(lambda n, jl: pytest.fail(
+        "all batches complete; nothing may re-run on resume"))
+    out2 = pbe.execute_write_batches(
+        recs, "staged.dwg", str(tmp_path / "b"),
+        max_ops_per_batch=2, run_batch=run2,
+        op_result_cb=lambda rec, r: replay.append(
+            (rec["index"], r["status"], bool(r["result_file"]))))
+    assert out2["status"] == "ok"
+    assert replay == live
+
+
+# --------------------------------------------------------------------------- #
 # apply_staged wiring
 # --------------------------------------------------------------------------- #
 

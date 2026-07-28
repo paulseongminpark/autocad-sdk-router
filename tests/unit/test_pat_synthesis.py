@@ -14,6 +14,7 @@ for _p in (_REPO, os.path.join(_REPO, "tools")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+import patch_batch_executor as pbe  # noqa: E402
 import patch_engine as pe  # noqa: E402
 from patch_ops import blocks as patch_ops_blocks  # noqa: E402
 
@@ -80,7 +81,6 @@ def _batch_record(index: int, pattern_name: str, pattern_definitions: list[dict]
                 _custom_hatch(pattern_name=pattern_name, pattern_definitions=pattern_definitions),
             )["args"]["entity"],
         },
-        "batch_marker_id": "s%d" % index,
     }
 
 
@@ -103,13 +103,7 @@ def test_custom_hatch_with_pattern_definitions_emits_and_without_still_defers():
     assert patch_ops_blocks._def_entity_append_op("BLK", empty) is None
 
 
-def test_batch_pat_synthesis_writes_exact_content_and_dedupes_names(monkeypatch, tmp_path):
-    native_bin = tmp_path / "native"
-    native_bin.mkdir()
-    for leaf in ("Ariadne.AcadNativeDbx.dbx", "Ariadne.AcadNative.crx"):
-        (native_bin / leaf).write_text("", encoding="utf-8")
-    monkeypatch.setattr(pe, "_resolve_native_acad_module", lambda leaf: str(native_bin / leaf))
-
+def test_batch_pat_synthesis_writes_exact_content_and_dedupes_names(tmp_path):
     definitions = _pattern_definitions()
     batch_dir = tmp_path / "batch"
     records = [
@@ -117,7 +111,7 @@ def test_batch_pat_synthesis_writes_exact_content_and_dedupes_names(monkeypatch,
         _batch_record(1, "H3", definitions),
     ]
 
-    pe._build_native_batch_script(str(batch_dir), "b001", records)
+    pe._synthesize_batch_pat_files(str(batch_dir), records)
 
     # R4t vintage contract: .pat files live under pats/<digest>/<NAME>.pat
     # (leaf name stays <NAME>.pat for cwd resolution; vintages separate by
@@ -137,10 +131,12 @@ def test_batch_pat_synthesis_writes_exact_content_and_dedupes_names(monkeypatch,
         "30, 2, -4.25, 2.38125, 4.1244459855, -1.25, 0.625\n"
     )
 
-    job_paths = sorted((batch_dir / "jobs").glob("*.json"))
-    assert len(job_paths) == 2
-    for job_path in job_paths:
-        job = json.loads(job_path.read_text(encoding="utf-8"))
+    # #47: the synthesized path rides the mutated op args into the canonical
+    # write-batch job docs (patch_batch_executor.build_native_job_doc ->
+    # patch_ops.build_job_args passthrough; m08e copies the .pat into the
+    # session cwd before every setPattern).
+    for record in records:
+        job = pbe.build_native_job_doc(record["native_op"], record["args"])
         entity = job["args"]["entity"]
         assert entity["pattern_pat_path"] == pat_path.as_posix()
         assert os.path.isabs(entity["pattern_pat_path"])

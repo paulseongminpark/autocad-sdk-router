@@ -118,7 +118,9 @@ def execute_write_batches(applied_records: List[Dict[str, Any]],
                           run_batch: Optional[Callable[..., Dict[str, Any]]] = None,
                           resume: bool = True,
                           step_cb: Optional[Callable[[Dict[str, Any]], None]] = None,
-                          batch_timeout_ms: int = 0) -> Dict[str, Any]:
+                          batch_timeout_ms: int = 0,
+                          pre_batch_cb: Optional[Callable[..., Any]] = None,
+                          op_result_cb: Optional[Callable[..., Any]] = None) -> Dict[str, Any]:
     """Execute every resolved write op against ``staged_dwg`` in planned batches.
 
     applied_records: patch_engine._resolve_native_write_ops output
@@ -128,6 +130,16 @@ def execute_write_batches(applied_records: List[Dict[str, Any]],
                             batch_timeout_ms=...) -> {envelope, error, ...}.
     step_cb: receives one journal-step dict per op and per batch (op-granular
         journal contract).
+    pre_batch_cb (#47): called as pre_batch_cb(recs, batch_id, batch_dir) ->
+        (recs, reason) BEFORE the batch's job docs are written, so a caller can
+        transform op args per batch (patch_engine wires .pat synthesis and the
+        census->rebuilt relink-handle translation here). A non-None reason
+        refuses the batch and stops the pipeline truthfully (nothing from the
+        refused batch ran). Skipped-on-resume batches are NOT re-transformed.
+    op_result_cb (#47): called as op_result_cb(rec, result_rec) once per op --
+        result_rec carries at least {status, result_file} -- on both the live
+        path and the resume-skip path, so per-op harvests (the source->new
+        handle ledger relink translation depends on) survive a resume.
 
     Returns {schema, status: ok|partial|blocked, plan, batches, ops_total,
              ops_ok, stopped_at_batch?, reason?}.
@@ -177,11 +189,39 @@ def execute_write_batches(applied_records: List[Dict[str, Any]],
             cached = _load_cached_envelope(run_dir)
             if cached and cached.get("status") == "PASS" and cached.get("qsave_done"):
                 ops_ok_total += len(recs)
+                if op_result_cb is not None:
+                    # replay per-op harvests from the persisted result files so
+                    # downstream batches (relink translation) still see the
+                    # ledger entries this skipped batch produced (#47).
+                    cached_by_index = {
+                        r.get("index"): r for r in (cached.get("results") or [])
+                        if isinstance(r, dict)}
+                    for rec in recs:
+                        cr = cached_by_index.get(rec["index"]) or {}
+                        rf = cr.get("result_file") or os.path.join(
+                            results_dir, "op_%05d_%s.json"
+                            % (rec["index"], _sanitize(rec["native_op"])))
+                        op_result_cb(rec, {"status": cr.get("status") or "ok",
+                                           "result_file": rf})
                 batches_out.append({"batch_id": bid, "status": "skipped_resume",
                                     "ops": len(recs), "run_dir": run_dir})
                 _emit({"step": "apply_batch[%s]" % bid, "status": "skipped_resume",
                        "op_count": len(recs), "run_dir": run_dir})
                 continue
+
+        if pre_batch_cb is not None:
+            recs, refuse_reason = pre_batch_cb(recs, bid, bdir)
+            if refuse_reason:
+                batches_out.append({"batch_id": bid, "status": "refused_pre_batch",
+                                    "ops": len(recs), "ops_ok": 0,
+                                    "qsave_done": False, "run_dir": run_dir,
+                                    "error": refuse_reason})
+                _emit({"step": "apply_batch[%s]" % bid, "status": "blocked",
+                       "op_count": len(recs), "reason": refuse_reason})
+                stopped_at = bid
+                status = "partial" if ops_ok_total > 0 else "blocked"
+                reason = refuse_reason
+                break
 
         job_list = []
         for rec in recs:
@@ -202,17 +242,21 @@ def execute_write_batches(applied_records: List[Dict[str, Any]],
         per_op = {r.get("index"): r for r in (envelope.get("results") or [])
                   if isinstance(r, dict)}
 
+        result_file_by_index = {e["index"]: e["result_file"] for e in job_list}
         ops_ok = 0
         for rec in recs:
             r = per_op.get(rec["index"], {})
             op_status = r.get("status") or "no_result"
             if op_status == "ok":
                 ops_ok += 1
+            result_file = r.get("result_file") or result_file_by_index.get(rec["index"])
+            if op_result_cb is not None:
+                op_result_cb(rec, dict(r, status=op_status, result_file=result_file))
             _emit({"step": "apply_batch[%s].op[%d]" % (bid, rec["index"]),
                    "status": op_status, "native_op": rec["native_op"],
                    "patch_op": rec.get("patch_op"), "step_id": rec.get("step_id"),
                    "error_code": r.get("error_code") or None,
-                   "result_file": r.get("result_file")})
+                   "result_file": result_file})
         ops_ok_total += ops_ok
 
         brec = {"batch_id": bid, "status": env_status or "no_envelope",
