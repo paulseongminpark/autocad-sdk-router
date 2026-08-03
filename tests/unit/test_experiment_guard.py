@@ -4,6 +4,7 @@ from __future__ import annotations
 import os
 import sys
 import hashlib
+import json
 from pathlib import Path
 
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -323,6 +324,32 @@ def test_guarded_runner_executes_only_after_ready_probe():
     assert result["executed"] is True
     assert result["command_exit_code"] == 7
     assert calls == [["python", "model.py"]]
+
+
+def test_guarded_runner_writes_preflight_and_final_receipt(tmp_path: Path):
+    receipt_path = tmp_path / "guard.json"
+
+    class Completed:
+        returncode = 0
+
+    def fake_runner(command, check=False):
+        preflight = json.loads(receipt_path.read_text(encoding="utf-8"))
+        assert preflight["guard"]["status"] == guard.READY
+        assert preflight["executed"] is False
+        return Completed()
+
+    result = guarded_runner.run_guarded(
+        required_observables=["modelspace_geometry", "block_definitions"],
+        command=["python", "model.py"],
+        probe_output=_rich_ir(),
+        receipt_path=receipt_path,
+        runner=fake_runner,
+    )
+
+    final = json.loads(receipt_path.read_text(encoding="utf-8"))
+    assert result["executed"] is True
+    assert final["executed"] is True
+    assert final["command_exit_code"] == 0
 
 
 def test_guarded_runner_never_executes_known_build_gap():

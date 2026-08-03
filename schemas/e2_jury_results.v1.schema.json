@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ariadne.local/schemas/e2_jury_results.v1.schema.json",
+  "title": "E2 dependence-aware jury results",
+  "type": "object",
+  "required": ["schema", "status", "thresholds_frozen_before_inference", "independent_evidence_family_count", "label_counts", "results"],
+  "properties": {
+    "schema": {"const": "e2.jury_results.v1"},
+    "status": {"const": "PARTIAL_PASS"},
+    "independent_evidence_family_count": {"type": "integer", "minimum": 1},
+    "label_counts": {"type": "object"},
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["hypothesis_id", "scores", "automatic_label", "promotion_status", "intervention_stability"],
+        "properties": {
+          "hypothesis_id": {"type": "string"},
+          "scores": {"type": "object", "required": ["rules", "gbdt", "gnn"]},
+          "automatic_label": {"enum": ["PROVISIONAL_SILVER_WALL", "PROVISIONAL_SILVER_NOT_WALL", "REVIEW"]},
+          "promotion_status": {"const": "NOT_GOLD_NOT_TRAINING_TRUTH"},
+          "intervention_stability": {"type": "object"}
+        }
+      }
+    }
+  }
+}

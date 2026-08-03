@@ -26,6 +26,7 @@ def run_guarded(
     probe_output: Mapping[str, Any] | None = None,
     allow_empty: bool = False,
     independent_oracle_receipt: Mapping[str, Any] | None = None,
+    receipt_path: Path | None = None,
     runner: Callable[..., Any] = subprocess.run,
 ) -> dict[str, Any]:
     decision = experiment_guard.qualify(
@@ -48,6 +49,13 @@ def run_guarded(
         "command": list(command),
         "command_exit_code": None,
     }
+    if receipt_path is not None:
+        receipt_path.parent.mkdir(parents=True, exist_ok=True)
+        receipt_path.write_text(
+            json.dumps(result, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
     if decision["status"] != experiment_guard.READY:
         return result
     if not command:
@@ -63,6 +71,12 @@ def run_guarded(
     completed = runner(list(command), check=False)
     result["executed"] = True
     result["command_exit_code"] = int(completed.returncode)
+    if receipt_path is not None:
+        receipt_path.write_text(
+            json.dumps(result, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
     return result
 
 
@@ -91,6 +105,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--probe-ir", type=Path)
     parser.add_argument("--allow-empty", action="store_true")
     parser.add_argument("--independent-oracle-receipt", type=Path)
+    parser.add_argument(
+        "--receipt-output",
+        type=Path,
+        help="Write the guard decision before execution and the final run receipt after execution.",
+    )
     parser.add_argument("command", nargs=argparse.REMAINDER)
     args = parser.parse_args(argv)
 
@@ -105,6 +124,7 @@ def main(argv: list[str] | None = None) -> int:
         probe_output=_load_probe(args.probe_ir),
         allow_empty=args.allow_empty,
         independent_oracle_receipt=_load_probe(args.independent_oracle_receipt),
+        receipt_path=args.receipt_output,
     )
     print(json.dumps(result, indent=2, ensure_ascii=False))
     if result["executed"]:

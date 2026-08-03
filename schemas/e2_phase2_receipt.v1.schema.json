@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ariadne.local/schemas/e2_phase2_receipt.v1.schema.json",
+  "title": "E2 model-assisted jury receipt",
+  "type": "object",
+  "required": ["schema", "status", "experiment_id", "source", "gates", "inputs", "outputs", "headline", "claim_boundary"],
+  "properties": {
+    "schema": {"const": "e2.phase2_receipt.v1"},
+    "status": {"enum": ["PASS", "PARTIAL_PASS", "PASS_WITH_DEFERRAL", "BLOCKED", "RETRACTED"]},
+    "experiment_id": {"type": "string"},
+    "source": {"type": "object", "required": ["path", "sha256", "read_only"]},
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["gate", "status", "evidence"],
+        "properties": {
+          "gate": {"type": "string"},
+          "status": {"enum": ["PASS", "PARTIAL_PASS", "PASS_WITH_DEFERRAL", "BLOCKED", "RETRACTED"]},
+          "evidence": {"type": "string"}
+        }
+      }
+    },
+    "inputs": {"type": "array", "items": {"type": "object"}},
+    "outputs": {"type": "array", "items": {"type": "object"}},
+    "headline": {"type": "object"},
+    "claim_boundary": {"type": "string"}
+  }
+}
