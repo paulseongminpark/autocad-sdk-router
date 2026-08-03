@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ariadne.local/schemas/e2_qualification_receipt.v1.schema.json",
+  "title": "E2 instrument qualification receipt",
+  "type": "object",
+  "required": ["schema", "status", "experiment_id", "source", "evidence", "gates", "scope_verdicts", "limitations"],
+  "properties": {
+    "schema": {"const": "e2.qualification_receipt.v1"},
+    "status": {"enum": ["PASS", "PARTIAL_PASS", "PASS_WITH_DEFERRAL", "BLOCKED", "RETRACTED"]},
+    "experiment_id": {"type": "string"},
+    "source": {"type": "object"},
+    "evidence": {"type": "array", "items": {"type": "object"}},
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["gate", "status", "evidence"],
+        "properties": {
+          "gate": {"type": "string"},
+          "status": {"enum": ["PASS", "PARTIAL_PASS", "PASS_WITH_DEFERRAL", "BLOCKED", "RETRACTED"]},
+          "evidence": {"type": "string"}
+        }
+      }
+    },
+    "scope_verdicts": {"type": "object"},
+    "limitations": {"type": "array", "items": {"type": "string"}}
+  }
+}

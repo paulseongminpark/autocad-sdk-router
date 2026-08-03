@@ -1,0 +1,7 @@
+tool_id,role,engine,input_contract,output_contract,qualification_gate,known_blind_spot,availability_source
+native_objectarx_graph,primary DWG observation,ObjectARX,DWG read-only,ariadne.dwg_graph_ir.v1,source hash plus native_full coverage plus entity census,groups materials plot settings skipped and proxy support partial,live cad.inspect_drawing receipt
+worldir_adapter,analysis projection,Python stdlib,ariadne.dwg_graph_ir.v1,worldir.input.v1,source equals adapted plus explicit exclusions,only LINE POLYLINE LWPOLYLINE ARC INSERT,run artifact hash
+worldir_oracle,block expansion and clipping,Python plus NumPy,worldir.input.v1,worldir.oracle.v1,raw equals visible plus clipped and all placed ids unique,2D segment projection only,run artifact hash
+wall_evidence_grid,exploratory rule arm,Python stdlib,seg.v1,wall candidate scores,metamorphic invariance plus labeled external evaluation,quadratic pair search and no truth on a single unlabeled DWG,run artifact hash
+gbdt_wall_arm,learned tabular arm,GBDT,frozen feature schema plus labeled split,predictions and calibrated scores,corpus-held-out evaluation plus feature-unit audit,no compatible labels for a new unlabeled DWG,model manifest plus evaluation receipt
+gnn_wall_arm,learned graph arm,GNN,frozen graph schema plus labeled split,predictions and calibrated scores,leave-one-corpus-out plus intervention suite,no compatible labels for a new unlabeled DWG,model manifest plus evaluation receipt

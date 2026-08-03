@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ariadne.local/schemas/world_geometry_ir.v1.schema.json",
+  "title": "World geometry segment projection",
+  "type": "object",
+  "required": ["oracle", "status", "drawing_id", "segments", "conservation_ledger", "failure_ledger"],
+  "properties": {
+    "oracle": {"const": "worldir.oracle.v1"},
+    "status": {"enum": ["PASS", "FAIL"]},
+    "drawing_id": {"type": "string"},
+    "segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["placed_uid", "source_entity_handle", "source_def_handle", "p0_world", "p1_world"],
+        "properties": {
+          "placed_uid": {"type": "string"},
+          "source_entity_handle": {"type": "string"},
+          "source_def_handle": {"type": "string"},
+          "p0_world": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+          "p1_world": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}}
+        }
+      }
+    },
+    "conservation_ledger": {"type": "object"},
+    "failure_ledger": {"type": "array"}
+  }
+}
