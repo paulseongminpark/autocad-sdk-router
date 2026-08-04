@@ -60,6 +60,20 @@ DEFAULTS = {
     "weights": {"parallel": 0.35, "thickness": 0.25, "junction": 0.20, "layer": 0.20},
 }
 WALL_LAYER_TOKENS = ("WALL", "WA", "BEARING", "벽")  # 벽 == 벽
+# A dimensionless overlap ratio at or below this value is numerical contact,
+# not longitudinal overlap.  Without this guard, two endpoint-touching oblique
+# segments can acquire a tiny positive overlap after vectorization and then
+# lose it after a rigid translation or unit re-expression.
+OVERLAP_EPS_RATIO = 1e-12
+ANGLE_EPS_DEG = 1e-12
+BAND_EPS_RATIO = 1e-12
+BAND_EPS_ABS = 1e-9
+
+
+def _band_epsilon(lo, hi):
+    """Scale-aware tolerance for inclusive physical-distance thresholds."""
+    relative = max(1.0, abs(float(lo)), abs(float(hi))) * BAND_EPS_RATIO
+    return max(BAND_EPS_ABS, relative)
 
 
 # ---------------------------------------------------------------------------
@@ -121,7 +135,8 @@ def _longitudinal_overlap_ratio(s, t):
     tt = sorted((_project_scalar(t[0], origin, u), _project_scalar(t[1], origin, u)))
     overlap = max(0.0, min(ts[1], tt[1]) - max(ts[0], tt[0]))
     denom = min(ls, lt)
-    return overlap / denom if denom > 0 else 0.0
+    ratio = overlap / denom if denom > 0 else 0.0
+    return 0.0 if ratio <= OVERLAP_EPS_RATIO else ratio
 
 
 def _lateral_offset(s, t):
@@ -247,18 +262,23 @@ def score(seg_ir, params=None):
             if i == j:
                 continue
             b = recs[j]
-            near_parallel = _angle_diff_deg(a["angle"], b["angle"]) <= angle_tol
+            near_parallel = (
+                _angle_diff_deg(a["angle"], b["angle"])
+                <= angle_tol + ANGLE_EPS_DEG
+            )
             if near_parallel:
                 ov = _longitudinal_overlap_ratio(a["geom"], b["geom"])
                 if ov > 0.0:
                     off = _lateral_offset(a["geom"], b["geom"])
+                    overlap_qualified = ov >= overlap_min - OVERLAP_EPS_RATIO
                     # thickness: track the plausible-wall-gap neighbour (prefer overlap>=min,
                     # then smallest offset) so the channel is independent of parallel's gate.
-                    cand = (0 if ov >= overlap_min else 1, off)
+                    cand = (0 if overlap_qualified else 1, off)
                     if best_thick_off is None or cand < best_thick_off[0]:
                         best_thick_off = (cand, off)
                     # parallel: requires offset in band AND overlap >= min.
-                    if ov >= overlap_min and lo <= off <= hi:
+                    band_eps = _band_epsilon(lo, hi)
+                    if overlap_qualified and lo - band_eps <= off <= hi + band_eps:
                         if best_parallel is None or ov > best_parallel[0]:
                             best_parallel = (ov, off, j)
             # junction: L/T (endpoint contacts) or X (interior crossing).
