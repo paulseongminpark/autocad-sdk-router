@@ -47,7 +47,7 @@ $ python -m pytest tests/unit -q --basetemp="$env:TEMP\pytest-b2" -p no:cachepro
 
 ## 커밋
 
-`<PENDING — 이 커밋 직후 기록>`
+`8f2e9f6` — "probe+meta: casefold symbol-table name lookups (#54 family)" (브랜치 `fix/ezdxf-trap-audit`, 6 files changed: `AUDIT.md`, `REPORT_B2.md`, `tests/unit/test_op_roundtrip_probe_casefold.py`, `tests/unit/test_transforms_struct_layer_casefold.py`, `tools/e2/meta/transforms_struct.py`, `tools/op_roundtrip_probe.py`).
 
 ## 검증 (VALIDATION 항목별)
 
