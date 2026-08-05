@@ -479,6 +479,18 @@ def _h_lwpolyline(ctx, space, ent, g, attr):
     const_width = _num(g.get("const_width"))
     if const_width:
         lw.dxf.const_width = const_width
+    # #59: an LWPOLYLINE is a planar curve, so its Z lives in `elevation`
+    # (DXF group 38), not on the vertices. Reading only x/y off the vertices
+    # flattened whole drawings to z=0 (measured: 2,000,000.02 -> 0). The IR
+    # leaves `elevation` empty and carries that Z on every vertex instead, so
+    # recover it from there when the field is absent.
+    elevation = _num(g.get("elevation"))
+    if elevation is None:
+        vertex_z = [p[2] for p in (_p3(v.get("point")) if isinstance(v, dict) else _p3(v)
+                                   for v in g.get("vertices") or [])]
+        elevation = vertex_z[0] if vertex_z else None
+    if elevation:
+        lw.dxf.elevation = elevation
     return lw
 
 
@@ -603,10 +615,26 @@ def _h_spline(ctx, space, ent, g, attr):
     spline = space.add_spline(dxfattribs=attr)
     spline.dxf.degree = degree
     if control:
+        # #53: three knot representations reach this branch, and only the first
+        # is DXF-standard. Accepting just that one and silently discarding the
+        # rest left control-point-only SPLINEs with an EMPTY knot vector, which
+        # makes AutoCAD reject the whole file (rc53) even though ezdxf's audit
+        # passes it -- 3 bad splines out of 12,980 killed a 4 MB drawing.
         knots = [_num(k, 0.0) for k in ent.get("spline_knots") or []]
-        spline.control_points = control
-        if knots and len(knots) == len(control) + degree + 1:
+        clamped = len(control) + degree + 1
+        if len(knots) == clamped:
+            spline.control_points = control
             spline.knots = knots
+        elif g.get("closed") and len(knots) == len(control) + 1:
+            # ObjectARX reports a periodic (closed) spline as nknots = ncp+1.
+            # set_closed is the API for exactly this: it wraps the first
+            # `degree` control points and regenerates a uniform knot vector.
+            spline.set_closed(control, degree)
+            ctx.report.added["spline_periodic"] += 1
+        else:
+            spline.control_points = control
+            spline.knots = open_uniform_knot_vector(len(control), degree + 1)
+            ctx.report.added["spline_knots_synthesized"] += 1
     if fit:
         spline.fit_points = fit
     return spline
@@ -629,7 +657,15 @@ def _h_wipeout(ctx, space, ent, g, attr):
     if len(points) < 3:
         ctx.report.skipped["wipeout:no_clip_boundary"] += 1
         return None
-    return space.add_wipeout(points, dxfattribs=attr)
+    wipeout = space.add_wipeout(points, dxfattribs=attr)
+    # #49: ezdxf's WIPEOUT factory applies every dxfattrib EXCEPT layer, which
+    # it overwrites with '0' (reproduced against ezdxf 1.4.3: color survives,
+    # layer does not). Assigning it afterwards survives save+reload, and this
+    # one line moved the HDC 267 run from 36 to 182 passing drawings.
+    layer = attr.get("layer")
+    if layer:
+        wipeout.dxf.layer = layer
+    return wipeout
 
 
 def _wipeout_wcs_vertices(g) -> list:
@@ -656,16 +692,41 @@ def _wipeout_wcs_vertices(g) -> list:
 
 
 def _h_face3d(ctx, space, ent, g, attr):
-    ctx.report.skipped["face3d:no_builder_branch"] += 1
-    return None
+    """#56: AcDbFace had no dispatch branch at all -- 136 3DFACEs in one drawing
+    fell into ``skipped`` unnoticed. Edge visibility is a group-70 bitmask
+    (``dxf.invisible_edges``), which ``set_edge_visibility`` maintains; the
+    unrelated group-60 ``dxf.invisible`` flag is NOT where those bits live.
+    """
+    face = space.add_3dface(_quad_points(g), dxfattribs=attr)
+    for index, visible in enumerate(g.get("edge_visibility") or []):
+        if index < 4 and not visible:
+            face.set_edge_visibility(index, False)
+    return face
 
 
 def _h_leader(ctx, space, ent, g, attr):
+    """#59: a LEADER rebuilt as a POLYLINE is a lost LEADER (137 -> 0 in d014).
+
+    ezdxf supports the entity natively, so identity is preserved; the polyline
+    form remains only as a fallback. Note that MULTILEADER also arrives with
+    ``kind == "leader"`` (the extractor's class map) and is therefore rebuilt as
+    a plain LEADER -- a known, separately tracked downgrade.
+    """
     points = _vertex_points(g)
     if len(points) < 2:
         ctx.report.skipped["leader:too_few_vertices"] += 1
         return None
-    return space.add_polyline3d(points, dxfattribs=attr)
+    try:
+        leader = space.add_leader(points, dimstyle=ctx.dim_style_ref,
+                                 dxfattribs=dict(attr))
+    except Exception as ex:  # noqa: BLE001
+        ctx.report.errors[f"leader:{type(ex).__name__}:{str(ex)[:40]}"] += 1
+        ctx.report.added["leader_polyline_fallback"] += 1
+        return space.add_polyline3d(points, dxfattribs=attr)
+    if isinstance(g.get("has_arrow_head"), bool):
+        leader.dxf.has_arrowhead = 1 if g["has_arrow_head"] else 0
+    leader.dxf.path_type = 1 if g.get("splined") else 0
+    return leader
 
 
 def _h_ray(ctx, space, ent, g, attr):

@@ -278,5 +278,169 @@ class Issue51BlockDimensionInlineTest(unittest.TestCase):
         self.assertIn("*D1", reloaded.blocks)
 
 
+class Issue49WipeoutLayerTest(unittest.TestCase):
+    """#49: ezdxf's add_wipeout ignores dxfattribs['layer'] -> everything on '0'.
+
+    Dominant cause of 214 of the 216 initial FAILs in the HDC 267 run
+    (~140,000 misplaced WIPEOUTs), so the layer is asserted after a full DXF
+    round trip: the post-creation assignment has to survive save+reload.
+    """
+
+    def _wipeout_ir(self):
+        return _ir(
+            [_ent("wipeout", {"origin": [10.0, 20.0, 0.0],
+                              "u_vector": [30.0, 0.0, 0.0],
+                              "v_vector": [0.0, 15.0, 0.0],
+                              "image_size": [1.0, 1.0],
+                              "clip_boundary_type": 2,
+                              "clip_boundary": [[-0.5, 0.5], [0.5, 0.5],
+                                                [0.5, -0.5], [-0.5, -0.5]],
+                              "frame_on": True}, layer="PV-MASK")],
+            symbol_tables={"layers": [{"name": "0"}, {"name": "PV-MASK"}]},
+        )
+
+    def test_wipeout_keeps_its_original_layer(self):
+        doc, report = build_dxf_from_ir(self._wipeout_ir())
+        wipeouts = list(_reload(doc).modelspace().query("WIPEOUT"))
+        self.assertEqual(len(wipeouts), 1)
+        self.assertEqual(wipeouts[0].dxf.layer, "PV-MASK")
+        self.assertEqual(report.added["wipeout"], 1)
+
+    def test_masking_area_returns_to_the_original_wcs_rectangle(self):
+        """The clip boundary is image-plane 2D; the WCS mapping must be exact."""
+        doc, _ = build_dxf_from_ir(self._wipeout_ir())
+        wipeout = list(_reload(doc).modelspace().query("WIPEOUT"))[0]
+        corners = {(round(p.x, 6), round(p.y, 6)) for p in wipeout.boundary_path_wcs()}
+        self.assertEqual(corners, {(10.0, 20.0), (40.0, 20.0),
+                                   (40.0, 35.0), (10.0, 35.0)})
+
+
+class Issue53PeriodicSplineTest(unittest.TestCase):
+    """#53: ObjectARX periodic knots (ncp+1) were dropped -> knot-less SPLINE.
+
+    A SPLINE with control points and NO knots makes AutoCAD reject the entire
+    DXF with rc53 (ezdxf's own audit passes it, which is why this went unseen).
+    """
+
+    @staticmethod
+    def _ring(count=8, radius=10.0):
+        import math as _math
+        return [[radius * _math.cos(i * 2 * _math.pi / count),
+                 radius * _math.sin(i * 2 * _math.pi / count), 0.0]
+                for i in range(count)]
+
+    def _periodic_ir(self):
+        control = self._ring()
+        return _ir([_ent("spline", {"degree": 3, "closed": True},
+                         layer="0",
+                         spline_control_points=control,
+                         spline_knots=[float(i) for i in range(len(control) + 1)])])
+
+    def test_periodic_spline_gets_a_valid_dxf_knot_vector(self):
+        doc, report = build_dxf_from_ir(self._periodic_ir())
+        splines = list(_reload(doc).modelspace().query("SPLINE"))
+        self.assertEqual(len(splines), 1)
+        spline = splines[0]
+        self.assertGreater(len(spline.knots), 0)
+        self.assertEqual(len(spline.knots),
+                         len(spline.control_points) + spline.dxf.degree + 1)
+        self.assertEqual(report.added["spline_periodic"], 1)
+
+    def test_standard_knot_vector_is_passed_through_unchanged(self):
+        control = [[0.0, 0.0, 0.0], [1.0, 2.0, 0.0], [3.0, 2.0, 0.0], [4.0, 0.0, 0.0]]
+        knots = [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]
+        doc, report = build_dxf_from_ir(_ir([
+            _ent("spline", {"degree": 3, "closed": False},
+                 spline_control_points=control, spline_knots=knots)]))
+        spline = list(_reload(doc).modelspace().query("SPLINE"))[0]
+        self.assertEqual(list(spline.knots), knots)
+        self.assertEqual(report.added["spline_periodic"], 0)
+
+    def test_mismatched_knot_count_is_synthesized_never_left_empty(self):
+        control = [[0.0, 0.0, 0.0], [1.0, 2.0, 0.0], [3.0, 2.0, 0.0], [4.0, 0.0, 0.0]]
+        doc, report = build_dxf_from_ir(_ir([
+            _ent("spline", {"degree": 3, "closed": False},
+                 spline_control_points=control, spline_knots=[0.0, 1.0, 2.0])]))
+        spline = list(_reload(doc).modelspace().query("SPLINE"))[0]
+        self.assertEqual(len(spline.knots),
+                         len(spline.control_points) + spline.dxf.degree + 1)
+        self.assertEqual(report.added["spline_knots_synthesized"], 1)
+
+
+class Issue56Face3dTest(unittest.TestCase):
+    """#56: no face3d dispatch branch -> all 136 3DFACEs in d008 were lost."""
+
+    def _face_ir(self):
+        return _ir([_ent("face3d", {"p0": [0.0, 0.0, 30.0], "p1": [10.0, 0.0, 30.0],
+                                    "p2": [10.0, 10.0, -0.0002],
+                                    "p3": [0.0, 10.0, -0.0002],
+                                    "edge_visibility": [True, False, True, False]},
+                         layer="ROOF")],
+                   symbol_tables={"layers": [{"name": "0"}, {"name": "ROOF"}]})
+
+    def test_face3d_is_created_with_z_preserved(self):
+        doc, report = build_dxf_from_ir(self._face_ir())
+        faces = list(_reload(doc).modelspace().query("3DFACE"))
+        self.assertEqual(len(faces), 1)
+        self.assertEqual(report.added["face3d"], 1)
+        self.assertAlmostEqual(faces[0].dxf.vtx0.z, 30.0)
+        self.assertAlmostEqual(faces[0].dxf.vtx2.z, -0.0002)
+        self.assertEqual(faces[0].dxf.layer, "ROOF")
+
+    def test_edge_visibility_bits_survive_the_roundtrip(self):
+        """set_edge_visibility writes group 70 (invisible_edges), not group 60."""
+        doc, _ = build_dxf_from_ir(self._face_ir())
+        face = list(_reload(doc).modelspace().query("3DFACE"))[0]
+        self.assertEqual(face.dxf.invisible_edges, 2 | 8)
+        self.assertEqual(face.dxf.invisible, 0)
+
+
+class Issue59LeaderAndElevationTest(unittest.TestCase):
+    """#59: LEADER was downgraded to POLYLINE, and LWPOLYLINE lost its Z."""
+
+    def test_leader_stays_a_leader(self):
+        doc, report = build_dxf_from_ir(_ir([
+            _ent("leader", {"vertices": [[0.0, 0.0, 0.0], [5.0, 5.0, 0.0],
+                                         [10.0, 5.0, 0.0]],
+                            "has_arrow_head": True, "splined": False},
+                 layer="0")]))
+        modelspace = _reload(doc).modelspace()
+        self.assertEqual(len(list(modelspace.query("LEADER"))), 1)
+        self.assertEqual(len(list(modelspace.query("POLYLINE"))), 0)
+        leader = list(modelspace.query("LEADER"))[0]
+        self.assertEqual(leader.dxf.has_arrowhead, 1)
+        self.assertEqual(leader.dxf.path_type, 0)
+        self.assertEqual(report.added["leader"], 1)
+
+    def test_splined_leader_keeps_its_spline_path_type(self):
+        doc, _ = build_dxf_from_ir(_ir([
+            _ent("leader", {"vertices": [[0.0, 0.0, 0.0], [5.0, 5.0, 0.0],
+                                         [10.0, 5.0, 0.0]],
+                            "has_arrow_head": False, "splined": True})]))
+        leader = list(_reload(doc).modelspace().query("LEADER"))[0]
+        self.assertEqual(leader.dxf.path_type, 1)
+        self.assertEqual(leader.dxf.has_arrowhead, 0)
+
+    def test_lwpolyline_elevation_is_recovered_from_vertex_z(self):
+        """The IR leaves ``elevation`` empty and carries the Z on the vertices."""
+        z = 2000000.020962
+        doc, _ = build_dxf_from_ir(_ir([
+            _ent("lwpolyline", {"vertices": [{"point": [0.0, 0.0, z]},
+                                             {"point": [10.0, 0.0, z]},
+                                             {"point": [10.0, 5.0, z]}],
+                                "closed": True})]))
+        lwpolyline = list(_reload(doc).modelspace().query("LWPOLYLINE"))[0]
+        self.assertAlmostEqual(lwpolyline.dxf.elevation, z, places=6)
+
+    def test_explicit_lwpolyline_elevation_is_used_as_is(self):
+        doc, _ = build_dxf_from_ir(_ir([
+            _ent("lwpolyline", {"elevation": -0.023448,
+                                "vertices": [{"point": [0.0, 0.0, 0.0]},
+                                             {"point": [10.0, 0.0, 0.0]}],
+                                "closed": False})]))
+        lwpolyline = list(_reload(doc).modelspace().query("LWPOLYLINE"))[0]
+        self.assertAlmostEqual(lwpolyline.dxf.elevation, -0.023448)
+
+
 if __name__ == "__main__":
     unittest.main()
