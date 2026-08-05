@@ -354,6 +354,8 @@ class Issue53PeriodicSplineTest(unittest.TestCase):
         self.assertEqual(len(spline.knots),
                          len(spline.control_points) + spline.dxf.degree + 1)
         self.assertEqual(report.added["spline_periodic"], 1)
+        # a build-event counter must not be counted as a second entity
+        self.assertEqual(report.total_added, 1)
 
     def test_standard_knot_vector_is_passed_through_unchanged(self):
         control = [[0.0, 0.0, 0.0], [1.0, 2.0, 0.0], [3.0, 2.0, 0.0], [4.0, 0.0, 0.0]]

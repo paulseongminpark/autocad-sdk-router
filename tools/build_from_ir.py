@@ -94,7 +94,10 @@ class BuildReport:
 
     @property
     def total_added(self) -> int:
-        return sum(v for k, v in self.added.items() if not k.startswith("table:"))
+        """Entities created. ``added`` also holds build-event keys (``table:*``,
+        ``spline_periodic``, ...) which describe HOW an entity was built, so
+        summing the whole counter would double-count them."""
+        return sum(v for k, v in self.added.items() if k in SUPPORTED_KINDS)
 
     @property
     def total_skipped(self) -> int:
