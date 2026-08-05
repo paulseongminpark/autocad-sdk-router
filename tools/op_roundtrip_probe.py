@@ -99,6 +99,28 @@ def _load_ir_maybe(value: Any) -> Dict[str, Any]:
     return load_ir(value)
 
 
+def _find_by_name_casefold(records: Optional[List[Any]],
+                            name: str) -> Optional[Dict[str, Any]]:
+    """First record in ``records`` whose ``"name"`` matches ``name``
+    case-insensitively -- DXF/AutoCAD symbol-table names (LAYER, DIMSTYLE,
+    UCS, VIEW, VPORT, LINETYPE, TEXTSTYLE, BLOCK) are case-insensitive-unique
+    (ezdxf's own ``Table.has_entry``/``__contains__`` key on
+    ``name.lower()``). A native write that upserts onto an existing record
+    whose stored name differs only in case from the caller's query name
+    (e.g. ``create_layer(name="wall")`` upserting onto an existing "WALL")
+    IS present in post_ir -- a case-sensitive ``==`` would miss it and
+    report a successful upsert as not-found (AUDIT.md T2, #54). Shared by
+    every ``_X_by_name`` helper below; returns the record UNCHANGED (never
+    rewrites its "name")."""
+    target = name.casefold()
+    for rec in (records or []):
+        if isinstance(rec, dict):
+            rec_name = rec.get("name")
+            if isinstance(rec_name, str) and rec_name.casefold() == target:
+                return rec
+    return None
+
+
 # --------------------------------------------------------------------------- #
 # 1. op resolution -- "exit 3 on not-wired" fires here
 # --------------------------------------------------------------------------- #
@@ -1539,11 +1561,9 @@ LAYER_RECORD_FIELDS = ("color_index", "linetype", "lineweight",
 def _layer_by_name(ir: Dict[str, Any], name: str) -> Optional[Dict[str, Any]]:
     """Find a symbol_tables.layers[] record by name -- the layer table's own
     join key (unique within a database), unlike an entity handle which is
-    assigned by the engine rather than asserted by the caller."""
-    for rec in ((ir.get("symbol_tables") or {}).get("layers") or []):
-        if isinstance(rec, dict) and rec.get("name") == name:
-            return rec
-    return None
+    assigned by the engine rather than asserted by the caller. Case-
+    insensitive (see _find_by_name_casefold)."""
+    return _find_by_name_casefold((ir.get("symbol_tables") or {}).get("layers"), name)
 
 
 def expected_layer_record(args: Dict[str, Any]) -> Dict[str, Any]:
@@ -1808,11 +1828,8 @@ DIMSTYLE_RECORD_FIELDS = (
 def _dimstyle_by_name(ir: Dict[str, Any], name: str) -> Optional[Dict[str, Any]]:
     """Find a symbol_tables.dim_styles[] record by name -- the dimstyle
     table's own join key (unique within a database), mirroring
-    _layer_by_name."""
-    for rec in ((ir.get("symbol_tables") or {}).get("dim_styles") or []):
-        if isinstance(rec, dict) and rec.get("name") == name:
-            return rec
-    return None
+    _layer_by_name (including its case-insensitive lookup)."""
+    return _find_by_name_casefold((ir.get("symbol_tables") or {}).get("dim_styles"), name)
 
 
 def expected_dimstyle_record(args: Dict[str, Any]) -> Dict[str, Any]:
@@ -2038,11 +2055,9 @@ UCS_RECORD_FIELDS = ("origin", "x_axis", "y_axis")
 
 def _ucs_by_name(ir: Dict[str, Any], name: str) -> Optional[Dict[str, Any]]:
     """Find a symbol_tables.ucs[] record by name -- the UCS table's own join
-    key (unique within a database), mirroring _layer_by_name/_dimstyle_by_name."""
-    for rec in ((ir.get("symbol_tables") or {}).get("ucs") or []):
-        if isinstance(rec, dict) and rec.get("name") == name:
-            return rec
-    return None
+    key (unique within a database), mirroring _layer_by_name/_dimstyle_by_name
+    (including its case-insensitive lookup)."""
+    return _find_by_name_casefold((ir.get("symbol_tables") or {}).get("ucs"), name)
 
 
 def expected_ucs_record(args: Dict[str, Any]) -> Dict[str, Any]:
@@ -2270,11 +2285,9 @@ VIEW_RECORD_FIELDS = ("center", "height", "width", "target", "view_direction",
 
 def _view_by_name(ir: Dict[str, Any], name: str) -> Optional[Dict[str, Any]]:
     """Find a symbol_tables.views[] record by name -- the VIEW table's own
-    join key (unique within a database), mirroring _layer_by_name/_ucs_by_name."""
-    for rec in ((ir.get("symbol_tables") or {}).get("views") or []):
-        if isinstance(rec, dict) and rec.get("name") == name:
-            return rec
-    return None
+    join key (unique within a database), mirroring _layer_by_name/_ucs_by_name
+    (including its case-insensitive lookup)."""
+    return _find_by_name_casefold((ir.get("symbol_tables") or {}).get("views"), name)
 
 
 def expected_view_record(args: Dict[str, Any]) -> Dict[str, Any]:
@@ -2489,10 +2502,7 @@ def _vport_by_name(ir: Dict[str, Any], name: str) -> Optional[Dict[str, Any]]:
     this returns the FIRST match, same as every other _X_by_name helper --
     callers of the roundtrip/mutation probes below must pass a unique,
     caller-chosen name (never "*Active") to avoid that ambiguity entirely."""
-    for rec in ((ir.get("symbol_tables") or {}).get("viewports") or []):
-        if isinstance(rec, dict) and rec.get("name") == name:
-            return rec
-    return None
+    return _find_by_name_casefold((ir.get("symbol_tables") or {}).get("viewports"), name)
 
 
 def expected_vport_record(args: Dict[str, Any]) -> Dict[str, Any]:
@@ -2719,11 +2729,8 @@ LINETYPE_RECORD_FIELDS = ("description", "dash_lengths")
 def _linetype_by_name(ir: Dict[str, Any], name: str) -> Optional[Dict[str, Any]]:
     """Find a symbol_tables.linetypes[] record by name -- the linetype
     table's own join key (unique within a database), mirroring
-    _layer_by_name."""
-    for rec in ((ir.get("symbol_tables") or {}).get("linetypes") or []):
-        if isinstance(rec, dict) and rec.get("name") == name:
-            return rec
-    return None
+    _layer_by_name (including its case-insensitive lookup)."""
+    return _find_by_name_casefold((ir.get("symbol_tables") or {}).get("linetypes"), name)
 
 
 def expected_linetype_record(args: Dict[str, Any]) -> Dict[str, Any]:
@@ -2952,11 +2959,8 @@ TEXTSTYLE_RECORD_FIELDS = ("font_file", "big_font_file", "height",
 def _textstyle_by_name(ir: Dict[str, Any], name: str) -> Optional[Dict[str, Any]]:
     """Find a symbol_tables.text_styles[] record by name -- the textstyle
     table's own join key (unique within a database), mirroring
-    _layer_by_name."""
-    for rec in ((ir.get("symbol_tables") or {}).get("text_styles") or []):
-        if isinstance(rec, dict) and rec.get("name") == name:
-            return rec
-    return None
+    _layer_by_name (including its case-insensitive lookup)."""
+    return _find_by_name_casefold((ir.get("symbol_tables") or {}).get("text_styles"), name)
 
 
 def expected_textstyle_record(args: Dict[str, Any]) -> Dict[str, Any]:
@@ -3373,11 +3377,9 @@ def _tagged_record_diff(expected: List[Dict[str, Any]], actual: List[Dict[str, A
 
 def _block_definition_by_name(ir: Dict[str, Any], name: str) -> Optional[Dict[str, Any]]:
     """Find a block_definitions[] record by block name (the block table's own
-    join key, unique within a database -- mirrors _layer_by_name)."""
-    for rec in (ir.get("block_definitions") or []):
-        if isinstance(rec, dict) and rec.get("name") == name:
-            return rec
-    return None
+    join key, unique within a database -- mirrors _layer_by_name, including
+    its case-insensitive lookup)."""
+    return _find_by_name_casefold(ir.get("block_definitions"), name)
 
 
 def probe_insert_attributes_roundtrip(

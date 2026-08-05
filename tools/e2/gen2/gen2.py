@@ -488,10 +488,16 @@ class DrawingBuilder:
         elif entity_type == "POLYLINE":
             self.msp.add_polyline2d([(x, y), (x, y + 10)], dxfattribs={"layer": layer})
         elif entity_type == "WIPEOUT":
-            self.msp.add_wipeout(
+            # ezdxf trap (#49): Wipeout.set_masking_area() -- called inside
+            # add_wipeout() -- overwrites dxf.layer back to "0" via its own
+            # update_dxf_attribs(DEFAULT_ATTRIBS) *after* new_entity() applies
+            # dxfattribs, so passing layer through dxfattribs is silently
+            # discarded. Must be reassigned post-creation.
+            wipeout = self.msp.add_wipeout(
                 [(x, y), (x + 20, y), (x + 20, y + 20), (x, y + 20)],
                 dxfattribs={"layer": layer},
             )
+            wipeout.dxf.layer = layer
         elif entity_type == "INSERT":
             block_name = "PROFILE-SYMBOL"
             if block_name not in self.doc.blocks:
