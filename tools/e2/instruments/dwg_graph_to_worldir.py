@@ -141,17 +141,23 @@ def _adapt_entity(entity: Mapping[str, Any]) -> dict[str, Any]:
         }
         raw_clip = entity.get("xclip")
         if isinstance(raw_clip, Mapping) and bool(raw_clip.get("enabled", False)):
-            raw_boundary = raw_clip.get("boundary_wcs")
+            # WorldIR transforms an INSERT-owned clip from the owner's block-local
+            # coordinates into world space together with the INSERT.  The native
+            # extractor's boundary_wcs is already transformed, so feeding it here
+            # applies the INSERT transform twice.  boundary_block is the same
+            # spatial-filter boundary expressed in the owning block definition.
+            raw_boundary = raw_clip.get("boundary_block")
             if not isinstance(raw_boundary, list) or len(raw_boundary) < 2:
                 raise AdapterFailure(
                     "INVALID_XCLIP",
-                    f"INSERT {handle} has enabled XCLIP without a usable boundary_wcs",
+                    f"INSERT {handle} has enabled XCLIP without a usable boundary_block",
                 )
             output["clip"] = {
                 "boundary_owner": [
                     _point2(point, f"INSERT {handle} XCLIP point {index}")
                     for index, point in enumerate(raw_boundary)
                 ],
+                "boundary_space": "referenced_block_local",
                 "inverted": bool(raw_clip.get("inverted", False)),
             }
         return output

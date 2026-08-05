@@ -280,7 +280,7 @@ def audit_unsupported_visibility(native: Mapping[str, Any], *, max_depth: int = 
                         )
                         world = oracle._matrix3(parent_transform @ local, f"native INSERT {handle}")
                         child_uid = oracle._hash_parts(path_uid, handle, target, row, column)
-                        clip = oracle._clip_spec(adapted_insert, parent_transform)
+                        clip = oracle._clip_spec(adapted_insert, parent_transform, world)
                         child_clips = active_clips + ((clip,) if clip is not None else ())
                         counts["reachable_insert_placements"] += 1
                         visit(target, world, child_uid, active_edges | {edge}, child_clips, depth + 1)

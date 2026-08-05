@@ -156,7 +156,7 @@ def _signed_area(points: Sequence[np.ndarray]) -> float:
 
 
 def _clip_spec(
-    entity: Mapping[str, Any], parent_transform: np.ndarray
+    entity: Mapping[str, Any], parent_transform: np.ndarray, child_transform: np.ndarray
 ) -> dict[str, Any] | None:
     raw_clip = entity.get("clip")
     if not isinstance(raw_clip, Mapping):
@@ -178,7 +178,17 @@ def _clip_spec(
             np.array([x1, y1]),
             np.array([x0, y1]),
         ]
-    world_points = [_apply(parent_transform, point) for point in owner_points]
+    boundary_space = str(raw_clip.get("boundary_space") or "owner_definition")
+    if boundary_space == "referenced_block_local":
+        clip_to_world = child_transform
+    elif boundary_space == "owner_definition":
+        clip_to_world = parent_transform
+    else:
+        raise OracleFailure(
+            "INVALID_XCLIP_SPACE",
+            f"unsupported XCLIP boundary space {boundary_space!r}",
+        )
+    world_points = [_apply(clip_to_world, point) for point in owner_points]
     area = _signed_area(world_points)
     if abs(area) <= GEOMETRY_EPSILON:
         raise OracleFailure("DEGENERATE_XCLIP", "XCLIP polygon has zero area")
@@ -682,7 +692,7 @@ def expand_world_ir(
                                 "array_col_index": column,
                             }
                             ledger["reachable_insert_placements"] += 1
-                            clip_polygon = _clip_spec(entity, parent_transform)
+                            clip_polygon = _clip_spec(entity, parent_transform, world_transform)
                             child_clips = active_clips
                             if clip_polygon is not None:
                                 clip_polygon["source_def_handle"] = definition_handle

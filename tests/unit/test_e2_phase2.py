@@ -35,7 +35,12 @@ def _native_with_clipped_and_visible_circle() -> dict:
                 "block_record_handle": "B1",
                 "layer": "0",
                 "geometry": {"kind": "insert", "position": [100, 0, 0], "scale": [1, 1, 1], "rotation": 0},
-                "xclip": {"enabled": True, "boundary_wcs": [[95, -5, 0], [115, 15, 0]], "inverted": False},
+                "xclip": {
+                    "enabled": True,
+                    "boundary_block": [[-5, -5], [15, 15]],
+                    "boundary_wcs": [[95, -5, 0], [115, 15, 0]],
+                    "inverted": False,
+                },
             },
             {
                 "handle": "I2",
@@ -43,7 +48,12 @@ def _native_with_clipped_and_visible_circle() -> dict:
                 "block_record_handle": "B1",
                 "layer": "0",
                 "geometry": {"kind": "insert", "position": [200, 0, 0], "scale": [1, 1, 1], "rotation": 0},
-                "xclip": {"enabled": True, "boundary_wcs": [[0, 0, 0], [20, 20, 0]], "inverted": False},
+                "xclip": {
+                    "enabled": True,
+                    "boundary_block": [[-200, 0], [-180, 20]],
+                    "boundary_wcs": [[0, 0, 0], [20, 20, 0]],
+                    "inverted": False,
+                },
             },
         ],
         "block_definitions": [

@@ -201,6 +201,12 @@ def test_xclip_removes_hidden_block_geometry_with_conservation():
     ir["entities"][1]["xclip"] = {
         "enabled": True,
         "inverted": False,
+        "boundary_block": [
+            [9.5, 20.333333333333332],
+            [9.5, 19.666666666666668],
+            [11.5, 19.666666666666668],
+            [11.5, 20.333333333333332],
+        ],
         "boundary_wcs": [[99.0, 199.0], [101.0, 203.0]],
     }
 
@@ -208,7 +214,13 @@ def test_xclip_removes_hidden_block_geometry_with_conservation():
     world = worldir_oracle.expand_world_ir(adapted)
 
     assert adapted["definitions"]["1F"]["entities"][1]["clip"] == {
-        "boundary_owner": [[99.0, 199.0], [101.0, 203.0]],
+        "boundary_owner": [
+            [9.5, 20.333333333333332],
+            [9.5, 19.666666666666668],
+            [11.5, 19.666666666666668],
+            [11.5, 20.333333333333332],
+        ],
+        "boundary_space": "referenced_block_local",
         "inverted": False,
     }
     assert world["status"] == "PASS"
@@ -236,6 +248,12 @@ def test_inverted_xclip_keeps_geometry_outside_boundary():
     ir["entities"][1]["xclip"] = {
         "enabled": True,
         "inverted": True,
+        "boundary_block": [
+            [9.5, 20.333333333333332],
+            [9.5, 19.666666666666668],
+            [11.5, 19.666666666666668],
+            [11.5, 20.333333333333332],
+        ],
         "boundary_wcs": [[99.0, 199.0], [101.0, 203.0]],
     }
 
