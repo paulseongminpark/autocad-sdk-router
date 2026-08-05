@@ -48,7 +48,7 @@ tools\e2\synth\openings.py: 2 (429,430)
 | tools/e2/synth/noise.py | 56-57 | SAFE | 동일 패턴(`doc.layers.new`). CHANGE_ONLY 밖. |
 | tools/e2/synth/grammar.py | 264-265 | SAFE | 동일 패턴. CHANGE_ONLY 밖. |
 | tools/e2/synth/openings.py | 429-430 | SAFE | 동일 패턴. CHANGE_ONLY 밖. |
-| tools/e2/meta/transforms_struct.py | 150,183,192,194,195,199,202,204,205,208,209,283-286 | **FIX (out of CHANGE_ONLY scope — 수리 안 함)** | `_rename_layer_table`이 `doc.layers.has_entry()`(무구분)로 `changes` 목록을 거르지만, 그 `changes`는 대소문자만 다른 두 이름을 **서로 다른 실제 레이어**인 것처럼 담을 수 있는 `layer_map`(파이썬 dict, 대소문자 구분)에서 왔다 — 아래 T2 실측 참고. 같은 실제 레이어를 두 번 처리하려다 두 번째 `duplicate_entry`/`remove` 호출이 이미 지워진 항목을 찾다가 실패한다. `tools/e2/meta/`는 CHANGE_ONLY 밖이라 이 레인에서 수리하지 않음 — 별도 레인 필요. |
+| tools/e2/meta/transforms_struct.py | 150,183,192,194,195,199,202,204,205,208,209,283-286 | **FIXED** | `_rename_layer_table`이 `doc.layers.has_entry()`(무구분)로 `changes` 목록을 거르지만, 그 `changes`는 대소문자만 다른 두 이름을 **서로 다른 실제 레이어**인 것처럼 담을 수 있는 `layer_map`(파이썬 dict, 대소문자 구분)에서 왔다 — 아래 T2 실측 참고. 같은 실제 레이어를 두 번 처리하려다 두 번째 `duplicate_entry`/`remove` 호출이 이미 지워진 항목을 찾다가 실패한다. B2 패킷(REPORT_B2.md)에서 수리: `_collect_layer_names`를 casefold 무구분 dedupe로, `_rename_layer_table`을 casefold 기준 changes dedupe로, `_remap_entity_layers`를 casefold lookup으로 교체 — red 재현(`ezdxf.DXFTableEntryError: wall`)과 green 둘 다 테스트로 고정. |
 
 ## T2 — 심볼테이블 이름의 대소문자 구분 비교 (#54)
 
@@ -63,16 +63,16 @@ if isinstance(rec, dict) and rec.get("name") == name:
 
 | 파일:줄 | 판정 | 근거 |
 |---|---|---|
-| tools/op_roundtrip_probe.py:1544 (`_layer_by_name`) | **FIX (out of CHANGE_ONLY scope)** | AutoCAD/DXF 레이어 이름은 대소문자 무구분 유일이다. `create_layer(name="wall")`이 기존 `"WALL"`을 upsert하면(네이티브 심볼테이블도 무구분) post_ir의 실제 레코드 이름은 그대로 `"WALL"`인데 `== "wall"` 비교가 실패해 "찾지 못함"(`STATUS_HOLLOW`)으로 오판 — 성공한 upsert를 실패로 보고하는 실참조 오판. |
-| tools/op_roundtrip_probe.py:1813 (`_dimstyle_by_name` 추정) | **FIX (out of CHANGE_ONLY scope)** | 위와 동일 패턴, DIMSTYLE 테이블 대상. |
-| tools/op_roundtrip_probe.py:2043 | **FIX (out of CHANGE_ONLY scope)** | 위와 동일 패턴(TEXTSTYLE 계열 추정). |
-| tools/op_roundtrip_probe.py:2275 | **FIX (out of CHANGE_ONLY scope)** | 위와 동일 패턴. |
-| tools/op_roundtrip_probe.py:2493 | **FIX (out of CHANGE_ONLY scope)** | 위와 동일 패턴. |
-| tools/op_roundtrip_probe.py:2724 (`_linetype_by_name`) | **FIX (out of CHANGE_ONLY scope)** | 위와 동일 패턴, LINETYPE 테이블 대상(코드 확인 완료 — docstring이 `_layer_by_name` 미러라고 명시). |
-| tools/op_roundtrip_probe.py:2957 | **FIX (out of CHANGE_ONLY scope)** | 위와 동일 패턴. |
-| tools/op_roundtrip_probe.py:3378 | **FIX (out of CHANGE_ONLY scope)** | 위와 동일 패턴. |
+| tools/op_roundtrip_probe.py:1544 (`_layer_by_name`) | **FIXED** | AutoCAD/DXF 레이어 이름은 대소문자 무구분 유일이다. `create_layer(name="wall")`이 기존 `"WALL"`을 upsert하면(네이티브 심볼테이블도 무구분) post_ir의 실제 레코드 이름은 그대로 `"WALL"`인데 `== "wall"` 비교가 실패해 "찾지 못함"(`STATUS_HOLLOW`)으로 오판 — 성공한 upsert를 실패로 보고하는 실참조 오판. B2 패킷에서 공용 헬퍼 `_find_by_name_casefold`로 수리(REPORT_B2.md). |
+| tools/op_roundtrip_probe.py:1813 (`_dimstyle_by_name`) | **FIXED** | 위와 동일 패턴, DIMSTYLE 테이블 대상. `_find_by_name_casefold`로 수리. |
+| tools/op_roundtrip_probe.py:2043 (`_ucs_by_name` — 정정: 이전 판정의 "TEXTSTYLE 계열 추정"은 오기, 코드 확인 결과 UCS 테이블) | **FIXED** | 위와 동일 패턴, UCS 테이블 대상. `_find_by_name_casefold`로 수리. |
+| tools/op_roundtrip_probe.py:2275 (`_view_by_name`) | **FIXED** | 위와 동일 패턴, VIEW 테이블 대상. `_find_by_name_casefold`로 수리. |
+| tools/op_roundtrip_probe.py:2493 (`_vport_by_name`) | **FIXED** | 위와 동일 패턴, VPORT 테이블 대상. `_find_by_name_casefold`로 수리. |
+| tools/op_roundtrip_probe.py:2724 (`_linetype_by_name`) | **FIXED** | 위와 동일 패턴, LINETYPE 테이블 대상(코드 확인 완료 — docstring이 `_layer_by_name` 미러라고 명시). `_find_by_name_casefold`로 수리. |
+| tools/op_roundtrip_probe.py:2957 (`_textstyle_by_name`) | **FIXED** | 위와 동일 패턴, TEXTSTYLE 테이블 대상. `_find_by_name_casefold`로 수리. |
+| tools/op_roundtrip_probe.py:3378 (`_block_definition_by_name`) | **FIXED** | 위와 동일 패턴, BLOCK 테이블 대상. `_find_by_name_casefold`로 수리. |
 
-`tools/op_roundtrip_probe.py`는 CHANGE_ONLY 밖 — 8건 모두 발견만 기록, 수리는 별도 레인.
+`tools/op_roundtrip_probe.py` 8건 전부 B2 패킷에서 수리 완료(REPORT_B2.md) — red(`tests/unit/test_op_roundtrip_probe_casefold.py`, 수리 전 대소문자 조회 실패)와 green(수리 후) 둘 다 인용.
 
 추가 수동 발견(같은 함정, 다른 코드 모양이라 위 rg 패턴에 안 걸림):
 
@@ -90,7 +90,7 @@ tools\e2\meta\transforms_struct.py:219   new = layer_map.get(old)
 
 | 파일:줄 | 판정 | 근거 |
 |---|---|---|
-| tools/e2/meta/transforms_struct.py:151,156,219 | **FIX (out of CHANGE_ONLY scope, T3 표 항목과 동일 결함)** | 실측(이 세션): 같은 파일을 저장 후 재로드하면 테이블 엔트리 이름(`'WALL'`)과 그 레이어를 참조하는 엔티티의 리터럴 문자열(`'wall'`)은 서로 다른 케이스로 **독립 보존**된다 (`ezdxf.readfile` 실측: `doc2.layers`엔 `'WALL'`, `e.dxf.layer`엔 `'wall'`). `_collect_layer_names`가 이 둘을 파이썬 `set`(대소문자 구분)에 같이 넣으므로 실제로는 하나뿐인 레이어가 `layer_map`에서 두 개의 다른 키로 등장할 수 있다 → `_rename_layer_table`이 같은 레코드를 두 번 처리(위 T3 항목). |
+| tools/e2/meta/transforms_struct.py:151,156,219 | **FIXED (T3 표 항목과 동일 결함, 함께 수리)** | 실측(이 세션): 같은 파일을 저장 후 재로드하면 테이블 엔트리 이름(`'WALL'`)과 그 레이어를 참조하는 엔티티의 리터럴 문자열(`'wall'`)은 서로 다른 케이스로 **독립 보존**된다 (`ezdxf.readfile` 실측: `doc2.layers`엔 `'WALL'`, `e.dxf.layer`엔 `'wall'`). `_collect_layer_names`가 이 둘을 파이썬 `set`(대소문자 구분)에 같이 넣으므로 실제로는 하나뿐인 레이어가 `layer_map`에서 두 개의 다른 키로 등장할 수 있다 → `_rename_layer_table`이 같은 레코드를 두 번 처리(위 T3 항목). B2 패킷에서 수리: 151/156을 casefold dedupe로, 219(`_remap_entity_layers`)를 casefold lookup으로 교체(REPORT_B2.md). |
 | tools/ir_to_patch.py:67,82 (`reserved_names`) | SAFE | 블록 테이블은 ezdxf가 아니라 네이티브 IR JSON에서 온 이름만 다루고, 새 이름은 `"ARIADNE_ANON_"` 전용 네임스페이스에 접미사를 붙여 생성한다 — 원본 도면이 이 네임스페이스와 대소문자만 다른 이름을 이미 갖고 있어야 충돌하는, 사실상 도달 불가능한 경로. CHANGE_ONLY 밖이기도 함. |
 | tools/blockdef_diff.py:771 (`matched_b_names`) | SAFE | 두 IR(before/after) 모두 같은 네이티브 추출 파이프라인 산출물이라 소스가 섞이지 않음(ezdxf 무구분 테이블과 파이썬 구조체를 섞는 T2/T3의 전제 자체가 없음). CHANGE_ONLY 밖. |
 

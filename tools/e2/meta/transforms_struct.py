@@ -145,19 +145,29 @@ def explode(dxf_in: Any, dxf_out: Any) -> Dict[str, str]:
 
 
 def _collect_layer_names(doc: "ezdxf.document.Drawing") -> List[str]:
-    """Sorted unique layer names from the layer table + entity references."""
-    names: Set[str] = set()
+    """Sorted unique layer names from the layer table + entity references.
+
+    ezdxf's layer table is case-insensitive-unique (``Table.has_entry`` keys
+    on ``name.lower()``), but a saved-and-reloaded drawing can independently
+    preserve the table entry's own name (e.g. "WALL") and an entity's
+    literal layer-reference string (e.g. "wall") in DIFFERENT case -- both
+    name the SAME real layer. Dedupe case-insensitively (table-entry casing
+    wins as the canonical form) so the same real layer never occupies two
+    keys in the layer_map that callers build from this list."""
+    canonical: Dict[str, str] = {}  # casefolded name -> canonical-cased name
     for layer in doc.layers:
-        names.add(str(layer.dxf.name))
+        name = str(layer.dxf.name)
+        canonical.setdefault(name.casefold(), name)
     for block in doc.blocks:
         for e in block:
             try:
                 if e.dxf.hasattr("layer"):
-                    names.add(str(e.dxf.layer))
+                    name = str(e.dxf.layer)
+                    canonical.setdefault(name.casefold(), name)
             except Exception:
                 continue
     # Stable order for deterministic anonymize / shuffle base permutation
-    return sorted(names)
+    return sorted(canonical.values())
 
 
 def _build_layer_map(names: Sequence[str], scheme: str, seed: int) -> Dict[str, str]:
@@ -175,13 +185,23 @@ def _build_layer_map(names: Sequence[str], scheme: str, seed: int) -> Dict[str, 
 
 
 def _rename_layer_table(doc: "ezdxf.document.Drawing", layer_map: Dict[str, str]) -> None:
-    """Apply layer_map to the layer table via two-phase temps (collision-safe)."""
-    # Only rename entries that exist and actually change.
-    changes = [
-        (old, new)
-        for old, new in layer_map.items()
-        if old != new and doc.layers.has_entry(old)
-    ]
+    """Apply layer_map to the layer table via two-phase temps (collision-safe).
+
+    ``layer_map`` is de-duplicated by casefolded old-name before use: the
+    ezdxf layer table is case-insensitive-unique, so two layer_map keys
+    differing only in case (e.g. "WALL" and "wall") name the SAME real
+    table entry -- processing both would duplicate_entry/remove it twice,
+    and the second call fails on an already-removed entry
+    (``ezdxf.DXFTableEntryError``). First-seen casing wins."""
+    seen_casefold: Set[str] = set()
+    changes: List[Tuple[str, str]] = []
+    for old, new in layer_map.items():
+        key = old.casefold()
+        if key in seen_casefold:
+            continue
+        seen_casefold.add(key)
+        if old != new and doc.layers.has_entry(old):
+            changes.append((old, new))
     if not changes:
         return
 
@@ -210,13 +230,18 @@ def _rename_layer_table(doc: "ezdxf.document.Drawing", layer_map: Dict[str, str]
 
 
 def _remap_entity_layers(doc: "ezdxf.document.Drawing", layer_map: Dict[str, str]) -> None:
+    """An entity's literal layer string can be cased differently from the
+    layer_map key that names its real layer (see _collect_layer_names) --
+    look it up case-insensitively rather than with a case-sensitive
+    dict.get, or a case-variant literal would silently go unremapped."""
+    lookup = {old.casefold(): new for old, new in layer_map.items()}
     for block in doc.blocks:
         for e in block:
             try:
                 if not e.dxf.hasattr("layer"):
                     continue
                 old = str(e.dxf.layer)
-                new = layer_map.get(old)
+                new = lookup.get(old.casefold())
                 if new is not None and new != old:
                     e.dxf.layer = new
             except Exception:
