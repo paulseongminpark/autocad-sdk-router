@@ -38,7 +38,7 @@
 
 ## 커밋
 
-<!-- COMMIT_HASH_PLACEHOLDER -->
+`cb5186c` — "gen2: fix add_wipeout layer-reset trap (#49); audit T1-T4 repo-wide (#54 #57 #58 #60)" (브랜치 `fix/ezdxf-trap-audit`, 4 files changed: `AUDIT.md`, `REPORT.md`, `tests/unit/test_gen2_wipeout_layer.py`, `tools/e2/gen2/gen2.py`).
 
 ## 건너뛴 것 / 검증 못 한 것
 
