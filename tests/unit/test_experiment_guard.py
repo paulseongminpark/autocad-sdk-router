@@ -7,6 +7,8 @@ import hashlib
 import json
 from pathlib import Path
 
+from jsonschema import Draft202012Validator
+
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 _TOOLS_E2 = os.path.normpath(os.path.join(_THIS_DIR, "..", "..", "tools", "e2"))
 if _TOOLS_E2 not in sys.path:
@@ -140,6 +142,98 @@ def _worldir_probe(*, adapter_balance=True, conservation=True, inserts=1):
     }
 
 
+def _target_oracle(tmp_path: Path, *, w1_visible=1, w2_visible=1):
+    def visible_ids(prefix: str, count: int) -> list[str]:
+        return [prefix, *(f"{prefix}-{index}" for index in range(2, count + 1))] if count else []
+
+    evidence = tmp_path / "native-display.json"
+    evidence.write_text('{"oracle":"autocad-native-display"}', encoding="utf-8")
+    return {
+        "schema": "ariadne.e2.target_population_oracle.v1",
+        "oracle": "autocad.native_display_membership.v1",
+        "status": "PASS",
+        "drawing_id": "probe",
+        "evidence": [
+            {
+                "path": str(evidence),
+                "sha256": hashlib.sha256(evidence.read_bytes()).hexdigest(),
+            }
+        ],
+        "targets": [
+            {
+                "target_id": "wall-w1",
+                "layer": "X-PLAN$0$W1",
+                "native_visible_source_segments": w1_visible,
+                "native_visible_segment_ids": visible_ids("P-W1", w1_visible),
+            },
+            {
+                "target_id": "wall-w2",
+                "layer": "X-PLAN$0$W2",
+                "native_visible_source_segments": w2_visible,
+                "native_visible_segment_ids": visible_ids("P-W2", w2_visible),
+            },
+        ],
+    }
+
+
+def _target_worldir_probe():
+    probe = _worldir_probe()
+    probe["segments"] = [
+        {
+            "placed_uid": "P-W1",
+            "lineage_id": "P-W1",
+            "source_layer": "X-PLAN$0$W1",
+            "p0_world": [0, 0],
+            "p1_world": [1, 0],
+        },
+        {
+            "placed_uid": "P-W2",
+            "lineage_id": "P-W2",
+            "source_layer": "X-PLAN$0$W2",
+            "p0_world": [0, 1],
+            "p1_world": [1, 1],
+        },
+    ]
+    probe["conservation_ledger"].update(
+        {
+            "expected_segment_instances": 2,
+            "visible_source_segment_instances": 2,
+            "emitted_segment_instances": 2,
+            "entity_entries": [
+                {
+                    "source_layer": "X-PLAN$0$W1",
+                    "visible_source_segments": 1,
+                    "emitted_segments": 1,
+                    "clipped_away_segments": 0,
+                    "status": "PRESERVED",
+                },
+                {
+                    "source_layer": "X-PLAN$0$W2",
+                    "visible_source_segments": 1,
+                    "emitted_segments": 1,
+                    "clipped_away_segments": 0,
+                    "status": "PRESERVED",
+                },
+            ],
+        }
+    )
+    return probe
+
+
+def _model_input(*placed_uids: str):
+    return {
+        "ir": "seg.v1",
+        "drawing_id": "probe",
+        "segments": [
+            {
+                "handle": uid,
+                "layer": "X-PLAN$0$W1" if uid.startswith("P-W1") else "X-PLAN$0$W2",
+            }
+            for uid in placed_uids
+        ],
+    }
+
+
 def test_supported_nested_world_segments_selects_adapter_oracle_pipeline():
     result = guard.qualify(
         required_observables=["nested_insert_world_segments", "world_lineage"],
@@ -147,6 +241,230 @@ def test_supported_nested_world_segments_selects_adapter_oracle_pipeline():
     )
     assert result["status"] == guard.NEEDS_PROBE
     assert result["selected_pipeline"] == "native_graph_worldir_segments"
+
+
+def test_target_population_observables_select_worldir_pipeline_and_need_probe():
+    result = guard.qualify(
+        required_observables=[
+            "nested_insert_world_segments",
+            "world_lineage",
+            "source_document_identity",
+            "native_display_membership",
+            "model_input_membership",
+        ],
+        candidate="auto",
+    )
+
+    assert result["status"] == guard.NEEDS_PROBE
+    assert result["selected_pipeline"] == "native_graph_worldir_segments"
+
+
+def test_target_population_gate_opens_only_when_oracle_world_and_model_input_agree(tmp_path: Path):
+    decision = guard.qualify(
+        required_observables=[
+            "nested_insert_world_segments",
+            "world_lineage",
+            "source_document_identity",
+            "native_display_membership",
+            "model_input_membership",
+        ],
+        candidate="auto",
+    )
+
+    result = guard.verify_probe(
+        decision,
+        _target_worldir_probe(),
+        target_population_oracle=_target_oracle(tmp_path),
+        model_input_output=_model_input("P-W1", "P-W2"),
+    )
+
+    assert result["status"] == guard.READY
+    assert result["reason_code"] == "INSTRUMENT_QUALIFIED"
+    assert result["target_population"]["wall-w1"]["model_input_segments"] == 1
+    assert result["target_population"]["wall-w2"]["model_input_segments"] == 1
+    assert set(result["evidence_payload_sha256"]) == {
+        "world_ir",
+        "target_population_oracle",
+        "model_input_ir",
+    }
+    assert all(len(value) == 64 for value in result["evidence_payload_sha256"].values())
+
+
+def test_target_population_gate_needs_build_when_native_display_oracle_is_absent():
+    decision = guard.qualify(
+        required_observables=[
+            "nested_insert_world_segments",
+            "world_lineage",
+            "source_document_identity",
+            "native_display_membership",
+            "model_input_membership",
+        ],
+        candidate="auto",
+    )
+
+    result = guard.verify_probe(
+        decision,
+        _target_worldir_probe(),
+        model_input_output=_model_input("P-W1", "P-W2"),
+    )
+
+    assert result["status"] == guard.NEEDS_BUILD
+    assert result["reason_code"] == "NATIVE_DISPLAY_ORACLE_REQUIRED"
+    assert result["missing_builds"] == ["autocad.native_display_membership.v1"]
+
+
+def test_target_population_oracle_fixture_matches_published_schema(tmp_path: Path):
+    repo = Path(__file__).resolve().parents[2]
+    schema = json.loads(
+        (repo / "schemas" / "e2_target_population_oracle.v1.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    Draft202012Validator.check_schema(schema)
+    Draft202012Validator(schema).validate(_target_oracle(tmp_path))
+
+
+def test_target_population_gate_blocks_when_visible_w1_is_missing_from_model_input(tmp_path: Path):
+    calls = []
+
+    def fake_runner(command, check=False):
+        calls.append(command)
+        raise AssertionError("model command must not run after target population loss")
+
+    result = guarded_runner.run_guarded(
+        required_observables=[
+            "nested_insert_world_segments",
+            "world_lineage",
+            "source_document_identity",
+            "native_display_membership",
+            "model_input_membership",
+        ],
+        command=["python", "model.py"],
+        probe_output=_target_worldir_probe(),
+        target_population_oracle=_target_oracle(tmp_path),
+        model_input_output=_model_input("P-W2"),
+        runner=fake_runner,
+    )
+
+    assert result["guard"]["status"] == guard.BLOCKED
+    assert result["guard"]["reason_code"] == "TARGET_POPULATION_LOST"
+    assert result["guard"]["target_population"]["wall-w1"]["missing_model_input_segments"] == 1
+    assert result["executed"] is False
+    assert calls == []
+
+
+def test_target_population_gate_blocks_when_native_visible_w1_was_all_clipped(tmp_path: Path):
+    probe = _target_worldir_probe()
+    probe["segments"] = [probe["segments"][1]]
+    probe["conservation_ledger"].update(
+        {
+            "visible_source_segment_instances": 1,
+            "clipped_away_segment_instances": 1,
+            "emitted_segment_instances": 1,
+            "entity_entries": [
+                {
+                    "source_layer": "X-PLAN$0$W1",
+                    "visible_source_segments": 0,
+                    "emitted_segments": 0,
+                    "clipped_away_segments": 1,
+                    "status": "CLIPPED",
+                },
+                probe["conservation_ledger"]["entity_entries"][1],
+            ],
+        }
+    )
+    decision = guard.qualify(
+        required_observables=[
+            "nested_insert_world_segments",
+            "source_document_identity",
+            "native_display_membership",
+            "model_input_membership",
+        ],
+        candidate="auto",
+    )
+
+    result = guard.verify_probe(
+        decision,
+        probe,
+        target_population_oracle=_target_oracle(tmp_path),
+        model_input_output=_model_input("P-W2"),
+    )
+
+    assert result["status"] == guard.BLOCKED
+    assert result["reason_code"] == "TARGET_POPULATION_LOST"
+    assert result["target_population"]["wall-w1"] == {
+        "layer": "X-PLAN$0$W1",
+        "native_visible_source_segments": 1,
+        "world_visible_source_segments": 0,
+        "world_emitted_segments": 0,
+        "model_input_segments": 0,
+        "native_missing_from_worldir_segments": 1,
+        "worldir_missing_from_native_segments": 0,
+        "missing_model_input_segments": 1,
+        "extra_model_input_segments": 0,
+    }
+
+
+def test_target_population_gate_blocks_native_world_visibility_disagreement(tmp_path: Path):
+    decision = guard.qualify(
+        required_observables=[
+            "nested_insert_world_segments",
+            "native_display_membership",
+            "model_input_membership",
+        ],
+        candidate="auto",
+    )
+
+    result = guard.verify_probe(
+        decision,
+        _target_worldir_probe(),
+        target_population_oracle=_target_oracle(tmp_path, w1_visible=2),
+        model_input_output=_model_input("P-W1", "P-W1-2", "P-W2"),
+    )
+
+    assert result["status"] == guard.BLOCKED
+    assert result["reason_code"] == "XCLIP_ORACLE_DISAGREEMENT"
+
+
+def test_target_population_gate_rejects_same_count_with_different_object_ids(tmp_path: Path):
+    oracle = _target_oracle(tmp_path)
+    oracle["targets"][0]["native_visible_segment_ids"] = ["P-W1-OTHER"]
+    decision = guard.qualify(
+        required_observables=["native_display_membership", "model_input_membership"],
+        candidate="auto",
+    )
+
+    result = guard.verify_probe(
+        decision,
+        _target_worldir_probe(),
+        target_population_oracle=oracle,
+        model_input_output=_model_input("P-W1", "P-W2"),
+    )
+
+    assert result["status"] == guard.BLOCKED
+    assert result["reason_code"] == "TARGET_POPULATION_LOST"
+    assert result["target_population"]["wall-w1"]["missing_model_input_segments"] == 1
+    assert result["target_population"]["wall-w1"]["extra_model_input_segments"] == 1
+
+
+def test_target_population_gate_rejects_unbound_native_oracle(tmp_path: Path):
+    oracle = _target_oracle(tmp_path)
+    Path(oracle["evidence"][0]["path"]).write_text("tampered", encoding="utf-8")
+    decision = guard.qualify(
+        required_observables=["native_display_membership"],
+        candidate="auto",
+    )
+
+    result = guard.verify_probe(
+        decision,
+        _target_worldir_probe(),
+        target_population_oracle=oracle,
+        model_input_output=_model_input("P-W1", "P-W2"),
+    )
+
+    assert result["status"] == guard.NEEDS_PROBE
+    assert result["reason_code"] == "TARGET_POPULATION_ORACLE_INVALID"
 
 
 def test_worldir_probe_with_both_ledgers_opens_supported_segment_experiment():

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ariadne.local/schemas/e2_target_population_oracle.v1.schema.json",
+  "title": "Independent native-display target population oracle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "oracle", "status", "drawing_id", "evidence", "targets"],
+  "properties": {
+    "schema": {"const": "ariadne.e2.target_population_oracle.v1"},
+    "oracle": {"const": "autocad.native_display_membership.v1"},
+    "status": {"const": "PASS"},
+    "drawing_id": {"type": "string", "minLength": 1},
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"}
+        }
+      }
+    },
+    "targets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "target_id",
+          "layer",
+          "native_visible_source_segments",
+          "native_visible_segment_ids"
+        ],
+        "properties": {
+          "target_id": {"type": "string", "minLength": 1},
+          "layer": {"type": "string", "minLength": 1},
+          "native_source_entity_templates": {"type": "integer", "minimum": 0},
+          "native_visible_source_segments": {"type": "integer", "minimum": 0},
+          "native_visible_segment_ids": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    }
+  }
+}

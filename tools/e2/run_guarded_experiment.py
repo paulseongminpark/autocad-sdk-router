@@ -26,6 +26,8 @@ def run_guarded(
     probe_output: Mapping[str, Any] | None = None,
     allow_empty: bool = False,
     independent_oracle_receipt: Mapping[str, Any] | None = None,
+    target_population_oracle: Mapping[str, Any] | None = None,
+    model_input_output: Mapping[str, Any] | None = None,
     receipt_path: Path | None = None,
     runner: Callable[..., Any] = subprocess.run,
 ) -> dict[str, Any]:
@@ -40,6 +42,8 @@ def run_guarded(
             probe_output,
             allow_empty=allow_empty,
             independent_oracle_receipt=independent_oracle_receipt,
+            target_population_oracle=target_population_oracle,
+            model_input_output=model_input_output,
         )
 
     result = {
@@ -105,6 +109,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--probe-ir", type=Path)
     parser.add_argument("--allow-empty", action="store_true")
     parser.add_argument("--independent-oracle-receipt", type=Path)
+    parser.add_argument("--target-population-oracle", type=Path)
+    parser.add_argument("--model-input-ir", type=Path)
     parser.add_argument(
         "--receipt-output",
         type=Path,
@@ -124,6 +130,8 @@ def main(argv: list[str] | None = None) -> int:
         probe_output=_load_probe(args.probe_ir),
         allow_empty=args.allow_empty,
         independent_oracle_receipt=_load_probe(args.independent_oracle_receipt),
+        target_population_oracle=_load_probe(args.target_population_oracle),
+        model_input_output=_load_probe(args.model_input_ir),
         receipt_path=args.receipt_output,
     )
     print(json.dumps(result, indent=2, ensure_ascii=False))

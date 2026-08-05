@@ -109,6 +109,17 @@ def test_adapter_preserves_nonzero_block_origin_and_nested_transforms():
     assert world["status"] == "PASS"
     assert world["adapter_ledger"]["balance_ok"] is True
     assert world["conservation_ledger"]["conservation_ok"] is True
+    assert {segment["source_layer"] for segment in world["segments"]} == {"WALL"}
+    assert {
+        entry["source_layer"]
+        for entry in world["conservation_ledger"]["entity_entries"]
+    } == {"WALL"}
+    placement_paths = world["conservation_ledger"]["placement_paths"]
+    assert all(
+        entry["placement_path_uid"] in placement_paths
+        for entry in world["conservation_ledger"]["entity_entries"]
+    )
+    assert any(record["lineage_path"] for record in placement_paths.values())
     pairs = _point_pairs(world)
     assert ((100.0, 200.0), (100.0, 202.0)) in pairs
     assert ((94.0, 204.0), (100.0, 204.0)) in pairs
@@ -204,6 +215,20 @@ def test_xclip_removes_hidden_block_geometry_with_conservation():
     assert world["conservation_ledger"]["clipped_away_segment_instances"] == 1
     assert world["conservation_ledger"]["emitted_segment_instances"] == 2
     assert world["conservation_ledger"]["conservation_ok"] is True
+    active_stacks = [
+        record["active_xclips"]
+        for record in world["conservation_ledger"]["placement_paths"].values()
+        if record["active_xclips"]
+    ]
+    assert len(active_stacks) == 2
+    assert all(
+        stack == [{
+            "source_def_handle": "1F",
+            "insert_entity_handle": "ROOT_INS",
+            "inverted": False,
+        }]
+        for stack in active_stacks
+    )
 
 
 def test_inverted_xclip_keeps_geometry_outside_boundary():

@@ -458,6 +458,7 @@ def _adapt_flat_seg_ir(ir: Mapping[str, Any]) -> dict[str, Any]:
             "kind": segment.get("kind", "SEGMENT"),
             "handle": _as_handle(handle, f"segment {index} handle/sid"),
             "pts": segment.get("pts", segment.get("points")),
+            "layer": segment.get("source_layer", segment.get("layer", "")),
         }
         entities.append(entity)
     return {
@@ -518,6 +519,7 @@ def expand_world_ir(
         "conservation_delta": 0,
         "conservation_ok": False,
         "entity_entries": [],
+        "placement_paths": {},
         "zero_output_entries": [],
     }
     failures: list[dict[str, Any]] = []
@@ -602,6 +604,18 @@ def expand_world_ir(
                     placement_path_uid=path_uid,
                 )
             definition = definitions[definition_handle]
+            ledger["placement_paths"][path_uid] = {
+                "source_def_handle": definition_handle,
+                "lineage_path": copy.deepcopy(lineage_path),
+                "active_xclips": [
+                    {
+                        "source_def_handle": str(clip.get("source_def_handle") or ""),
+                        "insert_entity_handle": str(clip.get("insert_entity_handle") or ""),
+                        "inverted": bool(clip.get("inverted", False)),
+                    }
+                    for clip in active_clips
+                ],
+            }
             entities = definition["entities"]
             if not entities:
                 ledger["empty_block_placements"] += 1
@@ -671,6 +685,8 @@ def expand_world_ir(
                             clip_polygon = _clip_spec(entity, parent_transform)
                             child_clips = active_clips
                             if clip_polygon is not None:
+                                clip_polygon["source_def_handle"] = definition_handle
+                                clip_polygon["insert_entity_handle"] = entity_handle
                                 child_clips = active_clips + (clip_polygon,)
                             visit(
                                 target_handle,
@@ -757,6 +773,7 @@ def expand_world_ir(
                                 "lineage_id": placed_uid,
                                 "source_entity_handle": entity_handle,
                                 "source_def_handle": definition_handle,
+                                "source_layer": str(entity.get("layer") or ""),
                                 "root_def_handle": root_handle,
                                 "placement_path_uid": path_uid,
                                 "lineage_path": copy.deepcopy(lineage_path),
@@ -797,6 +814,7 @@ def expand_world_ir(
                     {
                         "source_def_handle": definition_handle,
                         "source_entity_handle": entity_handle,
+                        "source_layer": str(entity.get("layer") or ""),
                         "placement_path_uid": path_uid,
                         "expected_segments": expected_count,
                         "visible_source_segments": visible_count,
@@ -1346,16 +1364,30 @@ def run_selftest() -> tuple[list[SelfTestResult], str]:
     )
     rename_result_a = expand_world_ir(rename_a)
     rename_result_b = expand_world_ir(rename_b)
+    rename_geometry_a = [
+        {key: value for key, value in segment.items() if key != "source_layer"}
+        for segment in rename_result_a["segments"]
+    ]
+    rename_geometry_b = [
+        {key: value for key, value in segment.items() if key != "source_layer"}
+        for segment in rename_result_b["segments"]
+    ]
+    source_layers_preserved = (
+        [segment.get("source_layer") for segment in rename_result_a["segments"]] == ["WALL_A"]
+        and [segment.get("source_layer") for segment in rename_result_b["segments"]] == ["RENAMED"]
+    )
     rename_equal = (
         rename_result_a["status"] == "PASS"
         and rename_result_b["status"] == "PASS"
-        and rename_result_a["segments"] == rename_result_b["segments"]
+        and rename_geometry_a == rename_geometry_b
+        and source_layers_preserved
     )
     tests.append(
         SelfTestResult(
             "transform_name_rename_parity",
             rename_equal,
-            f"status_a={rename_result_a['status']} status_b={rename_result_b['status']} segment_parity={rename_equal}",
+            f"status_a={rename_result_a['status']} status_b={rename_result_b['status']} "
+            f"geometry_parity={rename_geometry_a == rename_geometry_b} source_layers_preserved={source_layers_preserved}",
         )
     )
 

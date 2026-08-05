@@ -24,6 +24,17 @@ STATUS_DEFERRED = "PASS_WITH_DEFERRAL"
 STATUS_BLOCKED = "BLOCKED"
 WALL_THRESHOLD = 0.5
 ANTI_WALL_TOKENS = ("DOOR", "FUR", "KIT", "ELEV", "DIM", "TEXT", "수전", "가구")
+WALL_MODEL_REQUIRED_OBSERVABLES = frozenset(
+    {
+        "nested_insert_world_segments",
+        "world_lineage",
+        "silent_drop_detection",
+        "xclip_preservation",
+        "source_document_identity",
+        "native_display_membership",
+        "model_input_membership",
+    }
+)
 
 
 def _utc_now() -> str:
@@ -137,6 +148,17 @@ def _compact_conservation(world: Mapping[str, Any]) -> dict[str, Any]:
 
 def _gate(gate: str, status: str, evidence: str) -> dict[str, str]:
     return {"gate": gate, "status": status, "evidence": evidence}
+
+
+def _runtime_wall_guard_qualified(guard: Mapping[str, Any]) -> bool:
+    required = set(guard.get("required_observables") or [])
+    target_population = guard.get("target_population")
+    return (
+        guard.get("status") == "READY"
+        and WALL_MODEL_REQUIRED_OBSERVABLES <= required
+        and isinstance(target_population, Mapping)
+        and bool(target_population)
+    )
 
 
 def qualify(
@@ -746,9 +768,10 @@ def build_first_report(spec: Mapping[str, Any], run_dir: Path) -> dict[str, Any]
     guard_path = run_dir / "guard_decision.json"
     guard = _read_json(guard_path) if guard_path.is_file() else None
     if guard is not None:
-        guard_ok = (
-            guard.get("status") == "READY"
-            and "xclip_preservation" in (guard.get("required_observables") or [])
+        guard_ok = _runtime_wall_guard_qualified(guard)
+        missing_required = sorted(
+            WALL_MODEL_REQUIRED_OBSERVABLES
+            - set(guard.get("required_observables") or [])
         )
         receipt["gates"].append(
             _gate(
@@ -756,7 +779,8 @@ def build_first_report(spec: Mapping[str, Any], run_dir: Path) -> dict[str, Any]
                 STATUS_PASS if guard_ok else STATUS_BLOCKED,
                 (
                     f"status={guard.get('status')}; pipeline={guard.get('selected_pipeline')}; "
-                    f"reason={guard.get('reason_code')}"
+                    f"reason={guard.get('reason_code')}; missing_required={missing_required}; "
+                    f"target_populations={len(guard.get('target_population') or {})}"
                 ),
             )
         )

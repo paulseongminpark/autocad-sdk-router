@@ -17,6 +17,7 @@
           "placed_uid": {"type": "string"},
           "source_entity_handle": {"type": "string"},
           "source_def_handle": {"type": "string"},
+          "source_layer": {"type": "string"},
           "p0_world": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
           "p1_world": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}}
         }

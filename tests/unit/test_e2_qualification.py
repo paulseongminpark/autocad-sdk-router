@@ -13,7 +13,10 @@ REPO = Path(__file__).resolve().parents[2]
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
-from tools.e2.qualification.engine import build_first_report  # noqa: E402
+from tools.e2.qualification.engine import (  # noqa: E402
+    _runtime_wall_guard_qualified,
+    build_first_report,
+)
 
 
 def _write_json(path: Path, value: object) -> None:
@@ -149,3 +152,31 @@ def test_tool_registry_has_unique_ids_and_required_gates():
     assert len(ids) == len(set(ids))
     assert {"native_objectarx_graph", "wall_evidence_grid", "gbdt_wall_arm", "gnn_wall_arm"} <= set(ids)
     assert all(row["qualification_gate"] for row in rows)
+
+
+def test_wall_report_rejects_legacy_xclip_only_guard():
+    legacy = {
+        "status": "READY",
+        "required_observables": [
+            "nested_insert_world_segments",
+            "world_lineage",
+            "silent_drop_detection",
+            "xclip_preservation",
+        ],
+    }
+    target_qualified = {
+        **legacy,
+        "required_observables": [
+            *legacy["required_observables"],
+            "source_document_identity",
+            "native_display_membership",
+            "model_input_membership",
+        ],
+        "target_population": {
+            "wall-w1": {"model_input_segments": 1},
+            "wall-w2": {"model_input_segments": 1},
+        },
+    }
+
+    assert _runtime_wall_guard_qualified(legacy) is False
+    assert _runtime_wall_guard_qualified(target_qualified) is True

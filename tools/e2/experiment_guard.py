@@ -83,6 +83,9 @@ _PIPELINES: dict[str, dict[str, Any]] = {
             "world_lineage",
             "silent_drop_detection",
             "xclip_preservation",
+            "source_document_identity",
+            "native_display_membership",
+            "model_input_membership",
         },
     },
 }
@@ -301,6 +304,16 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _payload_sha256(value: Mapping[str, Any]) -> str:
+    rendered = json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(rendered).hexdigest()
+
+
 def _independent_oracle_receipt_ok(receipt: Mapping[str, Any] | None) -> bool:
     if not isinstance(receipt, Mapping) or receipt.get("status") != "PASS":
         return False
@@ -315,6 +328,294 @@ def _independent_oracle_receipt_ok(receipt: Mapping[str, Any] | None) -> bool:
         if len(expected) != 64 or not path.is_file() or _sha256(path) != expected:
             return False
     return True
+
+
+def _stable_segment_id(segment: Mapping[str, Any]) -> str:
+    return str(
+        segment.get("placed_uid")
+        or segment.get("lineage_id")
+        or segment.get("handle")
+        or ""
+    )
+
+
+def _target_population_check(
+    world: Mapping[str, Any],
+    target_oracle: Mapping[str, Any] | None,
+    model_input: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Compare native-display truth, WorldIR lineage and the actual model population."""
+
+    if target_oracle is None:
+        return {
+            "status": NEEDS_BUILD,
+            "reason_code": "NATIVE_DISPLAY_ORACLE_REQUIRED",
+            "reason": (
+                "Build or supply a hash-bound AutoCAD native-display membership oracle; "
+                "the WorldIR XCLIP implementation cannot certify itself."
+            ),
+            "missing_builds": ["autocad.native_display_membership.v1"],
+            "target_population": {},
+        }
+    if (
+        not isinstance(target_oracle, Mapping)
+        or target_oracle.get("schema") != "ariadne.e2.target_population_oracle.v1"
+        or target_oracle.get("oracle") != "autocad.native_display_membership.v1"
+        or not _independent_oracle_receipt_ok(target_oracle)
+    ):
+        return {
+            "status": NEEDS_PROBE,
+            "reason_code": "TARGET_POPULATION_ORACLE_INVALID",
+            "reason": "A hash-bound AutoCAD native-display target oracle is required.",
+            "target_population": {},
+        }
+    if not isinstance(model_input, Mapping) or not isinstance(model_input.get("segments"), list):
+        return {
+            "status": NEEDS_PROBE,
+            "reason_code": "MODEL_INPUT_RECEIPT_REQUIRED",
+            "reason": "The exact model-input IR must be supplied before the model command may run.",
+            "target_population": {},
+        }
+    evidence_payload_sha256 = {
+        "world_ir": _payload_sha256(world),
+        "target_population_oracle": _payload_sha256(target_oracle),
+        "model_input_ir": _payload_sha256(model_input),
+    }
+
+    drawing_id = str(world.get("drawing_id") or "")
+    oracle_drawing_id = str(target_oracle.get("drawing_id") or "")
+    model_drawing_id = str(model_input.get("drawing_id") or "")
+    if (
+        not drawing_id
+        or drawing_id == "unknown"
+        or drawing_id != oracle_drawing_id
+        or drawing_id != model_drawing_id
+    ):
+        return {
+            "status": BLOCKED,
+            "reason_code": "SOURCE_SCOPE_UNRESOLVED",
+            "reason": "WorldIR, native-display oracle and model input do not identify the same drawing.",
+            "target_population": {},
+            "evidence_payload_sha256": evidence_payload_sha256,
+        }
+
+    targets = target_oracle.get("targets")
+    if not isinstance(targets, list) or not targets:
+        return {
+            "status": NEEDS_PROBE,
+            "reason_code": "VACUOUS_TARGET_POPULATION",
+            "reason": "The native-display oracle declared no target populations.",
+            "target_population": {},
+            "evidence_payload_sha256": evidence_payload_sha256,
+        }
+
+    conservation = world.get("conservation_ledger")
+    entries = conservation.get("entity_entries") if isinstance(conservation, Mapping) else None
+    world_segments = world.get("segments")
+    if not isinstance(entries, list) or not isinstance(world_segments, list):
+        return {
+            "status": NEEDS_BUILD,
+            "reason_code": "TARGET_LINEAGE_MISSING",
+            "reason": "WorldIR lacks per-entity target lineage required for layer-level conservation.",
+            "target_population": {},
+            "evidence_payload_sha256": evidence_payload_sha256,
+        }
+
+    world_visible_by_layer: dict[str, int] = {}
+    for entry in entries:
+        if not isinstance(entry, Mapping) or "source_layer" not in entry:
+            return {
+                "status": NEEDS_BUILD,
+                "reason_code": "TARGET_LINEAGE_MISSING",
+                "reason": "A WorldIR entity ledger entry has no source_layer.",
+                "target_population": {},
+                "evidence_payload_sha256": evidence_payload_sha256,
+            }
+        layer = str(entry.get("source_layer") or "")
+        visible = entry.get("visible_source_segments")
+        if not isinstance(visible, int) or visible < 0:
+            return {
+                "status": NEEDS_BUILD,
+                "reason_code": "TARGET_LINEAGE_MISSING",
+                "reason": "A WorldIR entity ledger entry has invalid visible-source accounting.",
+                "target_population": {},
+                "evidence_payload_sha256": evidence_payload_sha256,
+            }
+        world_visible_by_layer[layer] = world_visible_by_layer.get(layer, 0) + visible
+
+    world_ids_by_layer: dict[str, set[str]] = {}
+    world_seen_ids: set[str] = set()
+    for segment in world_segments:
+        if not isinstance(segment, Mapping) or "source_layer" not in segment:
+            return {
+                "status": NEEDS_BUILD,
+                "reason_code": "TARGET_LINEAGE_MISSING",
+                "reason": "A WorldIR segment has no source_layer.",
+                "target_population": {},
+                "evidence_payload_sha256": evidence_payload_sha256,
+            }
+        segment_id = _stable_segment_id(segment)
+        if not segment_id:
+            return {
+                "status": NEEDS_BUILD,
+                "reason_code": "TARGET_LINEAGE_MISSING",
+                "reason": "A WorldIR segment has no stable placed identity.",
+                "target_population": {},
+                "evidence_payload_sha256": evidence_payload_sha256,
+            }
+        if segment_id in world_seen_ids:
+            return {
+                "status": NEEDS_BUILD,
+                "reason_code": "TARGET_LINEAGE_MISSING",
+                "reason": "WorldIR contains duplicate stable placed identities.",
+                "target_population": {},
+                "evidence_payload_sha256": evidence_payload_sha256,
+            }
+        world_seen_ids.add(segment_id)
+        layer = str(segment.get("source_layer") or "")
+        world_ids_by_layer.setdefault(layer, set()).add(segment_id)
+
+    model_ids_by_layer: dict[str, set[str]] = {}
+    model_seen_ids: set[str] = set()
+    for segment in model_input["segments"]:
+        if not isinstance(segment, Mapping):
+            return {
+                "status": NEEDS_PROBE,
+                "reason_code": "MODEL_INPUT_RECEIPT_INVALID",
+                "reason": "A model-input segment is not an object.",
+                "target_population": {},
+                "evidence_payload_sha256": evidence_payload_sha256,
+            }
+        segment_id = _stable_segment_id(segment)
+        layer = str(segment.get("source_layer", segment.get("layer", "")) or "")
+        if not segment_id or not layer:
+            return {
+                "status": NEEDS_PROBE,
+                "reason_code": "MODEL_INPUT_RECEIPT_INVALID",
+                "reason": "Every model-input segment needs a stable placed identity and source layer.",
+                "target_population": {},
+                "evidence_payload_sha256": evidence_payload_sha256,
+            }
+        if segment_id in model_seen_ids:
+            return {
+                "status": NEEDS_PROBE,
+                "reason_code": "MODEL_INPUT_RECEIPT_INVALID",
+                "reason": "The model-input receipt contains duplicate stable placed identities.",
+                "target_population": {},
+                "evidence_payload_sha256": evidence_payload_sha256,
+            }
+        model_seen_ids.add(segment_id)
+        model_ids_by_layer.setdefault(layer, set()).add(segment_id)
+
+    summary: dict[str, dict[str, Any]] = {}
+    seen_targets: set[str] = set()
+    seen_native_ids: set[str] = set()
+    lost = False
+    disagreement = False
+    positive_native_targets = 0
+    for target in targets:
+        if not isinstance(target, Mapping):
+            return {
+                "status": NEEDS_PROBE,
+                "reason_code": "TARGET_POPULATION_ORACLE_INVALID",
+                "reason": "Every native-display target must be an object.",
+                "target_population": {},
+                "evidence_payload_sha256": evidence_payload_sha256,
+            }
+        target_id = str(target.get("target_id") or "")
+        layer = str(target.get("layer") or "")
+        native_visible = target.get("native_visible_source_segments")
+        native_id_values = target.get("native_visible_segment_ids")
+        if (
+            not target_id
+            or target_id in seen_targets
+            or not layer
+            or not isinstance(native_visible, int)
+            or native_visible < 0
+            or not isinstance(native_id_values, list)
+            or any(not isinstance(item, str) or not item for item in native_id_values)
+            or len(native_id_values) != len(set(native_id_values))
+            or native_visible != len(native_id_values)
+        ):
+            return {
+                "status": NEEDS_PROBE,
+                "reason_code": "TARGET_POPULATION_ORACLE_INVALID",
+                "reason": (
+                    "Target ids, layers, native visible counts and unique stable segment ids "
+                    "must be complete and consistent."
+                ),
+                "target_population": {},
+                "evidence_payload_sha256": evidence_payload_sha256,
+            }
+        seen_targets.add(target_id)
+        native_ids = set(native_id_values)
+        if native_ids & seen_native_ids:
+            return {
+                "status": NEEDS_PROBE,
+                "reason_code": "TARGET_POPULATION_ORACLE_INVALID",
+                "reason": "A native-visible stable segment identity appears in multiple targets.",
+                "target_population": {},
+                "evidence_payload_sha256": evidence_payload_sha256,
+            }
+        seen_native_ids.update(native_ids)
+        if native_visible > 0:
+            positive_native_targets += 1
+        world_visible = world_visible_by_layer.get(layer, 0)
+        world_ids = world_ids_by_layer.get(layer, set())
+        model_ids = model_ids_by_layer.get(layer, set())
+        native_missing_from_world = native_ids - world_ids
+        world_missing_from_native = world_ids - native_ids
+        missing_ids = native_ids - model_ids
+        extra_ids = model_ids - native_ids
+        if native_visible > 0 and (not model_ids or missing_ids):
+            lost = True
+        if native_visible != world_visible or native_missing_from_world or world_missing_from_native:
+            disagreement = True
+        if extra_ids:
+            lost = True
+        summary[target_id] = {
+            "layer": layer,
+            "native_visible_source_segments": native_visible,
+            "world_visible_source_segments": world_visible,
+            "world_emitted_segments": len(world_ids),
+            "model_input_segments": len(model_ids),
+            "native_missing_from_worldir_segments": len(native_missing_from_world),
+            "worldir_missing_from_native_segments": len(world_missing_from_native),
+            "missing_model_input_segments": len(missing_ids),
+            "extra_model_input_segments": len(extra_ids),
+        }
+
+    if positive_native_targets == 0:
+        return {
+            "status": NEEDS_PROBE,
+            "reason_code": "VACUOUS_TARGET_POPULATION",
+            "reason": "The oracle did not exercise a visible target population.",
+            "target_population": summary,
+            "evidence_payload_sha256": evidence_payload_sha256,
+        }
+    if lost:
+        return {
+            "status": BLOCKED,
+            "reason_code": "TARGET_POPULATION_LOST",
+            "reason": "A native-visible target is absent or changed in the exact model-input population.",
+            "target_population": summary,
+            "evidence_payload_sha256": evidence_payload_sha256,
+        }
+    if disagreement:
+        return {
+            "status": BLOCKED,
+            "reason_code": "XCLIP_ORACLE_DISAGREEMENT",
+            "reason": "WorldIR visibility accounting disagrees with the independent AutoCAD display oracle.",
+            "target_population": summary,
+            "evidence_payload_sha256": evidence_payload_sha256,
+        }
+    return {
+        "status": READY,
+        "reason_code": "TARGET_POPULATION_PRESERVED",
+        "reason": "Every native-visible target is preserved from WorldIR lineage into model input.",
+        "target_population": summary,
+        "evidence_payload_sha256": evidence_payload_sha256,
+    }
 
 
 def _native_graph_observable_ok(observable: str, ir: Mapping[str, Any]) -> bool:
@@ -373,6 +674,8 @@ def verify_probe(
     *,
     allow_empty: bool = False,
     independent_oracle_receipt: Mapping[str, Any] | None = None,
+    target_population_oracle: Mapping[str, Any] | None = None,
+    model_input_output: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Promote NEEDS_PROBE to READY only when measured coverage is adequate."""
     base = dict(decision)
@@ -438,6 +741,37 @@ def verify_probe(
                 reason_code="WORLDIR_PROBE_INADEQUATE",
                 reason="The WorldIR probe did not exercise every requested property.",
             )
+        if "source_document_identity" in required:
+            drawing_id = str(probe_output.get("drawing_id") or "")
+            if not drawing_id or drawing_id == "unknown":
+                return _transition(
+                    base,
+                    NEEDS_PROBE,
+                    unverified_observables=["source_document_identity"],
+                    reason_code="SOURCE_SCOPE_UNRESOLVED",
+                    reason="The WorldIR probe does not identify its source drawing.",
+                )
+        if {"native_display_membership", "model_input_membership"} & set(required):
+            target_check = _target_population_check(
+                probe_output,
+                target_population_oracle,
+                model_input_output,
+            )
+            if target_check["status"] != READY:
+                return _transition(
+                    base,
+                    target_check["status"],
+                    unverified_observables=[
+                        item
+                        for item in ("native_display_membership", "model_input_membership")
+                        if item in required
+                    ],
+                    reason_code=target_check["reason_code"],
+                    reason=target_check["reason"],
+                    missing_builds=target_check.get("missing_builds", []),
+                    target_population=target_check["target_population"],
+                    evidence_payload_sha256=target_check.get("evidence_payload_sha256", {}),
+                )
         if base.get("conclusion") in {"absence", "impossibility"} and not _independent_oracle_receipt_ok(independent_oracle_receipt):
             return _transition(
                 base,
@@ -452,6 +786,16 @@ def verify_probe(
             probe_schema=probe_output.get("oracle"),
             reason_code="INSTRUMENT_QUALIFIED",
             reason="Adapter balance plus XCLIP-aware source and fragment conservation passed.",
+            **(
+                {"target_population": target_check["target_population"]}
+                if {"native_display_membership", "model_input_membership"} & set(required)
+                else {}
+            ),
+            **(
+                {"evidence_payload_sha256": target_check["evidence_payload_sha256"]}
+                if {"native_display_membership", "model_input_membership"} & set(required)
+                else {}
+            ),
         )
 
     if pipeline == "database_summary":
@@ -543,6 +887,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--probe-ir", type=Path, help="Actual probe output to verify.")
     parser.add_argument("--allow-empty", action="store_true")
     parser.add_argument("--independent-oracle-receipt", type=Path)
+    parser.add_argument("--target-population-oracle", type=Path)
+    parser.add_argument("--model-input-ir", type=Path)
     args = parser.parse_args(argv)
 
     decision = qualify(
@@ -559,6 +905,16 @@ def main(argv: list[str] | None = None) -> int:
             independent_oracle_receipt=(
                 _load_json(args.independent_oracle_receipt)
                 if args.independent_oracle_receipt is not None
+                else None
+            ),
+            target_population_oracle=(
+                _load_json(args.target_population_oracle)
+                if args.target_population_oracle is not None
+                else None
+            ),
+            model_input_output=(
+                _load_json(args.model_input_ir)
+                if args.model_input_ir is not None
                 else None
             ),
         )
