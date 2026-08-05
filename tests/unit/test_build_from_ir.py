@@ -453,6 +453,63 @@ class Issue59LeaderAndElevationTest(unittest.TestCase):
         self.assertAlmostEqual(lwpolyline.dxf.elevation, -0.023448)
 
 
+class Issue62MultileaderTest(unittest.TestCase):
+    """#62: the extractor stamps MULTILEADER (AcDbMLeader) with the same
+    geometry.kind == "leader" a legacy AcDbLeader gets -- only ``dxf_name``
+    tells them apart. A builder that dispatches on ``kind`` alone therefore
+    rebuilds every MULTILEADER as a plain LEADER, which has no slot for
+    annotation text, so the text is silently lost (HDC 267: 21 drawings /
+    129 entities, 14 drawings FAIL on this alone).
+    """
+
+    TEXT = "\\A1;{\\fDotumChe|b0|i0|c129|p49;annotation}"
+
+    def _multileader_ir(self, text=TEXT):
+        return _ir([
+            _ent("leader",
+                 {"vertices": [[42718.04, -1081835.54, 0.0],
+                               [42718.04, -1093485.009, 0.0]],
+                  "text": text, "height": 250.0},
+                 layer="AA-FLXK", dxf_name="MULTILEADER")])
+
+    def test_multileader_is_not_downgraded_to_leader(self):
+        doc, report = build_dxf_from_ir(self._multileader_ir())
+        modelspace = _reload(doc).modelspace()
+        self.assertEqual(len(list(modelspace.query("MULTILEADER"))), 1)
+        self.assertEqual(len(list(modelspace.query("LEADER"))), 0)
+        self.assertEqual(report.added["leader"], 1)
+
+    def test_multileader_text_survives_the_roundtrip(self):
+        doc, _ = build_dxf_from_ir(self._multileader_ir())
+        ml = list(_reload(doc).modelspace().query("MULTILEADER"))[0]
+        self.assertEqual(ml.context.mtext.default_content, self.TEXT)
+
+    def test_multileader_vertex_count_is_not_inflated_by_a_synthesized_landing(self):
+        """Without has_landing=0 / has_last_leader_line=0, AutoCAD synthesizes
+        a landing vertex the next time the drawing opens -- vertex count goes
+        2 -> 3 and the bbox widens (measured on d005). Assert the flags that
+        the #62 fix sets to suppress that synthesis, and that ezdxf's own
+        round-trip does not add a vertex on its own."""
+        doc, _ = build_dxf_from_ir(self._multileader_ir())
+        ml = list(_reload(doc).modelspace().query("MULTILEADER"))[0]
+        self.assertEqual(ml.dxf.has_landing, 0)
+        leader_lines = [line for leader in ml.context.leaders for line in leader.lines]
+        self.assertEqual(len(leader_lines), 1)
+        self.assertEqual(len(leader_lines[0].vertices), 2)
+        for leader in ml.context.leaders:
+            self.assertEqual(leader.has_last_leader_line, 0)
+
+    def test_multileader_without_text_falls_back_to_leader_with_a_reason(self):
+        """Block-content MULTILEADERs (no text) aren't represented in the IR
+        yet (#62 TODO) -- must not silently vanish; fall back to LEADER and
+        count why instead of dropping the entity or raising."""
+        doc, report = build_dxf_from_ir(self._multileader_ir(text=""))
+        modelspace = _reload(doc).modelspace()
+        self.assertEqual(len(list(modelspace.query("LEADER"))), 1)
+        self.assertEqual(len(list(modelspace.query("MULTILEADER"))), 0)
+        self.assertEqual(report.skipped["leader:multileader_no_text"], 1)
+
+
 class Issue55HatchEllipseArcTest(unittest.TestCase):
     """#55: 'ellipse_arc' boundary edges were ignored (dispatch said 'ell_arc'),
     so 288 edges vanished and took 20 whole hatches with them; and the

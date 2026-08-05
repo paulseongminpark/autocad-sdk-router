@@ -54,7 +54,8 @@ from pathlib import Path
 
 import ezdxf
 from ezdxf.document import Drawing
-from ezdxf.math import Vec3, open_uniform_knot_vector
+from ezdxf.math import Vec2, Vec3, open_uniform_knot_vector
+from ezdxf.render.mleader import ConnectionSide
 
 DEFAULT_DXFVERSION = "AC1027"  # R2013 -- the version the DWG convert step reads
 STANDARD = "Standard"  # ezdxf's pre-created text/dim style name (see #54, #58)
@@ -699,18 +700,67 @@ def _h_face3d(ctx, space, ent, g, attr):
     return face
 
 
+def _add_multileader_mtext(space, points, text, height, attr):
+    """#62: rebuild a MULTILEADER (AcDbMLeader) via ezdxf's native builder
+    instead of falling into the plain-LEADER path below, which has no slot
+    for annotation text.
+
+    Three geometry adjustments, all confirmed against measured originals
+    (d005/d037 in the campaign's HDC 267 corpus):
+
+    1. The IR's vertex order is [landing (text side) ... arrowhead], but
+       ``add_leader_line`` wants arrowhead -> landing, so the list is
+       reversed. Passing every vertex -- not just the arrowhead, leaving the
+       landing for ezdxf to invent -- keeps ezdxf from computing its own
+       landing point (which lands (-10, -250) off the original).
+    2. ``landing_gap``/``dogleg_length`` pinned to 0 to reproduce the
+       original path exactly rather than ezdxf's stylesheet defaults.
+    3. ``has_landing`` / each leader's ``has_last_leader_line`` pinned to 0.
+       Without this, AutoCAD synthesizes an extra landing vertex (and a
+       wider bbox) the next time it opens the rebuilt drawing (d005: 2
+       vertices in the original became 3 on reopen).
+    """
+    builder = space.add_multileader_mtext("Standard", dxfattribs=dict(attr))
+    builder.set_content(text, char_height=height or 0.0)
+    builder.set_connection_properties(landing_gap=0.0, dogleg_length=0.0)
+    reversed_points = [Vec2(p[0], p[1]) for p in reversed(points)]
+    side = (ConnectionSide.right if reversed_points[-1].x >= reversed_points[0].x
+            else ConnectionSide.left)
+    builder.add_leader_line(side, reversed_points)
+    builder.build(insert=Vec2(points[0][0], points[0][1]))
+    multileader = space[-1]
+    multileader.dxf.has_landing = 0
+    for leader in multileader.context.leaders:
+        leader.has_last_leader_line = 0
+    return multileader
+
+
 def _h_leader(ctx, space, ent, g, attr):
     """#59: a LEADER rebuilt as a POLYLINE is a lost LEADER (137 -> 0 in d014).
 
     ezdxf supports the entity natively, so identity is preserved; the polyline
     form remains only as a fallback. Note that MULTILEADER also arrives with
-    ``kind == "leader"`` (the extractor's class map) and is therefore rebuilt as
-    a plain LEADER -- a known, separately tracked downgrade.
+    ``kind == "leader"`` (the extractor's class map) -- #62 gives it its own
+    branch immediately below rather than letting it fall through to the
+    plain-LEADER path, which has no slot for annotation text.
     """
     points = _vertex_points(g)
     if len(points) < 2:
         ctx.report.skipped["leader:too_few_vertices"] += 1
         return None
+    if ent.get("dxf_name") == "MULTILEADER":
+        text = str(g.get("text") or "")
+        if not text:
+            # Block-content MULTILEADERs aren't represented in the IR yet
+            # (#62 TODO) -- fall back to LEADER rather than drop the entity.
+            ctx.report.skipped["leader:multileader_no_text"] += 1
+        else:
+            try:
+                return _add_multileader_mtext(space, points, text,
+                                              _num(g.get("height")), attr)
+            except Exception as ex:  # noqa: BLE001
+                ctx.report.errors[f"multileader:{type(ex).__name__}:{str(ex)[:40]}"] += 1
+                ctx.report.skipped["leader:multileader_build_failed"] += 1
     try:
         leader = space.add_leader(points, dimstyle=ctx.dim_style_ref,
                                  dxfattribs=dict(attr))
