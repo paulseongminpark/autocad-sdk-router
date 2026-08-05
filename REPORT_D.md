@@ -145,5 +145,5 @@ CHANGE_ONLY를 벗어난 파일 변경 없음. `ir_builder.py`(추출기) 미변
 
 ## 커밋
 
-커밋 해시는 이 보고서 작성 직후 `git log --oneline -3`으로 확인해 아래에 덧붙인다.
-(커밋 완료 후: `<COMMIT_HASH_PLACEHOLDER>`)
+`ec3be9f` — "builder: native MULTILEADER instead of LEADER downgrade (#62)"
+(부모: `2b19679`, 브랜치 `fix/hdc-builder-port`).
