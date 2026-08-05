@@ -59,14 +59,6 @@ from ezdxf.math import Vec3, open_uniform_knot_vector
 DEFAULT_DXFVERSION = "AC1027"  # R2013 -- the version the DWG convert step reads
 STANDARD = "Standard"  # ezdxf's pre-created text/dim style name (see #54, #58)
 
-# Kinds this builder rebuilds. Anything else is counted, never dropped silently.
-SUPPORTED_KINDS = frozenset({
-    "line", "arc", "circle", "ellipse", "lwpolyline", "polyline", "point",
-    "text", "mtext", "attribute", "block_reference", "spline", "hatch",
-    "mpolygon", "solid", "trace", "face3d", "wipeout", "leader", "ray",
-    "xline", "dimension",
-})
-
 # Kinds that cannot be rebuilt from IR alone -- the reason is the counter key,
 # so a caller reading the report learns WHY, not just how many.
 _UNREBUILDABLE = {
@@ -786,10 +778,42 @@ def _edge_ccw(edge: dict) -> bool:
 
 
 def _edge_ellipse(ctx, path, edge) -> bool:
+    """Add one elliptical boundary edge, in either IR dialect.
+
+    #55: ezdxf's ``add_ellipse`` wants the center->major-endpoint VECTOR (its
+    magnitude IS the major radius) plus ratio = minor/major. Neither dialect the
+    extractor emits looks like that:
+
+      * ``ellipse_arc`` carries a UNIT ``major_axis`` with ``major_radius`` /
+        ``minor_radius`` alongside (measured: 288 of 288 edges had length 1.0),
+        and no ``radius_ratio`` key at all. Passing that vector straight through
+        collapsed a radius-5000 arc to radius 1, and the missing ratio defaulted
+        to 1.0, turning every ellipse into a circle.
+      * ``ellipse`` carries a full-length ``major`` and an explicit ``ratio``
+        (the WCS-degree emit in AriadneNativeJob.cpp).
+
+    Both are normalized here so the dialect cannot leak into the geometry.
+    """
     center = _p2(edge.get("center"))
-    ratio = _num(edge.get("radius_ratio"), 1.0) or 1.0
-    major = _p2(edge.get("major_axis"), (1.0, 0.0))
-    path.add_ellipse(center, major, min(max(abs(ratio), 1e-9), 1.0),
+    full_major = edge.get("major")
+    if full_major is not None:
+        vector = _p2(full_major, (1.0, 0.0))
+        major_radius = math.hypot(vector[0], vector[1])
+    else:
+        unit = _p2(edge.get("major_axis"), (1.0, 0.0))
+        major_radius = abs(_num(edge.get("major_radius"), 1.0) or 1.0)
+        vector = (unit[0] * major_radius, unit[1] * major_radius)
+    if major_radius <= 0.0:
+        ctx.report.skipped["hatch_edge:ellipse_zero_major_radius"] += 1
+        return False
+    ratio = _num(edge.get("ratio"))
+    if ratio is None:
+        ratio = _num(edge.get("radius_ratio"))
+    if ratio is None:
+        minor_radius = abs(_num(edge.get("minor_radius"), major_radius) or major_radius)
+        ratio = minor_radius / major_radius
+    # ezdxf (and DXF) reject a ratio outside (0, 1].
+    path.add_ellipse(center, vector, min(max(abs(ratio), 1e-9), 1.0),
                      _deg(edge.get("start_angle")), _deg(edge.get("end_angle")),
                      _edge_ccw(edge))
     return True
@@ -811,7 +835,10 @@ def _apply_edge_path(ctx, hatch, loop) -> int:
                          _deg(edge.get("start_angle")), _deg(edge.get("end_angle")),
                          _edge_ccw(edge))
             added += 1
-        elif kind == "ell_arc":
+        elif kind in ("ellipse_arc", "ell_arc", "ellipse"):
+            # #55: the extractor emits "ellipse_arc"/"ellipse"; a dispatch that
+            # only knew "ell_arc" dropped 288 edges and, with them, the 20
+            # hatches whose loops consisted of nothing else.
             if _edge_ellipse(ctx, path, edge):
                 added += 1
         elif kind == "spline":
@@ -823,6 +850,13 @@ def _apply_edge_path(ctx, hatch, loop) -> int:
                     degree=int(_num(edge.get("degree"), 3) or 3),
                     periodic=1 if edge.get("periodic") else 0)
                 added += 1
+            else:
+                ctx.report.skipped["hatch_edge:spline_without_control_points"] += 1
+        else:
+            # #55's real lesson: an unrecognized edge type must be counted, not
+            # ignored. The 288 lost ellipse arcs were invisible until 20 hatches
+            # turned up boundary-less.
+            ctx.report.skipped[f"hatch_edge:{kind or 'unnamed'}"] += 1
     return added
 
 
@@ -908,6 +942,10 @@ _HANDLERS = {
     "xline": _h_xline,
     "dimension": _h_dimension,
 }
+
+# Geometry kinds this builder rebuilds. Derived from the handler table so the
+# advertised set can never drift from the implemented one.
+SUPPORTED_KINDS = frozenset(_HANDLERS)
 
 
 # --- dispatch -----------------------------------------------------------------

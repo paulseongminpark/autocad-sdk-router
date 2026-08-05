@@ -20,6 +20,7 @@ Requires ezdxf (declared in requirements-full.txt, used across tools/e2).
 from __future__ import annotations
 
 import io
+import math
 import os
 import sys
 import tempfile
@@ -33,7 +34,9 @@ for _p in (_REPO, os.path.join(_REPO, "tools")):
 
 import ezdxf  # noqa: E402
 
-from tools.build_from_ir import BuildReport, build_dxf_from_ir  # noqa: E402
+from tools.build_from_ir import (  # noqa: E402
+    SUPPORTED_KINDS, BuildReport, build_dxf_from_ir,
+)
 from tools.ir_builder import make_fixture_ir  # noqa: E402
 
 
@@ -122,6 +125,12 @@ class PublicApiTest(unittest.TestCase):
         _, report = build_dxf_from_ir(_ir([_ent("region", {})]))
         self.assertEqual(report.total_added, 0)
         self.assertEqual(report.skipped["region:acis_binary_not_in_ir"], 1)
+
+    def test_supported_kinds_cover_the_defect_issues(self):
+        """The kinds the campaign's issues are about must all be rebuildable."""
+        for kind in ("wipeout", "spline", "hatch", "face3d", "leader",
+                     "lwpolyline", "dimension"):
+            self.assertIn(kind, SUPPORTED_KINDS)
 
     def test_unknown_kind_is_counted_not_dropped(self):
         """#55's lesson: an unrecognized type string must never vanish silently."""
@@ -440,6 +449,103 @@ class Issue59LeaderAndElevationTest(unittest.TestCase):
                                 "closed": False})]))
         lwpolyline = list(_reload(doc).modelspace().query("LWPOLYLINE"))[0]
         self.assertAlmostEqual(lwpolyline.dxf.elevation, -0.023448)
+
+
+class Issue55HatchEllipseArcTest(unittest.TestCase):
+    """#55: 'ellipse_arc' boundary edges were ignored (dispatch said 'ell_arc'),
+    so 288 edges vanished and took 20 whole hatches with them; and the
+    major_axis/ratio convention was wrong, so any edge that DID get through
+    would have come out as a unit-radius circle.
+
+    Field names follow the extractor's own edge JSON -- see
+    tests/unit/test_ir_builder.py's edge-loop shape contract.
+    """
+
+    MAJOR_RADIUS = 5000.0
+    MINOR_RADIUS = 2000.0
+
+    def _hatch_ir(self, edges, *, loop_extra=None):
+        loop = {"index": 0, "loop_type": 1, "closed": True, "status": "ok",
+                "edges": edges}
+        loop.update(loop_extra or {})
+        return _ir([_ent("hatch", {"pattern_name": "SOLID", "is_solid_fill": True,
+                                   "loops": [loop]}, layer="0")])
+
+    def _unit_axis_ellipse_edge(self):
+        """The measured IR shape: unit major_axis + separate radii, radians."""
+        return {"type": "ellipse_arc", "center": [0.0, 0.0],
+                "major_axis": [1.0, 0.0],
+                "major_radius": self.MAJOR_RADIUS,
+                "minor_radius": self.MINOR_RADIUS,
+                "start_angle": 0.0, "end_angle": math.pi,
+                "counterclockwise": True}
+
+    @staticmethod
+    def _ellipse_edges(hatch):
+        return [e for e in hatch.paths[0].edges if type(e).__name__ == "EllipseEdge"]
+
+    def test_ellipse_arc_loop_is_not_dropped(self):
+        doc, report = build_dxf_from_ir(self._hatch_ir([self._unit_axis_ellipse_edge()]))
+        hatches = list(_reload(doc).modelspace().query("HATCH"))
+        self.assertEqual(len(hatches), 1)
+        self.assertEqual(report.added["hatch"], 1)
+        self.assertEqual(report.skipped["hatch:hatch_no_boundary"], 0)
+
+    def test_ellipse_arc_keeps_its_real_size_and_ratio(self):
+        doc, _ = build_dxf_from_ir(self._hatch_ir([self._unit_axis_ellipse_edge()]))
+        hatch = list(_reload(doc).modelspace().query("HATCH"))[0]
+        edges = self._ellipse_edges(hatch)
+        self.assertEqual(len(edges), 1)
+        edge = edges[0]
+        # ezdxf wants the center->major-endpoint VECTOR, not a unit direction.
+        self.assertAlmostEqual(math.hypot(edge.major_axis[0], edge.major_axis[1]),
+                               self.MAJOR_RADIUS, places=6)
+        self.assertAlmostEqual(edge.ratio, self.MINOR_RADIUS / self.MAJOR_RADIUS,
+                               places=9)
+        self.assertAlmostEqual(edge.end_angle, 180.0, places=6)
+
+    def test_full_length_major_dialect_gives_the_same_geometry(self):
+        """The extractor's other edge dialect: full-length 'major' + 'ratio'."""
+        doc, _ = build_dxf_from_ir(self._hatch_ir([{
+            "type": "ellipse", "center": [0.0, 0.0],
+            "major": [self.MAJOR_RADIUS, 0.0],
+            "ratio": self.MINOR_RADIUS / self.MAJOR_RADIUS,
+            "start_angle": 0.0, "end_angle": math.pi, "ccw": True}]))
+        edge = self._ellipse_edges(list(_reload(doc).modelspace().query("HATCH"))[0])[0]
+        self.assertAlmostEqual(math.hypot(edge.major_axis[0], edge.major_axis[1]),
+                               self.MAJOR_RADIUS, places=6)
+        self.assertAlmostEqual(edge.ratio, self.MINOR_RADIUS / self.MAJOR_RADIUS,
+                               places=9)
+
+    def test_unrecognized_edge_type_is_counted(self):
+        """The 288-edge loss showed up only as 20 discarded hatches: never again."""
+        doc, report = build_dxf_from_ir(self._hatch_ir([
+            {"type": "line", "start": [0.0, 0.0], "end": [10.0, 0.0]},
+            {"type": "line", "start": [10.0, 0.0], "end": [10.0, 10.0]},
+            {"type": "helix_edge_from_the_future", "start": [10.0, 10.0]},
+        ]))
+        self.assertEqual(report.skipped["hatch_edge:helix_edge_from_the_future"], 1)
+        self.assertEqual(report.added["hatch"], 1)
+        self.assertEqual(len(list(_reload(doc).modelspace().query("HATCH"))), 1)
+
+    def test_boundaryless_hatch_is_dropped_and_reported(self):
+        doc, report = build_dxf_from_ir(self._hatch_ir([
+            {"type": "helix_edge_from_the_future", "start": [0.0, 0.0]}]))
+        self.assertEqual(len(list(_reload(doc).modelspace().query("HATCH"))), 0)
+        self.assertEqual(report.skipped["hatch:hatch_no_boundary"], 1)
+        self.assertEqual(report.added["hatch"], 0)
+
+    def test_polyline_boundary_loop_still_works(self):
+        doc, report = build_dxf_from_ir(_ir([_ent("hatch", {
+            "pattern_name": "SOLID", "is_solid_fill": True,
+            "loops": [{"index": 0, "loop_type": 3, "closed": True,
+                       "vertices": [{"point": [0.0, 0.0, 0.0]},
+                                    {"point": [10.0, 0.0, 0.0]},
+                                    {"point": [10.0, 10.0, 0.0]}]}]})]))
+        hatch = list(_reload(doc).modelspace().query("HATCH"))[0]
+        self.assertEqual(len(hatch.paths[0].vertices), 3)
+        self.assertTrue(hatch.paths[0].is_closed)
+        self.assertEqual(report.added["hatch"], 1)
 
 
 if __name__ == "__main__":
