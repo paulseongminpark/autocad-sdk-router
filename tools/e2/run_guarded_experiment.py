@@ -3,18 +3,588 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import numbers
+import os
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, Sequence
 
 import experiment_guard
 
 
+_DWG_HEADER_CONTRACT = "ASCII_AC10_PLUS_TWO_DIGITS"
+
+
+class _RunnerContractError(Exception):
+    """A runner returned an object that cannot be trusted as a terminal result."""
+
+    def __init__(self, error_type: str, message: str) -> None:
+        super().__init__(message)
+        self.error_type = error_type
+
+
 def _load_probe(path: Path | None) -> Mapping[str, Any] | None:
     if path is None:
         return None
-    return json.loads(path.read_text(encoding="utf-8-sig"))
+    value = json.loads(path.read_text(encoding="utf-8-sig"))
+    if not isinstance(value, Mapping):
+        raise ValueError(f"{path}: expected a JSON object")
+    return value
+
+
+def _absolute_requested_path(path: Path) -> Path:
+    """Make a path absolute without resolving a symlink, junction, or alias."""
+
+    return Path(os.path.abspath(os.fspath(path)))
+
+
+def _json_integer(value: object) -> int | None:
+    if isinstance(value, numbers.Integral) and not isinstance(value, bool):
+        return int(value)
+    return None
+
+
+def _native_file_identity(stat_result: os.stat_result) -> dict[str, int | None]:
+    """Return a JSON-safe identity plus freshness fingerprint from one open file."""
+
+    inode = _json_integer(getattr(stat_result, "st_ino", None))
+    return {
+        "device": _json_integer(getattr(stat_result, "st_dev", None)),
+        "inode": inode,
+        # Python exposes the Windows file index through st_ino.  Keeping the
+        # explicit alias lets cross-platform receipt consumers avoid guessing.
+        "file_index": inode,
+        "size": _json_integer(getattr(stat_result, "st_size", None)),
+        "mtime_ns": _json_integer(getattr(stat_result, "st_mtime_ns", None)),
+        "ctime_ns": _json_integer(getattr(stat_result, "st_ctime_ns", None)),
+    }
+
+
+def _dwg_format_validation(signature: bytes, *, status: str = "OBSERVED") -> dict[str, Any]:
+    valid = (
+        len(signature) == 6
+        and signature[:4] == b"AC10"
+        and all(ord("0") <= byte <= ord("9") for byte in signature[4:6])
+    )
+    return {
+        "status": status,
+        "contract": _DWG_HEADER_CONTRACT,
+        "observed_signature": signature.decode("ascii", errors="replace"),
+        "observed_signature_hex": signature.hex(),
+        "valid": valid,
+    }
+
+
+def _unavailable_dwg_format_validation() -> dict[str, Any]:
+    return {
+        "status": "NOT_PROVIDED",
+        "contract": _DWG_HEADER_CONTRACT,
+        "observed_signature": None,
+        "observed_signature_hex": None,
+        "valid": None,
+    }
+
+
+def _snapshot_file(path: Path, *, capture_bytes: bool = False) -> tuple[dict[str, Any], bytes | None]:
+    """Observe the object reached through ``path`` without resolving its alias away.
+
+    The caller records both the lexical requested path and the resolved target.  The
+    hash and native identity come from the same open handle reached through the
+    requested path.  This is detect-and-invalidate evidence, not an atomic lock.
+    """
+
+    requested = _absolute_requested_path(path)
+    canonical_before = requested.resolve(strict=True)
+    if not canonical_before.is_file():
+        raise ValueError(f"{canonical_before}: expected a file")
+
+    digest = hashlib.sha256()
+    captured: list[bytes] | None = [] if capture_bytes else None
+    signature = b""
+    with requested.open("rb") as stream:
+        identity = _native_file_identity(os.fstat(stream.fileno()))
+        while True:
+            chunk = stream.read(1 << 20)
+            if not chunk:
+                break
+            if len(signature) < 6:
+                signature += chunk[: 6 - len(signature)]
+            digest.update(chunk)
+            if captured is not None:
+                captured.append(chunk)
+
+    canonical_after = requested.resolve(strict=True)
+    snapshot_stable = canonical_before == canonical_after
+    snapshot = {
+        "requested_path": str(requested),
+        "canonical_target": str(canonical_before),
+        "canonical_target_after_read": str(canonical_after),
+        "sha256": digest.hexdigest(),
+        "file_identity": identity,
+        "observed_signature": signature,
+        "snapshot_stable": snapshot_stable,
+        "snapshot_reasons": (
+            [] if snapshot_stable else ["REQUESTED_PATH_RETARGETED_DURING_SNAPSHOT"]
+        ),
+    }
+    return snapshot, b"".join(captured) if captured is not None else None
+
+
+def _record_snapshot(binding: dict[str, Any], name: str, snapshot: Mapping[str, Any]) -> None:
+    binding[f"{name}_path"] = snapshot["canonical_target"]  # Compatibility alias.
+    binding[f"{name}_requested_path"] = snapshot["requested_path"]
+    binding[f"{name}_canonical_target"] = snapshot["canonical_target"]
+    binding[f"{name}_sha256"] = snapshot["sha256"]
+    binding[f"{name}_file_identity"] = snapshot["file_identity"]
+    binding[f"{name}_snapshot_stable"] = snapshot["snapshot_stable"]
+    binding[f"{name}_snapshot_reasons"] = snapshot["snapshot_reasons"]
+
+
+def _evidence_binding(
+    *,
+    source_drawing: Path | None,
+    probe_path: Path | None,
+    source_binding_required: bool,
+) -> tuple[dict[str, Any], Mapping[str, Any] | None]:
+    """Capture source/probe identity, exact bytes, and format evidence at preflight."""
+
+    binding: dict[str, Any] = {
+        "source_binding_required": source_binding_required,
+        "source_path": None,
+        "source_requested_path": None,
+        "source_canonical_target": None,
+        "source_sha256": None,
+        "source_file_identity": None,
+        "source_snapshot_stable": None,
+        "source_snapshot_reasons": [],
+        "source_format_validation": _unavailable_dwg_format_validation(),
+        "probe_path": None,
+        "probe_requested_path": None,
+        "probe_canonical_target": None,
+        "probe_sha256": None,
+        "probe_file_identity": None,
+        "probe_snapshot_stable": None,
+        "probe_snapshot_reasons": [],
+        "observed_probe_drawing_id": None,
+        "verified_probe_drawing_id": None,
+        "binding_errors": [],
+        "pre_spawn_validation": {"status": "PENDING" if source_binding_required else "NOT_REQUIRED"},
+        "post_execution_validation": {"status": "PENDING" if source_binding_required else "NOT_REQUIRED"},
+        "terminal_evidence_valid": None,
+        "terminal_evidence_validity": "PENDING" if source_binding_required else "NOT_REQUIRED",
+        "validation_contract": "DETECT_AND_INVALIDATE_NOT_ATOMIC",
+    }
+    probe_output: Mapping[str, Any] | None = None
+
+    if source_drawing is not None:
+        try:
+            source_snapshot, _ = _snapshot_file(source_drawing)
+            _record_snapshot(binding, "source", source_snapshot)
+            binding["source_format_validation"] = _dwg_format_validation(
+                source_snapshot["observed_signature"]
+            )
+            if source_snapshot["snapshot_stable"] is not True:
+                binding["binding_errors"].append(
+                    "SOURCE_DRAWING_REQUESTED_PATH_RETARGETED_DURING_PREFLIGHT"
+                )
+            if binding["source_format_validation"]["valid"] is not True:
+                binding["binding_errors"].append("SOURCE_DRAWING_FORMAT_INVALID")
+        except (OSError, ValueError) as error:
+            binding["source_format_validation"] = {
+                **_unavailable_dwg_format_validation(),
+                "status": "UNAVAILABLE",
+                "valid": False,
+            }
+            binding["binding_errors"].append(f"SOURCE_DRAWING_UNAVAILABLE: {error}")
+
+    if probe_path is not None:
+        try:
+            probe_snapshot, raw = _snapshot_file(probe_path, capture_bytes=True)
+            _record_snapshot(binding, "probe", probe_snapshot)
+            if probe_snapshot["snapshot_stable"] is not True:
+                binding["binding_errors"].append(
+                    "PROBE_FILE_REQUESTED_PATH_RETARGETED_DURING_PREFLIGHT"
+                )
+            value = json.loads((raw or b"").decode("utf-8-sig"))
+            if not isinstance(value, Mapping):
+                raise ValueError(f"{probe_snapshot['canonical_target']}: expected a JSON object")
+            probe_output = value
+            observed = value.get("drawing_id")
+            binding["observed_probe_drawing_id"] = observed if isinstance(observed, str) else None
+        except (OSError, UnicodeDecodeError, ValueError, json.JSONDecodeError) as error:
+            binding["binding_errors"].append(f"PROBE_FILE_UNAVAILABLE_OR_INVALID: {error}")
+
+    return binding, probe_output
+
+
+def _not_required_validation() -> dict[str, Any]:
+    return {
+        "status": "NOT_REQUIRED",
+        "valid": None,
+        "source_requested_path": None,
+        "source_canonical_target": None,
+        "source_file_identity": None,
+        "source_sha256": None,
+        "source_requested_path_matches_preflight": None,
+        "source_canonical_target_matches_preflight": None,
+        "source_file_identity_matches_preflight": None,
+        "source_sha256_matches_preflight": None,
+        "source_matches_preflight": None,
+        "probe_requested_path": None,
+        "probe_canonical_target": None,
+        "probe_file_identity": None,
+        "probe_sha256": None,
+        "probe_requested_path_matches_preflight": None,
+        "probe_canonical_target_matches_preflight": None,
+        "probe_file_identity_matches_preflight": None,
+        "probe_sha256_matches_preflight": None,
+        "probe_matches_preflight": None,
+        "reasons": [],
+    }
+
+
+def _fingerprint_mismatch_reasons(
+    expected: Mapping[str, Any], actual: Mapping[str, Any], prefix: str
+) -> list[str]:
+    reasons: list[str] = []
+    identity_keys = ("device", "inode", "file_index")
+    stat_keys = ("size", "mtime_ns", "ctime_ns")
+    if any(expected.get(key) != actual.get(key) for key in identity_keys):
+        reasons.append(f"{prefix}_FILE_IDENTITY_CHANGED")
+    if any(expected.get(key) != actual.get(key) for key in stat_keys):
+        reasons.append(f"{prefix}_FILE_STAT_CHANGED")
+    return reasons
+
+
+def _revalidate_one(
+    *,
+    binding: Mapping[str, Any],
+    result: dict[str, Any],
+    name: str,
+    reason_prefix: str,
+) -> None:
+    expected_requested = binding.get(f"{name}_requested_path")
+    expected_canonical = binding.get(f"{name}_canonical_target")
+    expected_identity = binding.get(f"{name}_file_identity")
+    expected_sha256 = binding.get(f"{name}_sha256")
+    if not (
+        isinstance(expected_requested, str)
+        and isinstance(expected_canonical, str)
+        and isinstance(expected_identity, Mapping)
+        and isinstance(expected_sha256, str)
+    ):
+        result["reasons"].append(f"{reason_prefix}_PREFLIGHT_BINDING_MISSING")
+        return
+
+    try:
+        snapshot, _ = _snapshot_file(Path(expected_requested))
+    except (OSError, ValueError) as error:
+        result["reasons"].append(f"{reason_prefix}_UNAVAILABLE: {error}")
+        return
+
+    result[f"{name}_requested_path"] = snapshot["requested_path"]
+    result[f"{name}_canonical_target"] = snapshot["canonical_target"]
+    result[f"{name}_file_identity"] = snapshot["file_identity"]
+    result[f"{name}_sha256"] = snapshot["sha256"]
+    requested_matches = snapshot["requested_path"] == expected_requested
+    canonical_matches = snapshot["canonical_target"] == expected_canonical
+    identity_matches = snapshot["file_identity"] == expected_identity
+    sha256_matches = snapshot["sha256"] == expected_sha256
+    result[f"{name}_requested_path_matches_preflight"] = requested_matches
+    result[f"{name}_canonical_target_matches_preflight"] = canonical_matches
+    result[f"{name}_file_identity_matches_preflight"] = identity_matches
+    result[f"{name}_sha256_matches_preflight"] = sha256_matches
+    result[f"{name}_matches_preflight"] = all(
+        (requested_matches, canonical_matches, identity_matches, sha256_matches)
+    )
+
+    if snapshot["snapshot_stable"] is not True:
+        result["reasons"].append(f"{reason_prefix}_REQUESTED_PATH_RETARGETED_DURING_REVALIDATION")
+    if not requested_matches:
+        result["reasons"].append(f"{reason_prefix}_REQUESTED_PATH_CHANGED")
+    if not canonical_matches:
+        result["reasons"].append(f"{reason_prefix}_CANONICAL_TARGET_CHANGED")
+    if not identity_matches:
+        result["reasons"].extend(
+            _fingerprint_mismatch_reasons(expected_identity, snapshot["file_identity"], reason_prefix)
+        )
+    if not sha256_matches:
+        result["reasons"].append(f"{reason_prefix}_HASH_CHANGED")
+    if name == "source":
+        source_format = _dwg_format_validation(snapshot["observed_signature"])
+        result["source_format_validation"] = source_format
+        if source_format["valid"] is not True:
+            result["reasons"].append("SOURCE_DRAWING_FORMAT_INVALID")
+
+
+def _revalidate_evidence(binding: Mapping[str, Any]) -> dict[str, Any]:
+    """Re-observe the original requested paths and require every binding facet."""
+
+    if not binding.get("source_binding_required"):
+        return _not_required_validation()
+
+    result: dict[str, Any] = {
+        "status": "INVALID",
+        "valid": False,
+        "source_requested_path": None,
+        "source_canonical_target": None,
+        "source_file_identity": None,
+        "source_sha256": None,
+        "source_requested_path_matches_preflight": False,
+        "source_canonical_target_matches_preflight": False,
+        "source_file_identity_matches_preflight": False,
+        "source_sha256_matches_preflight": False,
+        "source_matches_preflight": False,
+        "probe_requested_path": None,
+        "probe_canonical_target": None,
+        "probe_file_identity": None,
+        "probe_sha256": None,
+        "probe_requested_path_matches_preflight": False,
+        "probe_canonical_target_matches_preflight": False,
+        "probe_file_identity_matches_preflight": False,
+        "probe_sha256_matches_preflight": False,
+        "probe_matches_preflight": False,
+        "reasons": [],
+    }
+    _revalidate_one(binding=binding, result=result, name="source", reason_prefix="SOURCE_DRAWING")
+    _revalidate_one(binding=binding, result=result, name="probe", reason_prefix="PROBE_FILE")
+    if not result["reasons"]:
+        result["status"] = "VALID"
+        result["valid"] = True
+    return result
+
+
+def _terminal_block(
+    decision: Mapping[str, Any],
+    *,
+    reason_code: str,
+    reason: str,
+) -> dict[str, Any]:
+    """Turn a qualification decision into an explicit terminal non-success."""
+
+    unverified = list(decision.get("unverified_observables") or [])
+    if "source_document_identity" not in unverified:
+        unverified.append("source_document_identity")
+    return {
+        **decision,
+        "status": experiment_guard.BLOCKED,
+        "exit_code": experiment_guard.EXIT_CODES[experiment_guard.BLOCKED],
+        "reason_code": reason_code,
+        "reason": reason,
+        "unverified_observables": unverified,
+    }
+
+
+def _preflight_guard(qualification: Mapping[str, Any]) -> dict[str, Any]:
+    """A disk preflight marker must never look like a terminal READY result."""
+
+    return _terminal_block(
+        qualification,
+        reason_code="PREFLIGHT_NON_TERMINAL",
+        reason="Qualification is recorded separately; this receipt is a non-terminal preflight marker.",
+    )
+
+
+def _fsync_directory_if_available(path: Path) -> None:
+    try:
+        descriptor = os.open(os.fspath(path), os.O_RDONLY)
+    except (AttributeError, NotImplementedError, OSError):
+        return
+    try:
+        try:
+            os.fsync(descriptor)
+        except (AttributeError, NotImplementedError, OSError):
+            # Windows commonly cannot fsync a directory handle.  The file itself
+            # was already flushed and fsynced before replace.
+            pass
+    finally:
+        os.close(descriptor)
+
+
+def _write_receipt(path: Path | None, result: Mapping[str, Any]) -> None:
+    """Atomically persist one receipt, or leave the prior receipt untouched."""
+
+    if path is None:
+        return
+    output = _absolute_requested_path(path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    payload = (json.dumps(result, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
+    descriptor: int | None = None
+    temporary: str | None = None
+    try:
+        descriptor, temporary = tempfile.mkstemp(
+            prefix=f".{output.name}.", suffix=".tmp", dir=os.fspath(output.parent)
+        )
+        with os.fdopen(descriptor, "wb") as stream:
+            descriptor = None
+            stream.write(payload)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, output)
+        temporary = None
+        _fsync_directory_if_available(output.parent)
+    except BaseException:
+        if descriptor is not None:
+            os.close(descriptor)
+        if temporary is not None:
+            try:
+                os.unlink(temporary)
+            except OSError:
+                pass
+        raise
+
+
+def _same_lexical_path(left: str, right: str) -> bool:
+    return os.path.normcase(os.path.normpath(left)) == os.path.normcase(os.path.normpath(right))
+
+
+def _receipt_path_conflicts(receipt_path: Path | None, binding: Mapping[str, Any]) -> list[str]:
+    """Reject an output path that resolves to or aliases a bound evidence file."""
+
+    if receipt_path is None:
+        return []
+    requested = _absolute_requested_path(receipt_path)
+    conflicts: list[str] = []
+    receipt_canonical: str | None = None
+    receipt_identity: Mapping[str, Any] | None = None
+    try:
+        receipt_snapshot, _ = _snapshot_file(requested)
+        receipt_canonical = receipt_snapshot["canonical_target"]
+        receipt_identity = receipt_snapshot["file_identity"]
+    except (OSError, ValueError):
+        # A missing future receipt path cannot yet alias an existing file.
+        pass
+
+    for name, label in (("source", "SOURCE_DRAWING"), ("probe", "PROBE_FILE")):
+        evidence_requested = binding.get(f"{name}_requested_path")
+        evidence_canonical = binding.get(f"{name}_canonical_target")
+        evidence_identity = binding.get(f"{name}_file_identity")
+        if isinstance(evidence_requested, str) and _same_lexical_path(
+            str(requested), evidence_requested
+        ):
+            conflicts.append(f"RECEIPT_PATH_ALIASES_{label}")
+            continue
+        if isinstance(receipt_canonical, str) and isinstance(evidence_canonical, str):
+            if _same_lexical_path(receipt_canonical, evidence_canonical):
+                conflicts.append(f"RECEIPT_PATH_ALIASES_{label}")
+                continue
+        if isinstance(receipt_identity, Mapping) and isinstance(evidence_identity, Mapping):
+            identity_keys = ("device", "inode", "file_index")
+            if all(
+                receipt_identity.get(key) is not None
+                and receipt_identity.get(key) == evidence_identity.get(key)
+                for key in identity_keys
+            ):
+                conflicts.append(f"RECEIPT_PATH_ALIASES_{label}")
+    return conflicts
+
+
+def _base_result(
+    *, decision: Mapping[str, Any], binding: Mapping[str, Any], command: Sequence[str]
+) -> dict[str, Any]:
+    return {
+        "schema": "ariadne.e2.guarded_experiment_run.v1",
+        "qualification": dict(decision),
+        "guard": dict(decision),
+        "evidence_binding": binding,
+        "executed": False,
+        "command": list(command),
+        "command_exit_code": None,
+        "receipt_phase": "TERMINAL",
+        "terminal_state": "NOT_EXECUTED_GUARD_NOT_READY",
+        "execution_outcome": "NOT_EXECUTED_GUARD_NOT_READY",
+        "evidence_authorized": None,
+        "command_succeeded": False,
+        "terminal_success": False,
+        "terminal_authorized": False,
+        "receipt_persisted": None,
+    }
+
+
+def _preflight_receipt(result: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        **result,
+        "guard": _preflight_guard(result["qualification"]),
+        "receipt_phase": "PREFLIGHT",
+        "terminal_state": "NON_TERMINAL",
+        "execution_outcome": "PREFLIGHT_NON_TERMINAL",
+        "evidence_authorized": None,
+        "command_succeeded": False,
+        "terminal_success": False,
+        "terminal_authorized": False,
+        "receipt_persisted": True,
+    }
+
+
+def _receipt_write_failed(result: Mapping[str, Any], error: Exception) -> dict[str, Any]:
+    failed = {
+        **result,
+        "guard": _terminal_block(
+            result["qualification"],
+            reason_code="RECEIPT_WRITE_FAILED",
+            reason="The guarded lifecycle could not durably persist its authoritative receipt.",
+        ),
+        "receipt_phase": "TERMINAL",
+        "terminal_state": "RECEIPT_WRITE_FAILED",
+        "execution_outcome": "RECEIPT_WRITE_FAILED",
+        "terminal_success": False,
+        "terminal_authorized": False,
+        "receipt_persisted": False,
+        "receipt_write_error_type": type(error).__name__,
+        "receipt_write_error": str(error),
+    }
+    return failed
+
+
+def _persist_terminal(result: dict[str, Any], receipt_path: Path | None) -> dict[str, Any]:
+    if receipt_path is None:
+        result["receipt_persisted"] = None
+        return result
+    result["receipt_persisted"] = True
+    try:
+        _write_receipt(receipt_path, result)
+    except Exception as error:
+        return _receipt_write_failed(result, error)
+    return result
+
+
+def _persist_preflight(result: Mapping[str, Any], receipt_path: Path | None) -> dict[str, Any] | None:
+    if receipt_path is None:
+        return None
+    try:
+        _write_receipt(receipt_path, _preflight_receipt(result))
+    except Exception as error:
+        return _receipt_write_failed(result, error)
+    return None
+
+
+def _validated_returncode(completed: Any) -> int:
+    try:
+        returncode = completed.returncode
+    except Exception as error:
+        raise _RunnerContractError(
+            "MISSING_RETURNCODE", "The runner result did not expose a readable integral returncode."
+        ) from error
+    if not isinstance(returncode, numbers.Integral) or isinstance(returncode, bool):
+        raise _RunnerContractError(
+            "INVALID_RETURNCODE", "The runner result returncode was missing or not an integral command exit code."
+        )
+    return int(returncode)
+
+
+def _record_terminal_evidence(
+    result: dict[str, Any], binding: dict[str, Any], validation: Mapping[str, Any]
+) -> None:
+    if not binding["source_binding_required"]:
+        result["evidence_authorized"] = None
+        return
+    evidence_authorized = validation.get("valid") is True
+    result["evidence_authorized"] = evidence_authorized
+    binding["terminal_evidence_valid"] = evidence_authorized
+    binding["terminal_evidence_validity"] = "VALID" if evidence_authorized else "INVALID"
 
 
 def run_guarded(
@@ -24,6 +594,8 @@ def run_guarded(
     candidate: str = "auto",
     conclusion: str = "exploratory",
     probe_output: Mapping[str, Any] | None = None,
+    probe_path: Path | None = None,
+    source_drawing: Path | None = None,
     allow_empty: bool = False,
     independent_oracle_receipt: Mapping[str, Any] | None = None,
     target_population_oracle: Mapping[str, Any] | None = None,
@@ -31,37 +603,81 @@ def run_guarded(
     receipt_path: Path | None = None,
     runner: Callable[..., Any] = subprocess.run,
 ) -> dict[str, Any]:
+    required = list(required_observables)
     decision = experiment_guard.qualify(
-        required_observables=required_observables,
+        required_observables=required,
         candidate=candidate,
         conclusion=conclusion,
     )
-    if probe_output is not None and decision["status"] == experiment_guard.NEEDS_PROBE:
+    source_binding_required = "source_document_identity" in required
+    binding, bound_probe_output = _evidence_binding(
+        source_drawing=source_drawing,
+        probe_path=probe_path,
+        source_binding_required=source_binding_required,
+    )
+    # A supplied probe path is authoritative.  Its exact hashed bytes replace
+    # an in-memory payload so a stale caller value cannot authorize execution.
+    effective_probe = bound_probe_output if probe_path is not None else probe_output
+    expected_source_sha256 = binding["source_sha256"]
+    if source_binding_required and probe_path is None:
+        binding["binding_errors"].append("PROBE_FILE_BINDING_REQUIRED")
+        expected_source_sha256 = None
+
+    if effective_probe is not None and decision["status"] == experiment_guard.NEEDS_PROBE:
         decision = experiment_guard.verify_probe(
             decision,
-            probe_output,
+            effective_probe,
             allow_empty=allow_empty,
             independent_oracle_receipt=independent_oracle_receipt,
             target_population_oracle=target_population_oracle,
             model_input_output=model_input_output,
+            expected_source_sha256=expected_source_sha256,
         )
 
-    result = {
-        "schema": "ariadne.e2.guarded_experiment_run.v1",
-        "guard": decision,
-        "executed": False,
-        "command": list(command),
-        "command_exit_code": None,
-    }
-    if receipt_path is not None:
-        receipt_path.parent.mkdir(parents=True, exist_ok=True)
-        receipt_path.write_text(
-            json.dumps(result, indent=2, ensure_ascii=False) + "\n",
-            encoding="utf-8",
-            newline="\n",
+    source_identity = decision.get("source_document_identity")
+    if isinstance(source_identity, Mapping):
+        binding["verified_probe_drawing_id"] = source_identity.get("verified_probe_drawing_id")
+
+    result = _base_result(decision=decision, binding=binding, command=command)
+    receipt_conflicts = _receipt_path_conflicts(receipt_path, binding)
+    if receipt_conflicts:
+        result["guard"] = _terminal_block(
+            decision,
+            reason_code="RECEIPT_PATH_ALIASES_EVIDENCE",
+            reason="The requested receipt path aliases a source or probe evidence file.",
         )
-    if decision["status"] != experiment_guard.READY:
+        result["terminal_state"] = "RECEIPT_PATH_ALIASES_EVIDENCE"
+        result["execution_outcome"] = "NOT_EXECUTED_RECEIPT_PATH_ALIASES_EVIDENCE"
+        result["receipt_persisted"] = False
+        result["receipt_path_conflicts"] = receipt_conflicts
+        if source_binding_required:
+            result["evidence_authorized"] = False
+            binding["terminal_evidence_valid"] = False
+            binding["terminal_evidence_validity"] = "RECEIPT_PATH_ALIASES_EVIDENCE"
         return result
+
+    source_format = binding["source_format_validation"]
+    if source_drawing is not None and source_format.get("valid") is not True:
+        result["guard"] = _terminal_block(
+            decision,
+            reason_code="SOURCE_DRAWING_FORMAT_INVALID",
+            reason="--source-drawing must begin with a conservative DWG AC10xx header.",
+        )
+        result["terminal_state"] = "SOURCE_DRAWING_FORMAT_INVALID"
+        result["execution_outcome"] = "NOT_EXECUTED_SOURCE_DRAWING_FORMAT_INVALID"
+        result["evidence_authorized"] = False if source_binding_required else None
+        if source_binding_required:
+            binding["terminal_evidence_valid"] = False
+            binding["terminal_evidence_validity"] = "SOURCE_DRAWING_FORMAT_INVALID"
+        return _persist_terminal(result, receipt_path)
+
+    if decision["status"] != experiment_guard.READY:
+        if source_binding_required:
+            result["evidence_authorized"] = False
+            binding["terminal_evidence_valid"] = False
+            binding["terminal_evidence_validity"] = "NOT_READY"
+        return _persist_terminal(result, receipt_path)
+
     if not command:
         result["guard"] = {
             **decision,
@@ -70,18 +686,103 @@ def run_guarded(
             "reason_code": "NO_EXPERIMENT_COMMAND",
             "reason": "The instrument is qualified, but no experiment command was supplied.",
         }
-        return result
+        result["terminal_state"] = "NOT_EXECUTED_NO_COMMAND"
+        result["execution_outcome"] = "NOT_EXECUTED_NO_COMMAND"
+        if source_binding_required:
+            result["evidence_authorized"] = False
+            binding["terminal_evidence_valid"] = False
+            binding["terminal_evidence_validity"] = "NOT_EXECUTED"
+        return _persist_terminal(result, receipt_path)
 
-    completed = runner(list(command), check=False)
-    result["executed"] = True
-    result["command_exit_code"] = int(completed.returncode)
-    if receipt_path is not None:
-        receipt_path.write_text(
-            json.dumps(result, indent=2, ensure_ascii=False) + "\n",
-            encoding="utf-8",
-            newline="\n",
+    preflight_failure = _persist_preflight(result, receipt_path)
+    if preflight_failure is not None:
+        return preflight_failure
+
+    pre_spawn_validation = _revalidate_evidence(binding)
+    binding["pre_spawn_validation"] = pre_spawn_validation
+    if source_binding_required and pre_spawn_validation["valid"] is not True:
+        result["guard"] = _terminal_block(
+            decision,
+            reason_code="EVIDENCE_BINDING_INVALIDATED_BEFORE_SPAWN",
+            reason="The requested source drawing or exact probe changed after preflight and before spawn.",
         )
-    return result
+        result["terminal_state"] = "EVIDENCE_BINDING_INVALIDATED_BEFORE_SPAWN"
+        result["execution_outcome"] = "NOT_EXECUTED_EVIDENCE_INVALIDATED_BEFORE_SPAWN"
+        result["evidence_authorized"] = False
+        binding["post_execution_validation"] = {"status": "NOT_RUN", "valid": False}
+        binding["terminal_evidence_valid"] = False
+        binding["terminal_evidence_validity"] = "INVALIDATED_BEFORE_SPAWN"
+        return _persist_terminal(result, receipt_path)
+
+    # This remains a detect-and-invalidate lifecycle rather than a claim of
+    # atomic locking or immutable filesystem state.
+    try:
+        completed = runner(list(command), check=False)
+    except Exception as error:
+        post_execution_validation = _revalidate_evidence(binding)
+        binding["post_execution_validation"] = post_execution_validation
+        _record_terminal_evidence(result, binding, post_execution_validation)
+        binding["terminal_evidence_valid"] = False
+        binding["terminal_evidence_validity"] = "RUNNER_EXCEPTION"
+        result["guard"] = _terminal_block(
+            decision,
+            reason_code="RUNNER_INVOCATION_FAILED",
+            reason="The guarded command runner raised before a terminal command result was available.",
+        )
+        result["terminal_state"] = "RUNNER_INVOCATION_FAILED"
+        result["execution_outcome"] = "RUNNER_EXCEPTION"
+        result["runner_error_type"] = type(error).__name__
+        return _persist_terminal(result, receipt_path)
+
+    result["executed"] = True
+    try:
+        result["command_exit_code"] = _validated_returncode(completed)
+    except _RunnerContractError as error:
+        post_execution_validation = _revalidate_evidence(binding)
+        binding["post_execution_validation"] = post_execution_validation
+        _record_terminal_evidence(result, binding, post_execution_validation)
+        binding["terminal_evidence_valid"] = False
+        binding["terminal_evidence_validity"] = "RUNNER_CONTRACT_INVALID"
+        result["guard"] = _terminal_block(
+            decision,
+            reason_code="RUNNER_CONTRACT_INVALID",
+            reason="The guarded command runner did not return a valid integral command exit code.",
+        )
+        result["terminal_state"] = "RUNNER_CONTRACT_INVALID"
+        result["execution_outcome"] = "RUNNER_CONTRACT_INVALID"
+        result["runner_error_type"] = error.error_type
+        result["runner_result_type"] = type(completed).__name__
+        return _persist_terminal(result, receipt_path)
+
+    post_execution_validation = _revalidate_evidence(binding)
+    binding["post_execution_validation"] = post_execution_validation
+    _record_terminal_evidence(result, binding, post_execution_validation)
+    returncode = result["command_exit_code"]
+    result["command_succeeded"] = returncode == 0
+
+    if source_binding_required and post_execution_validation["valid"] is not True:
+        result["guard"] = _terminal_block(
+            decision,
+            reason_code="EVIDENCE_BINDING_INVALIDATED_AFTER_EXECUTION",
+            reason=(
+                "The requested source drawing or exact probe changed during command execution; "
+                "the completed command is not an authorized terminal experiment."
+            ),
+        )
+        result["terminal_state"] = "EVIDENCE_BINDING_INVALIDATED_AFTER_EXECUTION"
+        result["execution_outcome"] = "COMMAND_COMPLETED_EVIDENCE_INVALIDATED"
+        result["evidence_authorized"] = False
+        binding["terminal_evidence_valid"] = False
+        binding["terminal_evidence_validity"] = "INVALIDATED_AFTER_EXECUTION"
+    elif not result["command_succeeded"]:
+        result["terminal_state"] = "COMMAND_FAILED"
+        result["execution_outcome"] = "COMMAND_FAILED"
+    else:
+        result["terminal_state"] = "AUTHORIZED_SUCCESS"
+        result["execution_outcome"] = "COMMAND_SUCCEEDED"
+        result["terminal_success"] = True
+        result["terminal_authorized"] = True
+    return _persist_terminal(result, receipt_path)
 
 
 def _requirements(values: Iterable[str]) -> list[str]:
@@ -107,6 +808,11 @@ def main(argv: list[str] | None = None) -> int:
         choices=["exploratory", "direction_changing", "absence", "impossibility"],
     )
     parser.add_argument("--probe-ir", type=Path)
+    parser.add_argument(
+        "--source-drawing",
+        type=Path,
+        help="Source or staged DWG to bind and validate when supplied.",
+    )
     parser.add_argument("--allow-empty", action="store_true")
     parser.add_argument("--independent-oracle-receipt", type=Path)
     parser.add_argument("--target-population-oracle", type=Path)
@@ -114,7 +820,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--receipt-output",
         type=Path,
-        help="Write the guard decision before execution and the final run receipt after execution.",
+        help="Persist a non-terminal preflight marker, then the final terminal receipt.",
     )
     parser.add_argument("command", nargs=argparse.REMAINDER)
     args = parser.parse_args(argv)
@@ -127,7 +833,8 @@ def main(argv: list[str] | None = None) -> int:
         command=command,
         candidate=args.candidate,
         conclusion=args.conclusion,
-        probe_output=_load_probe(args.probe_ir),
+        probe_path=args.probe_ir,
+        source_drawing=args.source_drawing,
         allow_empty=args.allow_empty,
         independent_oracle_receipt=_load_probe(args.independent_oracle_receipt),
         target_population_oracle=_load_probe(args.target_population_oracle),
@@ -135,6 +842,8 @@ def main(argv: list[str] | None = None) -> int:
         receipt_path=args.receipt_output,
     )
     print(json.dumps(result, indent=2, ensure_ascii=False))
+    if result["guard"]["status"] != experiment_guard.READY:
+        return int(result["guard"]["exit_code"])
     if result["executed"]:
         return int(result["command_exit_code"])
     return int(result["guard"]["exit_code"])

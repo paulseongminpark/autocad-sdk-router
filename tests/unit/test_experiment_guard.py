@@ -5,8 +5,10 @@ import os
 import sys
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
+import pytest
 from jsonschema import Draft202012Validator
 
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -16,6 +18,37 @@ if _TOOLS_E2 not in sys.path:
 
 import experiment_guard as guard
 import run_guarded_experiment as guarded_runner
+
+
+def _minimal_dwg_bytes(payload: bytes = b"test fixture") -> bytes:
+    """A header-only DWG fixture; the guard intentionally does not parse DWGs."""
+
+    return b"AC1027" + payload
+
+
+class _Completed:
+    def __init__(self, returncode: object = 0) -> None:
+        self.returncode = returncode
+
+
+def _assert_authoritative_receipt(result: dict, receipt_path: Path) -> dict:
+    saved = json.loads(receipt_path.read_text(encoding="utf-8"))
+    assert saved == result
+    assert saved["receipt_phase"] == "TERMINAL"
+    return saved
+
+
+def _assert_nonterminal_preflight(receipt_path: Path) -> dict:
+    preflight = json.loads(receipt_path.read_text(encoding="utf-8"))
+    assert preflight["receipt_phase"] == "PREFLIGHT"
+    assert preflight["terminal_state"] == "NON_TERMINAL"
+    assert preflight["execution_outcome"] == "PREFLIGHT_NON_TERMINAL"
+    assert preflight["guard"]["status"] == guard.BLOCKED
+    assert preflight["qualification"]["status"] == guard.READY
+    assert preflight["command_succeeded"] is False
+    assert preflight["terminal_authorized"] is False
+    assert preflight["terminal_success"] is False
+    return preflight
 
 
 def _rich_ir(*, include_hatch=True, entity_count=3, proxy_status="partial"):
@@ -248,7 +281,6 @@ def test_target_population_observables_select_worldir_pipeline_and_need_probe():
         required_observables=[
             "nested_insert_world_segments",
             "world_lineage",
-            "source_document_identity",
             "native_display_membership",
             "model_input_membership",
         ],
@@ -264,7 +296,6 @@ def test_target_population_gate_opens_only_when_oracle_world_and_model_input_agr
         required_observables=[
             "nested_insert_world_segments",
             "world_lineage",
-            "source_document_identity",
             "native_display_membership",
             "model_input_membership",
         ],
@@ -295,7 +326,6 @@ def test_target_population_gate_needs_build_when_native_display_oracle_is_absent
         required_observables=[
             "nested_insert_world_segments",
             "world_lineage",
-            "source_document_identity",
             "native_display_membership",
             "model_input_membership",
         ],
@@ -336,7 +366,6 @@ def test_target_population_gate_blocks_when_visible_w1_is_missing_from_model_inp
         required_observables=[
             "nested_insert_world_segments",
             "world_lineage",
-            "source_document_identity",
             "native_display_membership",
             "model_input_membership",
         ],
@@ -377,7 +406,6 @@ def test_target_population_gate_blocks_when_native_visible_w1_was_all_clipped(tm
     decision = guard.qualify(
         required_observables=[
             "nested_insert_world_segments",
-            "source_document_identity",
             "native_display_membership",
             "model_input_membership",
         ],
@@ -479,6 +507,330 @@ def test_worldir_probe_with_both_ledgers_opens_supported_segment_experiment():
     result = guard.verify_probe(decision, _worldir_probe())
     assert result["status"] == guard.READY
     assert result["coverage_level"] == "world_segments_verified"
+
+
+def test_source_document_identity_requires_an_exact_expected_sha256():
+    requirements = [
+        "nested_insert_world_segments",
+        "world_lineage",
+        "silent_drop_detection",
+        "source_document_identity",
+    ]
+    decision = guard.qualify(required_observables=requirements, candidate="auto")
+    expected = "a" * 64
+    matching = _worldir_probe()
+    matching["drawing_id"] = expected
+
+    assert guard.verify_probe(
+        decision, matching, expected_source_sha256=expected
+    )["status"] == guard.READY
+    missing = guard.verify_probe(decision, matching)
+    malformed = guard.verify_probe(
+        decision, matching, expected_source_sha256="not-a-sha256"
+    )
+    wrong = _worldir_probe()
+    wrong["drawing_id"] = "b" * 64
+    mismatched = guard.verify_probe(
+        decision, wrong, expected_source_sha256=expected
+    )
+
+    assert missing["status"] != guard.READY
+    assert missing["reason_code"] == "SOURCE_DOCUMENT_BINDING_REQUIRED"
+    assert malformed["status"] != guard.READY
+    assert malformed["reason_code"] == "SOURCE_DOCUMENT_BINDING_REQUIRED"
+    assert mismatched["status"] != guard.READY
+    assert mismatched["reason_code"] == "SOURCE_DOCUMENT_IDENTITY_MISMATCH"
+
+
+def test_guarded_runner_hash_binds_real_source_and_exact_probe_file(tmp_path: Path):
+    requirements = [
+        "nested_insert_world_segments",
+        "world_lineage",
+        "silent_drop_detection",
+        "source_document_identity",
+    ]
+    staged = tmp_path / "l0_gold.dwg"
+    staged.write_bytes(_minimal_dwg_bytes(b"matching staged DWG"))
+    staged_sha256 = hashlib.sha256(staged.read_bytes()).hexdigest()
+    matching_path = tmp_path / "matching-probe.json"
+    matching_probe = _worldir_probe()
+    matching_probe["drawing_id"] = staged_sha256
+    matching_path.write_text(json.dumps(matching_probe), encoding="utf-8")
+    receipt_path = tmp_path / "matching-receipt.json"
+    calls = []
+
+    class Completed:
+        returncode = 0
+
+    def fake_runner(command, check=False):
+        calls.append(command)
+        return Completed()
+
+    matching = guarded_runner.run_guarded(
+        required_observables=requirements,
+        command=["python", "extract.py"],
+        probe_path=matching_path,
+        source_drawing=staged,
+        receipt_path=receipt_path,
+        runner=fake_runner,
+    )
+
+    saved = json.loads(receipt_path.read_text(encoding="utf-8"))
+    binding = saved["evidence_binding"]
+    assert matching["guard"]["status"] == guard.READY
+    assert matching["executed"] is True
+    assert matching["receipt_phase"] == "TERMINAL"
+    assert matching["terminal_state"] == "AUTHORIZED_SUCCESS"
+    assert matching["command_succeeded"] is True
+    assert matching["evidence_authorized"] is True
+    assert matching["terminal_authorized"] is True
+    assert binding["source_path"] == str(staged.resolve())
+    assert binding["source_requested_path"] == str(staged.absolute())
+    assert binding["source_canonical_target"] == str(staged.resolve())
+    assert binding["source_file_identity"]["size"] == len(staged.read_bytes())
+    assert binding["source_format_validation"]["valid"] is True
+    assert binding["source_format_validation"]["observed_signature"] == "AC1027"
+    assert binding["source_sha256"] == staged_sha256
+    assert binding["probe_path"] == str(matching_path.resolve())
+    assert binding["probe_requested_path"] == str(matching_path.absolute())
+    assert binding["probe_canonical_target"] == str(matching_path.resolve())
+    assert binding["probe_file_identity"]["size"] == len(matching_path.read_bytes())
+    assert binding["probe_sha256"] == hashlib.sha256(matching_path.read_bytes()).hexdigest()
+    assert binding["verified_probe_drawing_id"] == staged_sha256
+    assert binding["pre_spawn_validation"]["status"] == "VALID"
+    assert binding["post_execution_validation"]["status"] == "VALID"
+    assert binding["terminal_evidence_valid"] is True
+    assert binding["terminal_evidence_validity"] == "VALID"
+    assert saved["terminal_authorized"] is True
+    assert saved["execution_outcome"] == "COMMAND_SUCCEEDED"
+    assert saved == matching
+    assert calls == [["python", "extract.py"]]
+
+    wrong_identity_path = tmp_path / "wrong-identity-probe.json"
+    wrong_identity_probe = _worldir_probe()
+    wrong_identity_probe["drawing_id"] = "b" * 64
+    wrong_identity_path.write_text(json.dumps(wrong_identity_probe), encoding="utf-8")
+    wrong_identity = guarded_runner.run_guarded(
+        required_observables=requirements,
+        command=["python", "extract.py"],
+        probe_path=wrong_identity_path,
+        source_drawing=staged,
+        runner=fake_runner,
+    )
+
+    wrong_source = tmp_path / "other.dwg"
+    wrong_source.write_bytes(_minimal_dwg_bytes(b"different staged DWG"))
+    wrong_source_result = guarded_runner.run_guarded(
+        required_observables=requirements,
+        command=["python", "extract.py"],
+        probe_path=matching_path,
+        source_drawing=wrong_source,
+        runner=fake_runner,
+    )
+
+    stale_in_memory_probe = dict(matching_probe)
+    mutated_path = tmp_path / "mutated-probe.json"
+    mutated_probe = _worldir_probe()
+    mutated_probe["drawing_id"] = "c" * 64
+    mutated_path.write_text(json.dumps(mutated_probe), encoding="utf-8")
+    mutated = guarded_runner.run_guarded(
+        required_observables=requirements,
+        command=["python", "extract.py"],
+        probe_output=stale_in_memory_probe,
+        probe_path=mutated_path,
+        source_drawing=staged,
+        runner=fake_runner,
+    )
+
+    omitted_source = guarded_runner.run_guarded(
+        required_observables=requirements,
+        command=["python", "extract.py"],
+        probe_path=matching_path,
+        runner=fake_runner,
+    )
+
+    assert wrong_identity["guard"]["status"] != guard.READY
+    assert wrong_identity["guard"]["reason_code"] == "SOURCE_DOCUMENT_IDENTITY_MISMATCH"
+    assert wrong_source_result["guard"]["status"] != guard.READY
+    assert wrong_source_result["guard"]["reason_code"] == "SOURCE_DOCUMENT_IDENTITY_MISMATCH"
+    assert mutated["guard"]["status"] != guard.READY
+    assert mutated["guard"]["reason_code"] == "SOURCE_DOCUMENT_IDENTITY_MISMATCH"
+    assert mutated["evidence_binding"]["probe_sha256"] == hashlib.sha256(mutated_path.read_bytes()).hexdigest()
+    assert omitted_source["guard"]["status"] != guard.READY
+    assert omitted_source["guard"]["reason_code"] == "SOURCE_DOCUMENT_BINDING_REQUIRED"
+    assert calls == [["python", "extract.py"]]
+
+
+def _matching_source_bound_inputs(tmp_path: Path, *, receipt_name: str):
+    requirements = [
+        "nested_insert_world_segments",
+        "world_lineage",
+        "silent_drop_detection",
+        "source_document_identity",
+    ]
+    source = tmp_path / "l0_gold.dwg"
+    source.write_bytes(_minimal_dwg_bytes(b"matching staged DWG"))
+    source_sha256 = hashlib.sha256(source.read_bytes()).hexdigest()
+    probe_path = tmp_path / "scoped_worldir_probe.json"
+    probe = _worldir_probe()
+    probe["drawing_id"] = source_sha256
+    probe_path.write_text(json.dumps(probe), encoding="utf-8")
+    return requirements, source, probe_path, tmp_path / receipt_name
+
+
+def test_guarded_runner_invalidates_terminal_receipt_when_subprocess_mutates_probe(tmp_path: Path):
+    requirements, source, probe_path, receipt_path = _matching_source_bound_inputs(
+        tmp_path, receipt_name="probe-mutated-receipt.json"
+    )
+    mutated_probe = _worldir_probe()
+    mutated_probe["drawing_id"] = "b" * 64
+    mutate_command = [
+        sys.executable,
+        "-c",
+        (
+            "from pathlib import Path; import sys; "
+            "Path(sys.argv[1]).write_text(sys.argv[2], encoding='utf-8')"
+        ),
+        str(probe_path),
+        json.dumps(mutated_probe),
+    ]
+
+    result = guarded_runner.run_guarded(
+        required_observables=requirements,
+        command=mutate_command,
+        probe_path=probe_path,
+        source_drawing=source,
+        receipt_path=receipt_path,
+    )
+
+    final = _assert_authoritative_receipt(result, receipt_path)
+    binding = final["evidence_binding"]
+    assert final["guard"]["status"] == guard.BLOCKED
+    assert final["guard"]["reason_code"] == "EVIDENCE_BINDING_INVALIDATED_AFTER_EXECUTION"
+    assert final["executed"] is True
+    assert final["command_exit_code"] == 0
+    assert final["command_succeeded"] is True
+    assert final["evidence_authorized"] is False
+    assert final["execution_outcome"] == "COMMAND_COMPLETED_EVIDENCE_INVALIDATED"
+    assert final["terminal_authorized"] is False
+    assert binding["post_execution_validation"]["valid"] is False
+    assert binding["post_execution_validation"]["probe_matches_preflight"] is False
+    assert binding["post_execution_validation"]["probe_sha256"] == hashlib.sha256(
+        probe_path.read_bytes()
+    ).hexdigest()
+    assert binding["terminal_evidence_valid"] is False
+    assert binding["terminal_evidence_validity"] == "INVALIDATED_AFTER_EXECUTION"
+
+
+def test_guarded_runner_invalidates_terminal_receipt_when_runner_mutates_source(tmp_path: Path):
+    requirements, source, probe_path, receipt_path = _matching_source_bound_inputs(
+        tmp_path, receipt_name="source-mutated-receipt.json"
+    )
+
+    class Completed:
+        returncode = 0
+
+    def mutating_runner(command, check=False):
+        source.write_bytes(b"source bytes changed during command")
+        return Completed()
+
+    result = guarded_runner.run_guarded(
+        required_observables=requirements,
+        command=["python", "model.py"],
+        probe_path=probe_path,
+        source_drawing=source,
+        receipt_path=receipt_path,
+        runner=mutating_runner,
+    )
+
+    final = _assert_authoritative_receipt(result, receipt_path)
+    binding = final["evidence_binding"]
+    assert final["guard"]["status"] == guard.BLOCKED
+    assert final["guard"]["reason_code"] == "EVIDENCE_BINDING_INVALIDATED_AFTER_EXECUTION"
+    assert final["executed"] is True
+    assert final["command_succeeded"] is True
+    assert final["evidence_authorized"] is False
+    assert final["terminal_authorized"] is False
+    assert binding["post_execution_validation"]["valid"] is False
+    assert binding["post_execution_validation"]["source_matches_preflight"] is False
+    assert binding["post_execution_validation"]["source_sha256"] == hashlib.sha256(
+        source.read_bytes()
+    ).hexdigest()
+    assert binding["terminal_evidence_validity"] == "INVALIDATED_AFTER_EXECUTION"
+
+
+def test_guarded_runner_blocks_pre_spawn_probe_mutation_and_does_not_execute(tmp_path: Path, monkeypatch):
+    requirements, source, probe_path, receipt_path = _matching_source_bound_inputs(
+        tmp_path, receipt_name="pre-spawn-mutated-receipt.json"
+    )
+    original_verify_probe = guarded_runner.experiment_guard.verify_probe
+    mutated_probe = _worldir_probe()
+    mutated_probe["drawing_id"] = "c" * 64
+
+    def mutate_after_preflight(*args, **kwargs):
+        decision = original_verify_probe(*args, **kwargs)
+        probe_path.write_text(json.dumps(mutated_probe), encoding="utf-8")
+        return decision
+
+    monkeypatch.setattr(guarded_runner.experiment_guard, "verify_probe", mutate_after_preflight)
+
+    def should_not_run(command, check=False):
+        raise AssertionError("pre-spawn binding change must prevent execution")
+
+    result = guarded_runner.run_guarded(
+        required_observables=requirements,
+        command=["python", "model.py"],
+        probe_path=probe_path,
+        source_drawing=source,
+        receipt_path=receipt_path,
+        runner=should_not_run,
+    )
+
+    final = _assert_authoritative_receipt(result, receipt_path)
+    binding = final["evidence_binding"]
+    assert final["guard"]["status"] == guard.BLOCKED
+    assert final["guard"]["reason_code"] == "EVIDENCE_BINDING_INVALIDATED_BEFORE_SPAWN"
+    assert final["executed"] is False
+    assert final["command_exit_code"] is None
+    assert final["command_succeeded"] is False
+    assert final["evidence_authorized"] is False
+    assert final["execution_outcome"] == "NOT_EXECUTED_EVIDENCE_INVALIDATED_BEFORE_SPAWN"
+    assert final["terminal_authorized"] is False
+    assert binding["pre_spawn_validation"]["valid"] is False
+    assert binding["post_execution_validation"] == {"status": "NOT_RUN", "valid": False}
+    assert binding["terminal_evidence_validity"] == "INVALIDATED_BEFORE_SPAWN"
+
+
+def test_guarded_runner_terminalizes_runner_exception_receipt(tmp_path: Path):
+    requirements, source, probe_path, receipt_path = _matching_source_bound_inputs(
+        tmp_path, receipt_name="runner-exception-receipt.json"
+    )
+
+    def failing_runner(command, check=False):
+        raise OSError("simulated runner failure")
+
+    result = guarded_runner.run_guarded(
+        required_observables=requirements,
+        command=["python", "model.py"],
+        probe_path=probe_path,
+        source_drawing=source,
+        receipt_path=receipt_path,
+        runner=failing_runner,
+    )
+
+    final = _assert_authoritative_receipt(result, receipt_path)
+    binding = final["evidence_binding"]
+    assert final["guard"]["status"] == guard.BLOCKED
+    assert final["guard"]["reason_code"] == "RUNNER_INVOCATION_FAILED"
+    assert final["executed"] is False
+    assert final["command_exit_code"] is None
+    assert final["execution_outcome"] == "RUNNER_EXCEPTION"
+    assert final["runner_error_type"] == "OSError"
+    assert final["command_succeeded"] is False
+    assert final["terminal_authorized"] is False
+    assert binding["post_execution_validation"]["valid"] is True
+    assert binding["terminal_evidence_valid"] is False
+    assert binding["terminal_evidence_validity"] == "RUNNER_EXCEPTION"
 
 
 def test_worldir_probe_with_adapter_imbalance_stays_closed():
@@ -641,6 +993,9 @@ def test_guarded_runner_executes_only_after_ready_probe():
     assert result["guard"]["status"] == guard.READY
     assert result["executed"] is True
     assert result["command_exit_code"] == 7
+    assert result["execution_outcome"] == "COMMAND_FAILED"
+    assert result["command_succeeded"] is False
+    assert result["terminal_authorized"] is False
     assert calls == [["python", "model.py"]]
 
 
@@ -651,8 +1006,7 @@ def test_guarded_runner_writes_preflight_and_final_receipt(tmp_path: Path):
         returncode = 0
 
     def fake_runner(command, check=False):
-        preflight = json.loads(receipt_path.read_text(encoding="utf-8"))
-        assert preflight["guard"]["status"] == guard.READY
+        preflight = _assert_nonterminal_preflight(receipt_path)
         assert preflight["executed"] is False
         return Completed()
 
@@ -664,10 +1018,18 @@ def test_guarded_runner_writes_preflight_and_final_receipt(tmp_path: Path):
         runner=fake_runner,
     )
 
-    final = json.loads(receipt_path.read_text(encoding="utf-8"))
+    final = _assert_authoritative_receipt(result, receipt_path)
     assert result["executed"] is True
     assert final["executed"] is True
     assert final["command_exit_code"] == 0
+    assert final["command_succeeded"] is True
+    assert final["evidence_authorized"] is None
+    assert final["terminal_authorized"] is True
+    assert final["evidence_binding"]["pre_spawn_validation"]["status"] == "NOT_REQUIRED"
+    assert final["evidence_binding"]["post_execution_validation"]["status"] == "NOT_REQUIRED"
+    assert final["evidence_binding"]["terminal_evidence_valid"] is None
+    assert final["evidence_binding"]["terminal_evidence_validity"] == "NOT_REQUIRED"
+    assert final["execution_outcome"] == "COMMAND_SUCCEEDED"
 
 
 def test_guarded_runner_never_executes_known_build_gap():
@@ -686,3 +1048,500 @@ def test_guarded_runner_never_executes_known_build_gap():
     assert result["guard"]["status"] == guard.NEEDS_BUILD
     assert result["executed"] is False
     assert calls == []
+
+
+def _make_directory_alias(alias: Path, target: Path) -> bool:
+    """Create a retargetable directory alias on Windows without requiring CAD."""
+
+    try:
+        os.symlink(target, alias, target_is_directory=True)
+        return True
+    except (NotImplementedError, OSError):
+        environment = os.environ.copy()
+        environment["CODEX_E2_ALIAS_PATH"] = str(alias)
+        environment["CODEX_E2_ALIAS_TARGET"] = str(target)
+        completed = subprocess.run(
+            [
+                "pwsh",
+                "-NoProfile",
+                "-NonInteractive",
+                "-Command",
+                (
+                    "New-Item -ItemType Junction -Path $env:CODEX_E2_ALIAS_PATH "
+                    "-Target $env:CODEX_E2_ALIAS_TARGET -ErrorAction Stop | Out-Null"
+                ),
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            env=environment,
+        )
+        return completed.returncode == 0 and alias.exists()
+
+
+def _remove_directory_alias(alias: Path) -> None:
+    if not alias.exists() and not alias.is_symlink():
+        return
+    if alias.is_symlink():
+        alias.unlink()
+    else:
+        os.rmdir(alias)
+
+
+@pytest.mark.parametrize("bound_kind", ["source", "probe"])
+def test_guarded_runner_invalidates_byte_identical_directory_alias_retarget(
+    tmp_path: Path, bound_kind: str
+):
+    requirements = [
+        "nested_insert_world_segments",
+        "world_lineage",
+        "silent_drop_detection",
+        "source_document_identity",
+    ]
+    target_a = tmp_path / "target-a"
+    target_b = tmp_path / "target-b"
+    target_a.mkdir()
+    target_b.mkdir()
+    alias = tmp_path / "retargetable-alias"
+    source_bytes = _minimal_dwg_bytes(b"byte-identical source")
+    source_sha256 = hashlib.sha256(source_bytes).hexdigest()
+    probe = _worldir_probe()
+    probe["drawing_id"] = source_sha256
+    probe_bytes = json.dumps(probe).encode("utf-8")
+
+    if bound_kind == "source":
+        (target_a / "source.dwg").write_bytes(source_bytes)
+        (target_b / "source.dwg").write_bytes(source_bytes)
+        source = alias / "source.dwg"
+        probe_path = tmp_path / "probe.json"
+        probe_path.write_bytes(probe_bytes)
+        expected_a = target_a / "source.dwg"
+    else:
+        source = tmp_path / "source.dwg"
+        source.write_bytes(source_bytes)
+        (target_a / "probe.json").write_bytes(probe_bytes)
+        (target_b / "probe.json").write_bytes(probe_bytes)
+        probe_path = alias / "probe.json"
+        expected_a = target_a / "probe.json"
+
+    if not _make_directory_alias(alias, target_a):
+        pytest.skip("Windows denied both directory symlink and junction creation")
+    receipt_path = tmp_path / f"{bound_kind}-retarget-receipt.json"
+
+    def retargeting_runner(command, check=False):
+        _remove_directory_alias(alias)
+        assert _make_directory_alias(alias, target_b)
+        return _Completed(0)
+
+    try:
+        result = guarded_runner.run_guarded(
+            required_observables=requirements,
+            command=["python", "model.py"],
+            probe_path=probe_path,
+            source_drawing=source,
+            receipt_path=receipt_path,
+            runner=retargeting_runner,
+        )
+    finally:
+        _remove_directory_alias(alias)
+
+    final = _assert_authoritative_receipt(result, receipt_path)
+    binding = final["evidence_binding"]
+    prefix = "SOURCE_DRAWING" if bound_kind == "source" else "PROBE_FILE"
+    assert final["guard"]["status"] == guard.BLOCKED
+    assert final["guard"]["reason_code"] == "EVIDENCE_BINDING_INVALIDATED_AFTER_EXECUTION"
+    assert final["executed"] is True
+    assert final["command_succeeded"] is True
+    assert final["evidence_authorized"] is False
+    assert final["terminal_authorized"] is False
+    assert binding[f"{bound_kind}_requested_path"] == str(
+        (source if bound_kind == "source" else probe_path).absolute()
+    )
+    assert binding[f"{bound_kind}_canonical_target"] == str(expected_a.resolve())
+    validation = binding["post_execution_validation"]
+    assert validation[f"{bound_kind}_canonical_target_matches_preflight"] is False
+    assert f"{prefix}_CANONICAL_TARGET_CHANGED" in validation["reasons"]
+    assert f"{prefix}_FILE_IDENTITY_CHANGED" in validation["reasons"]
+
+
+@pytest.mark.parametrize("bound_kind", ["source", "probe"])
+def test_guarded_runner_invalidates_byte_identical_replacement_when_observable(
+    tmp_path: Path, bound_kind: str
+):
+    requirements, source, probe_path, receipt_path = _matching_source_bound_inputs(
+        tmp_path, receipt_name=f"{bound_kind}-replacement-receipt.json"
+    )
+    target = source if bound_kind == "source" else probe_path
+    replacement = tmp_path / f"replacement-{target.name}"
+    replacement.write_bytes(target.read_bytes())
+
+    def replacing_runner(command, check=False):
+        os.replace(replacement, target)
+        return _Completed(0)
+
+    result = guarded_runner.run_guarded(
+        required_observables=requirements,
+        command=["python", "model.py"],
+        probe_path=probe_path,
+        source_drawing=source,
+        receipt_path=receipt_path,
+        runner=replacing_runner,
+    )
+
+    final = _assert_authoritative_receipt(result, receipt_path)
+    validation = final["evidence_binding"]["post_execution_validation"]
+    if validation[f"{bound_kind}_file_identity_matches_preflight"] is True:
+        pytest.skip("the platform did not expose a changed identity/stat fingerprint")
+    prefix = "SOURCE_DRAWING" if bound_kind == "source" else "PROBE_FILE"
+    assert final["guard"]["status"] == guard.BLOCKED
+    assert final["guard"]["reason_code"] == "EVIDENCE_BINDING_INVALIDATED_AFTER_EXECUTION"
+    assert final["command_succeeded"] is True
+    assert final["terminal_authorized"] is False
+    assert any(
+        reason in validation["reasons"]
+        for reason in (f"{prefix}_FILE_IDENTITY_CHANGED", f"{prefix}_FILE_STAT_CHANGED")
+    )
+
+
+@pytest.mark.parametrize("bound_kind", ["source", "probe"])
+def test_guarded_runner_invalidates_source_or_probe_deletion(tmp_path: Path, bound_kind: str):
+    requirements, source, probe_path, receipt_path = _matching_source_bound_inputs(
+        tmp_path, receipt_name=f"{bound_kind}-deleted-receipt.json"
+    )
+    target = source if bound_kind == "source" else probe_path
+
+    def deleting_runner(command, check=False):
+        target.unlink()
+        return _Completed(0)
+
+    result = guarded_runner.run_guarded(
+        required_observables=requirements,
+        command=["python", "model.py"],
+        probe_path=probe_path,
+        source_drawing=source,
+        receipt_path=receipt_path,
+        runner=deleting_runner,
+    )
+
+    final = _assert_authoritative_receipt(result, receipt_path)
+    prefix = "SOURCE_DRAWING" if bound_kind == "source" else "PROBE_FILE"
+    assert final["guard"]["status"] == guard.BLOCKED
+    assert final["guard"]["reason_code"] == "EVIDENCE_BINDING_INVALIDATED_AFTER_EXECUTION"
+    assert final["command_succeeded"] is True
+    assert final["evidence_authorized"] is False
+    assert final["terminal_authorized"] is False
+    assert any(
+        reason.startswith(f"{prefix}_UNAVAILABLE")
+        for reason in final["evidence_binding"]["post_execution_validation"]["reasons"]
+    )
+
+
+def test_guarded_runner_blocks_malformed_probe_with_a_terminal_receipt(tmp_path: Path):
+    requirements, source, probe_path, receipt_path = _matching_source_bound_inputs(
+        tmp_path, receipt_name="malformed-probe-receipt.json"
+    )
+    probe_path.write_text("{not valid JSON", encoding="utf-8")
+    calls = []
+
+    def should_not_run(command, check=False):
+        calls.append(command)
+        raise AssertionError("malformed probe must never run")
+
+    result = guarded_runner.run_guarded(
+        required_observables=requirements,
+        command=["python", "model.py"],
+        probe_path=probe_path,
+        source_drawing=source,
+        receipt_path=receipt_path,
+        runner=should_not_run,
+    )
+
+    final = _assert_authoritative_receipt(result, receipt_path)
+    assert final["guard"]["status"] == guard.NEEDS_PROBE
+    assert final["executed"] is False
+    assert final["command_succeeded"] is False
+    assert final["terminal_authorized"] is False
+    assert calls == []
+    assert any(
+        error.startswith("PROBE_FILE_UNAVAILABLE_OR_INVALID")
+        for error in final["evidence_binding"]["binding_errors"]
+    )
+
+
+def test_guarded_runner_rejects_non_dwg_source_even_when_probe_hash_matches(tmp_path: Path):
+    requirements, source, probe_path, receipt_path = _matching_source_bound_inputs(
+        tmp_path, receipt_name="malformed-source-receipt.json"
+    )
+    source.write_bytes(b"not a DWG")
+    probe = _worldir_probe()
+    probe["drawing_id"] = hashlib.sha256(source.read_bytes()).hexdigest()
+    probe_path.write_text(json.dumps(probe), encoding="utf-8")
+    calls = []
+
+    def should_not_run(command, check=False):
+        calls.append(command)
+        raise AssertionError("non-DWG source must never run")
+
+    result = guarded_runner.run_guarded(
+        required_observables=requirements,
+        command=["python", "model.py"],
+        probe_path=probe_path,
+        source_drawing=source,
+        receipt_path=receipt_path,
+        runner=should_not_run,
+    )
+
+    final = _assert_authoritative_receipt(result, receipt_path)
+    format_validation = final["evidence_binding"]["source_format_validation"]
+    assert final["guard"]["status"] == guard.BLOCKED
+    assert final["guard"]["reason_code"] == "SOURCE_DRAWING_FORMAT_INVALID"
+    assert final["executed"] is False
+    assert final["command_succeeded"] is False
+    assert final["terminal_authorized"] is False
+    assert format_validation["valid"] is False
+    assert format_validation["observed_signature_hex"] == b"not a ".hex()
+    assert calls == []
+
+
+@pytest.mark.parametrize(
+    ("completed", "runner_error_type"),
+    [
+        (object(), "MISSING_RETURNCODE"),
+        (_Completed(None), "INVALID_RETURNCODE"),
+        (_Completed("0"), "INVALID_RETURNCODE"),
+        (_Completed(1.5), "INVALID_RETURNCODE"),
+    ],
+)
+def test_guarded_runner_terminalizes_malformed_runner_results(
+    tmp_path: Path, completed: object, runner_error_type: str
+):
+    requirements, source, probe_path, receipt_path = _matching_source_bound_inputs(
+        tmp_path, receipt_name=f"runner-{runner_error_type}.json"
+    )
+
+    def malformed_runner(command, check=False):
+        return completed
+
+    result = guarded_runner.run_guarded(
+        required_observables=requirements,
+        command=["python", "model.py"],
+        probe_path=probe_path,
+        source_drawing=source,
+        receipt_path=receipt_path,
+        runner=malformed_runner,
+    )
+
+    final = _assert_authoritative_receipt(result, receipt_path)
+    assert final["guard"]["status"] == guard.BLOCKED
+    assert final["guard"]["reason_code"] == "RUNNER_CONTRACT_INVALID"
+    assert final["execution_outcome"] == "RUNNER_CONTRACT_INVALID"
+    assert final["terminal_state"] == "RUNNER_CONTRACT_INVALID"
+    assert final["runner_error_type"] == runner_error_type
+    assert final["executed"] is True
+    assert final["command_exit_code"] is None
+    assert final["command_succeeded"] is False
+    assert final["terminal_authorized"] is False
+
+
+def test_guarded_runner_records_nonzero_command_as_nonterminal_failure(tmp_path: Path):
+    requirements, source, probe_path, receipt_path = _matching_source_bound_inputs(
+        tmp_path, receipt_name="nonzero-receipt.json"
+    )
+
+    result = guarded_runner.run_guarded(
+        required_observables=requirements,
+        command=["python", "model.py"],
+        probe_path=probe_path,
+        source_drawing=source,
+        receipt_path=receipt_path,
+        runner=lambda command, check=False: _Completed(7),
+    )
+
+    final = _assert_authoritative_receipt(result, receipt_path)
+    assert final["guard"]["status"] == guard.READY
+    assert final["executed"] is True
+    assert final["command_exit_code"] == 7
+    assert final["execution_outcome"] == "COMMAND_FAILED"
+    assert final["terminal_state"] == "COMMAND_FAILED"
+    assert final["evidence_authorized"] is True
+    assert final["command_succeeded"] is False
+    assert final["terminal_authorized"] is False
+    assert final["terminal_success"] is False
+
+
+def test_guarded_runner_cli_returns_nonzero_command_exit(tmp_path: Path):
+    requirements, source, probe_path, receipt_path = _matching_source_bound_inputs(
+        tmp_path, receipt_name="cli-nonzero-receipt.json"
+    )
+    argv = [
+        *(item for required in requirements for item in ("--require", required)),
+        "--probe-ir",
+        str(probe_path),
+        "--source-drawing",
+        str(source),
+        "--receipt-output",
+        str(receipt_path),
+        "--",
+        sys.executable,
+        "-c",
+        "import sys; sys.exit(7)",
+    ]
+
+    assert guarded_runner.main(argv) == 7
+    final = json.loads(receipt_path.read_text(encoding="utf-8"))
+    assert final["guard"]["status"] == guard.READY
+    assert final["execution_outcome"] == "COMMAND_FAILED"
+    assert final["command_exit_code"] == 7
+    assert final["terminal_authorized"] is False
+
+
+def test_guarded_runner_returns_blocked_when_final_receipt_write_fails(
+    tmp_path: Path, monkeypatch
+):
+    requirements, source, probe_path, receipt_path = _matching_source_bound_inputs(
+        tmp_path, receipt_name="final-write-failure.json"
+    )
+    original_write_receipt = guarded_runner._write_receipt
+    calls = 0
+
+    def fail_final_write(path, result):
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise OSError("simulated final receipt write failure")
+        return original_write_receipt(path, result)
+
+    monkeypatch.setattr(guarded_runner, "_write_receipt", fail_final_write)
+    result = guarded_runner.run_guarded(
+        required_observables=requirements,
+        command=["python", "model.py"],
+        probe_path=probe_path,
+        source_drawing=source,
+        receipt_path=receipt_path,
+        runner=lambda command, check=False: _Completed(0),
+    )
+
+    preflight = _assert_nonterminal_preflight(receipt_path)
+    assert calls == 2
+    assert result["guard"]["status"] == guard.BLOCKED
+    assert result["guard"]["reason_code"] == "RECEIPT_WRITE_FAILED"
+    assert result["receipt_phase"] == "TERMINAL"
+    assert result["terminal_state"] == "RECEIPT_WRITE_FAILED"
+    assert result["execution_outcome"] == "RECEIPT_WRITE_FAILED"
+    assert result["command_exit_code"] == 0
+    assert result["command_succeeded"] is True
+    assert result["terminal_authorized"] is False
+    assert preflight["terminal_authorized"] is False
+
+
+def test_guarded_runner_does_not_execute_when_initial_receipt_write_fails(
+    tmp_path: Path, monkeypatch
+):
+    requirements, source, probe_path, receipt_path = _matching_source_bound_inputs(
+        tmp_path, receipt_name="initial-write-failure.json"
+    )
+    runner_calls = []
+
+    def fail_initial_write(path, result):
+        raise OSError("simulated initial receipt write failure")
+
+    def should_not_run(command, check=False):
+        runner_calls.append(command)
+        raise AssertionError("command must not run without a durable preflight receipt")
+
+    monkeypatch.setattr(guarded_runner, "_write_receipt", fail_initial_write)
+    result = guarded_runner.run_guarded(
+        required_observables=requirements,
+        command=["python", "model.py"],
+        probe_path=probe_path,
+        source_drawing=source,
+        receipt_path=receipt_path,
+        runner=should_not_run,
+    )
+
+    assert result["guard"]["status"] == guard.BLOCKED
+    assert result["guard"]["reason_code"] == "RECEIPT_WRITE_FAILED"
+    assert result["receipt_phase"] == "TERMINAL"
+    assert result["terminal_state"] == "RECEIPT_WRITE_FAILED"
+    assert result["executed"] is False
+    assert result["command_succeeded"] is False
+    assert result["terminal_authorized"] is False
+    assert result["receipt_persisted"] is False
+    assert runner_calls == []
+    assert not receipt_path.exists()
+
+
+@pytest.mark.parametrize("interrupt", [KeyboardInterrupt, SystemExit])
+def test_guarded_runner_propagates_base_exceptions_after_safe_preflight(
+    tmp_path: Path, interrupt: type[BaseException]
+):
+    requirements, source, probe_path, receipt_path = _matching_source_bound_inputs(
+        tmp_path, receipt_name=f"{interrupt.__name__}-preflight.json"
+    )
+
+    def interrupting_runner(command, check=False):
+        _assert_nonterminal_preflight(receipt_path)
+        raise interrupt()
+
+    with pytest.raises(interrupt):
+        guarded_runner.run_guarded(
+            required_observables=requirements,
+            command=["python", "model.py"],
+            probe_path=probe_path,
+            source_drawing=source,
+            receipt_path=receipt_path,
+            runner=interrupting_runner,
+        )
+
+    _assert_nonterminal_preflight(receipt_path)
+
+
+@pytest.mark.parametrize("aliased_evidence", ["source", "probe"])
+def test_guarded_runner_rejects_receipt_path_aliasing_evidence_without_overwrite(
+    tmp_path: Path, aliased_evidence: str
+):
+    requirements, source, probe_path, _ = _matching_source_bound_inputs(
+        tmp_path, receipt_name="unused.json"
+    )
+    receipt_path = source if aliased_evidence == "source" else probe_path
+    source_before = source.read_bytes()
+    probe_before = probe_path.read_bytes()
+    calls = []
+
+    def should_not_run(command, check=False):
+        calls.append(command)
+        raise AssertionError("receipt/evidence alias must fail before execution")
+
+    result = guarded_runner.run_guarded(
+        required_observables=requirements,
+        command=["python", "model.py"],
+        probe_path=probe_path,
+        source_drawing=source,
+        receipt_path=receipt_path,
+        runner=should_not_run,
+    )
+
+    assert result["guard"]["status"] == guard.BLOCKED
+    assert result["guard"]["reason_code"] == "RECEIPT_PATH_ALIASES_EVIDENCE"
+    assert result["executed"] is False
+    assert result["terminal_authorized"] is False
+    assert result["receipt_persisted"] is False
+    assert source.read_bytes() == source_before
+    assert probe_path.read_bytes() == probe_before
+    assert calls == []
+
+
+def test_atomic_receipt_write_cleans_temporary_file_when_replace_fails(
+    tmp_path: Path, monkeypatch
+):
+    receipt_path = tmp_path / "atomic-receipt.json"
+
+    def fail_replace(source, destination):
+        raise OSError("simulated replace failure")
+
+    monkeypatch.setattr(guarded_runner.os, "replace", fail_replace)
+    with pytest.raises(OSError):
+        guarded_runner._write_receipt(receipt_path, {"safe": True})
+
+    assert not receipt_path.exists()
+    assert list(tmp_path.glob(f".{receipt_path.name}.*.tmp")) == []

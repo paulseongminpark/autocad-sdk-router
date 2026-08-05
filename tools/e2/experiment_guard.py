@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
@@ -312,6 +313,18 @@ def _payload_sha256(value: Mapping[str, Any]) -> str:
         separators=(",", ":"),
     ).encode("utf-8")
     return hashlib.sha256(rendered).hexdigest()
+
+
+_SHA256_HEX = re.compile(r"^[0-9a-f]{64}$")
+
+
+def _normalized_sha256(value: Any) -> str | None:
+    """Return a canonical SHA-256 value only when its form is exact."""
+
+    if not isinstance(value, str):
+        return None
+    candidate = value.strip().lower()
+    return candidate if _SHA256_HEX.fullmatch(candidate) else None
 
 
 def _independent_oracle_receipt_ok(receipt: Mapping[str, Any] | None) -> bool:
@@ -676,6 +689,7 @@ def verify_probe(
     independent_oracle_receipt: Mapping[str, Any] | None = None,
     target_population_oracle: Mapping[str, Any] | None = None,
     model_input_output: Mapping[str, Any] | None = None,
+    expected_source_sha256: str | None = None,
 ) -> dict[str, Any]:
     """Promote NEEDS_PROBE to READY only when measured coverage is adequate."""
     base = dict(decision)
@@ -686,6 +700,7 @@ def verify_probe(
     required = list(base.get("required_observables") or [])
 
     if pipeline == "native_graph_worldir_segments":
+        source_identity_evidence: dict[str, str] | None = None
         adapter_ledger = probe_output.get("adapter_ledger")
         if not isinstance(adapter_ledger, Mapping) or not adapter_ledger.get("balance_ok"):
             return _transition(
@@ -742,15 +757,39 @@ def verify_probe(
                 reason="The WorldIR probe did not exercise every requested property.",
             )
         if "source_document_identity" in required:
-            drawing_id = str(probe_output.get("drawing_id") or "")
-            if not drawing_id or drawing_id == "unknown":
+            expected_source = _normalized_sha256(expected_source_sha256)
+            if expected_source is None:
                 return _transition(
                     base,
                     NEEDS_PROBE,
                     unverified_observables=["source_document_identity"],
-                    reason_code="SOURCE_SCOPE_UNRESOLVED",
-                    reason="The WorldIR probe does not identify its source drawing.",
+                    reason_code="SOURCE_DOCUMENT_BINDING_REQUIRED",
+                    reason=(
+                        "source_document_identity requires an explicit, well-formed "
+                        "SHA-256 computed from the source or staged DWG."
+                    ),
                 )
+            drawing_id = _normalized_sha256(probe_output.get("drawing_id"))
+            if drawing_id is None:
+                return _transition(
+                    base,
+                    NEEDS_PROBE,
+                    unverified_observables=["source_document_identity"],
+                    reason_code="SOURCE_DOCUMENT_IDENTITY_UNRESOLVED",
+                    reason="The WorldIR probe lacks a well-formed SHA-256 drawing identity.",
+                )
+            if drawing_id != expected_source:
+                return _transition(
+                    base,
+                    NEEDS_PROBE,
+                    unverified_observables=["source_document_identity"],
+                    reason_code="SOURCE_DOCUMENT_IDENTITY_MISMATCH",
+                    reason="The WorldIR probe drawing identity does not match the hashed source or staged DWG.",
+                )
+            source_identity_evidence = {
+                "expected_source_sha256": expected_source,
+                "verified_probe_drawing_id": drawing_id,
+            }
         if {"native_display_membership", "model_input_membership"} & set(required):
             target_check = _target_population_check(
                 probe_output,
@@ -771,6 +810,11 @@ def verify_probe(
                     missing_builds=target_check.get("missing_builds", []),
                     target_population=target_check["target_population"],
                     evidence_payload_sha256=target_check.get("evidence_payload_sha256", {}),
+                    **(
+                        {"source_document_identity": source_identity_evidence}
+                        if source_identity_evidence is not None
+                        else {}
+                    ),
                 )
         if base.get("conclusion") in {"absence", "impossibility"} and not _independent_oracle_receipt_ok(independent_oracle_receipt):
             return _transition(
@@ -778,6 +822,11 @@ def verify_probe(
                 NEEDS_PROBE,
                 reason_code="INDEPENDENT_ORACLE_REQUIRED",
                 reason="An absence or impossibility claim requires a hash-bound second observation receipt.",
+                **(
+                    {"source_document_identity": source_identity_evidence}
+                    if source_identity_evidence is not None
+                    else {}
+                ),
             )
         return _transition(
             base,
@@ -794,6 +843,11 @@ def verify_probe(
             **(
                 {"evidence_payload_sha256": target_check["evidence_payload_sha256"]}
                 if {"native_display_membership", "model_input_membership"} & set(required)
+                else {}
+            ),
+            **(
+                {"source_document_identity": source_identity_evidence}
+                if source_identity_evidence is not None
                 else {}
             ),
         )
