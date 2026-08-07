@@ -19,8 +19,6 @@ import joblib
 import numpy as np
 import torch
 
-from tools.e2.qualification import engine as phase1
-
 
 MODEL_SEEDS = (17, 29, 43)
 PHYSICAL_MM_PER_FROZEN_PIXEL = 12.0
@@ -80,14 +78,6 @@ def _frozen_pixel_space(ir: Mapping[str, Any]) -> dict[str, Any]:
     output["units"] = "frozen_cubicasa_pixel"
     output["scale_mm_per_unit"] = PHYSICAL_MM_PER_FROZEN_PIXEL
     return output
-
-
-def _rule_params(ir: Mapping[str, Any]) -> dict[str, Any]:
-    scale = _scale_mm_per_unit(ir)
-    return {
-        "thickness_band_units": [50.0 / scale, 400.0 / scale],
-        "snap_tol": 1.0 / scale,
-    }
 
 
 def transform_seg_ir(ir: Mapping[str, Any], intervention: str) -> tuple[dict[str, Any], dict[str, str]]:
@@ -151,7 +141,6 @@ class FrozenJury:
         self.gbdt_bundle = joblib.load(self.a4.CLEAN_INCUMBENT_PATH)
         if "models_by_seed" not in self.gbdt_bundle:
             raise RuntimeError("frozen GBDT bundle has no models_by_seed")
-        self.rule_scorer = phase1._load_evidence_grid()
 
     def artifact_receipt(self) -> dict[str, Any]:
         checks = {
@@ -181,10 +170,22 @@ class FrozenJury:
             "warning": "GBDT and GNN differ architecturally but share CubiCasa supervision, so they count as one independent evidence family for silver promotion.",
         }
     def _score_one(self, ir: Mapping[str, Any], parent_map: Mapping[str, str]) -> dict[str, Any]:
-        rules_result = self.rule_scorer.score(ir, params=_rule_params(ir))
+        builder = self.components["builder"]
+        graph_result = builder.build_graph(
+            dict(ir), self.components["graph_config"], collect_edges=True
+        )
+        handles_gnn = [
+            str(record["handle"])
+            for record in graph_result["prepared"]["records"]
+        ]
+        rules_result = self.components["rules_lib"].evaluate(
+            graph_result, builder.EDGE_TYPES
+        )
+        rules_scores = np.asarray(rules_result["score"], dtype=np.float64) / 16.0
+        if rules_scores.shape != (len(handles_gnn),):
+            raise RuntimeError("frozen A4 rules returned a non-node-aligned score vector")
         rules_raw = {
-            str(handle): float(record.get("score", 0.0))
-            for handle, record in (rules_result.get("per_handle") or {}).items()
+            handle: float(value) for handle, value in zip(handles_gnn, rules_scores)
         }
 
         pixel_ir = _frozen_pixel_space(ir)
@@ -203,10 +204,7 @@ class FrozenJury:
             for handle, value in zip(handles_gbdt, np.mean(np.vstack(seed_gbdt), axis=0))
         }
 
-        builder = self.components["builder"]
         gf = self.components["gf"]
-        graph_result = builder.build_graph(dict(ir), self.components["graph_config"], collect_edges=True)
-        handles_gnn = [str(record["handle"]) for record in graph_result["prepared"]["records"]]
         sample = gf.graph_sample_from_result(
             graph_id="e2-phase2/new-dwg",
             drawing_id=str(ir.get("drawing_id") or "unknown"),
@@ -241,6 +239,27 @@ class FrozenJury:
                 "graph_feature_count": int(graph_result["features"].shape[1]),
                 "gbdt_feature_count": int(design.shape[1]),
             },
+        }
+
+    def score_baseline(self, baseline_ir: Mapping[str, Any]) -> dict[str, Any]:
+        """Score one unchanged SEG-IR population with every sealed baseline arm.
+
+        This is the public, no-intervention entry point used by the L0 gold
+        drawing.  It preserves the caller's stable handles and performs no
+        training, threshold selection, or calibration.
+        """
+
+        identity = {
+            str(segment.get("handle") or segment.get("sid")): str(
+                segment.get("handle") or segment.get("sid")
+            )
+            for segment in baseline_ir.get("segments", []) or []
+        }
+        result = self._score_one(baseline_ir, identity)
+        return {
+            "schema": "e2.segment_juror_baseline.v1",
+            "status": "FROZEN_TRANSFER_SCORES",
+            **result,
         }
 
     def score_with_interventions(self, baseline_ir: Mapping[str, Any]) -> dict[str, Any]:
