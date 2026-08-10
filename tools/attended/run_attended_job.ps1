@@ -5,7 +5,8 @@ param(
   [Parameter(Mandatory=$true)][string]$RunDir,
   [int]$TimeoutSec = 240,
   [string]$AcadExe = 'C:\Program Files\Autodesk\AutoCAD 2027\acad.exe',
-  [string]$RouterHome = 'D:\dev\99_tools\autocad-sdk-router__wR_attended'
+  [string]$RouterHome = 'D:\dev\99_tools\autocad-sdk-router__wR_attended',
+  [string]$NativeBinDir = ''
 )
 $ErrorActionPreference = 'Stop'
 # Wave-R attended lane: ONE-SHOT native job runner hosted in a DEDICATED, disposable
@@ -57,8 +58,16 @@ if (-not (Test-Path -LiteralPath $AcadExe)) {
   exit 2
 }
 
-$dbx = Join-Path $RouterHome 'prebuilt\2027\Ariadne.AcadNativeDbx.dbx'
-$arx = Join-Path $RouterHome 'prebuilt\2027\Ariadne.AcadNative.arx'
+$dbx = if ([string]::IsNullOrWhiteSpace($NativeBinDir)) {
+  Join-Path $RouterHome 'prebuilt\2027\Ariadne.AcadNativeDbx.dbx'
+} else {
+  Join-Path $NativeBinDir 'Ariadne.AcadNativeDbx.dbx'
+}
+$arx = if ([string]::IsNullOrWhiteSpace($NativeBinDir)) {
+  Join-Path $RouterHome 'prebuilt\2027\Ariadne.AcadNative.arx'
+} else {
+  Join-Path $NativeBinDir 'Ariadne.AcadNative.arx'
+}
 if (-not (Test-Path -LiteralPath $dbx)) { throw "native dbx missing: $dbx" }
 if (-not (Test-Path -LiteralPath $arx)) { throw "native arx missing: $arx" }
 $binDir = Split-Path -Parent $arx
@@ -134,7 +143,14 @@ try {
   # (confirmed empirically: this wave's first live run hung past its own timeout
   # with this line missing -- see build_log.md).
   $env:ARIADNE_NATIVE_JOB_ARGS = $argsF
-  $proc = Start-Process -FilePath $AcadExe -ArgumentList @('/nologo', "`"$StagedDwg`"", '/b', "`"$scr`"") -PassThru
+  # Pass one explicitly quoted command line.  PowerShell's string[] form can
+  # lose the grouping of quoted path arguments when it flattens ArgumentList;
+  # the observed failure mode is a healthy acad.exe stuck on the Start page
+  # with neither the DWG nor /b script consumed.  Autodesk's startup contract
+  # also requires /b <script> to be the final parameter pair.
+  $launchArgs = "`"$StagedDwg`" /nologo /b `"$scr`""
+  Log "launch args: $launchArgs"
+  $proc = Start-Process -FilePath $AcadExe -ArgumentList $launchArgs -PassThru
   $launchedPid = $proc.Id
   Log "launched dedicated acad PID: $launchedPid"
 

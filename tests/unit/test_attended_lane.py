@@ -214,6 +214,54 @@ def test_run_attended_native_job_builds_expected_command_and_parses_result(tmp_p
     assert res["degraded"] is False
 
 
+def test_run_attended_native_job_threads_isolated_native_bin_dir(tmp_path, monkeypatch):
+    """A proof build must be selected explicitly; falling through to a stale
+    sibling/prebuilt ARX would invalidate an attended experiment."""
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    staged = tmp_path / "staged.dwg"
+    staged.write_bytes(b"fake-dwg")
+    launcher = tmp_path / "run_attended_job.ps1"
+    launcher.write_text("# stub\n", encoding="utf-8")
+    native_bin = tmp_path / "proof-bin"
+    native_bin.mkdir()
+    captured = {}
+
+    class _FakeProc:
+        returncode = 0
+
+        def poll(self):
+            return self.returncode
+
+        def kill(self):
+            pass
+
+        def wait(self, timeout=None):
+            pass
+
+    def fake_popen(cmd, **kwargs):
+        captured["cmd"] = cmd
+        (run_dir / "attended_job_result.json").write_text(
+            json.dumps({"status": "ok", "result": {"status": "ok"}}),
+            encoding="utf-8",
+        )
+        return _FakeProc()
+
+    monkeypatch.setattr(subprocess, "Popen", fake_popen)
+    al.run_attended_native_job(
+        str(staged),
+        str(run_dir),
+        "e2.inspect.xclip_membership",
+        {"target_layers": ["W1"]},
+        native_bin_dir=str(native_bin),
+        ps1_launcher=str(launcher),
+    )
+
+    cmd = captured["cmd"]
+    assert "-NativeBinDir" in cmd
+    assert cmd[cmd.index("-NativeBinDir") + 1] == str(native_bin)
+
+
 def test_run_attended_native_job_reports_gate1_block_as_error(tmp_path, monkeypatch):
     """A GATE1 (dedicated-instance) failure must surface as a truthful error,
     never as staged_used-present success."""

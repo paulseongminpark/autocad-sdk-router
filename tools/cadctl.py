@@ -38,6 +38,12 @@ STAGING_GOLDEN_DIR = ROUTER_HOME / "staging" / "golden"
 
 STATUS_JSON = REPORTS_DIR / "autocad_router_status_latest.json"
 OPERATIONS_V2 = CONFIG_DIR / "operations.v2.json"
+DISPLAY_MEMBERSHIP_STRICT_LAYER_ENTITIES_V1 = "strict_layer_entities_v1"
+DISPLAY_MEMBERSHIP_LINEAR_SEGMENTS_V1 = "linear_segments_v1"
+DISPLAY_MEMBERSHIP_GEOMETRY_SCOPES = frozenset({
+    DISPLAY_MEMBERSHIP_STRICT_LAYER_ENTITIES_V1,
+    DISPLAY_MEMBERSHIP_LINEAR_SEGMENTS_V1,
+})
 
 # Ensure sibling tools/*.py are importable when cadctl is imported by path.
 if str(_THIS_DIR) not in sys.path:
@@ -46,6 +52,7 @@ if str(_THIS_DIR) not in sys.path:
 import run_job  # noqa: E402  (sibling helper, Lane B1)
 import normalize_result  # noqa: E402  (sibling helper, Lane B1)
 import route_select  # noqa: E402  (sibling helper, Lane B1)
+import attended_lane  # noqa: E402  (dedicated full-AutoCAD one-shot lane)
 
 
 def _now_iso() -> str:
@@ -66,6 +73,20 @@ def _sha256_head(path: Path, n: int = 16) -> str:
         for chunk in iter(lambda: fh.read(1 << 20), b""):
             h.update(chunk)
     return h.hexdigest()[:n].upper()
+
+
+def _hash_parts(*parts: object) -> str:
+    """WorldIR-compatible stable identity over length-prefixed UTF-8 fields.
+
+    This shares only the identity convention with the WorldIR path. Visibility
+    is decided independently by the native ObjectARX operation.
+    """
+    digest = hashlib.sha256()
+    for part in parts:
+        raw = str(part).encode("utf-8")
+        digest.update(len(raw).to_bytes(8, byteorder="big", signed=False))
+        digest.update(raw)
+    return digest.hexdigest()
 
 
 def _import_optional(module_name: str):
@@ -1248,6 +1269,479 @@ class Cad:
                 "reason": f"visual_report.build_visual_report failed: {type(exc).__name__}: {exc}",
             }
 
+    def inspect_display_membership(
+        self,
+        dwg_path: str,
+        target_layers: list[str],
+        out_dir: str | None = None,
+        *,
+        geometry_scope: str = DISPLAY_MEMBERSHIP_STRICT_LAYER_ENTITIES_V1,
+        timeout: int = 240,
+    ) -> dict:
+        """Resolve target segment membership through a dedicated full AutoCAD.
+
+        This experiment-only path never falls back to accoreconsole. It stages a
+        copy, loads the ARX built from this exact checkout, runs
+        ``e2.inspect.xclip_membership``, verifies the original hash, and converts
+        only a complete native result into the hash-bound E2 target-oracle schema.
+        The default strict scope rejects every curved or unsupported target entity;
+        ``linear_segments_v1`` instead admits only linear source segments and
+        accounts for the excluded candidates in native evidence.
+        """
+        out_dir_p = Path(out_dir) if out_dir else (
+            self.router_home / "runs" / "display_membership" / _ts()
+        )
+        out_dir_p.mkdir(parents=True, exist_ok=True)
+        receipt_path = out_dir_p / "display_membership_receipt.json"
+
+        prior_evidence = [
+            path
+            for path in (
+                receipt_path,
+                out_dir_p / "display_membership_binding.json",
+                out_dir_p / "target_population_oracle.json",
+            )
+            if path.exists()
+        ]
+        if prior_evidence:
+            return {
+                "schema": "ariadne.cadctl.display_membership.v1",
+                "status": "BLOCKED",
+                "reason": "refusing to overwrite existing evidence: "
+                + ", ".join(str(path) for path in prior_evidence),
+                "executed": False,
+                "execution_context": "dedicated_full_autocad",
+                "operation": "e2.inspect.xclip_membership",
+                "out_dir": str(out_dir_p),
+                "geometry_scope": geometry_scope,
+                "evidence_preserved": True,
+            }
+
+        def finish(status: str, reason: str, *, executed: bool, **extra: object) -> dict:
+            payload = {
+                "schema": "ariadne.cadctl.display_membership.v1",
+                "status": status,
+                "reason": reason,
+                "executed": executed,
+                "execution_context": "dedicated_full_autocad",
+                "operation": "e2.inspect.xclip_membership",
+                "out_dir": str(out_dir_p),
+                "geometry_scope": geometry_scope,
+                **extra,
+            }
+            receipt_path.write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            payload["receipt"] = str(receipt_path)
+            return payload
+
+        if (
+            not isinstance(geometry_scope, str)
+            or geometry_scope not in DISPLAY_MEMBERSHIP_GEOMETRY_SCOPES
+        ):
+            return finish(
+                "BLOCKED",
+                "geometry_scope must be strict_layer_entities_v1 or linear_segments_v1",
+                executed=False,
+            )
+        if not isinstance(target_layers, list):
+            return finish("BLOCKED", "target_layers must be a non-empty list", executed=False)
+        normalized_layers = []
+        for value in target_layers:
+            if not isinstance(value, str) or not value.strip():
+                return finish(
+                    "BLOCKED",
+                    "every target layer must be a non-empty string",
+                    executed=False,
+                )
+            normalized_layers.append(value)
+        if not normalized_layers or len(set(normalized_layers)) != len(normalized_layers):
+            return finish(
+                "BLOCKED",
+                "target_layers must be non-empty and unique",
+                executed=False,
+            )
+
+        source = Path(dwg_path)
+        if not source.is_file() or source.suffix.lower() != ".dwg":
+            return finish(
+                "BLOCKED",
+                f"input DWG not found or not a .dwg file: {dwg_path}",
+                executed=False,
+            )
+        original_before = _sha256_head(source, 64).lower()
+
+        native_bin = (
+            self.router_home
+            / "src"
+            / "Ariadne.AcadNative"
+            / "bin"
+            / "x64"
+            / "Release"
+        )
+        required_native = [
+            native_bin / "Ariadne.AcadNativeDbx.dbx",
+            native_bin / "Ariadne.AcadNative.arx",
+        ]
+        missing_native = [str(path) for path in required_native if not path.is_file()]
+        if missing_native:
+            return finish(
+                "NEEDS_BUILD",
+                "current-checkout attended native build is missing: " + ", ".join(missing_native),
+                executed=False,
+                original_sha256_before=original_before,
+                native_bin_dir=str(native_bin),
+            )
+
+        stage_dir = out_dir_p / "staged"
+        stage_dir.mkdir(parents=True, exist_ok=True)
+        staged = stage_dir / "input.dwg"
+        if staged.exists():
+            return finish(
+                "BLOCKED",
+                f"refusing to overwrite existing staged DWG: {staged}",
+                executed=False,
+                original_sha256_before=original_before,
+            )
+        shutil.copy2(source, staged)
+        try:
+            os.chmod(staged, 0o666)
+        except OSError:
+            pass
+        staged_before = _sha256_head(staged, 64).lower()
+        if staged_before != original_before:
+            return finish(
+                "BLOCKED",
+                "staged copy hash differs from the source before execution",
+                executed=False,
+                original_sha256_before=original_before,
+                staged_sha256_before=staged_before,
+                staged_dwg=str(staged),
+            )
+
+        attended_dir = out_dir_p / "attended"
+        try:
+            attended = attended_lane.run_attended_native_job(
+                str(staged),
+                str(attended_dir),
+                "e2.inspect.xclip_membership",
+                {
+                    "target_layers": normalized_layers,
+                    "geometry_scope": geometry_scope,
+                },
+                timeout=timeout,
+                router_home=str(self.router_home),
+                native_bin_dir=str(native_bin),
+            )
+        except Exception as exc:
+            original_after = _sha256_head(source, 64).lower()
+            return finish(
+                "BLOCKED",
+                f"attended AutoCAD runner failed: {type(exc).__name__}: {exc}",
+                executed=True,
+                original_sha256_before=original_before,
+                original_sha256_after=original_after,
+                original_unchanged=original_before == original_after,
+                staged_dwg=str(staged),
+            )
+
+        original_after = _sha256_head(source, 64).lower()
+        raw_job_out = attended_dir / "job_out.json"
+        attended_result_ref = attended.get("result_json")
+        native_job = attended.get("result")
+        if not (
+            isinstance(native_job, dict)
+            and native_job.get("schema") == "ariadne.autocad_native_job_result.v1"
+        ) and raw_job_out.is_file():
+            try:
+                exact_job_out = json.loads(raw_job_out.read_text(encoding="utf-8-sig"))
+            except (OSError, ValueError):
+                exact_job_out = None
+            if isinstance(exact_job_out, dict):
+                native_job = exact_job_out
+                attended_result_ref = str(raw_job_out)
+
+        common = {
+            "original_sha256_before": original_before,
+            "original_sha256_after": original_after,
+            "original_unchanged": original_before == original_after,
+            "staged_dwg": str(staged),
+            "staged_sha256_before": staged_before,
+            "native_bin_dir": str(native_bin),
+            "attended_result_ref": attended_result_ref,
+            "stdout": attended.get("stdout_path"),
+            "stderr": attended.get("stderr_path"),
+            "degraded": bool(attended.get("degraded", False)),
+        }
+        if original_before != original_after:
+            return finish(
+                "BLOCKED",
+                "SAFETY VIOLATION: original DWG changed during attended inspection",
+                executed=True,
+                **common,
+            )
+        if attended.get("error") or attended.get("timed_out"):
+            return finish(
+                "BLOCKED",
+                str(attended.get("error") or "attended AutoCAD run timed out"),
+                executed=True,
+                **common,
+            )
+
+        if not isinstance(native_job, dict):
+            return finish(
+                "BLOCKED",
+                "attended run produced no parseable native job result",
+                executed=True,
+                **common,
+            )
+        native = native_job.get("result")
+        valid_outer = (
+            native_job.get("schema") == "ariadne.autocad_native_job_result.v1"
+            and native_job.get("engine") == "native_objectarx"
+            and native_job.get("operation") == "e2.inspect.xclip_membership"
+            and native_job.get("status") == "ok"
+        )
+        valid_inner = (
+            isinstance(native, dict)
+            and native.get("schema") == "ariadne.e2.native_xclip_membership_raw.v1"
+            and native.get("oracle_method") == "xclip_polygon_segment_intersection"
+            and native.get("host_mode") == "full_autocad"
+            and native.get("native_membership_resolved") is True
+        )
+        if not valid_outer or not valid_inner:
+            return finish(
+                "BLOCKED",
+                "native result is incomplete or was not produced in full_autocad",
+                executed=True,
+                **common,
+            )
+        if native.get("geometry_scope") != geometry_scope:
+            return finish(
+                "BLOCKED",
+                "native geometry_scope does not match the requested geometry_scope",
+                executed=True,
+                **common,
+            )
+
+        raw_layers = native.get("target_layers")
+        summaries = native.get("layer_summary")
+        records = native.get("records")
+        if (
+            raw_layers != normalized_layers
+            or not isinstance(summaries, list)
+            or not isinstance(records, list)
+        ):
+            return finish(
+                "BLOCKED",
+                "native result target layers, summaries, or records are incomplete",
+                executed=True,
+                **common,
+            )
+
+        ids_by_layer: dict[str, list[str]] = {layer: [] for layer in normalized_layers}
+        seen_ids: set[str] = set()
+        try:
+            for record in records:
+                if not isinstance(record, dict):
+                    raise ValueError("a visible record is not an object")
+                layer = record.get("source_layer")
+                source_def = str(record.get("source_def_handle") or "")
+                entity_handle = str(record.get("source_entity_handle") or "")
+                lineage = record.get("lineage_path")
+                subentity = record.get("subentity_ordinal")
+                fragment = record.get("clip_fragment_ordinal")
+                if (
+                    layer not in ids_by_layer
+                    or not source_def
+                    or not entity_handle
+                    or not isinstance(lineage, list)
+                    or not isinstance(subentity, int)
+                    or subentity < 0
+                    or not isinstance(fragment, int)
+                    or fragment < 0
+                ):
+                    raise ValueError("a visible record lacks stable native lineage")
+
+                root_handle = source_def
+                if lineage:
+                    first = lineage[0]
+                    if not isinstance(first, dict):
+                        raise ValueError("a lineage step is not an object")
+                    root_handle = str(first.get("source_def_handle") or "")
+                path_uid = _hash_parts("MODELSPACE_ROOT", root_handle)
+                expected_owner = root_handle
+                for step in lineage:
+                    if not isinstance(step, dict):
+                        raise ValueError("a lineage step is not an object")
+                    owner = str(step.get("source_def_handle") or "")
+                    insert_handle = str(step.get("insert_entity_handle") or "")
+                    target_def = str(step.get("target_def_handle") or "")
+                    row = step.get("array_row_index")
+                    column = step.get("array_col_index")
+                    if (
+                        owner != expected_owner
+                        or not insert_handle
+                        or not target_def
+                        or row != 0
+                        or column != 0
+                    ):
+                        raise ValueError("native lineage is discontinuous or uses an unsupported array")
+                    path_uid = _hash_parts(path_uid, insert_handle, target_def, row, column)
+                    expected_owner = target_def
+                if expected_owner != source_def:
+                    raise ValueError("native lineage does not terminate at source_def_handle")
+                placed_uid = _hash_parts(path_uid, entity_handle, subentity, fragment)
+                if placed_uid in seen_ids:
+                    raise ValueError("duplicate stable visible segment identity")
+                seen_ids.add(placed_uid)
+                ids_by_layer[str(layer)].append(placed_uid)
+        except (TypeError, ValueError) as exc:
+            return finish(
+                "BLOCKED",
+                f"native visible lineage is invalid: {exc}",
+                executed=True,
+                **common,
+            )
+
+        summaries_by_layer = {
+            row.get("layer"): row for row in summaries if isinstance(row, dict)
+        }
+        targets = []
+        for index, layer in enumerate(normalized_layers, start=1):
+            row = summaries_by_layer.get(layer)
+            visible_ids = sorted(ids_by_layer[layer])
+            if not isinstance(row, dict):
+                return finish(
+                    "BLOCKED",
+                    f"native result has no summary for target layer {layer!r}",
+                    executed=True,
+                    **common,
+                )
+            visible_count = row.get("native_visible_source_segments")
+            expected_count = row.get("expected_source_segments")
+            clipped_count = row.get("clipped_away_source_segments")
+            template_count = row.get("native_source_entity_templates")
+            excluded_curved_count = row.get("excluded_curved_source_segments")
+            excluded_degenerate_count = row.get(
+                "excluded_degenerate_source_segments"
+            )
+            excluded_unsupported_template_count = row.get(
+                "excluded_unsupported_entity_templates"
+            )
+            if (
+                not isinstance(visible_count, int)
+                or not isinstance(expected_count, int)
+                or not isinstance(clipped_count, int)
+                or not isinstance(template_count, int)
+                or not isinstance(excluded_curved_count, int)
+                or not isinstance(excluded_degenerate_count, int)
+                or not isinstance(excluded_unsupported_template_count, int)
+                or min(
+                    visible_count,
+                    expected_count,
+                    clipped_count,
+                    template_count,
+                    excluded_curved_count,
+                    excluded_degenerate_count,
+                    excluded_unsupported_template_count,
+                ) < 0
+                or expected_count != visible_count + clipped_count
+                or visible_count != len(visible_ids)
+                or (
+                    geometry_scope == DISPLAY_MEMBERSHIP_STRICT_LAYER_ENTITIES_V1
+                    and (
+                        excluded_curved_count != 0
+                        or excluded_degenerate_count != 0
+                        or excluded_unsupported_template_count != 0
+                    )
+                )
+            ):
+                return finish(
+                    "BLOCKED",
+                    f"native conservation or visible identity count failed for {layer!r}",
+                    executed=True,
+                    **common,
+                )
+            targets.append(
+                {
+                    "target_id": f"target-{index:03d}",
+                    "layer": layer,
+                    "native_source_entity_templates": template_count,
+                    "expected_source_segments": expected_count,
+                    "native_visible_source_segments": visible_count,
+                    "clipped_away_source_segments": clipped_count,
+                    "excluded_curved_source_segments": excluded_curved_count,
+                    "excluded_degenerate_source_segments": excluded_degenerate_count,
+                    "excluded_unsupported_entity_templates": excluded_unsupported_template_count,
+                    "native_visible_segment_ids": visible_ids,
+                }
+            )
+
+        raw_evidence = attended_dir / "job_out.json"
+        if not raw_evidence.is_file():
+            return finish(
+                "BLOCKED",
+                "native job_out.json evidence is missing",
+                executed=True,
+                **common,
+            )
+        raw_evidence_hash = _sha256_head(raw_evidence, 64).lower()
+        binding_path = out_dir_p / "display_membership_binding.json"
+        binding = {
+            "schema": "ariadne.e2.native_display_binding.v1",
+            "source_path": str(source.resolve()),
+            "source_sha256": original_before,
+            "staged_path": str(staged.resolve()),
+            "staged_sha256_before": staged_before,
+            "geometry_scope": geometry_scope,
+            "native_job_out_path": str(raw_evidence.resolve()),
+            "native_job_out_sha256": raw_evidence_hash,
+            "native_artifacts": [
+                {"path": str(path.resolve()), "sha256": _sha256_head(path, 64).lower()}
+                for path in required_native
+            ],
+            "execution_context": "dedicated_full_autocad",
+            "headless_fallback": False,
+        }
+        binding_path.write_text(
+            json.dumps(binding, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        oracle_path = out_dir_p / "target_population_oracle.json"
+        oracle = {
+            "schema": "ariadne.e2.target_population_oracle.v1",
+            "oracle": "autocad.native_display_membership.v1",
+            "status": "PASS",
+            "drawing_id": original_before,
+            "geometry_scope": geometry_scope,
+            "evidence": [
+                {"path": str(raw_evidence.resolve()), "sha256": raw_evidence_hash},
+                {
+                    "path": str(binding_path.resolve()),
+                    "sha256": _sha256_head(binding_path, 64).lower(),
+                },
+            ],
+            "targets": targets,
+        }
+        oracle_path.write_text(
+            json.dumps(oracle, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        return finish(
+            "PASS",
+            "full AutoCAD/ObjectARX resolved every target segment with conserved native lineage",
+            executed=True,
+            target_population_oracle=str(oracle_path),
+            target_population_oracle_sha256=_sha256_head(oracle_path, 64).lower(),
+            binding_evidence=str(binding_path),
+            native_visible_source_segments=sum(
+                target["native_visible_source_segments"] for target in targets
+            ),
+            **common,
+        )
+
     def live_status(self) -> dict:
         return {
             "schema": "ariadne.cadctl.live_status.v1",
@@ -1371,6 +1865,17 @@ def visual_report(source_ref: str, kind: str = "png",
                   artifact_id: str | None = None, out_dir: str | None = None,
                   route: str | None = None) -> dict:
     return Cad().visual_report(source_ref, kind, artifact_id, out_dir, route)
+
+
+def inspect_display_membership(dwg_path: str, target_layers: list[str],
+                               out_dir: str | None = None, *,
+                               geometry_scope: str = DISPLAY_MEMBERSHIP_STRICT_LAYER_ENTITIES_V1,
+                               timeout: int = 240) -> dict:
+    return Cad().inspect_display_membership(
+        dwg_path, target_layers, out_dir,
+        geometry_scope=geometry_scope,
+        timeout=timeout,
+    )
 
 
 def live_status() -> dict:

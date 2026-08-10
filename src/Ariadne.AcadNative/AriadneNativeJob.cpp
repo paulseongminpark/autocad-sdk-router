@@ -30,6 +30,8 @@
 #include "dbdict.h"
 #include "dbents.h"
 #include "dbspfilt.h"  // #27: AcDbSpatialFilter (XCLIP clip boundary)
+#include "dbplotsettings.h"  // E2: deterministic minimal-repro model plot setup
+#include "dbplotsetval.h"
 #include "gemat3d.h"   // #63: AcGeMatrix3d (clip-space -> WCS transform)
 #include "dbmtext.h"
 #include "dbpl.h"
@@ -97,6 +99,13 @@
 #include "dbObjectContextManager.h"  // w7-annoscale: AcDbObjectContextManager
 #include "dbObjectContextCollection.h" // w7-annoscale: collection + iterator
 #include "dbObjectContextInterface.h"  // w7-annoscale: per-entity participation PE
+#include "acdmmapi.h"              // E2: post-XCLIP DWF entity/graphic membership
+#include "AcPublishReactors.h"     // E2: publish lifecycle owns the DMM reactor
+#include "AcPlPlotConfigMgr.h"     // E2: standard DWF6 ePlot device
+#include "AcPlPlotConfig.h"
+#include "AcPlDSDData.h"           // E2: one-sheet attended publish job
+#include "AcPlDSDEntry.h"
+#include "acplmisc.h"              // acplPublishExecute
 
 #include "..\Ariadne.AcadNativeDbx\AriadneDbxApi.h"
 
@@ -3487,6 +3496,7 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
                 }
             }
             const std::string handle = handleOf(pBTR);
+            const AcGePoint3d origin = pBTR->origin();
             std::string sortentsJson;
             AcDbSortentsTable* pSortents = nullptr;
             if (pBTR->getSortentsTable(
@@ -3523,6 +3533,7 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
                 << ",\"is_layout\":" << (isLayout ? "true" : "false")
                 << ",\"is_anonymous\":" << (isAnon ? "true" : "false")
                 << ",\"is_xref\":" << (isXref ? "true" : "false")
+                << ",\"origin\":[" << origin.x << "," << origin.y << "," << origin.z << "]"
                 << ",\"entity_count\":" << entityCount;
             if (!sortentsJson.empty())
                 arr << ",\"sortents\":" << sortentsJson;
@@ -3534,7 +3545,8 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
                     defs << ",";
                 dfirst = false;
                 defs << "{\"handle\":\"" << jsonEscape(handle) << "\""
-                     << ",\"name\":\"" << jsonEscape(name) << "\"";
+                     << ",\"name\":\"" << jsonEscape(name) << "\""
+                     << ",\"origin\":[" << origin.x << "," << origin.y << "," << origin.z << "]";
                 if (isAnon)
                     defs << ",\"anonymous\":true";
                 defs << ",\"entity_count\":" << entityCount
@@ -6435,6 +6447,9 @@ static const AriadneOperationSpec kAriadneNativeOperationTable[] = {
     { "extend.customobject.create", "extend" },
     { "inspect.customobject.count", "inspect" },
     { "inspect.protocol.queryx", "inspect" },
+    { "e2.fixture.create_xclip", "experiment_fixture" },
+    { "e2.inspect.xclip_membership", "experiment_oracle" },
+    { "plot.engine.run", "plot_publish" },
 };
 
 static const size_t kAriadneNativeOperationCount =
@@ -6482,6 +6497,7 @@ struct AriadneJobCtx
     const std::string& hostMode;  // "coreconsole" | "full_autocad"
 };
 
+#include "families/e2_display_oracle.inc"  // E2 — experiment-only attended DWF/DMM oracle
 #include "families/m08c_handlers.inc"   // M08C — symbol tables / database metadata
 #include "families/m08d_handlers.inc"   // M08D — entities / geometry / brep / annotation read
 #include "families/m08e_handlers.inc"   // M08E — blocks / xrefs-layouts / dictionaries-xdata
@@ -7524,6 +7540,15 @@ static void ariadneNativeJob()
           << (available ? "true" : "false")
           << ",\"protocol\":\"AriadneProbeProtocol\"},"
           << "\"status\":\"" << (available ? "ok" : "error") << "\"}";
+    }
+    else if (op == "e2.fixture.create_xclip") {
+        runE2CreateXclipFixture(pDb, jobHostMode, r);
+    }
+    else if (op == "e2.inspect.xclip_membership") {
+        runE2NativeXclipMembership(job, pDb, jobHostMode, r);
+    }
+    else if (op == "plot.engine.run") {
+        runE2NativeDisplayOracle(job, pDb, jobHostMode, r);
     }
     else {
         // Not a legacy table op -> it was admitted by a family module (familyHasOp).

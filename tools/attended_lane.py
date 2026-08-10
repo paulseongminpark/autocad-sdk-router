@@ -169,6 +169,7 @@ def run_attended_native_job(staged_dwg: str, run_dir: str, operation: str,
                             args: Dict[str, Any], *, timeout: int = DEFAULT_TIMEOUT_SEC,
                             acad_exe: Optional[str] = None,
                             router_home: Optional[str] = None,
+                            native_bin_dir: Optional[str] = None,
                             ps1_launcher: Optional[str] = None) -> Dict[str, Any]:
     """Drive ONE native ObjectARX job inside a DEDICATED, disposable full
     acad.exe instance (never the user's session) via the
@@ -207,6 +208,8 @@ def run_attended_native_job(staged_dwg: str, run_dir: str, operation: str,
     ]
     if acad_exe:
         cmd += ["-AcadExe", acad_exe]
+    if native_bin_dir:
+        cmd += ["-NativeBinDir", native_bin_dir]
     # wA-cert BUGFIX: this was `if router_home: cmd += [...]`, silently falling
     # through to run_attended_job.ps1's OWN hardcoded `-RouterHome` default
     # (a specific sibling worktree name baked in at Wave-R authoring time) any
