@@ -95,6 +95,21 @@ _FINAL_RECEIPT_SCHEMA = "ariadne.cad_os.attended_job_result.v1"
 _COMPLETION_RECEIPT_NAME = "attended_job_completion.json"
 _FINAL_RECEIPT_NAME = "attended_job_final_receipt.json"
 _MAX_CLEANUP_WAIT_SEC = 90
+_RESERVED_RUN_ARTIFACT_NAMES = (
+    _COMPLETION_RECEIPT_NAME,
+    _FINAL_RECEIPT_NAME,
+    # Kept reserved so an old Wave-R receipt cannot be mistaken for a current
+    # final artifact if a caller reuses a run directory.
+    "attended_job_result.json",
+    "job_in.json",
+    "job_out.json",
+    "live_job_args.json",
+    "security_before.txt",
+    "security_after.txt",
+    "attended_job.scr",
+    "stdout.txt",
+    "stderr.txt",
+)
 
 
 def _import_optional(module_name: str):
@@ -138,6 +153,34 @@ def _read_json_object(path: Path) -> Optional[Dict[str, Any]]:
     except (OSError, ValueError):
         return None
     return value if isinstance(value, dict) else None
+
+
+def _reserved_run_artifacts(run_dir: Path) -> List[str]:
+    """Return producer artifacts that make a run directory non-reusable.
+
+    These files are safety evidence.  Never clean them up implicitly: a new
+    launch must use a fresh directory instead of overwriting old receipt,
+    security, or stdout/stderr material.
+    """
+    found = [name for name in _RESERVED_RUN_ARTIFACT_NAMES
+             if os.path.lexists(str(run_dir / name))]
+    try:
+        children = list(run_dir.iterdir())
+    except OSError:
+        return found
+    for child in children:
+        name = child.name
+        if name.endswith(".tmp") and any(
+            name.startswith(prefix)
+            for prefix in (
+                ".attended_job_completion.json.",
+                ".attended_job_final_receipt.json.",
+                "attended_job_completion.json.",
+                "attended_job_final_receipt.json.",
+            )
+        ):
+            found.append(name)
+    return found
 
 
 def _is_positive_int(value: Any) -> bool:
@@ -418,6 +461,24 @@ def _close_and_verify_powershell_helper(proc: Any) -> bool:
         return False
 
 
+def _wait_or_close_powershell_helper(proc: Any, *, wait_sec: int = 5) -> bool:
+    """Give a post-receipt helper a short natural-exit window, then close it."""
+    try:
+        if proc.poll() is not None:
+            return True
+        try:
+            proc.wait(timeout=wait_sec)
+        except subprocess.TimeoutExpired:
+            pass
+        except (OSError, subprocess.SubprocessError, AttributeError):
+            return _close_and_verify_powershell_helper(proc)
+        if proc.poll() is not None:
+            return True
+    except AttributeError:
+        return False
+    return _close_and_verify_powershell_helper(proc)
+
+
 # --------------------------------------------------------------------------- #
 # 1. job doc construction -- pure, unit-testable (no I/O)
 # --------------------------------------------------------------------------- #
@@ -460,6 +521,16 @@ def run_attended_native_job(staged_dwg: str, run_dir: str, operation: str,
     run_dir_p.mkdir(parents=True, exist_ok=True)
     stdout_path = run_dir_p / "stdout.txt"
     stderr_path = run_dir_p / "stderr.txt"
+
+    stale_artifacts = _reserved_run_artifacts(run_dir_p)
+    if stale_artifacts:
+        msg = ("refusing to reuse run_dir with reserved producer artifacts: %s"
+               % ", ".join(stale_artifacts))
+        return {"command": None, "exit_code": None, "stdout_path": str(stdout_path),
+                "stderr_path": str(stderr_path), "envelope": None, "result_json": None,
+                "completion_receipt": None, "result": None, "staged_used": None,
+                "timed_out": False, "error": msg, "degraded": False,
+                "degraded_reason": None}
 
     launcher = ps1_launcher or _PS1_LAUNCHER
     if not os.path.isfile(launcher):
@@ -610,11 +681,17 @@ def run_attended_native_job(staged_dwg: str, run_dir: str, operation: str,
                 time.sleep(0.5)
 
             code = proc.poll()
-            if code is None and not result_json_path.is_file():
+            if result_json_path.is_file():
+                # A normal PowerShell-owned final receipt is authoritative for
+                # CAD cleanup, but its writer can still hang afterward while
+                # flushing stdout.  Do not leave that helper orphaned.
+                if not _wait_or_close_powershell_helper(proc):
+                    error = error or "PowerShell helper remained alive after final safety receipt"
+                code = proc.poll()
+            elif code is None:
                 # The completion receipt earns its bounded cleanup window above;
-                # only a missing final receipt is cleaned up from Python. Once
-                # the final safety receipt exists, PowerShell may finish its own
-                # stdout flush without being killed by this caller.
+                # this is the no-final-receipt branch.  The final-receipt branch
+                # above already gave its helper a bounded natural-exit window.
                 try:
                     proc.kill()
                 except OSError:

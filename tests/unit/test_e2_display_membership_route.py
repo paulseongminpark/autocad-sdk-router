@@ -360,6 +360,52 @@ def test_cadctl_display_membership_rejects_precleanup_receipt_without_final_laun
     assert "target_population_oracle" not in result
 
 
+def test_cadctl_display_membership_blocks_stale_attended_artifacts_before_popen(
+    tmp_path: Path, monkeypatch
+):
+    """The staged copy can be new while ``out/attended`` is old evidence.
+
+    In that case the route must be BLOCKED; it must never reuse a valid-looking
+    old final receipt or start PowerShell/AutoCAD against the new staged DWG.
+    """
+    router = tmp_path / "router"
+    native_bin = router / "src" / "Ariadne.AcadNative" / "bin" / "x64" / "Release"
+    native_bin.mkdir(parents=True)
+    (native_bin / "Ariadne.AcadNativeDbx.dbx").write_bytes(b"dbx")
+    (native_bin / "Ariadne.AcadNative.arx").write_bytes(b"arx")
+    source = tmp_path / "source.dwg"
+    source.write_bytes(b"immutable-dwg-payload")
+    out_dir = tmp_path / "out"
+    attended_dir = out_dir / "attended"
+    attended_dir.mkdir(parents=True)
+    stale_job_out = attended_dir / "job_out.json"
+    stale_job_out.write_text(json.dumps(_raw_native_result()), encoding="utf-8")
+    stale_final = attended_dir / "attended_job_final_receipt.json"
+    stale_final.write_text(
+        json.dumps(_final_launcher_envelope("e2.inspect.xclip_membership", stale_job_out)),
+        encoding="utf-8",
+    )
+    stale_job_out_before = stale_job_out.read_bytes()
+    stale_final_before = stale_final.read_bytes()
+    popen_calls = []
+
+    def fail_popen(*args, **kwargs):
+        popen_calls.append(args)
+        raise AssertionError("stale attended artifacts must block before Popen")
+
+    monkeypatch.setattr(cadctl.attended_lane.subprocess, "Popen", fail_popen)
+    result = cadctl.Cad(router_home=router).inspect_display_membership(
+        str(source), ["W1"], str(out_dir)
+    )
+
+    assert result["status"] == "BLOCKED"
+    assert result["executed"] is True
+    assert "reserved producer artifacts" in result["reason"]
+    assert popen_calls == []
+    assert stale_job_out.read_bytes() == stale_job_out_before
+    assert stale_final.read_bytes() == stale_final_before
+
+
 def test_cadctl_display_membership_requires_recovery_authority_evidence(
     tmp_path: Path, monkeypatch
 ):

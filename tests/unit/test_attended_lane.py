@@ -200,6 +200,42 @@ def test_run_attended_native_job_missing_launcher_is_truthful(tmp_path):
     assert res["staged_used"] is None
 
 
+def test_run_attended_native_job_rejects_stale_producer_artifacts_before_launch(tmp_path, monkeypatch):
+    """A reusable run directory is evidence-bearing, not a scratch folder.
+
+    A valid-looking old final receipt plus old job_out must block before Python
+    starts another PowerShell/AutoCAD process or overwrites either artifact.
+    """
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    launcher = tmp_path / "run_attended_job.ps1"
+    launcher.write_text("# stub\n", encoding="utf-8")
+    staged = tmp_path / "staged.dwg"
+    staged.write_bytes(b"fake-dwg")
+    job_out = run_dir / "job_out.json"
+    native = {"schema": "ariadne.autocad_native_job_result.v1", "status": "ok", "result": {"created": True}}
+    job_out.write_text(json.dumps(native), encoding="utf-8")
+    final_path = run_dir / "attended_job_final_receipt.json"
+    final_path.write_text(json.dumps(_final_attended_receipt("write.entity.hatch", job_out)), encoding="utf-8")
+    job_out_before = job_out.read_bytes()
+    final_before = final_path.read_bytes()
+
+    def fail_popen(*args, **kwargs):
+        raise AssertionError("stale artifacts must block before Popen")
+
+    monkeypatch.setattr(subprocess, "Popen", fail_popen)
+    res = al.run_attended_native_job(
+        str(staged), str(run_dir), "write.entity.hatch", {}, ps1_launcher=str(launcher)
+    )
+
+    assert res["command"] is None
+    assert res["error"] is not None and "reserved producer artifacts" in res["error"]
+    assert res["envelope"] is None
+    assert res["staged_used"] is None
+    assert job_out.read_bytes() == job_out_before
+    assert final_path.read_bytes() == final_before
+
+
 def test_run_attended_native_job_builds_expected_command_and_parses_result(tmp_path, monkeypatch):
     run_dir = tmp_path / "run"
     run_dir.mkdir()
@@ -267,6 +303,54 @@ def test_run_attended_native_job_builds_expected_command_and_parses_result(tmp_p
     assert res["result"] == native
     assert res["timed_out"] is False
     assert res["degraded"] is False
+
+
+def test_run_attended_native_job_bounds_helper_after_normal_final_receipt(tmp_path, monkeypatch):
+    """A PowerShell-owned final receipt proves AutoCAD cleanup, but the
+    PowerShell process itself may still hang while flushing stdout.  The caller
+    must wait briefly, then close its exact Popen handle before returning."""
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    staged = tmp_path / "staged.dwg"
+    staged.write_bytes(b"fake-dwg")
+    launcher = tmp_path / "run_attended_job.ps1"
+    launcher.write_text("# stub\n", encoding="utf-8")
+    native = {"schema": "ariadne.autocad_native_job_result.v1", "status": "ok", "result": {}}
+
+    class _FakeProc:
+        def __init__(self):
+            self.killed = False
+            self.wait_timeouts = []
+
+        def poll(self):
+            return 0 if self.killed else None
+
+        def wait(self, timeout=None):
+            self.wait_timeouts.append(timeout)
+
+        def kill(self):
+            self.killed = True
+
+    proc = _FakeProc()
+
+    def fake_popen(cmd, **kwargs):
+        job_out = run_dir / "job_out.json"
+        job_out.write_text(json.dumps(native), encoding="utf-8")
+        (run_dir / "attended_job_final_receipt.json").write_text(
+            json.dumps(_final_attended_receipt("write.entity.hatch", job_out)), encoding="utf-8"
+        )
+        return proc
+
+    monkeypatch.setattr(subprocess, "Popen", fake_popen)
+    res = al.run_attended_native_job(
+        str(staged), str(run_dir), "write.entity.hatch", {}, ps1_launcher=str(launcher)
+    )
+
+    assert res["error"] is None
+    assert res["exit_code"] == 0
+    assert proc.killed is True
+    assert 5 in proc.wait_timeouts
+    assert 10 in proc.wait_timeouts
 
 
 def test_run_attended_native_job_threads_isolated_native_bin_dir(tmp_path, monkeypatch):
@@ -354,7 +438,8 @@ def test_run_attended_native_job_waits_for_final_receipt_after_completion_signal
     """A compact completion receipt arrives before cleanup, then the final
     receipt follows after the old 30-second fallback boundary. The Python
     caller must not kill the launcher or switch to a degraded reconstruction
-    while the bounded cleanup window remains open."""
+    while the bounded cleanup window remains open; after the final receipt it
+    may close a lingering PowerShell helper."""
     run_dir = tmp_path / "run"
     run_dir.mkdir()
     launcher = tmp_path / "run_attended_job.ps1"
@@ -365,27 +450,34 @@ def test_run_attended_native_job_waits_for_final_receipt_after_completion_signal
         "schema": "ariadne.autocad_native_job_result.v1", "status": "ok",
         "result": {"created": True, "class": "AcDbHatch", "handle": "19191"},
     }
-    job_out.write_text(json.dumps(native), encoding="utf-8")
-    (run_dir / "attended_job_completion.json").write_text(
-        json.dumps(_completion_receipt("write.entity.hatch", job_out, cleanup_wait_sec=45)),
-        encoding="utf-8",
-    )
 
     class _FakeProc:
         """Cleanup is still running until the final receipt is written."""
-        killed = False
+        def __init__(self):
+            self.killed = False
+            self.killed_after_final = False
 
         def poll(self):
-            return None
+            return 0 if self.killed else None
 
         def kill(self):
             self.killed = True
+            self.killed_after_final = (run_dir / "attended_job_final_receipt.json").is_file()
 
         def wait(self, timeout=None):
             pass
 
     proc = _FakeProc()
-    monkeypatch.setattr(subprocess, "Popen", lambda cmd, **kw: proc)
+
+    def fake_popen(cmd, **kwargs):
+        job_out.write_text(json.dumps(native), encoding="utf-8")
+        (run_dir / "attended_job_completion.json").write_text(
+            json.dumps(_completion_receipt("write.entity.hatch", job_out, cleanup_wait_sec=45)),
+            encoding="utf-8",
+        )
+        return proc
+
+    monkeypatch.setattr(subprocess, "Popen", fake_popen)
 
     # The final receipt lands after 31 seconds, deliberately later than the
     # old raw-job_out fallback threshold but inside the receipt's 45-second
@@ -406,7 +498,8 @@ def test_run_attended_native_job_waits_for_final_receipt_after_completion_signal
     res = al.run_attended_native_job(str(tmp_path / "staged.dwg"), str(run_dir),
                                      "write.entity.hatch", {}, timeout=60, ps1_launcher=str(launcher))
 
-    assert proc.killed is False
+    assert proc.killed is True
+    assert proc.killed_after_final is True
     assert res["degraded"] is False
     assert res["timed_out"] is False
     assert res["error"] is None
@@ -426,11 +519,6 @@ def test_run_attended_native_job_rejects_completion_without_final_safety_receipt
     launcher = tmp_path / "run_attended_job.ps1"
     launcher.write_text("# stub\n", encoding="utf-8")
     job_out = run_dir / "job_out.json"
-    job_out.write_text(json.dumps({"status": "ok", "result": {"created": True}}), encoding="utf-8")
-    (run_dir / "attended_job_completion.json").write_text(
-        json.dumps(_completion_receipt("write.entity.hatch", job_out, cleanup_wait_sec=5)),
-        encoding="utf-8",
-    )
 
     class _FakeProc:
         killed = False
@@ -445,7 +533,16 @@ def test_run_attended_native_job_rejects_completion_without_final_safety_receipt
             pass
 
     proc = _FakeProc()
-    monkeypatch.setattr(subprocess, "Popen", lambda cmd, **kw: proc)
+
+    def fake_popen(cmd, **kwargs):
+        job_out.write_text(json.dumps({"status": "ok", "result": {"created": True}}), encoding="utf-8")
+        (run_dir / "attended_job_completion.json").write_text(
+            json.dumps(_completion_receipt("write.entity.hatch", job_out, cleanup_wait_sec=5)),
+            encoding="utf-8",
+        )
+        return proc
+
+    monkeypatch.setattr(subprocess, "Popen", fake_popen)
     clock = {"t": 1_000_000.0}
     monkeypatch.setattr(al.time, "monotonic", lambda: clock["t"])
     monkeypatch.setattr(al.time, "sleep", lambda s: clock.__setitem__("t", clock["t"] + s))
@@ -474,9 +571,6 @@ def test_run_attended_native_job_recovers_final_receipt_only_after_independent_c
     launcher.write_text("# stub\n", encoding="utf-8")
     job_out = run_dir / "job_out.json"
     native = {"schema": "ariadne.autocad_native_job_result.v1", "status": "ok", "result": {"created": True}}
-    job_out.write_text(json.dumps(native), encoding="utf-8")
-    (run_dir / "security_before.txt").write_text("0\nC:/trusted\n", encoding="utf-8")
-    (run_dir / "security_after.txt").write_text("0\nC:/trusted\n", encoding="utf-8")
     completion = _completion_receipt("write.entity.hatch", job_out, cleanup_wait_sec=1)
     completion["launched_pid"] = 4242
     completion["pre_existing_pids"] = [3131]
@@ -485,7 +579,6 @@ def test_run_attended_native_job_recovers_final_receipt_only_after_independent_c
         "process_name": "acad",
         "start_time_utc": "2026-08-10T00:00:01.0000000Z",
     }]
-    (run_dir / "attended_job_completion.json").write_text(json.dumps(completion), encoding="utf-8")
 
     class _FakeProc:
         def __init__(self):
@@ -501,7 +594,15 @@ def test_run_attended_native_job_recovers_final_receipt_only_after_independent_c
             pass
 
     proc = _FakeProc()
-    monkeypatch.setattr(subprocess, "Popen", lambda cmd, **kw: proc)
+
+    def fake_popen(cmd, **kwargs):
+        job_out.write_text(json.dumps(native), encoding="utf-8")
+        (run_dir / "security_before.txt").write_text("0\nC:/trusted\n", encoding="utf-8")
+        (run_dir / "security_after.txt").write_text("0\nC:/trusted\n", encoding="utf-8")
+        (run_dir / "attended_job_completion.json").write_text(json.dumps(completion), encoding="utf-8")
+        return proc
+
+    monkeypatch.setattr(subprocess, "Popen", fake_popen)
     monkeypatch.setattr(
         al,
         "_query_process_identities",
