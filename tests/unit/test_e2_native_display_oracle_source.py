@@ -14,87 +14,65 @@ REGISTRY = REPO / "config" / "operations.v2.json"
 ATTENDED_RUNNER = REPO / "tools" / "attended" / "run_attended_job.ps1"
 
 
-def test_native_job_wires_experiment_only_plot_oracle_without_registry_promotion():
+def test_native_job_keeps_only_spatial_filter_membership_for_e2():
     job = JOB_SOURCE.read_text(encoding="utf-8")
     registry = REGISTRY.read_text(encoding="utf-8-sig")
 
-    assert '{ "plot.engine.run", "plot_publish" }' in job
-    assert 'else if (op == "plot.engine.run")' in job
-    assert "runE2NativeDisplayOracle(job, pDb, jobHostMode, r)" in job
-    assert '{ "e2.fixture.create_xclip", "experiment_fixture" }' in job
-    assert 'else if (op == "e2.fixture.create_xclip")' in job
-    assert "runE2CreateXclipFixture(pDb, jobHostMode, r)" in job
+    assert '{ "e2.inspect.xclip_membership", "experiment_oracle" }' in job
+    assert 'else if (op == "e2.inspect.xclip_membership")' in job
+    assert "runE2NativeXclipMembership(job, pDb, jobHostMode, r)" in job
     assert '#include "families/e2_display_oracle.inc"' in job
 
-    # A source-level handler is not enough to promote the public operation.  The
-    # registry stays hard-blocked until a real attended AutoCAD run proves it.
-    plot_record = registry[registry.index('"id": "plot.engine.run"') :]
-    plot_record = plot_record[: plot_record.index("\n    },")]
-    assert '"status": "blocked"' in plot_record
-    assert '"implementation_strategy": "hard_blocked"' in plot_record
+    # The public CADAgent route owns this attended operation.  Native source
+    # presence alone must not promote it into the generic operation registry.
+    assert '"id": "e2.inspect.xclip_membership"' not in registry
+
+    removed_operations = (
+        '{ "e2.fixture.create_xclip", "experiment_fixture" }',
+        'else if (op == "e2.fixture.create_xclip")',
+        '{ "plot.engine.run", "plot_publish" }',
+        'else if (op == "plot.engine.run")',
+    )
+    for operation in removed_operations:
+        assert operation not in job
 
 
-def test_probe_records_raw_graphic_ids_without_claiming_visibility():
+def test_native_membership_source_has_no_fixture_or_dwf_dmm_publish_arm():
+    job = JOB_SOURCE.read_text(encoding="utf-8")
     source = ORACLE_SOURCE.read_text(encoding="utf-8")
 
-    assert "class E2NativeDisplayDmmReactor : public AcDMMReactor" in source
-    assert "void OnEndEntity(AcDMMEntityReactorInfo* pInfo) override" in source
-    assert "pInfo->UniqueEntityId()" in source
-    assert "pInfo->entity()->layerId()" in source
-    assert "pInfo->effectiveBlockLayerId()" in source
-    assert "mTargetLayers.find(sourceLayer)" in source
-    assert "mTargetLayers.find(effectiveLayer)" in source
-    assert "pInfo->getEntityBlockRefPath()" in source
-    assert "pInfo->GetNextAvailableNodeId()" in source
-    assert "pInfo->SetCurrentNode(nodeId, blockPath)" in source
-    assert "pInfo->GetCurrentEntityNode(node, blockPath)" in source
-    assert "pInfo->flush()" in source
-    assert "pInfo->getGraphicIDs()" in source
-    assert '"native_visibility_resolved\\\":false"' in source
-    assert "inconclusive_all_graphic_ids_empty" in source
-    assert '"visible\\\":"' not in source
+    removed_symbols = (
+        "runE2CreateXclipFixture",
+        "runE2NativeDisplayOracle",
+        "E2NativeDisplayDmmReactor",
+        "E2NativeDisplayPublishReactor",
+        "AcDMMReactor",
+        "AcPublishReactor",
+        "AcGlobAddDMMReactor",
+        "acplPublishExecute",
+        "AcPublish",
+        "AcPl",
+        "E2ACPLPUBLISHEXECUTE",
+        "E2_DMM_",
+        "DWF",
+        "DMM",
+    )
+    for symbol in removed_symbols:
+        assert symbol not in source
 
-
-def test_probe_keeps_official_metadata_recipe_as_a_separate_intervention_arm():
-    source = ORACLE_SOURCE.read_text(encoding="utf-8")
-
-    assert 'metadataMode != "set_current_node_only"' in source
-    assert 'mMetadataMode == "official_metadata"' in source
-    assert "pInfo->AddProperties(&properties)" in source
-    assert "pInfo->AddNodeToMap(" in source
-    assert "pInfo->AddPropertiesIds(&propertyIds, node)" in source
-    assert 'metadataMode != "set_current_node_with_properties"' in source
-    assert 'metadataMode != "official_metadata"' in source
-    assert '"metadata_mode must be set_current_node_only, "' in source
-
-
-def test_fixture_builds_one_visible_and_one_xclip_rejected_target_line():
-    source = ORACLE_SOURCE.read_text(encoding="utf-8")
-
-    assert "runE2CreateXclipFixture" in source
-    assert 'ACRX_T("E2_DMM_VISIBLE")' in source
-    assert 'ACRX_T("E2_DMM_CLIPPED")' in source
-    assert "AcDbSpatialFilter* pSpatialFilter = new AcDbSpatialFilter();" in source
-    assert "pSpatialFilter->setDefinition(" in source
-    assert "visible_source_handle" in source
-    assert "clipped_source_handle" in source
-
-
-def test_oracle_uses_publish_lifecycle_and_fails_closed():
-    source = ORACLE_SOURCE.read_text(encoding="utf-8")
-
-    assert "OnAboutToBeginPublishing" in source
-    assert "OnEndPublish" in source
-    assert "OnCancelledOrFailedPublishing" in source
-    assert "AcGlobAddDMMReactor" in source
-    assert "AcGlobRemoveDMMReactor" in source
-    assert "acplPublishExecute" in source
-    assert 'GetProcAddress(publishModule, "acplPublishExecute")' in source
-    assert "entry.setTitle(outputStem.c_str())" in source
-    assert 'ctxHostMode != "full_autocad"' in source
-    assert "DMM_REACTOR_NOT_FIRED" in source
-    assert "target_layers" in source
-    assert "output_path" in source
+    removed_includes = (
+        '"dbplotsettings.h"',
+        '"dbplotsetval.h"',
+        '"acdmmapi.h"',
+        '"AcPublishReactors.h"',
+        '"AcPlPlotConfigMgr.h"',
+        '"AcPlPlotConfig.h"',
+        '"AcPlDSDData.h"',
+        '"AcPlDSDEntry.h"',
+        '"acplmisc.h"',
+    )
+    for include in removed_includes:
+        assert include not in job
 
 
 def test_attended_runner_can_load_an_isolated_proof_build():
@@ -110,35 +88,72 @@ def test_attended_runner_can_load_an_isolated_proof_build():
 def test_native_job_wires_spatial_filter_membership_as_a_distinct_experiment_op():
     job = JOB_SOURCE.read_text(encoding="utf-8")
     source = ORACLE_SOURCE.read_text(encoding="utf-8")
-    registry = REGISTRY.read_text(encoding="utf-8-sig")
 
-    assert '{ "e2.inspect.xclip_membership", "experiment_oracle" }' in job
-    assert 'else if (op == "e2.inspect.xclip_membership")' in job
-    assert "runE2NativeXclipMembership(job, pDb, jobHostMode, r)" in job
     assert "AcDbSpatialFilter" in source
     assert "getOriginalInverseBlockXform" in source
     assert "native_membership_resolved" in source
     assert "xclip_polygon_segment_intersection" in source
-    # This remains an experiment-only high-level cadagent route. It must not be
-    # silently promoted into the generic public operation registry by source
-    # presence alone.
-    assert '"id": "e2.inspect.xclip_membership"' not in registry
+    assert "e2ReadBlockReferenceClip" in source
+    assert "static void e2EmitStringArray(" in source
+    assert "runE2NativeXclipMembership" in source
+    assert "e2.inspect.xclip_membership" in job
 
 
-def test_native_membership_scope_keeps_strict_fail_closed_and_accounts_linear_exclusions():
+def test_linear_segments_exclude_degenerate_source_and_world_collapses():
     source = ORACLE_SOURCE.read_text(encoding="utf-8")
 
     assert 'kE2GeometryScopeStrictLayerEntities = "strict_layer_entities_v1"' in source
     assert 'kE2GeometryScopeLinearSegments = "linear_segments_v1"' in source
-    assert '"GEOMETRY_SCOPE_INVALID"' in source
-    assert 'state.geometryScope == kE2GeometryScopeLinearSegments' in source
+    assert '"DEGENERATE_TARGET_LINE"' in source
+    assert '"DEGENERATE_TARGET_POLYLINE"' in source
+    assert '"DEGENERATE_WORLD_TARGET"' in source
+    assert "excludedDegenerateSourceSegments" in source
+    assert '\\"excluded_degenerate_source_segments\\":' in source
+
+    primitive_segments = source[source.index("static bool e2PrimitiveSegments") :]
+    line_branch = primitive_segments[
+        primitive_segments.index("if (AcDbLine* pLine") : primitive_segments.index(
+            "if (AcDbPolyline* pPolyline"
+        )
+    ]
+    assert "if (linearSegments)" in line_branch
+    assert "++stats.excludedDegenerateSourceSegments;" in line_branch
+    assert line_branch.index("++stats.excludedDegenerateSourceSegments;") < line_branch.index(
+        '"DEGENERATE_TARGET_LINE"'
+    )
+
+    world_collapse = source[source.index("p0.transformBy(parentWorld)") :]
+    world_collapse = world_collapse[: world_collapse.index("std::vector<E2Segment2> fragments")]
+    assert "if (state.geometryScope == kE2GeometryScopeLinearSegments)" in world_collapse
+    assert "++stats.excludedDegenerateSourceSegments;" in world_collapse
+    assert "continue;" in world_collapse
+    assert world_collapse.index("++stats.expectedSourceSegments;") > world_collapse.index(
+        "++stats.excludedDegenerateSourceSegments;"
+    )
+    assert (
+        "stats.expectedSourceSegments !=\n"
+        "            stats.visibleSourceSegments + stats.clippedAwaySourceSegments"
+    ) in source
+
+
+def test_linear_scope_preserves_curved_and_unsupported_exclusion_accounting():
+    source = ORACLE_SOURCE.read_text(encoding="utf-8")
+
     assert '"TARGET_BULGE_UNSUPPORTED"' in source
     assert '"TARGET_ENTITY_TYPE_UNSUPPORTED"' in source
     assert "excludedCurvedSourceSegments" in source
-    assert "excludedDegenerateSourceSegments" in source
     assert "excludedUnsupportedEntityTemplates" in source
     assert '\\"excluded_curved_source_segments\\":' in source
-    assert '\\"excluded_degenerate_source_segments\\":' in source
     assert '\\"excluded_unsupported_entity_templates\\":' in source
-    assert '\\"geometry_scope\\":\\"' in source
     assert "E2PrimitiveSegment" in source
+
+
+def test_xclip_membership_does_not_change_unrelated_block_record_origin_json():
+    job = JOB_SOURCE.read_text(encoding="utf-8")
+    block_record_function = job[job.index("static std::string blockTableRecordsJson") :]
+    block_record_function = block_record_function[
+        : block_record_function.index("static std::string layoutsRichJson")
+    ]
+
+    assert "pBTR->origin()" not in block_record_function
+    assert '\\"origin\\":[' not in block_record_function

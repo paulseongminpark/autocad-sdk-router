@@ -1,342 +1,14 @@
 //////////////////////////////////////////////////////////////////////////////
-// E2 attended native-display probe (experiment-only).
+// E2 native XCLIP membership oracle.
 //
-// This is deliberately wired to the existing, publicly hard-blocked
-// plot.engine.run operation.  Source presence is not capability proof: the
-// registry must remain blocked until a dedicated full AutoCAD run shows that
-// the publish and DMM callbacks fire on a staged drawing.
-//
-// The DWF Metadata Manager (DMM) observes entities while AutoCAD publishes a
-// DWF.  Its callbacks expose the effective layer and enclosing block-reference
-// path independently of the WorldIR XCLIP implementation under test.  The SDK
-// also offers graphic IDs, but an empty ID array is not documented as proof
-// that an entity was clipped.  This probe therefore records the raw IDs and
-// never turns an empty array into a native visibility decision.
+// This family contains only the AcDbSpatialFilter-based membership path used
+// by e2.inspect.xclip_membership. It resolves XCLIP polygons and intersects
+// them with LINE and straight LWPOLYLINE source segments in world space.
 //////////////////////////////////////////////////////////////////////////////
 
 #include <algorithm>
 #include <map>
 #include <set>
-
-// Do not statically link AcPublish_crx.lib: that would make the shared .crx
-// depend on attended-only AcPublish at module-load time and could break the
-// existing accoreconsole inspection lane.  Resolve acplPublishExecute only
-// after the attended handler has loaded AcPublish.crx.
-typedef void (__cdecl *E2ACPLPUBLISHEXECUTE)(AcPlDSDData, AcPlPlotConfig*, bool);
-
-static Acad::ErrorStatus e2EnsureFixtureLayer(
-    AcDbDatabase* pDb,
-    const ACHAR* name,
-    Adesk::UInt16 colorIndex,
-    AcDbObjectId& layerId)
-{
-    AcDbLayerTable* pLayers = nullptr;
-    Acad::ErrorStatus es = pDb->getLayerTable(pLayers, AcDb::kForWrite);
-    if (es != Acad::eOk || pLayers == nullptr)
-        return es;
-    if (pLayers->has(name)) {
-        es = pLayers->getAt(name, layerId);
-        pLayers->close();
-        return es;
-    }
-
-    AcDbLayerTableRecord* pLayer = new AcDbLayerTableRecord();
-    pLayer->setName(name);
-    AcCmColor color;
-    color.setColorIndex(colorIndex);
-    pLayer->setColor(color);
-    es = pLayers->add(layerId, pLayer);
-    pLayers->close();
-    if (es == Acad::eOk)
-        pLayer->close();
-    else
-        delete pLayer;
-    return es;
-}
-
-static Acad::ErrorStatus e2EraseModelSpace(
-    AcDbDatabase* pDb,
-    AcDbObjectId& modelSpaceId,
-    int& erased)
-{
-    erased = 0;
-    AcDbBlockTable* pBlocks = nullptr;
-    Acad::ErrorStatus es = pDb->getBlockTable(pBlocks, AcDb::kForRead);
-    if (es != Acad::eOk || pBlocks == nullptr)
-        return es;
-    es = pBlocks->getAt(ACDB_MODEL_SPACE, modelSpaceId);
-    pBlocks->close();
-    if (es != Acad::eOk)
-        return es;
-
-    AcDbBlockTableRecord* pModel = nullptr;
-    es = acdbOpenObject(pModel, modelSpaceId, AcDb::kForWrite);
-    if (es != Acad::eOk || pModel == nullptr)
-        return es;
-    AcDbBlockTableRecordIterator* pIt = nullptr;
-    es = pModel->newIterator(pIt);
-    if (es == Acad::eOk && pIt != nullptr) {
-        for (; !pIt->done(); pIt->step()) {
-            AcDbEntity* pEntity = nullptr;
-            if (pIt->getEntity(pEntity, AcDb::kForWrite) == Acad::eOk &&
-                pEntity != nullptr) {
-                if (pEntity->erase() == Acad::eOk)
-                    ++erased;
-                pEntity->close();
-            }
-        }
-        delete pIt;
-    }
-    pModel->close();
-    return es;
-}
-
-static Acad::ErrorStatus e2AttachRectangularXclip(
-    AcDbBlockReference* pReference,
-    const AcGePoint2d& lowerLeft,
-    const AcGePoint2d& upperRight,
-    std::string& filterHandle)
-{
-    if (pReference == nullptr)
-        return Acad::eNullObjectPointer;
-    Acad::ErrorStatus es = pReference->createExtensionDictionary();
-    if (es != Acad::eOk && es != Acad::eAlreadyInDb)
-        return es;
-    const AcDbObjectId extensionId = pReference->extensionDictionary();
-
-    AcDbDictionary* pExtension = nullptr;
-    es = acdbOpenObject(pExtension, extensionId, AcDb::kForWrite);
-    if (es != Acad::eOk || pExtension == nullptr)
-        return es;
-    AcDbDictionary* pFilterDictionary = new AcDbDictionary();
-    AcDbObjectId filterDictionaryId;
-    es = pExtension->setAt(ACRX_T("ACAD_FILTER"), pFilterDictionary, filterDictionaryId);
-    pExtension->close();
-    if (es != Acad::eOk) {
-        delete pFilterDictionary;
-        return es;
-    }
-
-    AcGePoint2dArray boundary;
-    boundary.append(lowerLeft);
-    boundary.append(upperRight);
-    // ObjectARX 2027's acdb26.lib exports the default constructor plus
-    // setDefinition(), but not the public-looking convenience constructor that
-    // takes the boundary.  Use the exported two-step path so the minimal repro
-    // itself does not depend on an unresolved SDK symbol.
-    AcDbSpatialFilter* pSpatialFilter = new AcDbSpatialFilter();
-    es = pSpatialFilter->setDefinition(
-        boundary,
-        AcGeVector3d::kZAxis,
-        0.0,
-        0.0,
-        0.0,
-        Adesk::kTrue);
-    if (es == Acad::eOk)
-        es = pSpatialFilter->setInverted(false);
-    if (es != Acad::eOk) {
-        pFilterDictionary->close();
-        delete pSpatialFilter;
-        return es;
-    }
-    AcDbObjectId spatialFilterId;
-    es = pFilterDictionary->setAt(
-        ACRX_T("SPATIAL"), pSpatialFilter, spatialFilterId);
-    pFilterDictionary->close();
-    if (es != Acad::eOk) {
-        delete pSpatialFilter;
-        return es;
-    }
-    filterHandle = handleOf(pSpatialFilter);
-    pSpatialFilter->close();
-    return Acad::eOk;
-}
-
-static void runE2CreateXclipFixture(
-    AcDbDatabase* pDb,
-    const std::string& ctxHostMode,
-    std::ostringstream& r)
-{
-    if (ctxHostMode != "full_autocad") {
-        emitNativeError(
-            r,
-            "ATTENDED_HOST_REQUIRED",
-            "the E2 XCLIP fixture is created only in a staged full AutoCAD document");
-        return;
-    }
-
-    const ACHAR* visibleLayerName = ACRX_T("E2_DMM_VISIBLE");
-    const ACHAR* clippedLayerName = ACRX_T("E2_DMM_CLIPPED");
-    const ACHAR* frameLayerName = ACRX_T("E2_DMM_FRAME");
-    const ACHAR* blockName = ACRX_T("E2_DMM_XCLIP_BLOCK");
-    AcDbObjectId visibleLayerId;
-    AcDbObjectId clippedLayerId;
-    AcDbObjectId frameLayerId;
-    Acad::ErrorStatus es = e2EnsureFixtureLayer(
-        pDb, visibleLayerName, 1, visibleLayerId);
-    if (es == Acad::eOk)
-        es = e2EnsureFixtureLayer(pDb, clippedLayerName, 3, clippedLayerId);
-    if (es == Acad::eOk)
-        es = e2EnsureFixtureLayer(pDb, frameLayerName, 8, frameLayerId);
-    if (es != Acad::eOk) {
-        emitNativeError(r, "FIXTURE_LAYER_CREATE_FAILED", "could not create probe layers");
-        return;
-    }
-
-    AcDbObjectId modelSpaceId;
-    int erased = 0;
-    es = e2EraseModelSpace(pDb, modelSpaceId, erased);
-    if (es != Acad::eOk) {
-        emitNativeError(r, "FIXTURE_MODELSPACE_CLEAR_FAILED", "could not clear staged model space");
-        return;
-    }
-
-    AcDbBlockTable* pBlocks = nullptr;
-    es = pDb->getBlockTable(pBlocks, AcDb::kForWrite);
-    if (es != Acad::eOk || pBlocks == nullptr) {
-        emitNativeError(r, "FIXTURE_BLOCK_TABLE_OPEN_FAILED", "could not open the block table");
-        return;
-    }
-    if (pBlocks->has(blockName)) {
-        pBlocks->close();
-        emitNativeError(r, "FIXTURE_ALREADY_EXISTS", "the staged drawing already contains the probe block");
-        return;
-    }
-    AcDbBlockTableRecord* pDefinition = new AcDbBlockTableRecord();
-    pDefinition->setName(blockName);
-    pDefinition->setOrigin(AcGePoint3d::kOrigin);
-    AcDbObjectId definitionId;
-    es = pBlocks->add(definitionId, pDefinition);
-    pBlocks->close();
-    if (es != Acad::eOk) {
-        delete pDefinition;
-        emitNativeError(r, "FIXTURE_BLOCK_CREATE_FAILED", "could not create the probe block definition");
-        return;
-    }
-
-    AcDbLine* pVisible = new AcDbLine(
-        AcGePoint3d(0.0, 0.0, 0.0), AcGePoint3d(10.0, 0.0, 0.0));
-    pVisible->setLayer(visibleLayerId);
-    AcDbObjectId visibleId;
-    es = pDefinition->appendAcDbEntity(visibleId, pVisible);
-    if (es != Acad::eOk) {
-        delete pVisible;
-        pDefinition->close();
-        emitNativeError(r, "FIXTURE_VISIBLE_LINE_FAILED", "could not append the visible probe line");
-        return;
-    }
-    const std::string visibleHandle = handleOf(pVisible);
-    pVisible->close();
-
-    AcDbLine* pClipped = new AcDbLine(
-        AcGePoint3d(20.0, 0.0, 0.0), AcGePoint3d(30.0, 0.0, 0.0));
-    pClipped->setLayer(clippedLayerId);
-    AcDbObjectId clippedId;
-    es = pDefinition->appendAcDbEntity(clippedId, pClipped);
-    if (es != Acad::eOk) {
-        delete pClipped;
-        pDefinition->close();
-        emitNativeError(r, "FIXTURE_CLIPPED_LINE_FAILED", "could not append the clipped probe line");
-        return;
-    }
-    const std::string clippedHandle = handleOf(pClipped);
-    pClipped->close();
-    pDefinition->close();
-
-    AcDbBlockTableRecord* pModel = nullptr;
-    es = acdbOpenObject(pModel, modelSpaceId, AcDb::kForWrite);
-    if (es != Acad::eOk || pModel == nullptr) {
-        emitNativeError(r, "FIXTURE_MODELSPACE_OPEN_FAILED", "could not reopen staged model space");
-        return;
-    }
-    AcDbLine* pFrame = new AcDbLine(
-        AcGePoint3d(0.0, -1.0, 0.0), AcGePoint3d(0.0, 1.0, 0.0));
-    pFrame->setLayer(frameLayerId);
-    AcDbObjectId frameId;
-    es = pModel->appendAcDbEntity(frameId, pFrame);
-    if (es == Acad::eOk)
-        pFrame->close();
-    else
-        delete pFrame;
-    if (es != Acad::eOk) {
-        pModel->close();
-        emitNativeError(r, "FIXTURE_FRAME_LINE_FAILED", "could not append the frame line");
-        return;
-    }
-
-    AcDbBlockReference* pReference = new AcDbBlockReference(
-        AcGePoint3d::kOrigin, definitionId);
-    AcDbObjectId referenceId;
-    es = pModel->appendAcDbEntity(referenceId, pReference);
-    pModel->close();
-    if (es != Acad::eOk) {
-        delete pReference;
-        emitNativeError(r, "FIXTURE_INSERT_FAILED", "could not append the probe block reference");
-        return;
-    }
-    const std::string referenceHandle = handleOf(pReference);
-    std::string filterHandle;
-    es = e2AttachRectangularXclip(
-        pReference,
-        AcGePoint2d(-1.0, -2.0),
-        AcGePoint2d(11.0, 2.0),
-        filterHandle);
-    pReference->close();
-    if (es != Acad::eOk) {
-        emitNativeError(r, "FIXTURE_XCLIP_CREATE_FAILED", "could not attach the spatial filter");
-        return;
-    }
-
-    AcDbBlockTableRecord* pModelForLayout = nullptr;
-    if (acdbOpenObject(pModelForLayout, modelSpaceId, AcDb::kForRead) == Acad::eOk &&
-        pModelForLayout != nullptr) {
-        const AcDbObjectId layoutId = pModelForLayout->getLayoutId();
-        pModelForLayout->close();
-        AcDbLayout* pLayout = nullptr;
-        if (acdbOpenObject(pLayout, layoutId, AcDb::kForWrite) == Acad::eOk &&
-            pLayout != nullptr) {
-            AcDbPlotSettingsValidator* pValidator =
-                acdbHostApplicationServices()->plotSettingsValidator();
-            if (pValidator != nullptr) {
-                pValidator->setPlotType(pLayout, AcDbPlotSettings::kExtents);
-                pValidator->setUseStandardScale(pLayout, Adesk::kTrue);
-                pValidator->setStdScaleType(pLayout, AcDbPlotSettings::kScaleToFit);
-                pValidator->setPlotCentered(pLayout, Adesk::kTrue);
-            }
-            pLayout->close();
-        }
-    }
-    pDb->setExtmin(AcGePoint3d(-1.0, -2.0, 0.0));
-    pDb->setExtmax(AcGePoint3d(11.0, 2.0, 0.0));
-
-    r << "\"result\":{";
-    r << "\"schema\":\"ariadne.e2.xclip_minimal_fixture.v1\"";
-    r << ",\"modelspace_entities_erased\":" << erased;
-    r << ",\"visible_layer\":\"E2_DMM_VISIBLE\"";
-    r << ",\"clipped_layer\":\"E2_DMM_CLIPPED\"";
-    r << ",\"visible_source_handle\":\"" << visibleHandle << "\"";
-    r << ",\"clipped_source_handle\":\"" << clippedHandle << "\"";
-    r << ",\"block_reference_handle\":\"" << referenceHandle << "\"";
-    r << ",\"spatial_filter_handle\":\"" << filterHandle << "\"";
-    r << ",\"clip_boundary_block\":[[-1,-2],[11,2]]";
-    r << ",\"expected_native_display\":{";
-    r << "\"E2_DMM_VISIBLE\":true,\"E2_DMM_CLIPPED\":false}";
-    r << "},\"status\":\"ok\"}";
-}
-
-struct E2NativeDisplayRecord
-{
-    std::string uniqueEntityId;
-    std::string sourceHandle;
-    std::string entityClass;
-    std::string sourceLayer;
-    std::string effectiveLayer;
-    std::string matchedTargetLayer;
-    std::vector<std::string> blockRefPath;
-    std::vector<long> graphicIds;
-    int dmmNodeId;
-    bool graphicIdObserved;
-};
 
 static std::string e2LayerName(const AcDbObjectId& layerId)
 {
@@ -354,13 +26,11 @@ static std::string e2LayerName(const AcDbObjectId& layerId)
 }
 
 // ---------------------------------------------------------------------------
-// Independent XCLIP membership oracle.
+// AcDbSpatialFilter XCLIP membership oracle.
 //
-// DMM callbacks are deliberately NOT used here: the controlled fixture proved
-// that AutoCAD emits DMM entity callbacks for both a visible line and a line
-// wholly rejected by XCLIP.  This arm instead reads AcDbSpatialFilter state from
-// ObjectARX and applies an independent polygon/segment intersection algorithm to
-// the native LINE/LWPOLYLINE geometry.  The Python shell shares only the stable
+// The native operation reads XCLIP state from ObjectARX and applies an
+// independent polygon/segment intersection algorithm to native LINE and
+// straight LWPOLYLINE geometry. The Python shell shares only the stable
 // lineage-id convention; it never decides visibility.
 // ---------------------------------------------------------------------------
 
@@ -369,7 +39,15 @@ static const char* kE2GeometryScopeStrictLayerEntities = "strict_layer_entities_
 static const char* kE2GeometryScopeLinearSegments = "linear_segments_v1";
 static void e2EmitStringArray(
     std::ostringstream& r,
-    const std::vector<std::string>& values);
+    const std::vector<std::string>& values)
+{
+    r << "[";
+    for (size_t i = 0; i < values.size(); ++i) {
+        if (i > 0) r << ",";
+        r << "\"" << jsonEscape(values[i]) << "\"";
+    }
+    r << "]";
+}
 
 struct E2Point2
 {
@@ -805,11 +483,24 @@ static bool e2PrimitiveSegments(
     const bool linearSegments =
         state.geometryScope == kE2GeometryScopeLinearSegments;
     if (AcDbLine* pLine = AcDbLine::cast(pEntity)) {
+        const E2Segment2 local = {
+            e2Point2(pLine->startPoint()),
+            e2Point2(pLine->endPoint())
+        };
+        const E2Point2 localSpan = e2Subtract(local.p1, local.p0);
+        if (e2Dot(localSpan, localSpan) <=
+            kE2GeometryEpsilon * kE2GeometryEpsilon) {
+            if (linearSegments) {
+                ++stats.excludedDegenerateSourceSegments;
+                return true;
+            }
+            state.fail(
+                "DEGENERATE_TARGET_LINE",
+                "target LINE has zero length");
+            return false;
+        }
         E2PrimitiveSegment segment = {
-            {
-                e2Point2(pLine->startPoint()),
-                e2Point2(pLine->endPoint())
-            },
+            local,
             0
         };
         output.push_back(segment);
@@ -818,6 +509,8 @@ static bool e2PrimitiveSegments(
     if (AcDbPolyline* pPolyline = AcDbPolyline::cast(pEntity)) {
         const unsigned int count = pPolyline->numVerts();
         if (count < 2) {
+            if (linearSegments)
+                return true;  // no source segment exists to account for
             state.fail("DEGENERATE_TARGET_POLYLINE", "target LWPOLYLINE has fewer than two vertices");
             return false;
         }
@@ -850,11 +543,16 @@ static bool e2PrimitiveSegments(
                 e2Point2(vertices[i]), e2Point2(vertices[next])
             };
             const E2Point2 localSpan = e2Subtract(local.p1, local.p0);
-            if (linearSegments &&
-                e2Dot(localSpan, localSpan) <=
-                    kE2GeometryEpsilon * kE2GeometryEpsilon) {
-                ++stats.excludedDegenerateSourceSegments;
-                continue;
+            if (e2Dot(localSpan, localSpan) <=
+                kE2GeometryEpsilon * kE2GeometryEpsilon) {
+                if (linearSegments) {
+                    ++stats.excludedDegenerateSourceSegments;
+                    continue;
+                }
+                state.fail(
+                    "DEGENERATE_TARGET_POLYLINE",
+                    "target LWPOLYLINE contains a zero-length segment");
+                return false;
             }
             if (linearSegments && std::fabs(bulges[i]) > kE2GeometryEpsilon) {
                 ++stats.excludedCurvedSourceSegments;
@@ -979,7 +677,6 @@ static void e2VisitDefinition(
         }
         const bool primitiveVisible = ancestorsVisible && e2EntityLayerVisible(pEntity, state);
         for (const E2PrimitiveSegment& sourceSegment : localSegments) {
-            ++stats.expectedSourceSegments;
             E2Segment2 world = sourceSegment.segment;
             AcGePoint3d p0(world.p0.x, world.p0.y, 0.0);
             AcGePoint3d p1(world.p1.x, world.p1.y, 0.0);
@@ -990,10 +687,15 @@ static void e2VisitDefinition(
             const E2Point2 span = e2Subtract(world.p1, world.p0);
             if (e2Dot(span, span) <=
                 kE2GeometryEpsilon * kE2GeometryEpsilon) {
+                if (state.geometryScope == kE2GeometryScopeLinearSegments) {
+                    ++stats.excludedDegenerateSourceSegments;
+                    continue;
+                }
                 pEntity->close();
                 state.fail("DEGENERATE_WORLD_TARGET", "a target segment collapsed under INSERT transforms");
                 return;
             }
+            ++stats.expectedSourceSegments;
             std::vector<E2Segment2> fragments;
             if (primitiveVisible)
                 fragments.push_back(world);
@@ -1166,7 +868,6 @@ static void runE2NativeXclipMembership(
     r << ",\"camera_extent_applied\":false";
     r << ",\"layer_visibility_applied\":true";
     r << ",\"entity_visibility_applied\":true";
-    r << ",\"dwf_dmm_used_for_membership\":false";
     r << ",\"drawing_path\":\""
       << jsonEscape(rawDrawingPath != nullptr ? acharToAscii(rawDrawingPath) : std::string())
       << "\"";
@@ -1208,570 +909,4 @@ static void runE2NativeXclipMembership(
           << ",\"p1_world\":[" << record.world.p1.x << "," << record.world.p1.y << "]}";
     }
     r << "]},\"status\":\"ok\"}";
-}
-
-class E2NativeDisplayDmmReactor : public AcDMMReactor
-{
-public:
-    E2NativeDisplayDmmReactor(
-        const std::vector<std::string>& targetLayers,
-        const std::string& metadataMode)
-        : mTargetLayers(targetLayers.begin(), targetLayers.end()),
-          mMetadataMode(metadataMode),
-          mBeginSheets(0), mEndSheets(0), mBeginEntities(0), mEndEntities(0),
-          mTargetCallbacks(0), mGraphicIdCallbacks(0), mNodesAssigned(0),
-          mNodeAssignmentFailures(0), mPropertiesAdded(0),
-          mPropertyAssociationFailures(0)
-    {
-    }
-
-    void OnBeginSheet(AcDMMSheetReactorInfo*) override
-    {
-        ++mBeginSheets;
-    }
-
-    void OnEndSheet(AcDMMSheetReactorInfo*) override
-    {
-        ++mEndSheets;
-    }
-
-    void OnBeginEntity(AcDMMEntityReactorInfo* pInfo) override
-    {
-        ++mBeginEntities;
-        if (pInfo == nullptr || pInfo->entity() == nullptr)
-            return;
-        const std::string sourceLayer = e2LayerName(pInfo->entity()->layerId());
-        const std::string effectiveLayer = e2LayerName(pInfo->effectiveBlockLayerId());
-        if (mTargetLayers.find(sourceLayer) == mTargetLayers.end() &&
-            mTargetLayers.find(effectiveLayer) == mTargetLayers.end())
-            return;
-
-        // Autodesk's documented metadata recipe is stronger than merely
-        // assigning a node: AddProperties -> AddNodeToMap -> AddPropertiesIds.
-        // Keep explicit arms so the live probe can distinguish our former
-        // node-only use from the documented path one variable at a time.
-        const int nodeId = pInfo->GetNextAvailableNodeId();
-        AcDbObjectIdArray blockPath = pInfo->getEntityBlockRefPath();
-        bool propertyAdded = true;
-        std::wstring propertyId;
-        if (mMetadataMode != "set_current_node_only") {
-            const wchar_t* uniqueId = pInfo->UniqueEntityId();
-            propertyId = L"ARIADNE_E2_";
-            propertyId += uniqueId != nullptr
-                ? uniqueId : std::to_wstring(nodeId);
-            AcDMMEPlotProperties properties;
-            properties.SetId(propertyId.c_str());
-            AcDMMEPlotProperty property(
-                L"ARIADNE_E2_UNIQUE_ENTITY_ID",
-                uniqueId != nullptr ? uniqueId : L"");
-            property.SetCategory(L"hidden");
-            properties.AddProperty(&property);
-            propertyAdded = pInfo->AddProperties(&properties);
-            if (propertyAdded)
-                ++mPropertiesAdded;
-        }
-
-        bool nodeAssigned = false;
-        if (nodeId > 0 && mMetadataMode == "official_metadata")
-            nodeAssigned = pInfo->AddNodeToMap(
-                pInfo->entity()->objectId(), blockPath, nodeId);
-        else if (nodeId > 0)
-            nodeAssigned = pInfo->SetCurrentNode(nodeId, blockPath);
-
-        if (nodeAssigned)
-            ++mNodesAssigned;
-        else
-            ++mNodeAssignmentFailures;
-
-        if (mMetadataMode != "set_current_node_only") {
-            AcDMMNode node;
-            AcDMMStringVec propertyIds;
-            propertyIds.append(AcDMMWideString(propertyId.c_str()));
-            const bool associated = propertyAdded && nodeAssigned &&
-                pInfo->GetCurrentEntityNode(node, blockPath) &&
-                pInfo->AddPropertiesIds(&propertyIds, node);
-            if (!associated)
-                ++mPropertyAssociationFailures;
-        }
-    }
-
-    void OnEndEntity(AcDMMEntityReactorInfo* pInfo) override
-    {
-        ++mEndEntities;
-        if (pInfo == nullptr)
-            return;
-
-        AcDbEntity* pEntity = pInfo->entity();
-        if (pEntity == nullptr)
-            return;
-
-        const std::string sourceLayer = e2LayerName(pEntity->layerId());
-        const std::string effectiveLayer = e2LayerName(pInfo->effectiveBlockLayerId());
-        std::string matchedTargetLayer;
-        if (mTargetLayers.find(sourceLayer) != mTargetLayers.end())
-            matchedTargetLayer = sourceLayer;
-        else if (mTargetLayers.find(effectiveLayer) != mTargetLayers.end())
-            matchedTargetLayer = effectiveLayer;
-        if (matchedTargetLayer.empty())
-            return;
-
-        E2NativeDisplayRecord record;
-        const wchar_t* uniqueId = pInfo->UniqueEntityId();
-        record.uniqueEntityId = uniqueId != nullptr
-            ? wideToUtf8(std::wstring(uniqueId)) : std::string();
-        record.sourceHandle = handleOf(pEntity);
-        record.entityClass = pEntity->isA() != nullptr
-            ? acharToAscii(pEntity->isA()->name()) : std::string();
-        record.sourceLayer = sourceLayer;
-        record.effectiveLayer = effectiveLayer;
-        record.matchedTargetLayer = matchedTargetLayer;
-
-        const AcDbObjectIdArray& blockPath = pInfo->getEntityBlockRefPath();
-        for (int i = 0; i < blockPath.length(); ++i)
-            record.blockRefPath.push_back(handleOfId(blockPath.at(i)));
-
-        AcDMMNode node;
-        record.dmmNodeId = pInfo->GetCurrentEntityNode(node, blockPath)
-            ? node.nodeNumber() : 0;
-
-        // The SDK explicitly exposes flush() to synchronize the entity callback
-        // with the plot driver.  Read graphics only after that barrier; an empty
-        // array then remains honest evidence rather than a timing artefact.
-        pInfo->flush();
-        const AcArray<long>& graphicIds = pInfo->getGraphicIDs();
-        for (int i = 0; i < graphicIds.length(); ++i)
-            record.graphicIds.push_back(graphicIds.at(i));
-        record.graphicIdObserved = graphicIds.length() > 0;
-
-        ++mTargetCallbacks;
-        if (record.graphicIdObserved)
-            ++mGraphicIdCallbacks;
-        mRecords.push_back(record);
-    }
-
-    int beginSheets() const { return mBeginSheets; }
-    int endSheets() const { return mEndSheets; }
-    int beginEntities() const { return mBeginEntities; }
-    int endEntities() const { return mEndEntities; }
-    int targetCallbacks() const { return mTargetCallbacks; }
-    int graphicIdCallbacks() const { return mGraphicIdCallbacks; }
-    int nodesAssigned() const { return mNodesAssigned; }
-    int nodeAssignmentFailures() const { return mNodeAssignmentFailures; }
-    int propertiesAdded() const { return mPropertiesAdded; }
-    int propertyAssociationFailures() const { return mPropertyAssociationFailures; }
-    const std::string& metadataMode() const { return mMetadataMode; }
-    const std::vector<E2NativeDisplayRecord>& records() const { return mRecords; }
-
-private:
-    std::set<std::string> mTargetLayers;
-    std::string mMetadataMode;
-    std::vector<E2NativeDisplayRecord> mRecords;
-    int mBeginSheets;
-    int mEndSheets;
-    int mBeginEntities;
-    int mEndEntities;
-    int mTargetCallbacks;
-    int mGraphicIdCallbacks;
-    int mNodesAssigned;
-    int mNodeAssignmentFailures;
-    int mPropertiesAdded;
-    int mPropertyAssociationFailures;
-};
-
-class E2NativeDisplayPublishReactor : public AcPublishReactor
-{
-public:
-    E2NativeDisplayPublishReactor(
-        E2NativeDisplayDmmReactor& dmm,
-        ACGLOBADDDMMREACTOR addDmm,
-        ACGLOBREMOVEDMMREACTOR removeDmm)
-        : mDmm(dmm), mAddDmm(addDmm), mRemoveDmm(removeDmm),
-          mDmmRegistered(false), mPublishStarted(false), mPublishEnded(false),
-          mPublishFailed(false)
-    {
-    }
-
-    void OnAboutToBeginPublishing(AcPublishBeginJobInfo*) override
-    {
-        mPublishStarted = true;
-        if (!mDmmRegistered && mAddDmm != nullptr) {
-            // Export resolved from aceplotx.crx: AcGlobAddDMMReactor.
-            mAddDmm(&mDmm);
-            mDmmRegistered = true;
-        }
-    }
-
-    void OnEndPublish(AcPublishReactorInfo*) override
-    {
-        mPublishEnded = true;
-        detachDmm();
-    }
-
-    void OnCancelledOrFailedPublishing(AcPublishReactorInfo*) override
-    {
-        mPublishFailed = true;
-        detachDmm();
-    }
-
-    void detachDmm()
-    {
-        if (mDmmRegistered && mRemoveDmm != nullptr) {
-            // Export resolved from aceplotx.crx: AcGlobRemoveDMMReactor.
-            mRemoveDmm(&mDmm);
-            mDmmRegistered = false;
-        }
-    }
-
-    bool publishStarted() const { return mPublishStarted; }
-    bool publishEnded() const { return mPublishEnded; }
-    bool publishFailed() const { return mPublishFailed; }
-    bool dmmRegistered() const { return mDmmRegistered; }
-
-private:
-    E2NativeDisplayDmmReactor& mDmm;
-    ACGLOBADDDMMREACTOR mAddDmm;
-    ACGLOBREMOVEDMMREACTOR mRemoveDmm;
-    bool mDmmRegistered;
-    bool mPublishStarted;
-    bool mPublishEnded;
-    bool mPublishFailed;
-};
-
-static std::wstring e2NormalizedPath(const std::wstring& value)
-{
-    std::wstring out(value);
-    std::replace(out.begin(), out.end(), L'/', L'\\');
-    std::transform(out.begin(), out.end(), out.begin(), towlower);
-    return out;
-}
-
-static bool e2AllowedOutputPath(const std::wstring& path)
-{
-    const std::wstring normalized = e2NormalizedPath(path);
-    if (normalized.size() < 5 || normalized.substr(normalized.size() - 4) != L".dwf")
-        return false;
-    if (normalized.rfind(L"d:\\runs\\", 0) == 0)
-        return true;
-    if (normalized.find(L"\\runs\\") != std::wstring::npos ||
-        normalized.find(L"\\staging\\") != std::wstring::npos)
-        return true;
-    wchar_t tempPath[MAX_PATH] = {};
-    const DWORD tempLength = GetTempPathW(MAX_PATH, tempPath);
-    if (tempLength > 0 && tempLength < MAX_PATH) {
-        const std::wstring normalizedTemp = e2NormalizedPath(std::wstring(tempPath));
-        if (normalized.rfind(normalizedTemp, 0) == 0)
-            return true;
-    }
-    return false;
-}
-
-static HMODULE e2LoadAcadModule(const wchar_t* moduleName)
-{
-    HMODULE module = GetModuleHandleW(moduleName);
-    if (module != nullptr)
-        return module;
-    if (!acrxLoadModule(moduleName, 0))
-        return nullptr;
-    return GetModuleHandleW(moduleName);
-}
-
-static void e2EmitStringArray(std::ostringstream& r, const std::vector<std::string>& values)
-{
-    r << "[";
-    for (size_t i = 0; i < values.size(); ++i) {
-        if (i > 0) r << ",";
-        r << "\"" << jsonEscape(values[i]) << "\"";
-    }
-    r << "]";
-}
-
-static void e2EmitLongArray(std::ostringstream& r, const std::vector<long>& values)
-{
-    r << "[";
-    for (size_t i = 0; i < values.size(); ++i) {
-        if (i > 0) r << ",";
-        r << values[i];
-    }
-    r << "]";
-}
-
-static void e2EmitDisplayResult(
-    std::ostringstream& r,
-    const std::string& drawingPath,
-    const std::string& outputPath,
-    const std::vector<std::string>& targetLayers,
-    const E2NativeDisplayDmmReactor& dmm,
-    const E2NativeDisplayPublishReactor& publish)
-{
-    std::map<std::string, int> callbackCount;
-    std::map<std::string, int> graphicIdCount;
-    std::set<std::string> seenPlacementKeys;
-    int duplicatePlacementRecords = 0;
-    int compoundGraphicIdRecords = 0;
-
-    for (const E2NativeDisplayRecord& record : dmm.records()) {
-        ++callbackCount[record.matchedTargetLayer];
-        if (record.graphicIdObserved) {
-            ++graphicIdCount[record.matchedTargetLayer];
-            if (record.entityClass != "AcDbLine")
-                ++compoundGraphicIdRecords;
-        }
-        std::ostringstream key;
-        key << record.uniqueEntityId << "|" << record.sourceHandle;
-        for (const std::string& step : record.blockRefPath)
-            key << "|" << step;
-        if (!seenPlacementKeys.insert(key.str()).second)
-            ++duplicatePlacementRecords;
-    }
-
-    r << "\"result\":{";
-    r << "\"schema\":\"ariadne.e2.native_display_probe_raw.v1\"";
-    r << ",\"probe\":\"autocad.dwf_dmm_graphic_id.v1\"";
-    r << ",\"measurement_granularity\":\"entity_instance\"";
-    r << ",\"metadata_mode\":\"" << jsonEscape(dmm.metadataMode()) << "\"";
-    r << ",\"native_visibility_resolved\":false";
-    r << ",\"membership_status\":\""
-      << (dmm.graphicIdCallbacks() > 0 ? "entity_graphic_ids_observed" : "inconclusive_all_graphic_ids_empty")
-      << "\"";
-    r << ",\"compound_entity_subsegments_resolved\":false";
-    r << ",\"drawing_path\":\"" << jsonEscape(drawingPath) << "\"";
-    r << ",\"output_path\":\"" << jsonEscape(outputPath) << "\"";
-    r << ",\"publish_started\":" << (publish.publishStarted() ? "true" : "false");
-    r << ",\"publish_ended\":" << (publish.publishEnded() ? "true" : "false");
-    r << ",\"publish_failed\":" << (publish.publishFailed() ? "true" : "false");
-    r << ",\"begin_sheet_callbacks\":" << dmm.beginSheets();
-    r << ",\"end_sheet_callbacks\":" << dmm.endSheets();
-    r << ",\"begin_entity_callbacks\":" << dmm.beginEntities();
-    r << ",\"end_entity_callbacks\":" << dmm.endEntities();
-    r << ",\"target_entity_callbacks\":" << dmm.targetCallbacks();
-    r << ",\"target_callbacks_with_graphic_ids\":" << dmm.graphicIdCallbacks();
-    r << ",\"graphic_id_probe_all_empty\":"
-      << (dmm.targetCallbacks() > 0 && dmm.graphicIdCallbacks() == 0 ? "true" : "false");
-    r << ",\"dmm_nodes_assigned\":" << dmm.nodesAssigned();
-    r << ",\"dmm_node_assignment_failures\":" << dmm.nodeAssignmentFailures();
-    r << ",\"dmm_properties_added\":" << dmm.propertiesAdded();
-    r << ",\"dmm_property_association_failures\":"
-      << dmm.propertyAssociationFailures();
-    r << ",\"duplicate_placement_records\":" << duplicatePlacementRecords;
-    r << ",\"compound_callbacks_with_graphic_ids\":" << compoundGraphicIdRecords;
-    r << ",\"target_layers\":";
-    e2EmitStringArray(r, targetLayers);
-    r << ",\"layer_summary\":[";
-    for (size_t i = 0; i < targetLayers.size(); ++i) {
-        if (i > 0) r << ",";
-        const std::string& layer = targetLayers[i];
-        r << "{\"layer\":\"" << jsonEscape(layer) << "\"";
-        r << ",\"entity_callbacks\":" << callbackCount[layer];
-        r << ",\"callbacks_with_graphic_ids\":" << graphicIdCount[layer] << "}";
-    }
-    r << "]";
-    r << ",\"records\":[";
-    const std::vector<E2NativeDisplayRecord>& records = dmm.records();
-    for (size_t i = 0; i < records.size(); ++i) {
-        if (i > 0) r << ",";
-        const E2NativeDisplayRecord& record = records[i];
-        r << "{\"unique_entity_id\":\"" << jsonEscape(record.uniqueEntityId) << "\"";
-        r << ",\"source_handle\":\"" << jsonEscape(record.sourceHandle) << "\"";
-        r << ",\"entity_class\":\"" << jsonEscape(record.entityClass) << "\"";
-        r << ",\"source_layer\":\"" << jsonEscape(record.sourceLayer) << "\"";
-        r << ",\"effective_layer\":\"" << jsonEscape(record.effectiveLayer) << "\"";
-        r << ",\"matched_target_layer\":\""
-          << jsonEscape(record.matchedTargetLayer) << "\"";
-        r << ",\"block_ref_path\":";
-        e2EmitStringArray(r, record.blockRefPath);
-        r << ",\"dmm_node_id\":" << record.dmmNodeId;
-        r << ",\"graphic_ids\":";
-        e2EmitLongArray(r, record.graphicIds);
-        r << ",\"graphic_id_observed\":"
-          << (record.graphicIdObserved ? "true" : "false") << "}";
-    }
-    r << "]},\"status\":\"ok\"}";
-}
-
-static void runE2NativeDisplayOracle(
-    const std::string& job,
-    AcDbDatabase* pDb,
-    const std::string& ctxHostMode,
-    std::ostringstream& r)
-{
-    if (ctxHostMode != "full_autocad") {
-        emitNativeError(r, "ATTENDED_HOST_REQUIRED",
-                        "DWF/DMM display membership requires a dedicated full AutoCAD host");
-        return;
-    }
-
-    const std::vector<std::string> targetLayers = jsonFindStringArray(job, "target_layers");
-    if (targetLayers.empty()) {
-        emitNativeError(r, "TARGET_LAYERS_REQUIRED", "target_layers must contain at least one layer");
-        return;
-    }
-    std::set<std::string> uniqueLayers(targetLayers.begin(), targetLayers.end());
-    if (uniqueLayers.size() != targetLayers.size()) {
-        emitNativeError(r, "DUPLICATE_TARGET_LAYER", "target_layers must be unique");
-        return;
-    }
-
-    std::string metadataMode = "set_current_node_only";
-    jsonFindString(job, "metadata_mode", metadataMode);
-    if (metadataMode != "set_current_node_only" &&
-        metadataMode != "set_current_node_with_properties" &&
-        metadataMode != "official_metadata") {
-        emitNativeError(
-            r,
-            "METADATA_MODE_INVALID",
-            "metadata_mode must be set_current_node_only, "
-            "set_current_node_with_properties, or official_metadata");
-        return;
-    }
-
-    std::string outputPathUtf8;
-    if (!jsonFindString(job, "output_path", outputPathUtf8) || outputPathUtf8.empty()) {
-        emitNativeError(r, "OUTPUT_PATH_REQUIRED", "output_path is required");
-        return;
-    }
-    const std::wstring outputPath = utf8ToWide(outputPathUtf8);
-    if (!e2AllowedOutputPath(outputPath)) {
-        emitNativeError(r, "OUTPUT_PATH_NOT_ALLOWED",
-                        "output_path must be a new .dwf under runs, staging, or the temporary directory");
-        return;
-    }
-    if (GetFileAttributesW(outputPath.c_str()) != INVALID_FILE_ATTRIBUTES) {
-        emitNativeError(r, "OUTPUT_ALREADY_EXISTS", "refusing to overwrite an existing DWF artifact");
-        return;
-    }
-
-    const ACHAR* rawDrawingPath = nullptr;
-    if (pDb == nullptr || pDb->getFilename(rawDrawingPath) != Acad::eOk ||
-        rawDrawingPath == nullptr || rawDrawingPath[0] == 0) {
-        emitNativeError(r, "DRAWING_PATH_UNRESOLVED", "working database has no file-backed drawing path");
-        return;
-    }
-    const std::wstring drawingPath(rawDrawingPath);
-    if (e2NormalizedPath(drawingPath) == e2NormalizedPath(outputPath)) {
-        emitNativeError(r, "OUTPUT_EQUALS_DRAWING", "DWF output must not replace the staged DWG");
-        return;
-    }
-    const size_t outputSlash = outputPath.find_last_of(L"\\/");
-    const size_t outputDot = outputPath.find_last_of(L'.');
-    const size_t outputStemStart = outputSlash == std::wstring::npos ? 0 : outputSlash + 1;
-    const size_t outputStemLength =
-        outputDot != std::wstring::npos && outputDot > outputStemStart
-        ? outputDot - outputStemStart : std::wstring::npos;
-    const std::wstring outputStem = outputPath.substr(outputStemStart, outputStemLength);
-    if (outputStem.empty()) {
-        emitNativeError(r, "OUTPUT_NAME_INVALID", "output_path must contain a DWF file name");
-        return;
-    }
-
-    HMODULE publishModule = e2LoadAcadModule(L"AcPublish.crx");
-    HMODULE dmmModule = e2LoadAcadModule(L"AcEPlotX.crx");
-    if (publishModule == nullptr || dmmModule == nullptr) {
-        emitNativeError(r, "PUBLISH_MODULE_LOAD_FAILED",
-                        "AcPublish.crx and AcEPlotX.crx must both load in the attended host");
-        return;
-    }
-
-    ACGLOBADDPUBLISHREACTOR addPublish = reinterpret_cast<ACGLOBADDPUBLISHREACTOR>(
-        GetProcAddress(publishModule, "AcGlobAddPublishReactor"));
-    ACGLOBREMOVEPUBLISHREACTOR removePublish = reinterpret_cast<ACGLOBREMOVEPUBLISHREACTOR>(
-        GetProcAddress(publishModule, "AcGlobRemovePublishReactor"));
-    ACGLOBADDDMMREACTOR addDmm = reinterpret_cast<ACGLOBADDDMMREACTOR>(
-        GetProcAddress(dmmModule, "AcGlobAddDMMReactor"));
-    ACGLOBREMOVEDMMREACTOR removeDmm = reinterpret_cast<ACGLOBREMOVEDMMREACTOR>(
-        GetProcAddress(dmmModule, "AcGlobRemoveDMMReactor"));
-    E2ACPLPUBLISHEXECUTE publishExecute = reinterpret_cast<E2ACPLPUBLISHEXECUTE>(
-        GetProcAddress(publishModule, "acplPublishExecute"));
-    if (addPublish == nullptr || removePublish == nullptr || addDmm == nullptr ||
-        removeDmm == nullptr || publishExecute == nullptr) {
-        emitNativeError(r, "PUBLISH_REACTOR_EXPORT_MISSING",
-                        "required AcPublish or AcEPlotX reactor exports are unavailable");
-        return;
-    }
-
-    AcDbLayoutManager* layoutManager = acdbHostApplicationServices()->layoutManager();
-    AcString layoutName;
-    if (layoutManager == nullptr ||
-        layoutManager->getActiveLayoutName(layoutName, true, pDb) != Acad::eOk ||
-        layoutName.isEmpty()) {
-        emitNativeError(r, "ACTIVE_LAYOUT_UNRESOLVED", "could not resolve the active layout");
-        return;
-    }
-
-    AcPlPlotConfig* plotConfig = nullptr;
-    AcPlPlotConfigManager* configManager = acplPlotConfigManager;
-    const ACHAR* deviceName = configManager != nullptr
-        ? configManager->getStdConfigName(AcPlPlotConfigManager::kDWF6ePlot) : nullptr;
-    if (configManager == nullptr || deviceName == nullptr ||
-        configManager->setCurrentConfig(plotConfig, deviceName) != Acad::eOk ||
-        plotConfig == nullptr) {
-        emitNativeError(r, "DWF_PLOT_CONFIG_UNAVAILABLE", "DWF6 ePlot configuration is unavailable");
-        return;
-    }
-    plotConfig->setPlotToFile(true);
-
-    AcPlDSDEntry entry;
-    entry.setDwgName(drawingPath.c_str());
-    entry.setLayout(layoutName.constPtr());
-    // kSingleDWF derives the produced leaf from the sheet title even when
-    // destinationName is populated.  Bind the title to the requested output
-    // stem so the artifact path and the hash-bound receipt cannot diverge.
-    entry.setTitle(outputStem.c_str());
-    entry.setSetupType(AcPlDSDEntry::kOriginalPS);
-
-    AcPlDSDEntries entries;
-    entries.append(entry);
-    AcPlDSDData dsd;
-    dsd.setDSDEntries(entries);
-    dsd.setDestinationName(outputPath.c_str());
-    if (outputSlash != std::wstring::npos)
-        dsd.setProjectPath(outputPath.substr(0, outputSlash).c_str());
-    dsd.setSheetType(AcPlDSDEntry::kSingleDWF);
-    dsd.setIsHomogeneous(true);
-    dsd.setNoOfCopies(1);
-    dsd.setViewFile(false);
-    dsd.setPlotStampOn(false);
-    dsd.setPromptForDwfName(false);
-    dsd.setInitializeLayouts(false);
-
-    E2NativeDisplayDmmReactor dmm(targetLayers, metadataMode);
-    E2NativeDisplayPublishReactor publish(dmm, addDmm, removeDmm);
-    addPublish(&publish);
-    bool publishCallReturned = false;
-    try {
-        publishExecute(dsd, plotConfig, false);
-        publishCallReturned = true;
-    }
-    catch (...) {
-        publish.detachDmm();
-        removePublish(&publish);
-        delete plotConfig;
-        emitNativeError(r, "PUBLISH_EXECUTION_EXCEPTION", "acplPublishExecute raised an exception");
-        return;
-    }
-    publish.detachDmm();
-    removePublish(&publish);
-    delete plotConfig;
-
-    if (!publishCallReturned || !publish.publishStarted() ||
-        dmm.beginSheets() <= 0 || dmm.endSheets() <= 0 || dmm.endEntities() <= 0) {
-        emitNativeError(r, "DMM_REACTOR_NOT_FIRED",
-                        "publish returned without a complete DMM sheet/entity callback trace");
-        return;
-    }
-    if (publish.publishFailed()) {
-        emitNativeError(r, "PUBLISH_FAILED", "AutoCAD reported cancelled or failed publishing");
-        return;
-    }
-    if (GetFileAttributesW(outputPath.c_str()) == INVALID_FILE_ATTRIBUTES) {
-        emitNativeError(r, "DWF_OUTPUT_MISSING", "publish callbacks fired but the DWF artifact is missing");
-        return;
-    }
-
-    e2EmitDisplayResult(
-        r,
-        wideToUtf8(drawingPath),
-        outputPathUtf8,
-        targetLayers,
-        dmm,
-        publish);
 }
