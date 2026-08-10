@@ -20,6 +20,7 @@ Exposes the CAD OS Layer as a small set of agent-callable tools:
     cad.anchor_clear       -> cadctl.Cad().anchor_clear(dwg, handle, out, author_agent)
     cad.diff_before_after  -> cad_diff.compute_diff(pre_ir, post_ir)  [two IR paths]
     cad.visual_report      -> visual_report.build_visual_report(source_ref, kind)
+    cad.inspect_display_membership -> full-AutoCAD/ObjectARX XCLIP membership on a staged copy
     cad.live_status        -> truthful liveness probe (live ARX pump not attached)
     cad.run_command_template -> cadctl.Cad().run_command_template(template_id, slots, dwg)
 
@@ -60,6 +61,10 @@ SERVER_NAME = "cadagent-mcp"
 SERVER_VERSION = "0.1.0"
 TRANSPORT = "mock"  # stdlib JSON-RPC-over-stdio; not a 3rd-party MCP lib
 PROTOCOL_VERSION = "2025-06-18"  # MCP spec revision this server speaks
+DISPLAY_MEMBERSHIP_GEOMETRY_SCOPES = {
+    "strict_layer_entities_v1",
+    "linear_segments_v1",
+}
 
 
 # --------------------------------------------------------------------------- #
@@ -497,6 +502,41 @@ def _tool_run_operation(args: Dict[str, Any]) -> Dict[str, Any]:
         return _err("cadctl.run_operation failed: %r" % exc)
 
 
+def _tool_inspect_display_membership(args: Dict[str, Any]) -> Dict[str, Any]:
+    """Run the experiment-only native display-membership oracle.
+
+    The cadctl shell owns staging, full-AutoCAD-only execution, hash binding and
+    the no-headless-fallback gate. This MCP handler only validates/forwards args.
+    """
+    dwg = args.get("dwg") or args.get("dwg_path")
+    layers = args.get("target_layers")
+    if not dwg:
+        return _err("missing required arg: dwg")
+    if not isinstance(layers, list) or not layers:
+        return _err("missing required arg: target_layers")
+    geometry_scope = args.get("geometry_scope", "strict_layer_entities_v1")
+    if (
+        not isinstance(geometry_scope, str)
+        or geometry_scope not in DISPLAY_MEMBERSHIP_GEOMETRY_SCOPES
+    ):
+        return _err(
+            "geometry_scope must be strict_layer_entities_v1 or linear_segments_v1"
+        )
+    cad, error = _cad()
+    if cad is None:
+        return _err(error, delegate="cadctl.Cad.inspect_display_membership")
+    try:
+        return {"ok": True, "result": cad.inspect_display_membership(
+            dwg,
+            layers,
+            args.get("out") or args.get("out_dir"),
+            geometry_scope=geometry_scope,
+            timeout=int(args.get("timeout", 240)),
+        )}
+    except Exception as exc:  # noqa: BLE001
+        return _err("cadctl.inspect_display_membership failed: %r" % exc)
+
+
 def _tool_run_command_template(args: Dict[str, Any]) -> Dict[str, Any]:
     """Run a governed command template through command_template_engine.
 
@@ -806,6 +846,36 @@ _TOOLS: List[Dict[str, Any]] = [
         },
     },
     {
+        "name": "cad.inspect_display_membership",
+        "description": "Resolve target LINE/LWPOLYLINE segment membership through an experiment-only "
+                       "dedicated full AutoCAD/ObjectARX run. The shell stages a copy, forbids a "
+                       "headless fallback, verifies the source hash, and emits a hash-bound target "
+                       "population oracle only after native conservation succeeds.",
+        "delegates_to": "cadctl.Cad.inspect_display_membership",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "dwg": {"type": "string", "description": "Read-only source DWG; a copy is staged."},
+                "target_layers": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": True,
+                    "items": {"type": "string", "minLength": 1},
+                },
+                "out": {"type": "string", "description": "Fresh run directory."},
+                "geometry_scope": {
+                    "type": "string",
+                    "enum": ["strict_layer_entities_v1", "linear_segments_v1"],
+                    "default": "strict_layer_entities_v1",
+                    "description": "Strictly require only LINE/straight LWPOLYLINE, or include only linear segments while accounting for excluded curved and unsupported targets.",
+                },
+                "timeout": {"type": "integer", "minimum": 1, "default": 240},
+            },
+            "required": ["dwg", "target_layers"],
+            "additionalProperties": False,
+        },
+    },
+    {
         "name": "cad.run_command_template",
         "description": "Run a governed built-in AutoCAD command template (for example AUDIT "
                        "or -PURGE) through command_template_engine. Agents supply only a "
@@ -848,6 +918,7 @@ _DISPATCH: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "cad.visual_report": _tool_visual_report,
     "cad.live_status": _tool_live_status,
     "cad.run_operation": _tool_run_operation,
+    "cad.inspect_display_membership": _tool_inspect_display_membership,
     "cad.run_command_template": _tool_run_command_template,
 }
 
@@ -876,6 +947,8 @@ def tools_manifest() -> Dict[str, Any]:
             "pump is wired.",
             "cad.run_command_template is the only agent-facing path for governed "
             "built-in command templates; it never accepts a raw command string.",
+            "cad.inspect_display_membership is full-AutoCAD/ObjectARX-only and fails "
+            "closed when the current checkout has no matching attended native build.",
         ],
     }
 
@@ -981,7 +1054,7 @@ _EXPECTED_TOOLS = {
     "cad.patch_dry_run", "cad.patch_apply_staged", "cad.anchor_set",
     "cad.anchor_get", "cad.anchor_list", "cad.anchor_clear", "cad.diff_before_after",
     "cad.visual_report", "cad.live_status", "cad.run_operation",
-    "cad.run_command_template",
+    "cad.run_command_template", "cad.inspect_display_membership",
 }
 
 # Trivial (often invalid/missing) args per tool. The contract: EVERY handler must
@@ -1006,6 +1079,7 @@ _SELFTEST_ARGS: Dict[str, Dict[str, Any]] = {
     "cad.visual_report": {"source_ref": "/nonexistent/source.dwg", "kind": "png"},
     "cad.live_status": {},
     "cad.run_operation": {"op_id": "inspect.database.graph"},  # no dwg -> refusal dict (no accoreconsole)
+    "cad.inspect_display_membership": {},
     "cad.run_command_template": {
         "template_id": "maintenance.drawing.audit",
         "dwg": "/nonexistent/source.dwg",
@@ -1053,7 +1127,7 @@ def _selftest() -> int:
 
     ok = (
         manifest["transport"] == "mock"
-        and len(manifest["tools"]) == 18
+        and len(manifest["tools"]) == len(_EXPECTED_TOOLS)
         and manifest_names == _EXPECTED_TOOLS
         # manifest and dispatch table must agree exactly (no orphan tools).
         and set(_DISPATCH.keys()) == manifest_names

@@ -60,6 +60,20 @@ def test_native_build_script_verifies_artifacts_under_requested_platform_and_con
     assert "bin\\x64\\Release" not in bin_assignment.group(1)
 
 
+def test_router_accepts_prebuilt_only_through_a_committed_exact_set_marker():
+    text = ROUTER.read_text(encoding="utf-8")
+
+    assert "function Test-CommittedNativeDeployment" in text
+    assert "native_deployment_manifest.json" in text
+    assert "ariadne.cad_os.native_deployment_manifest.v1" in text
+    assert "release_build_integrity_bundle" in text
+    assert "Ariadne.AcadNativeDbx.dbx" in text
+    assert "Ariadne.AcadNative.crx" in text
+    assert "Ariadne.AcadNative.arx" in text
+    assert "Get-FileHash -LiteralPath $artifact -Algorithm SHA256" in text
+    assert "Where-Object { Test-CommittedNativeDeployment -DeployDir $_.FullName }" in text
+
+
 def test_arx_shell_loads_dbx_core_before_registering_job_command():
     text = NATIVE_ARX_ENTRY.read_text(encoding="utf-8")
 

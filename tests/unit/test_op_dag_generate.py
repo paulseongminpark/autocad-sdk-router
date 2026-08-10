@@ -23,6 +23,7 @@ import json
 import os
 import sys
 import unittest
+from unittest import mock
 
 _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
@@ -132,6 +133,30 @@ class TestOpDagBuild(unittest.TestCase):
         missing = [(n["op_id"], rel) for n in self.nodes for rel in n["target_files"]
                    if not os.path.isfile(os.path.join(_REPO, rel))]
         self.assertEqual(missing, [], f"target_files must resolve to real files: {missing[:10]}")
+
+    def test_path_extraction_keeps_only_repo_relative_paths(self):
+        cases = {
+            "/dev/tools/op_dag_generate.py": [],
+            "D:/dev/tools/op_dag_generate.py": [],
+            r"D:\dev\tools\op_dag_generate.py": [],
+            r"\\server\share\tools\op_dag_generate.py": [],
+            r'"D:\Program Files\Vendor\plugin.py"': [],
+            r"D:\Program Files\Vendor\plugin.py": [],
+            r'"\\server\shared folder\Vendor\plugin.py"': [],
+            r"\\server\shared folder\Vendor\plugin.py": [],
+            '"tools/op_dag_generate.py"': ["tools/op_dag_generate.py"],
+            "tools/op_dag_generate.py": ["tools/op_dag_generate.py"],
+            r'"tools\op_dag_generate.py"': ["tools/op_dag_generate.py"],
+            r"tools\op_dag_generate.py": ["tools/op_dag_generate.py"],
+            r'".\tools\op_dag_generate.py"': ["tools/op_dag_generate.py"],
+            r".\tools\op_dag_generate.py": ["tools/op_dag_generate.py"],
+            (r"D:\Program Files\Vendor\plugin.py and "
+             "tools/op_dag_generate.py"): ["tools/op_dag_generate.py"],
+        }
+        with mock.patch.object(odg.os.path, "isfile", return_value=True):
+            for text, expected in cases.items():
+                with self.subTest(text=text):
+                    self.assertEqual(odg._extract_existing_files(text), expected)
 
     def test_target_files_are_sorted_and_deduped(self):
         bad = [n["op_id"] for n in self.nodes

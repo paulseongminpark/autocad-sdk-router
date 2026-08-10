@@ -125,8 +125,14 @@ _JSON_ENCODING = "utf-8-sig"
 GEOMETRY_FAMILIES = {"entities", "brep_solids", "geometry_kernel"}
 
 # repo-relative-looking path tokens ending in one of these extensions, pulled
-# out of free-text registry fields (citation / evidence_refs / tests).
-_PATH_TOKEN_RE = re.compile(r"[A-Za-z0-9_./\\-]+\.(?:py|ps1|cs|inc|h|cpp|json|md)\b")
+# out of free-text registry fields (citation / evidence_refs / tests). The
+# absolute-path branch comes first and consumes spaces through the filename so
+# a suffix after the final space cannot be re-read as a relative path.
+_PATH_TOKEN_RE = re.compile(
+    r"(?<![A-Za-z0-9_.-])(?:"
+    r"(?:[A-Za-z]:[\\/]|[\\/]{2}|/)[A-Za-z0-9_.-][^\"'`\r\n]*?"
+    r"|[A-Za-z0-9_./\\-]+)"
+    r"\.(?:py|ps1|cs|inc|h|cpp|json|md)\b(?![\\/])")
 
 # .gitignore's "Large, regenerable run + staging evidence" roots: never
 # committed, so their on-disk presence varies per worktree. A citation /
@@ -217,7 +223,11 @@ def _extract_existing_files(*texts: Optional[str]) -> List[str]:
         if not text:
             continue
         for tok in _PATH_TOKEN_RE.findall(text):
-            cand = tok.strip(".").replace("\\", "/")
+            cand = tok.replace("\\", "/")
+            if cand.startswith("./"):
+                cand = cand[2:]
+            if cand.startswith("/") or re.match(r"^[A-Za-z]:/", cand):
+                continue
             if cand.startswith(_WORKTREE_VARIABLE_ROOTS):
                 continue
             if cand not in found and os.path.isfile(os.path.join(ROOT, cand)):

@@ -25,9 +25,11 @@ Discoverable by pytest and ``python -m unittest discover -s tests``. Stdlib only
 from __future__ import annotations
 
 import json
+import io
 import os
 import sys
 import unittest
+from contextlib import redirect_stdout
 
 _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
@@ -41,7 +43,7 @@ _EXPECTED_TOOLS = {
     "cad.patch_dry_run", "cad.patch_apply_staged", "cad.anchor_set",
     "cad.anchor_get", "cad.anchor_list", "cad.anchor_clear", "cad.diff_before_after",
     "cad.visual_report", "cad.live_status", "cad.run_operation",
-    "cad.run_command_template",
+    "cad.run_command_template", "cad.inspect_display_membership",
 }
 
 # Trivial args per tool: deliberately minimal/invalid so handlers report a
@@ -67,6 +69,7 @@ _TRIVIAL_ARGS = {
     "cad.run_operation": {"op_id": "inspect.database.graph"},
     # nonexistent dwg -> run_command_template returns a refusal dict; no accoreconsole.
     "cad.run_command_template": {"template_id": "maintenance.drawing.audit", "dwg": "/nonexistent/source.dwg", "slots": {}},
+    "cad.inspect_display_membership": {},
 }
 
 
@@ -94,6 +97,11 @@ class TestToolsManifest(unittest.TestCase):
         self.assertEqual(set(self.mcp._DISPATCH.keys()), names,
                          "dispatch table and manifest disagree (orphan tool)")
 
+    def test_module_selftest_tracks_the_declared_tool_set(self):
+        with redirect_stdout(io.StringIO()):
+            result = self.mcp._selftest()
+        self.assertEqual(result, 0)
+
     def test_every_tool_declares_a_delegate(self):
         # Each tool must delegate to a shell (no raw-SDK tool).
         for t in self.manifest["tools"]:
@@ -105,6 +113,46 @@ class TestToolsManifest(unittest.TestCase):
         for t in self.manifest["tools"]:
             self.assertIn("inputSchema", t, "tool %s missing inputSchema" % t["name"])
             self.assertEqual(t["inputSchema"].get("type"), "object")
+
+    def test_display_membership_geometry_scope_is_closed_and_forwarded(self):
+        tool = next(
+            item for item in self.manifest["tools"]
+            if item["name"] == "cad.inspect_display_membership"
+        )
+        scope = tool["inputSchema"]["properties"]["geometry_scope"]
+        self.assertEqual(
+            scope["enum"], ["strict_layer_entities_v1", "linear_segments_v1"]
+        )
+        self.assertEqual(scope["default"], "strict_layer_entities_v1")
+
+        invalid = self.mcp._tool_inspect_display_membership({
+            "dwg": "source.dwg",
+            "target_layers": ["W1"],
+            "geometry_scope": "curve_segments_v1",
+        })
+        self.assertFalse(invalid["ok"])
+        self.assertIn("geometry_scope", invalid["error"])
+
+        calls = []
+
+        class FakeCad:
+            def inspect_display_membership(self, *args, **kwargs):
+                calls.append((args, kwargs))
+                return {"status": "NEEDS_BUILD"}
+
+        original_cad = self.mcp._cad
+        self.mcp._cad = lambda: (FakeCad(), None)
+        try:
+            forwarded = self.mcp._tool_inspect_display_membership({
+                "dwg": "source.dwg",
+                "target_layers": ["W1"],
+                "geometry_scope": "linear_segments_v1",
+            })
+        finally:
+            self.mcp._cad = original_cad
+
+        self.assertTrue(forwarded["ok"])
+        self.assertEqual(calls[0][1]["geometry_scope"], "linear_segments_v1")
 
 
 class TestHandlerDispatchReturnsDict(unittest.TestCase):

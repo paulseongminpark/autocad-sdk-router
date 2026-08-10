@@ -61,23 +61,332 @@ $LatestStatusPath = Join-Path $RouterHome 'reports\autocad_router_status_latest.
 $RunsDir = Join-Path $RouterHome 'runs'
 $StagingDir = Join-Path $RouterHome 'staging'
 $NativeExtractorProject = Join-Path $RouterHome 'src\Ariadne.DwgGeometryExtractor\Ariadne.DwgGeometryExtractor.csproj'
-$NativeAcadBinDir = if (-not [string]::IsNullOrWhiteSpace($env:ARIADNE_NATIVE_ACAD_BIN_DIR)) {
-  $env:ARIADNE_NATIVE_ACAD_BIN_DIR
-}
-else {
-  # Distribution-first: a cloned repo ships compiled native modules under
-  # prebuilt\<acad-version>\ (committed). Pick the highest version dir that actually
-  # contains the headless .crx. Maintainers testing a FRESH local build set
-  # $env:ARIADNE_NATIVE_ACAD_BIN_DIR to the build output. Final fallback = build output.
-  $prebuiltRoot = Join-Path $RouterHome 'prebuilt'
-  $picked = $null
-  if (Test-Path -LiteralPath $prebuiltRoot) {
-    $picked = Get-ChildItem -LiteralPath $prebuiltRoot -Directory -ErrorAction SilentlyContinue |
-      Sort-Object Name -Descending |
-      Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName 'Ariadne.AcadNative.crx') } |
-      Select-Object -First 1
+
+# NATIVE_DEPLOYMENT_CONSUMER_BEGIN
+$script:NativeDeploymentLeaves = @(
+  'Ariadne.AcadNativeDbx.dbx',
+  'Ariadne.AcadNative.crx',
+  'Ariadne.AcadNative.arx'
+)
+
+function Get-Sha256File {
+  param([string]$Path)
+  $stream = [System.IO.File]::Open($Path, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::Read)
+  $sha = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    -join ($sha.ComputeHash($stream) | ForEach-Object { $_.ToString('x2') })
+  } finally {
+    $sha.Dispose()
+    $stream.Dispose()
   }
-  if ($picked) { $picked.FullName } else { Join-Path $RouterHome 'src\Ariadne.AcadNative\bin\x64\Release' }
+}
+
+function Get-Sha256Text {
+  param([string]$Text)
+  $encoding = New-Object System.Text.UTF8Encoding($false)
+  $sha = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    $bytes = $encoding.GetBytes($Text)
+    -join ($sha.ComputeHash($bytes) | ForEach-Object { $_.ToString('x2') })
+  } finally {
+    $sha.Dispose()
+  }
+}
+
+function Test-NativeBuildOutputPart {
+  param([string]$Part)
+  $normalized = $Part.ToLowerInvariant()
+  return (
+    $normalized -in @('bin', 'obj', '.vs', 'build') -or
+    $normalized.StartsWith('obj-') -or
+    $normalized.StartsWith('obj_')
+  )
+}
+
+function Get-NativeSourceInputs {
+  $roots = @(
+    (Join-Path $RouterHome 'src\Ariadne.AcadNative'),
+    (Join-Path $RouterHome 'src\Ariadne.AcadNativeDbx')
+  )
+  $inputs = @()
+  foreach ($root in $roots) {
+    if (-not (Test-Path -LiteralPath $root -PathType Container)) {
+      throw "Native source root missing: $root"
+    }
+    $rootItem = Get-Item -LiteralPath $root -Force
+    if (($rootItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+      throw "Native source root is a reparse point: $root"
+    }
+    $pending = New-Object System.Collections.Queue
+    $pending.Enqueue($rootItem.FullName)
+    while ($pending.Count -gt 0) {
+      $current = $pending.Dequeue()
+      foreach ($entry in (Get-ChildItem -LiteralPath $current -Force)) {
+        if (($entry.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+          throw "Native source tree contains a reparse point: $($entry.FullName)"
+        }
+        if ($entry.PSIsContainer) {
+          if (-not (Test-NativeBuildOutputPart $entry.Name)) {
+            $pending.Enqueue($entry.FullName)
+          }
+          continue
+        }
+        $relative = $entry.FullName.Substring($RouterHome.Length).TrimStart('\', '/') -replace '\\', '/'
+        $inputs += [ordered]@{
+          path = $relative
+          sha256 = Get-Sha256File -Path $entry.FullName
+          bytes = [int64]$entry.Length
+        }
+      }
+    }
+  }
+  $inputs = @($inputs | Sort-Object @{ Expression = { $_.path.ToLowerInvariant() } }, @{ Expression = { $_.path } })
+  if ($inputs.Count -eq 0) { throw 'Native source input inventory is empty.' }
+  return $inputs
+}
+
+function Get-NativeSourceDigest {
+  param([object[]]$Inputs)
+  $builder = New-Object System.Text.StringBuilder
+  foreach ($input in $Inputs) {
+    [void]$builder.Append([string]$input.path)
+    [void]$builder.Append([char]0)
+    [void]$builder.Append([string]$input.sha256)
+    [void]$builder.Append([char]0)
+    [void]$builder.Append([string]$input.bytes)
+    [void]$builder.Append("`n")
+  }
+  Get-Sha256Text $builder.ToString()
+}
+
+function Get-NativeLockedStreamSha256 {
+  param([System.IO.FileStream]$Stream)
+  $sha = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    $Stream.Position = 0
+    $digest = -join ($sha.ComputeHash($Stream) | ForEach-Object { $_.ToString('x2') })
+    $Stream.Position = 0
+    return $digest
+  } finally {
+    $sha.Dispose()
+  }
+}
+
+function Read-NativeLockedUtf8Text {
+  param([System.IO.FileStream]$Stream)
+  if ($Stream.Length -le 0 -or $Stream.Length -gt 8MB) {
+    throw "Native manifest size is outside the accepted range: $($Stream.Length)"
+  }
+  $Stream.Position = 0
+  $buffer = New-Object byte[] ([int]$Stream.Length)
+  $offset = 0
+  while ($offset -lt $buffer.Length) {
+    $read = $Stream.Read($buffer, $offset, $buffer.Length - $offset)
+    if ($read -le 0) { throw 'Native manifest ended before its declared length.' }
+    $offset += $read
+  }
+  $Stream.Position = 0
+  return (New-Object System.Text.UTF8Encoding($false, $true)).GetString($buffer)
+}
+
+function Test-NativeLockedX64Pe32Plus {
+  param([System.IO.FileStream]$Stream)
+  if ($Stream.Length -lt 512) { return $false }
+  $reader = New-Object System.IO.BinaryReader($Stream, (New-Object System.Text.UTF8Encoding($false)), $true)
+  try {
+    $Stream.Position = 0
+    if ($reader.ReadByte() -ne 0x4D -or $reader.ReadByte() -ne 0x5A) { return $false }
+    $Stream.Position = 0x3C
+    $peOffset = $reader.ReadInt32()
+    if ($peOffset -lt 0x40 -or ([int64]$peOffset + 26) -gt $Stream.Length) { return $false }
+    $Stream.Position = $peOffset
+    if ($reader.ReadUInt32() -ne 0x00004550) { return $false }
+    if ($reader.ReadUInt16() -ne 0x8664) { return $false }
+    if ($reader.ReadUInt16() -lt 1) { return $false }
+    $Stream.Position = $peOffset + 20
+    $optionalBytes = $reader.ReadUInt16()
+    if ($optionalBytes -lt 0xF0 -or ([int64]$peOffset + 24 + $optionalBytes) -gt $Stream.Length) { return $false }
+    $Stream.Position = $peOffset + 24
+    return ($reader.ReadUInt16() -eq 0x020B)
+  } finally {
+    $reader.Dispose()
+    $Stream.Position = 0
+  }
+}
+
+function Close-NativeDeploymentLease {
+  param($Lease)
+  if ($null -eq $Lease -or $Lease.closed -eq $true) { return }
+  foreach ($stream in @($Lease.artifact_streams)) {
+    if ($null -ne $stream) { $stream.Dispose() }
+  }
+  if ($null -ne $Lease.manifest_stream) { $Lease.manifest_stream.Dispose() }
+  $Lease.closed = $true
+}
+
+function Open-NativeDeploymentLease {
+  param([string]$BinDir, [string]$ManifestLeaf)
+  if ($ManifestLeaf -cnotin @('native_deployment_manifest.json', 'native_build_manifest.json')) {
+    throw "Unsupported native manifest leaf: $ManifestLeaf"
+  }
+  $lease = [pscustomobject]@{
+    bin_dir = $null
+    manifest_kind = if ($ManifestLeaf -ceq 'native_deployment_manifest.json') { 'deployment' } else { 'build' }
+    manifest_path = $null
+    manifest_stream = $null
+    artifact_streams = New-Object System.Collections.ArrayList
+    artifact_paths = @{}
+    closed = $false
+  }
+  try {
+    $directory = Get-Item -LiteralPath $BinDir -Force -ErrorAction Stop
+    if (-not $directory.PSIsContainer -or
+        ($directory.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+      throw "Native bin directory is missing or a reparse point: $BinDir"
+    }
+    $lease.bin_dir = $directory.FullName
+    $lease.manifest_path = Join-Path $directory.FullName $ManifestLeaf
+    $manifestItem = Get-Item -LiteralPath $lease.manifest_path -Force -ErrorAction Stop
+    if ($manifestItem.PSIsContainer -or
+        ($manifestItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+      throw "Native manifest is not a regular file: $($lease.manifest_path)"
+    }
+    $lease.manifest_stream = [System.IO.File]::Open(
+      $lease.manifest_path,
+      [System.IO.FileMode]::Open,
+      [System.IO.FileAccess]::Read,
+      [System.IO.FileShare]::Read
+    )
+    try {
+      $document = (Read-NativeLockedUtf8Text $lease.manifest_stream) | ConvertFrom-Json
+    } catch {
+      throw "Native manifest is invalid JSON: $($_.Exception.Message)"
+    }
+
+    if ($lease.manifest_kind -ceq 'deployment') {
+      if ([string]$document.schema -cne 'ariadne.cad_os.native_deployment_manifest.v1' -or
+          [string]$document.deployment_state -cne 'committed' -or $document.committed -ne $true) {
+        throw 'Native deployment manifest is not a committed v1 marker.'
+      }
+      $claimedSourceDigest = [string]$document.source_tree_digest
+    } else {
+      if ([string]$document.schema -cne 'ariadne.cad_os.native_build_manifest.v1' -or
+          $document.build_snapshot.exact_match -ne $true) {
+        throw 'Native build manifest is not a finalized exact-snapshot v1 manifest.'
+      }
+      $manifestBin = [System.IO.Path]::GetFullPath([string]$document.load_bin_dir).TrimEnd('\')
+      if (-not [string]::Equals($manifestBin, $directory.FullName.TrimEnd('\'), [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Native build manifest load_bin_dir does not match the requested bin directory.'
+      }
+      $claimedSourceDigest = [string]$document.source_tree.digest
+    }
+    if ([string]$document.claim_scope -cne 'release_build_integrity_bundle' -or
+        [string]$document.build_target -cne 'Rebuild' -or
+        [string]$document.configuration -cne 'Release' -or
+        [string]$document.platform -cne 'x64') {
+      throw 'Native manifest is not a Release|x64 Rebuild integrity bundle.'
+    }
+    $recipePath = Join-Path $RouterHome 'tools\build_native_acad.ps1'
+    if ([string]$document.build_recipe.path -cne 'tools/build_native_acad.ps1' -or
+        [string]$document.build_recipe.sha256 -cne (Get-Sha256File $recipePath)) {
+      throw 'Native manifest does not bind to the current build recipe.'
+    }
+    $sourceInputs = @(Get-NativeSourceInputs)
+    $actualSourceDigest = Get-NativeSourceDigest $sourceInputs
+    if ($claimedSourceDigest -notmatch '^[0-9a-f]{64}$' -or
+        $claimedSourceDigest -cne $actualSourceDigest) {
+      throw 'Native manifest source-tree digest does not match the current native sources.'
+    }
+
+    $allRecords = @($document.artifacts)
+    if ($allRecords.Count -ne $script:NativeDeploymentLeaves.Count) {
+      throw 'Native manifest must contain the exact DBX, CRX, and ARX artifact set.'
+    }
+    foreach ($leaf in $script:NativeDeploymentLeaves) {
+      $records = @($allRecords | Where-Object { [string]$_.leaf -ceq $leaf })
+      if ($records.Count -ne 1) {
+        throw "Native manifest must contain exactly one record for $leaf."
+      }
+      $record = $records[0]
+      $artifactPath = Join-Path $directory.FullName $leaf
+      $artifactItem = Get-Item -LiteralPath $artifactPath -Force -ErrorAction Stop
+      if ($artifactItem.PSIsContainer -or
+          ($artifactItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+        throw "Native artifact is not a regular file: $leaf"
+      }
+      $artifactStream = [System.IO.File]::Open(
+        $artifactPath,
+        [System.IO.FileMode]::Open,
+        [System.IO.FileAccess]::Read,
+        [System.IO.FileShare]::Read
+      )
+      [void]$lease.artifact_streams.Add($artifactStream)
+      $lease.artifact_paths[$leaf] = $artifactPath
+      if ($record.exists -ne $true -or $record.current -ne $true -or
+          $record.pe_verification.verified -ne $true -or
+          [string]$record.pe_verification.machine -cne '0x8664' -or
+          [string]$record.pe_verification.format -cne 'PE32+' -or
+          [int64]$record.bytes -ne [int64]$artifactStream.Length -or
+          [string]$record.sha256 -cne (Get-NativeLockedStreamSha256 $artifactStream) -or
+          -not (Test-NativeLockedX64Pe32Plus $artifactStream)) {
+        throw "Native artifact does not match its verified manifest record: $leaf"
+      }
+    }
+    return $lease
+  } catch {
+    Close-NativeDeploymentLease $lease
+    throw
+  }
+}
+
+function Test-CommittedNativeDeployment {
+  param([string]$DeployDir)
+  $probeLease = $null
+  try {
+    $probeLease = Open-NativeDeploymentLease -BinDir $DeployDir -ManifestLeaf 'native_deployment_manifest.json'
+    return $true
+  } catch {
+    return $false
+  } finally {
+    Close-NativeDeploymentLease $probeLease
+  }
+}
+
+# The superseded unlocked verifier used `Get-FileHash -LiteralPath $artifact -Algorithm SHA256`.
+# The active verifier hashes the already-leased stream so a publisher cannot swap generations.
+# NATIVE_DEPLOYMENT_CONSUMER_END
+
+$script:NativeDeploymentLease = $null
+$NativeAcadBinDir = $null
+$NativeDeploymentError = $null
+if (-not [string]::IsNullOrWhiteSpace($env:ARIADNE_NATIVE_ACAD_BIN_DIR)) {
+  try {
+    $script:NativeDeploymentLease = Open-NativeDeploymentLease -BinDir $env:ARIADNE_NATIVE_ACAD_BIN_DIR `
+      -ManifestLeaf 'native_build_manifest.json'
+    $NativeAcadBinDir = $script:NativeDeploymentLease.bin_dir
+  } catch {
+    $NativeDeploymentError = "Explicit native bin was rejected: $($_.Exception.Message)"
+  }
+} else {
+  $prebuiltRoot = Join-Path $RouterHome 'prebuilt'
+  if (Test-Path -LiteralPath $prebuiltRoot -PathType Container) {
+    $committedCandidates = @(Get-ChildItem -LiteralPath $prebuiltRoot -Directory -ErrorAction SilentlyContinue |
+      Sort-Object Name -Descending |
+      Where-Object { Test-CommittedNativeDeployment -DeployDir $_.FullName })
+    foreach ($candidate in $committedCandidates) {
+      try {
+        $script:NativeDeploymentLease = Open-NativeDeploymentLease -BinDir $candidate.FullName `
+          -ManifestLeaf 'native_deployment_manifest.json'
+        $NativeAcadBinDir = $script:NativeDeploymentLease.bin_dir
+        break
+      } catch {
+        $NativeDeploymentError = "Committed prebuilt '$($candidate.FullName)' was rejected: $($_.Exception.Message)"
+      }
+    }
+  }
+  if ($null -eq $script:NativeDeploymentLease -and [string]::IsNullOrWhiteSpace($NativeDeploymentError)) {
+    $NativeDeploymentError = 'No committed native prebuilt deployment is available.'
+  }
 }
 
 function Read-JsonFile {
@@ -207,11 +516,13 @@ function Resolve-AcadEnginePath {
 
 function Resolve-NativeAcadModule {
   param([string]$LeafName)
-  $path = Join-Path $NativeAcadBinDir $LeafName
-  if (-not (Test-Path -LiteralPath $path)) {
-    throw "Native AutoCAD module missing: $path"
+  if ($null -eq $script:NativeDeploymentLease -or $script:NativeDeploymentLease.closed -eq $true) {
+    throw "Native AutoCAD modules are unavailable: $NativeDeploymentError"
   }
-  return (Resolve-Path -LiteralPath $path).Path
+  if (-not $script:NativeDeploymentLease.artifact_paths.ContainsKey($LeafName)) {
+    throw "Native AutoCAD module is outside the leased exact artifact set: $LeafName"
+  }
+  return [string]$script:NativeDeploymentLease.artifact_paths[$LeafName]
 }
 
 function Get-CadJobOperation {
@@ -394,6 +705,16 @@ function Test-NativeAcadModules {
   param([object]$Capabilities, [bool]$ProbeCoreConsoleLoad = $false)
   $cap = @($Capabilities.routes | Where-Object { $_.id -eq 'dwg_truth_autocad' }) | Select-Object -First 1
   $engine = if ($cap) { Resolve-AcadEnginePath -Default $cap.engine_path } else { Resolve-AcadEnginePath -Default '' }
+  if ($null -eq $script:NativeDeploymentLease -or $script:NativeDeploymentLease.closed -eq $true) {
+    return [ordered]@{
+      status = 'UNAVAILABLE'
+      modules = @()
+      coreconsole_load = [ordered]@{
+        status = 'SKIPPED'
+        detail = $NativeDeploymentError
+      }
+    }
+  }
   $dbx = Join-Path $NativeAcadBinDir 'Ariadne.AcadNativeDbx.dbx'
   $crx = Join-Path $NativeAcadBinDir 'Ariadne.AcadNative.crx'
   $arx = Join-Path $NativeAcadBinDir 'Ariadne.AcadNative.arx'
@@ -1709,9 +2030,10 @@ function Invoke-AutoCadRoute {
 }
 
 # ---- main ----
-$capabilities = Read-JsonFile -Path $ConfigPath
+try {
+  $capabilities = Read-JsonFile -Path $ConfigPath
 
-switch ($Action) {
+  switch ($Action) {
   'status' {
     $status = Get-Status -Capabilities $capabilities -ProbeNativeModules $true
     Write-Json -Payload $status -Path $LatestStatusPath
@@ -1848,4 +2170,7 @@ switch ($Action) {
       capabilities = $capabilities.routes
     })
   }
+  }
+} finally {
+  Close-NativeDeploymentLease $script:NativeDeploymentLease
 }

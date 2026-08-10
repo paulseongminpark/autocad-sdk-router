@@ -1,0 +1,68 @@
+{
+    "schema":  "ariadne.cad_os.native_deployment_manifest.v1",
+    "schema_version":  1,
+    "claim_scope":  "release_build_integrity_bundle",
+    "deployment_state":  "committed",
+    "committed":  true,
+    "build_target":  "Rebuild",
+    "configuration":  "Release",
+    "platform":  "x64",
+    "build_recipe":  {
+                         "path":  "tools/build_native_acad.ps1",
+                         "sha256":  "3316ee6a39a1a498e7df73085510f612be986fc5e5d5285e10596830211209ec"
+                     },
+    "source_tree_digest":  "db4256bf650a27e89a0b5cdbad334085116035f186f2e95a9571470d3d9b5379",
+    "artifacts":  [
+                      {
+                          "leaf":  "Ariadne.AcadNativeDbx.dbx",
+                          "sha256":  "5b5dd4080a76c4f09aa2ba167dd0ac8e34d09de06e3cec69cea115884aeabeb2",
+                          "bytes":  54272,
+                          "current":  true,
+                          "exists":  true,
+                          "pe_verification":  {
+                                                  "verified":  true,
+                                                  "format":  "PE32+",
+                                                  "machine":  "0x8664",
+                                                  "minimum_bytes":  512,
+                                                  "pe_header_offset":  288,
+                                                  "section_count":  6,
+                                                  "optional_header_bytes":  240,
+                                                  "reason":  "MZ, PE, x64 machine, section table, and PE32+ optional header checks passed."
+                                              }
+                      },
+                      {
+                          "leaf":  "Ariadne.AcadNative.crx",
+                          "sha256":  "71184abddb6a27fadad7d8e722b4467079fe34c8d9527fb64ceb127f29c41a5b",
+                          "bytes":  1174528,
+                          "current":  true,
+                          "exists":  true,
+                          "pe_verification":  {
+                                                  "verified":  true,
+                                                  "format":  "PE32+",
+                                                  "machine":  "0x8664",
+                                                  "minimum_bytes":  512,
+                                                  "pe_header_offset":  296,
+                                                  "section_count":  6,
+                                                  "optional_header_bytes":  240,
+                                                  "reason":  "MZ, PE, x64 machine, section table, and PE32+ optional header checks passed."
+                                              }
+                      },
+                      {
+                          "leaf":  "Ariadne.AcadNative.arx",
+                          "sha256":  "a399c673910234877053b1734e7d269e4547e93d5e4f9801b8e39ca663811321",
+                          "bytes":  1183744,
+                          "current":  true,
+                          "exists":  true,
+                          "pe_verification":  {
+                                                  "verified":  true,
+                                                  "format":  "PE32+",
+                                                  "machine":  "0x8664",
+                                                  "minimum_bytes":  512,
+                                                  "pe_header_offset":  280,
+                                                  "section_count":  6,
+                                                  "optional_header_bytes":  240,
+                                                  "reason":  "MZ, PE, x64 machine, section table, and PE32+ optional header checks passed."
+                                              }
+                      }
+                  ]
+}
