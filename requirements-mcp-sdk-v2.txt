@@ -1,0 +1,3 @@
+# Isolated compatibility-matrix dependency only.  Do not install this target
+# into the shared Python interpreter: Grasshopper currently imports FastMCP v1.
+mcp==2.0.0

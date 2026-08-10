@@ -5,7 +5,6 @@ mocked, and only a temp fake DWG is used as the read-only original.
 """
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -121,21 +120,14 @@ def test_mcp_tool_delegates_with_ok_result_envelope(monkeypatch, tmp_path):
     calls = []
     _install_fake_accoreconsole(monkeypatch, tmp_path, calls)
 
-    resp = cadagent_mcp.handle_rpc({
-        "jsonrpc": "2.0",
-        "id": 1,
-        "method": "tools/call",
-        "params": {
-            "name": "cad.run_command_template",
-            "arguments": {
-                "template_id": "maintenance.drawing.audit",
-                "slots": {"fix_answer": "Y"},
-                "dwg": str(dwg),
-            },
+    payload = cadagent_mcp._dispatch_tool(
+        "cad.run_command_template",
+        {
+            "template_id": "maintenance.drawing.audit",
+            "slots": {"fix_answer": "Y"},
+            "dwg": str(dwg),
         },
-    })
-
-    payload = json.loads(resp)["result"]["structuredContent"]
+    )
     assert payload["ok"] is True
     assert payload["result"]["template_id"] == "maintenance.drawing.audit"
     assert payload["result"]["executed"] is True
