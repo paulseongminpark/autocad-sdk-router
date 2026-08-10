@@ -44,7 +44,7 @@ def _table_ops(src):
 def _dispatcher_region(src):
     # ONLY the ARIADNE_NATIVE_JOB dispatcher body -- not the separate live-pump
     # dispatcher (which has its own op== chain further down).
-    start = src.index("static void ariadneNativeJob()")
+    start = src.index("static std::string ariadneNativeJobResult(")
     end = src.index("static bool readCommandArg", start)
     return src[start:end]
 

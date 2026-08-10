@@ -2874,6 +2874,7 @@ class Cad:
             "bytes": launcher_receipt_bytes,
         }
         native = native_job.get("result")
+        document_access = native_job.get("document_access")
         valid_outer = (
             native_job.get("schema") == "ariadne.autocad_native_job_result.v1"
             and native_job.get("engine") == "native_objectarx"
@@ -2894,6 +2895,38 @@ class Cad:
                 executed=execution_state["launch_observed"],
                 **common,
             )
+        valid_document_access = (
+            isinstance(document_access, dict)
+            and document_access.get("mode") == "read_only"
+            and document_access.get("required") is True
+            and document_access.get("application_context") is True
+            and type(document_access.get("open_errorstatus")) is int
+            and document_access.get("open_errorstatus") == 0
+            and type(document_access.get("read_lock_errorstatus")) is int
+            and document_access.get("read_lock_errorstatus") == 0
+            and type(document_access.get("read_unlock_errorstatus")) is int
+            and document_access.get("read_unlock_errorstatus") == 0
+            and type(document_access.get("restore_errorstatus")) is int
+            and document_access.get("restore_errorstatus") == 0
+            and type(document_access.get("close_errorstatus")) is int
+            and document_access.get("close_errorstatus") == 0
+            and document_access.get("path_verified_before") is True
+            and document_access.get("path_verified_after") is True
+            and document_access.get("read_only_verified_before") is True
+            and document_access.get("read_only_verified_after") is True
+            and document_access.get("working_database_matches_before") is True
+            and document_access.get("working_database_matches_after") is True
+            and document_access.get("operation_executed") is True
+            and _same_resolved_path(document_access.get("opened_path"), staged)
+        )
+        if not valid_document_access:
+            return finish(
+                "BLOCKED",
+                "native result does not prove a complete read-only document lifecycle",
+                executed=execution_state["launch_observed"],
+                **common,
+            )
+        common["native_document_access"] = document_access
         if not _same_resolved_path(native.get("drawing_path"), staged):
             return finish(
                 "BLOCKED",
@@ -3122,6 +3155,7 @@ class Cad:
             "staged_path": str(staged.resolve()),
             "staged_sha256_before": staged_before,
             "staged_read_only_evidence": common["staged_read_only_evidence"],
+            "native_document_access": common["native_document_access"],
             "geometry_scope": geometry_scope,
             "native_job_out_path": str(raw_evidence.resolve()),
             "native_job_out_sha256": raw_job_out_sha256,

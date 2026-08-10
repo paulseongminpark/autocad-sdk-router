@@ -31,6 +31,24 @@ def _raw_native_result(
         "schema": "ariadne.autocad_native_job_result.v1",
         "engine": "native_objectarx",
         "operation": "e2.inspect.xclip_membership",
+        "document_access": {
+            "mode": "read_only",
+            "required": True,
+            "application_context": True,
+            "open_errorstatus": 0,
+            "read_lock_errorstatus": 0,
+            "read_unlock_errorstatus": 0,
+            "restore_errorstatus": 0,
+            "close_errorstatus": 0,
+            "path_verified_before": True,
+            "path_verified_after": True,
+            "read_only_verified_before": True,
+            "read_only_verified_after": True,
+            "working_database_matches_before": True,
+            "working_database_matches_after": True,
+            "operation_executed": True,
+            "opened_path": None,
+        },
         "result": {
             "schema": "ariadne.e2.native_xclip_membership_raw.v1",
             "oracle_method": "xclip_polygon_segment_intersection",
@@ -79,6 +97,7 @@ def _raw_native_result(
 
 def _bind_raw_to_staged(raw: dict, staged_dwg: str) -> dict:
     raw["result"]["drawing_path"] = str(Path(staged_dwg).resolve())
+    raw["document_access"]["opened_path"] = str(Path(staged_dwg).resolve())
     return raw
 
 
@@ -445,6 +464,9 @@ def test_cadctl_display_membership_is_attended_only_hash_bound_and_original_safe
     assert receipt["staged_read_only_evidence"]["required"] is True
     assert receipt["staged_read_only_evidence"]["before_launch"]["read_only"] is True
     assert receipt["staged_read_only_evidence"]["after_execution"]["read_only"] is True
+    assert receipt["native_document_access"]["mode"] == "read_only"
+    assert receipt["native_document_access"]["close_errorstatus"] == 0
+    assert binding["native_document_access"] == receipt["native_document_access"]
     assert binding["attended_final_receipt"] == launcher_evidence
     assert receipt["final_evidence_sha256"]["observation_oracle"] == result[
         "target_population_oracle_sha256"
@@ -458,6 +480,66 @@ def test_cadctl_display_membership_is_attended_only_hash_bound_and_original_safe
     assert repeated["evidence_preserved"] is True
     assert receipt_path.read_bytes() == receipt_before
     assert len(calls) == 1
+
+
+@pytest.mark.parametrize(
+    ("field", "bad_value"),
+    [
+        ("mode", "write"),
+        ("required", False),
+        ("application_context", False),
+        ("open_errorstatus", 1),
+        ("read_lock_errorstatus", 1),
+        ("read_unlock_errorstatus", 1),
+        ("restore_errorstatus", 1),
+        ("close_errorstatus", 1),
+        ("path_verified_before", False),
+        ("path_verified_after", False),
+        ("read_only_verified_before", False),
+        ("read_only_verified_after", False),
+        ("working_database_matches_before", False),
+        ("working_database_matches_after", False),
+        ("operation_executed", False),
+        ("opened_path", "C:/wrong/input.dwg"),
+    ],
+)
+def test_cadctl_display_membership_rejects_incomplete_native_document_lifecycle(
+    tmp_path: Path, monkeypatch, field: str, bad_value: object
+):
+    router = tmp_path / "router"
+    _prepare_current_native_checkout(router)
+    source = tmp_path / "source.dwg"
+    source.write_bytes(b"immutable-dwg-payload")
+
+    def fake_attended(staged_dwg, run_dir, operation, args, **kwargs):
+        run_path = Path(run_dir)
+        run_path.mkdir(parents=True, exist_ok=True)
+        raw = _bind_raw_to_staged(_raw_native_result(), staged_dwg)
+        raw["document_access"][field] = bad_value
+        job_out = run_path / "job_out.json"
+        job_out.write_text(json.dumps(raw), encoding="utf-8")
+        envelope, final_receipt = _persist_final_launcher_envelope(
+            operation, job_out
+        )
+        return {
+            "result": raw,
+            "error": None,
+            "timed_out": False,
+            "result_json": str(final_receipt),
+            "stdout_path": None,
+            "stderr_path": None,
+            "envelope": envelope,
+            "degraded": False,
+        }
+
+    monkeypatch.setattr(cadctl.attended_lane, "run_attended_native_job", fake_attended)
+    result = cadctl.Cad(router_home=router).inspect_display_membership(
+        str(source), ["W1"], str(tmp_path / "out")
+    )
+
+    assert result["status"] == "BLOCKED"
+    assert "read-only document lifecycle" in result["reason"]
+    assert "target_population_oracle" not in result
 
 
 def test_cadctl_display_membership_binds_linear_scope_and_rejects_native_scope_mismatch(

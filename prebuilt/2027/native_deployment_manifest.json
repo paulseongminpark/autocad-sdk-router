@@ -11,11 +11,11 @@
                          "path":  "tools/build_native_acad.ps1",
                          "sha256":  "3316ee6a39a1a498e7df73085510f612be986fc5e5d5285e10596830211209ec"
                      },
-    "source_tree_digest":  "7d36ed572ddcae872845652b979fb603ae5136ab5f896c8f781fdac543b9c320",
+    "source_tree_digest":  "db4256bf650a27e89a0b5cdbad334085116035f186f2e95a9571470d3d9b5379",
     "artifacts":  [
                       {
                           "leaf":  "Ariadne.AcadNativeDbx.dbx",
-                          "sha256":  "0f9cfb062d69ddd87d599685b8153bd7d309872eded32049048d929d6d9e6a90",
+                          "sha256":  "5b5dd4080a76c4f09aa2ba167dd0ac8e34d09de06e3cec69cea115884aeabeb2",
                           "bytes":  54272,
                           "current":  true,
                           "exists":  true,
@@ -32,8 +32,8 @@
                       },
                       {
                           "leaf":  "Ariadne.AcadNative.crx",
-                          "sha256":  "123a11ec33deb087164438a958dbd05e483029a2ed429582aa173702bbfa2455",
-                          "bytes":  1163776,
+                          "sha256":  "71184abddb6a27fadad7d8e722b4467079fe34c8d9527fb64ceb127f29c41a5b",
+                          "bytes":  1174528,
                           "current":  true,
                           "exists":  true,
                           "pe_verification":  {
@@ -49,8 +49,8 @@
                       },
                       {
                           "leaf":  "Ariadne.AcadNative.arx",
-                          "sha256":  "94d51e0a5b0559a4b8b032d6cd8e4735e1d9c80fce78ab932f6375b3d80a25ad",
-                          "bytes":  1171968,
+                          "sha256":  "a399c673910234877053b1734e7d269e4547e93d5e4f9801b8e39ca663811321",
+                          "bytes":  1183744,
                           "current":  true,
                           "exists":  true,
                           "pe_verification":  {

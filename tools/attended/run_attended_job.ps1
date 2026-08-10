@@ -507,16 +507,30 @@ $jobIn  = Join-Path $RunDir 'job_in.json'
 $jobOut = Join-Path $RunDir 'job_out.json'
 $argsF  = Join-Path $RunDir 'live_job_args.json'
 $completionCleanupWaitSec = 60
+$readOnlyOperation = ($Operation -eq 'e2.inspect.xclip_membership')
 WriteJson $jobDoc $jobIn
-WriteJson ([ordered]@{ job_in = (FS $jobIn); job_out = (FS $jobOut); host_mode = 'full_autocad' }) $argsF
+$argsDoc = [ordered]@{
+  job_in = (FS $jobIn)
+  job_out = (FS $jobOut)
+  host_mode = 'full_autocad'
+}
+if ($readOnlyOperation) {
+  $argsDoc['drawing_path'] = (FS $StagedDwg)
+  $argsDoc['document_open_mode'] = 'require_read_only'
+}
+WriteJson $argsDoc $argsF
 
 $secBefore = Join-Path $RunDir 'security_before.txt'
 $secAfter  = Join-Path $RunDir 'security_after.txt'
 $trustedEscaped = $binDir.Replace('\', '\\')
 
 $scr = Join-Path $RunDir 'attended_job.scr'
-$readOnlyOperation = ($Operation -eq 'e2.inspect.xclip_membership')
 $shutdownCommands = @(Get-AttendedShutdownCommands -ReadOnlyOperation $readOnlyOperation)
+$nativeCommand = if ($readOnlyOperation) {
+  'ARIADNE_NATIVE_JOB_ARGS_READONLY'
+} else {
+  'ARIADNE_NATIVE_JOB_ARGS'
+}
 $scriptLines = @(
   '(setq _ariadneOsl (getvar "SECURELOAD"))',
   '(setq _ariadneOtp (getvar "TRUSTEDPATHS"))',
@@ -530,7 +544,7 @@ $scriptLines = @(
   "(setvar `"TRUSTEDPATHS`" (strcat _ariadneOtp `";$trustedEscaped`"))",
   "(arxload `"$(FS $dbx)`")",
   "(arxload `"$(FS $arx)`")",
-  'ARIADNE_NATIVE_JOB_ARGS',
+  $nativeCommand,
   '(setvar "SECURELOAD" _ariadneOsl)',
   '(setvar "TRUSTEDPATHS" _ariadneOtp)',
   "(setq _f2 (open `"$(FS $secAfter)`" `"w`"))",
@@ -572,14 +586,18 @@ try {
     $dedicatedOk = $false
     Log 'GATE1 FAIL: pre-existing acad process identity enumeration was unknown; aborting before launch.'
   } else {
-    # ---- launch DEDICATED acad.exe on the STAGED doc only --------------------
+    # ---- launch one DEDICATED acad.exe ---------------------------------------
     # ARIADNE_NATIVE_JOB_ARGS (the AutoCAD command run inside the script) reads
     # this env var from the child at launch time; writing the path to disk alone
     # is not enough to select the non-interactive command.
     $env:ARIADNE_NATIVE_JOB_ARGS = $argsF
-    # Pass one explicitly quoted command line.  Autodesk requires /b <script>
-    # to be the final parameter pair.
-    $launchArgs = "`"$StagedDwg`" /nologo /b `"$scr`""
+    # A read-only observation starts on a disposable blank document.  The
+    # session command opens the staged DWG itself with ObjectARX
+    # DocOpenParams::kRequireReadOnly, avoiding AutoCAD's modal prompt for an
+    # OS-read-only command-line drawing. Mutating jobs retain the established
+    # staged-document launch. Autodesk requires /b <script> as the final pair.
+    $launchDocumentArg = if ($readOnlyOperation) { '' } else { "`"$StagedDwg`" " }
+    $launchArgs = "$launchDocumentArg/nologo /b `"$scr`""
     Log "launch args: $launchArgs"
     $proc = Start-Process -FilePath $AcadExe -ArgumentList $launchArgs -PassThru
     if ($null -eq $proc) {

@@ -1181,6 +1181,11 @@ def test_ps1_writes_a_compact_atomic_completion_receipt_before_cleanup(ps1_src: 
 
 def test_ps1_does_not_qsave_the_read_only_display_membership_operation(ps1_src: str):
     assert "$readOnlyOperation = ($Operation -eq 'e2.inspect.xclip_membership')" in ps1_src
+    assert "$argsDoc['drawing_path'] = (FS $StagedDwg)" in ps1_src
+    assert "$argsDoc['document_open_mode'] = 'require_read_only'" in ps1_src
+    assert "$nativeCommand = if ($readOnlyOperation)" in ps1_src
+    assert "ARIADNE_NATIVE_JOB_ARGS_READONLY" in ps1_src
+    assert "$launchDocumentArg = if ($readOnlyOperation)" in ps1_src
     assert "$shutdownCommands = @(Get-AttendedShutdownCommands" in ps1_src
     assert "@($scriptLines + $shutdownCommands)" in ps1_src
     assert "read_only_operation = $readOnlyOperation" in ps1_src

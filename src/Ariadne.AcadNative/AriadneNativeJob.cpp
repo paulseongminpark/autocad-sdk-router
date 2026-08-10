@@ -6355,8 +6355,7 @@ public:
         mDoc = acDocManager->curDocument();
         if (mDoc == nullptr)
             return;
-        const Acad::ErrorStatus es =
-            acDocManager->lockDocument(mDoc, AcAp::kWrite);
+        const Acad::ErrorStatus es = acDocManager->lockDocument(mDoc, AcAp::kWrite);
         mLocked = (es == Acad::eOk);
     }
 
@@ -6531,20 +6530,16 @@ static bool tryFamilyDispatch(const std::string& op, const AriadneJobCtx& ctx, s
         || annoscaleReadDispatch(op, ctx, r);  // w7-annoscale
 }
 
-static void ariadneNativeJob()
+static std::string ariadneNativeJobResult(
+    const std::string& job,
+    std::string jobHostMode,
+    AcDbDatabase* pDb)
 {
-    const std::wstring inPath = readJobPathSetting(L"ARIADNE_CAD_JOB_IN");
-    const std::wstring outPath = readJobPathSetting(L"ARIADNE_CAD_JOB_OUT");
-    std::string jobHostMode = wideToAscii(readJobPathSetting(L"ARIADNE_CAD_JOB_HOST_MODE"));
     if (jobHostMode.empty())
         jobHostMode = "coreconsole";
 
-    AriadneDocumentWriteLock documentLock;
-    const std::string job = (!inPath.empty()) ? readAllBytes(inPath.c_str()) : std::string();
     std::string op;
     jsonFindString(job, "operation", op);
-
-    AcDbDatabase* pDb = acdbHostApplicationServices()->workingDatabase();
 
     std::ostringstream r; r.precision(kJsonDoublePrecision);
     r << "{\"schema\":\"ariadne.autocad_native_job_result.v1\","
@@ -6559,14 +6554,12 @@ static void ariadneNativeJob()
     if (findAriadneNativeOp(op) == nullptr && !familyHasOp(op)) {
         emitNativeError(r, "OPERATION_NOT_IMPLEMENTED",
                         "operation '" + op + "' is not implemented in the native module");
-        writeResult(outPath.empty() ? nullptr : outPath.c_str(), r.str());
-        return;
+        return r.str();
     }
 
     if (pDb == nullptr) {
         emitNativeError(r, "NO_WORKING_DATABASE", "no working database");
-        writeResult(outPath.empty() ? nullptr : outPath.c_str(), r.str());
-        return;
+        return r.str();
     }
 
     if (op == "inspect.database.summary") {
@@ -7541,7 +7534,22 @@ static void ariadneNativeJob()
         }
     }
 
-    writeResult(outPath.empty() ? nullptr : outPath.c_str(), r.str());
+    return r.str();
+}
+
+static void ariadneNativeJob()
+{
+    const std::wstring inPath = readJobPathSetting(L"ARIADNE_CAD_JOB_IN");
+    const std::wstring outPath = readJobPathSetting(L"ARIADNE_CAD_JOB_OUT");
+    std::string jobHostMode = wideToAscii(
+        readJobPathSetting(L"ARIADNE_CAD_JOB_HOST_MODE"));
+    const std::string job = (!inPath.empty())
+        ? readAllBytes(inPath.c_str())
+        : std::string();
+    AriadneDocumentWriteLock documentLock;
+    AcDbDatabase* pDb = acdbHostApplicationServices()->workingDatabase();
+    const std::string result = ariadneNativeJobResult(job, jobHostMode, pDb);
+    writeResult(outPath.empty() ? nullptr : outPath.c_str(), result);
 }
 
 static bool readCommandArg(const ACHAR* prompt, std::wstring& value)
@@ -7624,6 +7632,254 @@ static void ariadneNativeJobArgs()
     gJobOutOverride = outPath;
     gJobHostModeOverride = hostMode;
     ariadneNativeJob();
+    clearJobPathOverrides();
+}
+
+class AriadneReadOnlyDocumentCapture : public AcApDocManagerReactor
+{
+public:
+    AriadneReadOnlyDocumentCapture() : mDocument(nullptr) {}
+
+    void documentCreated(AcApDocument* pDocument) override
+    {
+        if (mDocument == nullptr)
+            mDocument = pDocument;
+    }
+
+    AcApDocument* document() const { return mDocument; }
+
+private:
+    AcApDocument* mDocument;
+};
+
+static bool ariadneCanonicalPath(const std::wstring& input, std::wstring& output)
+{
+    output.clear();
+    if (input.empty())
+        return false;
+    const DWORD required = GetFullPathNameW(input.c_str(), 0, nullptr, nullptr);
+    if (required == 0)
+        return false;
+    std::vector<wchar_t> buffer(static_cast<size_t>(required) + 1, L'\0');
+    const DWORD written = GetFullPathNameW(
+        input.c_str(), static_cast<DWORD>(buffer.size()), buffer.data(), nullptr);
+    if (written == 0 || written >= buffer.size())
+        return false;
+    output.assign(buffer.data(), written);
+    for (wchar_t& ch : output) {
+        if (ch == L'/')
+            ch = L'\\';
+    }
+    return true;
+}
+
+static bool ariadneSameCanonicalPath(const std::wstring& left, const std::wstring& right)
+{
+    std::wstring canonicalLeft;
+    std::wstring canonicalRight;
+    return ariadneCanonicalPath(left, canonicalLeft)
+        && ariadneCanonicalPath(right, canonicalRight)
+        && _wcsicmp(canonicalLeft.c_str(), canonicalRight.c_str()) == 0;
+}
+
+static std::string ariadneReadOnlyBootstrapError(
+    const std::string& operation,
+    const std::string& reason)
+{
+    std::ostringstream r;
+    r << "{\"schema\":\"ariadne.autocad_native_job_result.v1\""
+      << ",\"engine\":\"native_objectarx\""
+      << ",\"operation\":\"" << jsonEscape(operation) << "\""
+      << ",\"error\":\"" << jsonEscape(reason) << "\""
+      << ",\"error_code\":\"READ_ONLY_DOCUMENT_BOOTSTRAP_FAILED\""
+      << ",\"status\":\"error\"}";
+    return r.str();
+}
+
+static std::string ariadneAttachDocumentAccess(
+    const std::string& operationResult,
+    const std::wstring& openedPath,
+    Acad::ErrorStatus openStatus,
+    Acad::ErrorStatus readLockStatus,
+    Acad::ErrorStatus readUnlockStatus,
+    Acad::ErrorStatus restoreStatus,
+    Acad::ErrorStatus closeStatus,
+    bool applicationContext,
+    bool pathVerifiedBefore,
+    bool pathVerifiedAfter,
+    bool readOnlyVerifiedBefore,
+    bool readOnlyVerifiedAfter,
+    bool workingDatabaseMatchesBefore,
+    bool workingDatabaseMatchesAfter,
+    bool operationExecuted)
+{
+    std::string base = operationResult;
+    const size_t closingBrace = base.find_last_of('}');
+    if (closingBrace == std::string::npos) {
+        base = ariadneReadOnlyBootstrapError(
+            "e2.inspect.xclip_membership", "native operation produced invalid JSON");
+    }
+    const size_t insertAt = base.find_last_of('}');
+    std::ostringstream access;
+    access << ",\"document_access\":{"
+           << "\"mode\":\"read_only\""
+           << ",\"required\":true"
+           << ",\"application_context\":" << (applicationContext ? "true" : "false")
+           << ",\"open_errorstatus\":" << static_cast<int>(openStatus)
+           << ",\"read_lock_errorstatus\":" << static_cast<int>(readLockStatus)
+           << ",\"read_unlock_errorstatus\":" << static_cast<int>(readUnlockStatus)
+           << ",\"restore_errorstatus\":" << static_cast<int>(restoreStatus)
+           << ",\"close_errorstatus\":" << static_cast<int>(closeStatus)
+           << ",\"path_verified_before\":" << (pathVerifiedBefore ? "true" : "false")
+           << ",\"path_verified_after\":" << (pathVerifiedAfter ? "true" : "false")
+           << ",\"read_only_verified_before\":" << (readOnlyVerifiedBefore ? "true" : "false")
+           << ",\"read_only_verified_after\":" << (readOnlyVerifiedAfter ? "true" : "false")
+           << ",\"working_database_matches_before\":" << (workingDatabaseMatchesBefore ? "true" : "false")
+           << ",\"working_database_matches_after\":" << (workingDatabaseMatchesAfter ? "true" : "false")
+           << ",\"operation_executed\":" << (operationExecuted ? "true" : "false")
+           << ",\"opened_path\":\"" << jsonEscape(wideToUtf8(openedPath)) << "\"}";
+    base.insert(insertAt, access.str());
+    return base;
+}
+
+// Observation-only attended entrypoint.  The launcher starts AutoCAD on a
+// disposable blank document, then this SESSION command opens the staged DWG
+// with kRequireReadOnly and closes it before publishing job_out.json.  No UI
+// flags are set: an error is data, never a modal prompt.
+static void ariadneNativeJobArgsReadOnly()
+{
+    const std::wstring argsPath = readArgsFileSetting();
+    const std::string spec = argsPath.empty()
+        ? std::string()
+        : readAllBytes(argsPath.c_str());
+    std::string in;
+    std::string out;
+    std::string host;
+    std::string drawing;
+    std::string openMode;
+    jsonFindString(spec, "job_in", in);
+    jsonFindString(spec, "job_out", out);
+    jsonFindString(spec, "host_mode", host);
+    jsonFindString(spec, "drawing_path", drawing);
+    jsonFindString(spec, "document_open_mode", openMode);
+    if (host.empty())
+        host = "full_autocad";
+
+    const std::wstring inPath = utf8ToWide(in);
+    const std::wstring outPath = utf8ToWide(out);
+    const std::wstring stagedPath = utf8ToWide(drawing);
+    const std::string immutableJob = !inPath.empty()
+        ? readAllBytes(inPath.c_str())
+        : std::string();
+    std::string operation;
+    jsonFindString(immutableJob, "operation", operation);
+
+    Acad::ErrorStatus openStatus = Acad::eInvalidContext;
+    Acad::ErrorStatus readLockStatus = Acad::eInvalidContext;
+    Acad::ErrorStatus readUnlockStatus = Acad::eInvalidContext;
+    Acad::ErrorStatus restoreStatus = Acad::eInvalidContext;
+    Acad::ErrorStatus closeStatus = Acad::eInvalidContext;
+    bool applicationContext = acDocManager != nullptr
+        && acDocManager->isApplicationContext();
+    bool pathVerifiedBefore = false;
+    bool pathVerifiedAfter = false;
+    bool readOnlyVerifiedBefore = false;
+    bool readOnlyVerifiedAfter = false;
+    bool workingDatabaseMatchesBefore = false;
+    bool workingDatabaseMatchesAfter = false;
+    bool operationExecuted = false;
+    std::wstring openedPath;
+    std::string operationResult;
+    AcApDocument* previousDocument = acDocManager != nullptr
+        ? acDocManager->curDocument()
+        : nullptr;
+    AcApDocument* openedDocument = nullptr;
+
+    if (spec.empty() || inPath.empty() || outPath.empty() || stagedPath.empty()
+        || openMode != "require_read_only") {
+        operationResult = ariadneReadOnlyBootstrapError(
+            operation, "read-only args file is missing required paths or mode");
+    }
+    else if (operation != "e2.inspect.xclip_membership") {
+        operationResult = ariadneReadOnlyBootstrapError(
+            operation, "read-only bootstrap only admits e2.inspect.xclip_membership");
+    }
+    else if (!hostIsFullAutoCad() || !applicationContext || previousDocument == nullptr) {
+        operationResult = ariadneReadOnlyBootstrapError(
+            operation, "full AutoCAD application context with a bootstrap document is required");
+    }
+    else {
+        AriadneReadOnlyDocumentCapture capture;
+        acDocManager->addReactor(&capture);
+        AcApDocManager::DocOpenParams openParams = {};
+        openParams.mpwszFileName = stagedPath.c_str();
+        openParams.mnInitialViewType = AcApDocManager::DocOpenParams::kDefaultView;
+        openParams.mnFlags =
+            AcApDocManager::DocOpenParams::kRequireReadOnly |
+            AcApDocManager::DocOpenParams::kFileNameArgIsUnicode;
+        openStatus = acDocManager->appContextOpenDocument(&openParams);
+        acDocManager->removeReactor(&capture);
+        openedDocument = capture.document();
+
+        if (openStatus != Acad::eOk || openedDocument == nullptr) {
+            operationResult = ariadneReadOnlyBootstrapError(
+                operation, "ObjectARX could not open the staged DWG read-only");
+        }
+        else {
+            openedPath = openedDocument->fileName() != nullptr
+                ? std::wstring(openedDocument->fileName())
+                : std::wstring();
+            pathVerifiedBefore = ariadneSameCanonicalPath(stagedPath, openedPath);
+            readOnlyVerifiedBefore = openedDocument->isReadOnly();
+            if (pathVerifiedBefore && readOnlyVerifiedBefore) {
+                readLockStatus = acDocManager->setCurDocument(
+                    openedDocument, AcAp::kRead, false);
+                workingDatabaseMatchesBefore = readLockStatus == Acad::eOk
+                    && acdbHostApplicationServices()->workingDatabase()
+                        == openedDocument->database();
+            }
+            if (pathVerifiedBefore && readOnlyVerifiedBefore
+                && workingDatabaseMatchesBefore) {
+                operationResult = ariadneNativeJobResult(
+                    immutableJob, host, openedDocument->database());
+                operationExecuted = !operationResult.empty();
+                if (!operationExecuted) {
+                    operationResult = ariadneReadOnlyBootstrapError(
+                        operation, "native operation did not produce a temporary result");
+                }
+                const std::wstring afterPath = openedDocument->fileName() != nullptr
+                    ? std::wstring(openedDocument->fileName())
+                    : std::wstring();
+                pathVerifiedAfter = ariadneSameCanonicalPath(stagedPath, afterPath);
+                readOnlyVerifiedAfter = openedDocument->isReadOnly();
+                workingDatabaseMatchesAfter =
+                    acdbHostApplicationServices()->workingDatabase()
+                    == openedDocument->database();
+            }
+            else {
+                operationResult = ariadneReadOnlyBootstrapError(
+                    operation, "opened document did not satisfy path/read-only/database gates");
+            }
+        }
+    }
+
+    if (openedDocument != nullptr && acDocManager != nullptr
+        && readLockStatus == Acad::eOk)
+        readUnlockStatus = acDocManager->unlockDocument(openedDocument);
+    if (previousDocument != nullptr && acDocManager != nullptr)
+        restoreStatus = acDocManager->setCurDocument(previousDocument, AcAp::kNone, false);
+    if (openedDocument != nullptr && acDocManager != nullptr)
+        closeStatus = acDocManager->appContextCloseDocument(openedDocument);
+
+    if (!outPath.empty()) {
+        const std::string finalResult = ariadneAttachDocumentAccess(
+            operationResult, openedPath, openStatus, readLockStatus, readUnlockStatus,
+            restoreStatus, closeStatus, applicationContext, pathVerifiedBefore,
+            pathVerifiedAfter, readOnlyVerifiedBefore, readOnlyVerifiedAfter,
+            workingDatabaseMatchesBefore, workingDatabaseMatchesAfter,
+            operationExecuted);
+        writeResult(outPath.c_str(), finalResult);
+    }
     clearJobPathOverrides();
 }
 
@@ -8201,6 +8457,11 @@ acrxEntryPoint(AcRx::AppMsgCode msg, void* pkt)
                                 ACRX_CMD_MODAL,
                                 &ariadneNativeJobArgs);
         acedRegCmds->addCommand(_T("ARIADNE_NATIVE"),
+                                _T("ARIADNE_NATIVE_JOB_ARGS_READONLY"),
+                                _T("ARIADNE_NATIVE_JOB_ARGS_READONLY"),
+                                ACRX_CMD_MODAL | ACRX_CMD_SESSION,
+                                &ariadneNativeJobArgsReadOnly);
+        acedRegCmds->addCommand(_T("ARIADNE_NATIVE"),
                                 _T("ARIADNE_NATIVE_JOB_MAILBOX"),
                                 _T("ARIADNE_NATIVE_JOB_MAILBOX"),
                                 ACRX_CMD_MODAL,
@@ -8220,9 +8481,9 @@ acrxEntryPoint(AcRx::AppMsgCode msg, void* pkt)
         // AriadnePalette.cpp which is in the .arx project ONLY. The headless .crx
         // (ARIADNE_NATIVE_CRX defined) neither links nor registers it.
         ariadneRegisterPaletteCommand();  // arx-only; declared extern "C" at file scope
-        acutPrintf(_T("\nAriadne.AcadNative loaded. Commands: ARIADNE_NATIVE_JOB, ARIADNE_NATIVE_JOB_ARGS, ARIADNE_NATIVE_JOB_MAILBOX, CADAGENT_PUMP, CADAGENT_STATUS, ARIADNE_PALETTE\n"));
+        acutPrintf(_T("\nAriadne.AcadNative loaded. Commands: ARIADNE_NATIVE_JOB, ARIADNE_NATIVE_JOB_ARGS, ARIADNE_NATIVE_JOB_ARGS_READONLY, ARIADNE_NATIVE_JOB_MAILBOX, CADAGENT_PUMP, CADAGENT_STATUS, ARIADNE_PALETTE\n"));
 #else
-        acutPrintf(_T("\nAriadne.AcadNative loaded. Commands: ARIADNE_NATIVE_JOB, ARIADNE_NATIVE_JOB_ARGS, ARIADNE_NATIVE_JOB_MAILBOX, CADAGENT_PUMP, CADAGENT_STATUS\n"));
+        acutPrintf(_T("\nAriadne.AcadNative loaded. Commands: ARIADNE_NATIVE_JOB, ARIADNE_NATIVE_JOB_ARGS, ARIADNE_NATIVE_JOB_ARGS_READONLY, ARIADNE_NATIVE_JOB_MAILBOX, CADAGENT_PUMP, CADAGENT_STATUS\n"));
 #endif
         break;
 

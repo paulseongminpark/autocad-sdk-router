@@ -81,8 +81,40 @@ def test_attended_runner_can_load_an_isolated_proof_build():
     assert "[string]$NativeBinDir = ''" in source
     assert "Join-Path $NativeBinDir 'Ariadne.AcadNativeDbx.dbx'" in source
     assert "Join-Path $NativeBinDir 'Ariadne.AcadNative.arx'" in source
-    assert '$launchArgs = "`"$StagedDwg`" /nologo /b `"$scr`""' in source
+    assert "$nativeCommand = if ($readOnlyOperation)" in source
+    assert "ARIADNE_NATIVE_JOB_ARGS_READONLY" in source
+    assert "$argsDoc['drawing_path'] = (FS $StagedDwg)" in source
+    assert "$launchDocumentArg = if ($readOnlyOperation)" in source
+    assert '$launchArgs = "$launchDocumentArg/nologo /b `"$scr`""' in source
     assert "-ArgumentList $launchArgs" in source
+
+
+def test_native_read_only_bootstrap_opens_closes_and_proves_the_staged_document():
+    job = JOB_SOURCE.read_text(encoding="utf-8")
+
+    assert "ARIADNE_NATIVE_JOB_ARGS_READONLY" in job
+    assert "ACRX_CMD_MODAL | ACRX_CMD_SESSION" in job
+    assert "AcApDocManager::DocOpenParams::kRequireReadOnly" in job
+    assert "AcApDocManager::DocOpenParams::kFileNameArgIsUnicode" in job
+    assert "acDocManager->isApplicationContext()" in job
+    assert "acDocManager->appContextOpenDocument(&openParams)" in job
+    assert "openedDocument->isReadOnly()" in job
+    assert "readLockStatus = acDocManager->setCurDocument(" in job
+    assert "openedDocument, AcAp::kRead, false)" in job
+    assert "readUnlockStatus = acDocManager->unlockDocument(openedDocument)" in job
+    assert "acdbHostApplicationServices()->workingDatabase()" in job
+    assert "== openedDocument->database()" in job
+    assert "acDocManager->appContextCloseDocument(openedDocument)" in job
+    assert "static std::string ariadneNativeJobResult(" in job
+    assert "const std::string immutableJob" in job
+    assert "immutableJob, host, openedDocument->database()" in job
+    assert '.readonly.' not in job
+    assert '\\"document_access\\"' in job
+    assert '\\"read_only_verified_before\\"' in job
+    assert '\\"read_only_verified_after\\"' in job
+    assert '\\"read_unlock_errorstatus\\"' in job
+    assert '\\"close_errorstatus\\"' in job
+
 
 
 def test_native_job_wires_spatial_filter_membership_as_a_distinct_experiment_op():
