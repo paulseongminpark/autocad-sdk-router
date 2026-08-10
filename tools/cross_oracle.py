@@ -214,7 +214,7 @@ _KNOWN_GEOMETRY_LEAF_FIELDS = frozenset({
     # pack-a (#42/#43): TEXT alignment anchor (DXF code 11) + OLE2FRAME
     # embedded-object payload/meta (schemas/dwg_graph_ir.v1.schema.json
     # geometry properties).
-    "alignment_point",
+    "alignment_point", "is_default_alignment", "horizontal_mode", "vertical_mode",
     "ole_type", "ole_version", "ole_user_type", "frame_corners",
     "ole_data_b64", "ole_data_sha256", "ole_data_bytes",
     "ole_data_unavailable_reason",

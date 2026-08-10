@@ -521,10 +521,28 @@ def _h_text(ctx, space, ent, g, attr):
     rotation = _num(g.get("rotation"))
     if rotation:
         dxfattribs["rotation"] = math.degrees(rotation)
+    # #63: ObjectARX explicitly tells us whether alignmentPoint() is valid.
+    # A default-aligned TEXT may expose [0, 0, 0] as a sentinel, so the new
+    # contract uses that state bit.  For pre-#63 IR that has no state bit, the
+    # enum modes are a backwards-compatible signal: a nonzero horizontal or
+    # vertical mode is non-default without inspecting point coordinates.
+    horizontal_mode = _num(g.get("horizontal_mode"))
+    vertical_mode = _num(g.get("vertical_mode"))
+    state = g.get("is_default_alignment")
+    non_default_alignment = (
+        state is False
+        or (state is None and any(mode is not None and mode != 0.0
+                                  for mode in (horizontal_mode, vertical_mode)))
+    )
+    if non_default_alignment:
+        if horizontal_mode is not None:
+            dxfattribs["halign"] = int(horizontal_mode)
+        if vertical_mode is not None:
+            dxfattribs["valign"] = int(vertical_mode)
+        align = g.get("alignment_point")
+        if align is not None:
+            dxfattribs["align_point"] = _p3(align)
     text = space.add_text(str(g.get("text") or ""), dxfattribs=dxfattribs)
-    align = g.get("alignment_point")
-    if align is not None:
-        text.dxf.align_point = _p3(align)
     return text
 
 

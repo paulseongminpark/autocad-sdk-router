@@ -1778,9 +1778,21 @@ static bool collectEntitiesFromBlock(AcDbBlockTableRecord* pBTR, const char* spa
         }
         else if (AcDbText* pT = AcDbText::cast(pEnt)) {
             const AcGePoint3d p = pT->position();
+            // #63: alignmentPoint() returns the origin for a default-aligned
+            // TEXT as a sentinel.  The ObjectARX state bit is the contract
+            // that distinguishes that sentinel from a real origin-anchored
+            // alignment; do not infer it from point coordinates.
+            const bool defaultAlignment = pT->isDefaultAlignment() != Adesk::kFalse;
             arr << ",\"position\":[" << p.x << "," << p.y << "," << p.z << "]"
                 << ",\"text\":\"" << jsonEscape(acharToAscii(pT->textStringConst())) << "\""
-                << ",\"height\":" << pT->height();
+                << ",\"height\":" << pT->height()
+                << ",\"is_default_alignment\":" << (defaultAlignment ? "true" : "false")
+                << ",\"horizontal_mode\":" << static_cast<int>(pT->horizontalMode())
+                << ",\"vertical_mode\":" << static_cast<int>(pT->verticalMode());
+            if (!defaultAlignment) {
+                const AcGePoint3d a = pT->alignmentPoint();
+                arr << ",\"alignment_point\":[" << a.x << "," << a.y << "," << a.z << "]";
+            }
         }
         else if (AcDbPolyline* pPl = AcDbPolyline::cast(pEnt)) {
             const unsigned int n = pPl->numVerts();

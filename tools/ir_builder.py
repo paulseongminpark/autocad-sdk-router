@@ -865,6 +865,8 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
 
     The native collector writes geometry inline on the entity record (start/end,
     center/radius/angles, position/scale/rotation/block_name, text, vertices,
+    TEXT alignment state (is_default_alignment/horizontal_mode/vertical_mode/
+    alignment_point),
     T3a: major_axis/radius_ratio, height, xline1_point/xline2_point/
     dim_line_point/measurement. T3a-batch2: degree/fit_points (spline),
     chord_point/far_chord_point (radial/diametric dims); NOT leader_length --
@@ -984,6 +986,15 @@ def _geometry_from_native_entity(raw: dict, kind: str) -> dict:
         num = _to_number(raw.get(nk))
         if num is not None:
             geom[ik] = num
+    # #63: TextHorzMode/TextVertMode are enum ordinals, not arbitrary floats.
+    # Keep them explicit in the IR so the builder can restore non-default
+    # alignment without looking at the alignment-point coordinates.
+    for nk in ("horizontal_mode", "vertical_mode"):
+        mode = _to_number(raw.get(nk))
+        if mode is not None:
+            geom[nk] = int(mode)
+    if isinstance(raw.get("is_default_alignment"), bool):
+        geom["is_default_alignment"] = raw["is_default_alignment"]
     if raw.get("text") is not None:
         geom["text"] = str(raw.get("text"))
     if raw.get("block_name") is not None:
