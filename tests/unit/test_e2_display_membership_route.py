@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import stat
 import subprocess
 import sys
 from pathlib import Path
@@ -341,6 +343,19 @@ def test_cadctl_display_membership_is_attended_only_hash_bound_and_original_safe
                 **kwargs,
             }
         )
+        staged_path = Path(staged_dwg)
+        staged_stat = staged_path.stat()
+        observed_attributes = getattr(staged_stat, "st_file_attributes", 0)
+        assert os.name == "nt"
+        assert staged_path.read_bytes() == source.read_bytes()
+        assert observed_attributes & stat.FILE_ATTRIBUTE_READONLY
+        assert not (
+            stat.S_IMODE(staged_stat.st_mode)
+            & (stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH)
+        )
+        with pytest.raises(OSError):
+            with staged_path.open("r+b") as staged_stream:
+                staged_stream.write(b"forbidden-staged-mutation")
         run_path = Path(run_dir)
         run_path.mkdir(parents=True, exist_ok=True)
         job_out = run_path / "job_out.json"
@@ -427,6 +442,9 @@ def test_cadctl_display_membership_is_attended_only_hash_bound_and_original_safe
     assert receipt["final_evidence_sha256"]["attended_final_receipt"] == (
         launcher_evidence["sha256"]
     )
+    assert receipt["staged_read_only_evidence"]["required"] is True
+    assert receipt["staged_read_only_evidence"]["before_launch"]["read_only"] is True
+    assert receipt["staged_read_only_evidence"]["after_execution"]["read_only"] is True
     assert binding["attended_final_receipt"] == launcher_evidence
     assert receipt["final_evidence_sha256"]["observation_oracle"] == result[
         "target_population_oracle_sha256"
@@ -1506,7 +1524,8 @@ def test_final_receipt_temporary_inode_is_locked_and_byte_verified_during_publis
 
 
 @pytest.mark.parametrize(
-    "mutated_input", ["source", "staged", "raw_job_out", "launcher_receipt"]
+    "mutated_input",
+    ["source", "staged", "staged_writable", "raw_job_out", "launcher_receipt"],
 )
 def test_final_pass_publication_revalidates_all_bound_inputs(
     tmp_path: Path, monkeypatch, mutated_input: str
@@ -1528,8 +1547,11 @@ def test_final_pass_publication_revalidates_all_bound_inputs(
 
     def mutate_before_final(path, payload, *, before_publish=None):
         if path.name == "display_membership_receipt.json" and payload.get("status") == "PASS":
-            target = source if mutated_input == "source" else evidence_paths[mutated_input]
-            target.write_bytes(b"changed-after-final-validation")
+            if mutated_input == "staged_writable":
+                os.chmod(evidence_paths["staged"], 0o666)
+            else:
+                target = source if mutated_input == "source" else evidence_paths[mutated_input]
+                target.write_bytes(b"changed-after-final-validation")
         return original_writer(path, payload, before_publish=before_publish)
 
     monkeypatch.setattr(cadctl.attended_lane, "run_attended_native_job", fake_attended)

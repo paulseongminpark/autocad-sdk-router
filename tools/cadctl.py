@@ -175,6 +175,46 @@ def _sha256_file(path: Path) -> str:
     return _sha256_head(path, 64).lower()
 
 
+def _read_only_file_state(path: Path) -> dict:
+    """Return the OS-enforced read-only state used by observation-only DWGs."""
+    state = {
+        "path": str(Path(os.path.abspath(str(path)))),
+        "read_only": False,
+        "mode": None,
+        "writable_mode_bits": None,
+        "windows_file_attributes": None,
+        "windows_read_only_attribute": None,
+        "reason": None,
+    }
+    try:
+        file_stat = path.stat()
+        mode = stat.S_IMODE(file_stat.st_mode)
+        writable_mode_bits = bool(
+            mode & (stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH)
+        )
+        state["mode"] = f"0o{mode:o}"
+        state["writable_mode_bits"] = writable_mode_bits
+        if os.name == "nt":
+            attributes = getattr(file_stat, "st_file_attributes", None)
+            has_read_only_attribute = (
+                isinstance(attributes, int)
+                and bool(attributes & stat.FILE_ATTRIBUTE_READONLY)
+            )
+            state["windows_file_attributes"] = attributes
+            state["windows_read_only_attribute"] = has_read_only_attribute
+            state["read_only"] = has_read_only_attribute and not writable_mode_bits
+        else:
+            state["read_only"] = not writable_mode_bits
+        state["reason"] = (
+            "OS read-only attribute and mode are enforced"
+            if state["read_only"]
+            else "file remains writable at the OS boundary"
+        )
+    except OSError as exc:
+        state["reason"] = f"{type(exc).__name__}: {exc}"
+    return state
+
+
 def _canonical_json_bytes(value: object) -> bytes:
     """Stable JSON encoding used only to compare independently supplied facts."""
     return json.dumps(
@@ -2429,10 +2469,18 @@ class Cad:
                 **manifest_common,
             )
         try:
-            os.chmod(staged, 0o666)
-        except OSError:
-            pass
+            os.chmod(staged, 0o444)
+        except OSError as exc:
+            return finish(
+                "BLOCKED",
+                f"could not make observation-only staged DWG read-only: {type(exc).__name__}: {exc}",
+                executed=False,
+                original_sha256_before=original_before,
+                staged_dwg=str(staged),
+                **manifest_common,
+            )
         staged_before = _sha256_head(staged, 64).lower()
+        staged_read_only_after_copy = _read_only_file_state(staged)
         if staged_before != original_before:
             return finish(
                 "BLOCKED",
@@ -2441,6 +2489,20 @@ class Cad:
                 original_sha256_before=original_before,
                 staged_sha256_before=staged_before,
                 staged_dwg=str(staged),
+                **manifest_common,
+            )
+        if not staged_read_only_after_copy["read_only"]:
+            return finish(
+                "BLOCKED",
+                "observation-only staged DWG is writable after staging",
+                executed=False,
+                original_sha256_before=original_before,
+                staged_sha256_before=staged_before,
+                staged_dwg=str(staged),
+                staged_read_only_evidence={
+                    "required": True,
+                    "after_copy": staged_read_only_after_copy,
+                },
                 **manifest_common,
             )
 
@@ -2473,6 +2535,27 @@ class Cad:
                 output_freshness=prelaunch_layout,
                 **manifest_common,
             )
+        staged_sha256_before_launch = _sha256_file(staged)
+        staged_read_only_before_launch = _read_only_file_state(staged)
+        if (
+            staged_sha256_before_launch != original_before
+            or not staged_read_only_before_launch["read_only"]
+        ):
+            return finish(
+                "BLOCKED",
+                "observation-only staged DWG changed or became writable before native launch",
+                executed=False,
+                original_sha256_before=original_before,
+                staged_sha256_before=staged_before,
+                staged_sha256_before_launch=staged_sha256_before_launch,
+                staged_dwg=str(staged),
+                staged_read_only_evidence={
+                    "required": True,
+                    "after_copy": staged_read_only_after_copy,
+                    "before_launch": staged_read_only_before_launch,
+                },
+                **manifest_common,
+            )
         try:
             attended = attended_lane.run_attended_native_job(
                 str(staged),
@@ -2496,10 +2579,20 @@ class Cad:
                 original_sha256_after=original_after,
                 original_unchanged=original_before == original_after,
                 staged_dwg=str(staged),
+                staged_read_only_evidence={
+                    "required": True,
+                    "after_copy": staged_read_only_after_copy,
+                    "before_launch": staged_read_only_before_launch,
+                },
                 **manifest_common,
             )
 
         original_after = _sha256_head(source, 64).lower()
+        staged_read_only_after_execution = _read_only_file_state(staged)
+        try:
+            staged_sha256_after_execution = _sha256_file(staged)
+        except OSError:
+            staged_sha256_after_execution = None
         if not isinstance(attended, dict):
             return finish(
                 "BLOCKED",
@@ -2519,6 +2612,14 @@ class Cad:
             "original_unchanged": original_before == original_after,
             "staged_dwg": str(staged),
             "staged_sha256_before": staged_before,
+            "staged_sha256_before_launch": staged_sha256_before_launch,
+            "staged_sha256_after_execution": staged_sha256_after_execution,
+            "staged_read_only_evidence": {
+                "required": True,
+                "after_copy": staged_read_only_after_copy,
+                "before_launch": staged_read_only_before_launch,
+                "after_execution": staged_read_only_after_execution,
+            },
             "native_bin_dir": str(native_bin),
             "attended_result_ref": str(raw_job_out),
             "attended_reported_result_ref": attended.get("result_json"),
@@ -2547,6 +2648,16 @@ class Cad:
             return finish(
                 "BLOCKED",
                 "SAFETY VIOLATION: original DWG changed during attended inspection",
+                executed=execution_state["launch_observed"],
+                **common,
+            )
+        if (
+            staged_sha256_after_execution != staged_before
+            or not staged_read_only_after_execution["read_only"]
+        ):
+            return finish(
+                "BLOCKED",
+                "SAFETY VIOLATION: observation-only staged DWG changed or became writable",
                 executed=execution_state["launch_observed"],
                 **common,
             )
@@ -3010,6 +3121,7 @@ class Cad:
             "source_sha256": original_before,
             "staged_path": str(staged.resolve()),
             "staged_sha256_before": staged_before,
+            "staged_read_only_evidence": common["staged_read_only_evidence"],
             "geometry_scope": geometry_scope,
             "native_job_out_path": str(raw_evidence.resolve()),
             "native_job_out_sha256": raw_job_out_sha256,
@@ -3191,6 +3303,12 @@ class Cad:
                 if _sha256_file(source) != _sha256_file(staged):
                     raise OSError(
                         "staged DWG no longer matches the original before PASS publication"
+                    )
+                staged_read_only_final = _read_only_file_state(staged)
+                if not staged_read_only_final["read_only"]:
+                    raise OSError(
+                        "staged DWG became writable before PASS publication: "
+                        + str(staged_read_only_final["reason"])
                     )
                 final_manifest = _verify_native_build_manifest(
                     self.router_home, native_bin
