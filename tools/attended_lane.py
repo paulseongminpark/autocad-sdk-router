@@ -74,7 +74,7 @@ import time
 import uuid
 import zlib
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 _ROUTER_HOME = os.path.dirname(_THIS_DIR)
@@ -146,13 +146,33 @@ def _load_ir(path: str) -> Dict[str, Any]:
         return json.load(fh)
 
 
+def _strict_json_object(text: str) -> Optional[Dict[str, Any]]:
+    def reject_constant(value: str) -> None:
+        raise ValueError("non-finite JSON number: %s" % value)
+
+    def reject_duplicates(pairs: List[Tuple[str, Any]]) -> Dict[str, Any]:
+        result: Dict[str, Any] = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError("duplicate JSON object key: %s" % key)
+            result[key] = value
+        return result
+
+    value = json.loads(
+        text,
+        object_pairs_hook=reject_duplicates,
+        parse_constant=reject_constant,
+    )
+    return value if isinstance(value, dict) else None
+
+
 def _read_json_object(path: Path) -> Optional[Dict[str, Any]]:
     """Load one atomically-written receipt or native result object."""
     try:
-        value = json.loads(path.read_text(encoding=_JSON_ENCODING))
+        value = _strict_json_object(path.read_text(encoding=_JSON_ENCODING))
     except (OSError, ValueError):
         return None
-    return value if isinstance(value, dict) else None
+    return value
 
 
 def _reserved_run_artifacts(run_dir: Path) -> List[str]:
@@ -235,7 +255,7 @@ def _same_process_identity(expected: Dict[str, Any], current: Dict[str, Any]) ->
 
 
 def _write_json_atomic(path: Path, payload: Dict[str, Any]) -> None:
-    """Durably publish a compact receipt without exposing a partial JSON file."""
+    """Publish one compact receipt without replacing a competing authority."""
     temporary = path.with_name(".%s.%s.tmp" % (path.name, uuid.uuid4().hex))
     try:
         with open(temporary, "w", encoding="utf-8", newline="\n") as fh:
@@ -243,7 +263,7 @@ def _write_json_atomic(path: Path, payload: Dict[str, Any]) -> None:
             fh.write("\n")
             fh.flush()
             os.fsync(fh.fileno())
-        os.replace(temporary, path)
+        os.link(temporary, path)
     finally:
         try:
             temporary.unlink()
@@ -354,6 +374,11 @@ def _completion_receipt_errors(receipt: Dict[str, Any], *, operation: str,
         errors.append("run_id")
     if receipt.get("operation") != operation:
         errors.append("operation")
+    if operation == "e2.inspect.xclip_membership":
+        if receipt.get("read_only_operation") is not True:
+            errors.append("read_only_operation")
+        if receipt.get("staged_save_attempted") is not False:
+            errors.append("staged_save_attempted")
     if not _is_positive_int(receipt.get("launched_pid")):
         errors.append("launched_pid")
     launched_name = receipt.get("launched_process_name")
@@ -477,6 +502,8 @@ def _build_independent_recovery_receipt(*, completion: Dict[str, Any],
         "status": "ok",
         "run_id": completion["run_id"],
         "operation": completion["operation"],
+        "read_only_operation": completion.get("read_only_operation"),
+        "staged_save_attempted": completion.get("staged_save_attempted"),
         "receipt_authority": "python_independent_safety_validator",
         "recovered_from_launcher_finalization_hang": True,
         "powershell_helper_closed": False,
@@ -735,6 +762,13 @@ def run_attended_native_job(staged_dwg: str, run_dir: str, operation: str,
                     recovered_envelope["powershell_helper_closed"] = True
                     try:
                         _write_json_atomic(result_json_path, recovered_envelope)
+                    except FileExistsError:
+                        winner = _read_json_object(result_json_path)
+                        if winner is None:
+                            error = (
+                                "independent launcher-finalization recovery lost publication "
+                                "to an unreadable final receipt"
+                            )
                     except OSError as exc:
                         error = "independent launcher-finalization recovery could not write final receipt: %s" % exc
                     break
@@ -783,8 +817,13 @@ def run_attended_native_job(staged_dwg: str, run_dir: str, operation: str,
                 receipt_errors.append("run_id")
             if envelope.get("operation") != operation:
                 receipt_errors.append("operation")
-            if not isinstance(envelope.get("launched_pid"), int) or envelope["launched_pid"] <= 0:
+            if not _is_positive_int(envelope.get("launched_pid")):
                 receipt_errors.append("launched_pid")
+            if operation == "e2.inspect.xclip_membership":
+                if envelope.get("read_only_operation") is not True:
+                    receipt_errors.append("read_only_operation")
+                if envelope.get("staged_save_attempted") is not False:
+                    receipt_errors.append("staged_save_attempted")
             if not _is_nonempty_string(envelope.get("launched_process_name")):
                 receipt_errors.append("launched_process_name")
             elif envelope["launched_process_name"].casefold() not in _ACAD_PROCESS_NAMES:

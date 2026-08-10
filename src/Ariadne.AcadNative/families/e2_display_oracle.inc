@@ -117,6 +117,8 @@ struct E2MembershipState
     std::string geometryScope;
     std::string errorCode;
     std::string error;
+    long long unsupportedDefinitionCount = 0;
+    std::vector<std::string> unsupportedDefinitionReasons;
 
     bool failed() const { return !errorCode.empty(); }
     void fail(const char* code, const std::string& message)
@@ -126,7 +128,36 @@ struct E2MembershipState
             error = message;
         }
     }
+    void failUnsupported(
+        const char* code,
+        const char* reason,
+        const std::string& message)
+    {
+        if (!failed()) {
+            ++unsupportedDefinitionCount;
+            unsupportedDefinitionReasons.push_back(reason);
+            fail(code, message);
+        }
+    }
 };
+
+static void e2EmitMembershipError(
+    std::ostringstream& r,
+    const E2MembershipState& state)
+{
+    if (state.unsupportedDefinitionCount == 0) {
+        emitNativeError(r, state.errorCode.c_str(), state.error);
+        return;
+    }
+    r << "\"status\":\"error\""
+      << ",\"error_code\":\"" << jsonEscape(state.errorCode) << "\""
+      << ",\"error\":\"" << jsonEscape(state.error) << "\""
+      << ",\"unsupported_definition_count\":"
+      << state.unsupportedDefinitionCount
+      << ",\"unsupported_definition_reasons\":";
+    e2EmitStringArray(r, state.unsupportedDefinitionReasons);
+    r << "}";
+}
 
 static E2Point2 e2Point2(const AcGePoint3d& point)
 {
@@ -199,7 +230,7 @@ static std::vector<std::pair<double, double>> e2InsideIntervals(
     const E2Point2 direction = e2Subtract(segment.p1, segment.p0);
     const double denominator = e2Dot(direction, direction);
     std::vector<std::pair<double, double>> intervals;
-    if (denominator <= kE2GeometryEpsilon)
+    if (denominator <= kE2GeometryEpsilon * kE2GeometryEpsilon)
         return intervals;
 
     std::vector<double> breaks;
@@ -338,6 +369,35 @@ static int e2ReadBlockReferenceClip(
     }
     if (enabled != Adesk::kTrue)
         return 0;
+    if (!normal.isEqualTo(AcGeVector3d::kZAxis)) {
+        state.failUnsupported(
+            "XCLIP_NORMAL_UNSUPPORTED",
+            "tilted_normal",
+            "v1 native membership supports only a positive WCS Z-axis XCLIP normal");
+        return -1;
+    }
+    if (elevation != 0.0) {
+        state.failUnsupported(
+            "XCLIP_ELEVATION_UNSUPPORTED",
+            "nonzero_elevation",
+            "v1 native membership does not apply a nonzero XCLIP ECS elevation");
+        return -1;
+    }
+    // Autodesk's ordinary 2D XCLIP example uses zero for both depths, while
+    // dbspfilt.h also defines ACDB_INFINITE_XCLIP_DEPTH as the explicit
+    // unbounded value for each side. Anything else is an active depth clip,
+    // which this XY-only membership oracle cannot apply accurately.
+    const bool zeroDepth = frontClip == 0.0 && backClip == 0.0;
+    const bool infiniteDepth =
+        frontClip == ACDB_INFINITE_XCLIP_DEPTH &&
+        backClip == ACDB_INFINITE_XCLIP_DEPTH;
+    if (!zeroDepth && !infiniteDepth) {
+        state.failUnsupported(
+            "XCLIP_DEPTH_CLIP_UNSUPPORTED",
+            "active_depth_clip",
+            "v1 native membership does not apply active front or back XCLIP depth");
+        return -1;
+    }
     if (points.length() < 2) {
         state.fail("XCLIP_BOUNDARY_INVALID", "enabled XCLIP has fewer than two points");
         return -1;
@@ -822,7 +882,7 @@ static void runE2NativeXclipMembership(
             state);
     }
     if (state.failed()) {
-        emitNativeError(r, state.errorCode.c_str(), state.error);
+        e2EmitMembershipError(r, state);
         return;
     }
 

@@ -24,12 +24,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import shutil
 import stat
 import subprocess
 import sys
 import tempfile
+from contextlib import contextmanager, nullcontext
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -104,8 +106,60 @@ def _ts() -> str:
     return datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
 
 
+def _reject_json_constant(value: str) -> None:
+    raise ValueError(f"non-finite JSON number is not permitted: {value}")
+
+
+def _reject_duplicate_json_object(pairs: list[tuple[str, object]]) -> dict:
+    result: dict = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON object key: {key}")
+        result[key] = value
+    return result
+
+
+def _strict_json_loads(value: str) -> object:
+    """Parse evidence JSON without Python's duplicate/non-finite extensions."""
+    return json.loads(
+        value,
+        object_pairs_hook=_reject_duplicate_json_object,
+        parse_constant=_reject_json_constant,
+    )
+
+
 def _load_json_bom(path: Path) -> dict:
-    return json.loads(Path(path).read_text(encoding="utf-8-sig"))
+    return _strict_json_loads(Path(path).read_text(encoding="utf-8-sig"))
+
+
+def _is_plain_int(value: object) -> bool:
+    """JSON booleans are not valid integer evidence, despite Python's type tree."""
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
+def _is_nonnegative_plain_int(value: object) -> bool:
+    return _is_plain_int(value) and value >= 0
+
+
+def _is_positive_plain_int(value: object) -> bool:
+    return _is_plain_int(value) and value > 0
+
+
+def _is_nonempty_string(value: object) -> bool:
+    return isinstance(value, str) and bool(value.strip())
+
+
+def _is_finite_point2(value: object) -> bool:
+    return (
+        isinstance(value, list)
+        and len(value) == 2
+        and all(
+            isinstance(coordinate, (int, float))
+            and not isinstance(coordinate, bool)
+            and math.isfinite(float(coordinate))
+            for coordinate in value
+        )
+    )
 
 
 def _sha256_head(path: Path, n: int = 16) -> str:
@@ -163,24 +217,34 @@ def _native_source_inputs(router_home: Path) -> list[dict]:
     inputs: list[dict] = []
     for relative_root in _NATIVE_SOURCE_ROOTS:
         root = router_home / relative_root
-        if not root.is_dir():
+        if not root.is_dir() or _path_reparse_error(root) is not None:
             raise FileNotFoundError(f"native source root is missing: {root}")
-        for path in root.rglob("*"):
-            relative_to_root = path.relative_to(root)
-            if any(_is_native_build_output_component(part) for part in relative_to_root.parts[:-1]):
-                continue
-            if not path.is_file():
-                continue
-            if _is_reparse_point(path):
-                raise OSError(f"native source input is a reparse point: {path}")
-            raw = path.read_bytes()
-            inputs.append(
-                {
-                    "path": path.relative_to(router_home).as_posix(),
-                    "sha256": hashlib.sha256(raw).hexdigest(),
-                    "bytes": len(raw),
-                }
-            )
+        for current_text, directory_names, file_names in os.walk(
+            root, topdown=True, followlinks=False
+        ):
+            current = Path(current_text)
+            if _is_reparse_point(current):
+                raise OSError(f"native source directory is a reparse point: {current}")
+            retained_directories = []
+            for name in directory_names:
+                child = current / name
+                if _is_reparse_point(child):
+                    raise OSError(f"native source directory is a reparse point: {child}")
+                if not _is_native_build_output_component(name):
+                    retained_directories.append(name)
+            directory_names[:] = retained_directories
+            for name in file_names:
+                path = current / name
+                if _is_reparse_point(path):
+                    raise OSError(f"native source input is a reparse point: {path}")
+                raw = path.read_bytes()
+                inputs.append(
+                    {
+                        "path": path.relative_to(router_home).as_posix(),
+                        "sha256": hashlib.sha256(raw).hexdigest(),
+                        "bytes": len(raw),
+                    }
+                )
     inputs.sort(key=lambda entry: entry["path"].casefold())
     if not inputs:
         raise FileNotFoundError("native source input inventory is empty")
@@ -290,6 +354,80 @@ def _path_reparse_error(path: Path) -> str | None:
         if current != absolute and not current.is_dir():
             return f"path component is not a directory: {current}"
     return None
+
+
+@contextmanager
+def _hold_windows_paths_stable(paths: list[Path]):
+    """Deny write/delete replacement while the final receipt is committed.
+
+    A hash check followed by an atomic receipt link still has a race unless the
+    checked files and containing directories remain locked through that link.
+    Display membership is a Windows/AutoCAD-only route, so unsupported hosts
+    fail closed rather than silently weakening this publication boundary.
+    """
+    if os.name != "nt":
+        raise OSError("stable evidence publication requires Windows file locking")
+
+    import ctypes
+    from ctypes import wintypes
+
+    create_file = ctypes.WinDLL("kernel32", use_last_error=True).CreateFileW
+    create_file.argtypes = (
+        wintypes.LPCWSTR,
+        wintypes.DWORD,
+        wintypes.DWORD,
+        wintypes.LPVOID,
+        wintypes.DWORD,
+        wintypes.DWORD,
+        wintypes.HANDLE,
+    )
+    create_file.restype = wintypes.HANDLE
+    close_handle = ctypes.WinDLL("kernel32", use_last_error=True).CloseHandle
+    close_handle.argtypes = (wintypes.HANDLE,)
+    close_handle.restype = wintypes.BOOL
+
+    generic_read = 0x80000000
+    file_share_read = 0x00000001
+    open_existing = 3
+    file_attribute_normal = 0x00000080
+    file_flag_backup_semantics = 0x02000000
+    invalid_handle = wintypes.HANDLE(-1).value
+    handles = []
+    unique_paths: list[Path] = []
+    seen: set[str] = set()
+    try:
+        for raw_path in paths:
+            path = Path(os.path.abspath(str(raw_path)))
+            key = os.path.normcase(str(path))
+            if key in seen:
+                continue
+            seen.add(key)
+            if _path_reparse_error(path) is not None or not path.exists():
+                raise OSError(f"cannot lock missing or reparse evidence path: {path}")
+            unique_paths.append(path)
+
+        # Lock directories before their children so neither path identity nor
+        # a checked leaf can be swapped before the receipt hard-link commits.
+        unique_paths.sort(key=lambda value: (not value.is_dir(), len(value.parts), str(value)))
+        for path in unique_paths:
+            is_directory = path.is_dir()
+            handle = create_file(
+                str(path),
+                0 if is_directory else generic_read,
+                file_share_read,
+                None,
+                open_existing,
+                file_flag_backup_semantics if is_directory else file_attribute_normal,
+                None,
+            )
+            if handle == invalid_handle:
+                code = ctypes.get_last_error()
+                raise OSError(code, f"cannot hold stable evidence handle: {path}")
+            handles.append(handle)
+        yield
+    finally:
+        for handle in reversed(handles):
+            close_handle(handle)
 
 
 def _display_output_roots(router_home: Path) -> tuple[Path, ...]:
@@ -425,7 +563,58 @@ def _validate_display_prelaunch_layout(
     return {"valid": True}
 
 
-def _atomic_write_json_no_overwrite(path: Path, payload: dict) -> None:
+def _validate_display_runtime_layout(
+    out_dir: Path,
+    staged_dir: Path,
+    attended_dir: Path,
+    staged_dwg: Path,
+    router_home: Path,
+) -> dict:
+    """Revalidate the path identities after an external AutoCAD process ran."""
+    containment = _validate_display_output_dir(out_dir, router_home)
+    if not containment.get("valid"):
+        return {
+            "valid": False,
+            "reason": "output containment changed: " + str(containment.get("reason")),
+        }
+    try:
+        for label, actual, expected in (
+            ("staged", out_dir / "staged", staged_dir),
+            ("attended", out_dir / "attended", attended_dir),
+        ):
+            if (
+                not actual.is_dir()
+                or _is_reparse_point(actual)
+                or not _same_resolved_path(str(actual), expected)
+            ):
+                return {
+                    "valid": False,
+                    "reason": f"output {label} directory identity changed during execution",
+                }
+        actual_staged = staged_dir / "input.dwg"
+        if (
+            not actual_staged.is_file()
+            or _is_reparse_point(actual_staged)
+            or not _same_resolved_path(str(actual_staged), staged_dwg)
+        ):
+            return {
+                "valid": False,
+                "reason": "staged DWG identity changed during execution",
+            }
+    except OSError as exc:
+        return {
+            "valid": False,
+            "reason": f"cannot revalidate runtime layout: {type(exc).__name__}: {exc}",
+        }
+    return {"valid": True}
+
+
+def _atomic_write_json_no_overwrite(
+    path: Path,
+    payload: dict,
+    *,
+    before_publish=None,
+) -> None:
     """Publish complete JSON evidence once; a competing destination is an error."""
     if os.path.lexists(path):
         raise FileExistsError(f"refusing to overwrite existing evidence: {path}")
@@ -434,19 +623,104 @@ def _atomic_write_json_no_overwrite(path: Path, payload: dict) -> None:
         prefix=f".{path.name}.", suffix=".tmp", dir=str(path.parent)
     )
     temporary = Path(temporary_name)
+    published = False
     try:
         with os.fdopen(descriptor, "wb") as stream:
             stream.write(encoded)
             stream.flush()
             os.fsync(stream.fileno())
         # os.replace would silently destroy an existing receipt. A same-volume
-        # hard-link creates the final name atomically and fails on a race.
-        os.link(temporary, path)
+        # hard-link creates the final name atomically and fails on a race. Hold
+        # the temporary inode stable as well as the caller's evidence set: the
+        # final name is only trustworthy if the exact encoded payload remained
+        # immutable until the link was created.
+        guard_context = before_publish() if before_publish is not None else nullcontext()
+        with _hold_windows_paths_stable([temporary]):
+            if temporary.read_bytes() != encoded:
+                raise OSError("temporary evidence bytes changed before publication")
+            with guard_context:
+                if temporary.read_bytes() != encoded:
+                    raise OSError("temporary evidence bytes changed inside publication guard")
+                os.link(temporary, path)
+                published = True
+                if (
+                    not os.path.samefile(temporary, path)
+                    or path.stat().st_size != len(encoded)
+                    or path.read_bytes() != encoded
+                ):
+                    raise OSError("published evidence bytes do not match the final payload")
     finally:
         try:
             temporary.unlink()
         except FileNotFoundError:
             pass
+        except OSError:
+            # Once the no-overwrite hard-link has succeeded, the destination is
+            # authoritative. A best-effort cleanup failure must not turn a
+            # persisted PASS receipt into a contradictory BLOCKED return.
+            if not published:
+                raise
+
+
+def _pe64_image_state(path: Path) -> dict:
+    """Validate the minimum structural facts of an x64 PE32+ DLL image."""
+    state = {
+        "verified": False,
+        "machine": None,
+        "format": None,
+        "minimum_bytes": 512,
+        "pe_header_offset": None,
+        "section_count": None,
+        "optional_header_bytes": None,
+        "reason": None,
+    }
+    try:
+        raw = path.read_bytes()
+        if len(raw) < state["minimum_bytes"]:
+            raise ValueError("artifact is smaller than the minimum PE inspection size")
+        if raw[:2] != b"MZ":
+            raise ValueError("DOS MZ signature is missing")
+        pe_offset = int.from_bytes(raw[0x3C:0x40], "little")
+        state["pe_header_offset"] = pe_offset
+        if pe_offset < 0x40 or pe_offset + 24 > len(raw):
+            raise ValueError("PE header offset is outside the artifact")
+        if raw[pe_offset : pe_offset + 4] != b"PE\x00\x00":
+            raise ValueError("PE signature is missing")
+        machine = int.from_bytes(raw[pe_offset + 4 : pe_offset + 6], "little")
+        section_count = int.from_bytes(raw[pe_offset + 6 : pe_offset + 8], "little")
+        optional_bytes = int.from_bytes(
+            raw[pe_offset + 20 : pe_offset + 22], "little"
+        )
+        characteristics = int.from_bytes(
+            raw[pe_offset + 22 : pe_offset + 24], "little"
+        )
+        optional_offset = pe_offset + 24
+        if optional_offset + optional_bytes > len(raw):
+            raise ValueError("optional header extends beyond the artifact")
+        optional_magic = int.from_bytes(
+            raw[optional_offset : optional_offset + 2], "little"
+        )
+        state.update(
+            {
+                "machine": f"0x{machine:04x}",
+                "format": "PE32+" if optional_magic == 0x20B else f"0x{optional_magic:04x}",
+                "section_count": section_count,
+                "optional_header_bytes": optional_bytes,
+            }
+        )
+        if machine != 0x8664:
+            raise ValueError("PE machine is not AMD64")
+        if section_count < 1:
+            raise ValueError("PE has no sections")
+        if optional_bytes < 0xF0 or optional_magic != 0x20B:
+            raise ValueError("PE optional header is not a complete PE32+ header")
+        if not characteristics & 0x2000:
+            raise ValueError("PE image is not marked as a DLL")
+        state["verified"] = True
+        state["reason"] = "verified x64 PE32+ DLL image"
+    except (OSError, ValueError) as exc:
+        state["reason"] = f"{type(exc).__name__}: {exc}"
+    return state
 
 
 def _verify_native_build_manifest(router_home: Path, native_bin: Path) -> dict:
@@ -460,12 +734,18 @@ def _verify_native_build_manifest(router_home: Path, native_bin: Path) -> dict:
         "errors": [],
         "artifact_paths": [],
     }
-    if not manifest_path.is_file() or _is_reparse_point(manifest_path):
+    native_bin_error = _path_reparse_error(native_bin)
+    if native_bin_error:
+        receipt["errors"].append(
+            "native build artifact directory is unsafe: " + native_bin_error
+        )
+        return receipt
+    if not manifest_path.is_file() or _path_reparse_error(manifest_path) is not None:
         receipt["errors"].append("native build manifest is missing or unsafe")
         return receipt
     try:
         manifest_bytes = manifest_path.read_bytes()
-        manifest = json.loads(manifest_bytes.decode("utf-8-sig"))
+        manifest = _strict_json_loads(manifest_bytes.decode("utf-8-sig"))
     except (OSError, UnicodeError, ValueError) as exc:
         receipt["errors"].append(
             f"native build manifest is not parseable: {type(exc).__name__}: {exc}"
@@ -483,6 +763,12 @@ def _verify_native_build_manifest(router_home: Path, native_bin: Path) -> dict:
     )
     if not checks["schema"]:
         receipt["errors"].append("manifest schema/version")
+    checks["claim_scope"] = (
+        manifest.get("claim_scope") == "release_build_integrity_bundle"
+    )
+    checks["build_target"] = manifest.get("build_target") == "Rebuild"
+    if not checks["claim_scope"] or not checks["build_target"]:
+        receipt["errors"].append("manifest claim scope or build target")
     checks["configuration"] = manifest.get("configuration") == "Release"
     checks["platform"] = manifest.get("platform") == "x64"
     if not checks["configuration"] or not checks["platform"]:
@@ -597,6 +883,20 @@ def _verify_native_build_manifest(router_home: Path, native_bin: Path) -> dict:
     for leaf in DISPLAY_MEMBERSHIP_REQUIRED_ARTIFACTS:
         item = by_leaf.get(leaf)
         path = native_bin / leaf
+        observed_pe = _pe64_image_state(path) if path.is_file() else {"verified": False}
+        manifest_pe = item.get("pe_verification") if isinstance(item, dict) else None
+        pe_ok = (
+            isinstance(manifest_pe, dict)
+            and manifest_pe.get("verified") is True
+            and manifest_pe.get("machine") == observed_pe.get("machine") == "0x8664"
+            and manifest_pe.get("format") == observed_pe.get("format") == "PE32+"
+            and manifest_pe.get("minimum_bytes") == observed_pe.get("minimum_bytes") == 512
+            and manifest_pe.get("pe_header_offset") == observed_pe.get("pe_header_offset")
+            and manifest_pe.get("section_count") == observed_pe.get("section_count")
+            and manifest_pe.get("optional_header_bytes")
+            == observed_pe.get("optional_header_bytes")
+            and observed_pe.get("verified") is True
+        )
         ok = (
             isinstance(item, dict)
             and item.get("current") is True
@@ -607,7 +907,9 @@ def _verify_native_build_manifest(router_home: Path, native_bin: Path) -> dict:
             and item.get("bytes") == path.stat().st_size
             and isinstance(item.get("sha256"), str)
             and item.get("sha256").lower() == _sha256_file(path)
+            and pe_ok
         )
+        checks[f"artifact_pe:{leaf}"] = pe_ok
         checks[f"artifact:{leaf}"] = ok
         if not ok:
             artifact_checks = False
@@ -634,28 +936,30 @@ def _attended_execution_state(attended: dict) -> dict:
     command = attended.get("command")
     command_constructed = isinstance(command, (list, tuple)) and bool(command)
     envelope = attended.get("envelope")
-    receipt_launch = (
-        isinstance(envelope, dict)
-        and isinstance(envelope.get("launched_pid"), int)
-        and not isinstance(envelope.get("launched_pid"), bool)
-        and envelope["launched_pid"] > 0
+    receipt_launch = isinstance(envelope, dict) and _is_positive_plain_int(
+        envelope.get("launched_pid")
     )
-    exit_code = attended.get("exit_code")
-    command_completed = (
-        command_constructed
-        and isinstance(exit_code, int)
-        and not isinstance(exit_code, bool)
-    )
+    launch_evidence = "final_receipt.launched_pid" if receipt_launch else "none"
+    if not receipt_launch:
+        completion_path = attended.get("completion_receipt")
+        if isinstance(completion_path, str) and completion_path:
+            try:
+                completion = _load_json_bom(Path(completion_path))
+            except (OSError, UnicodeError, ValueError):
+                completion = None
+            receipt_launch = (
+                isinstance(completion, dict)
+                and completion.get("schema")
+                == "ariadne.cad_os.attended_job_completion.v1"
+                and completion.get("phase") == "cleanup_pending"
+                and _is_positive_plain_int(completion.get("launched_pid"))
+            )
+            if receipt_launch:
+                launch_evidence = "completion_receipt.launched_pid"
     return {
         "command_constructed": command_constructed,
-        "launch_observed": receipt_launch or command_completed,
-        "launch_evidence": (
-            "final_receipt.launched_pid"
-            if receipt_launch
-            else "runner_exit_code"
-            if command_completed
-            else "none"
-        ),
+        "launch_observed": receipt_launch,
+        "launch_evidence": launch_evidence,
     }
 
 
@@ -1976,7 +2280,9 @@ class Cad:
                 "evidence_preserved": True,
             }
 
-        def write_evidence(path: Path, payload: dict) -> None:
+        pass_prepublish_guard = None
+
+        def write_evidence(path: Path, payload: dict, *, before_publish=None) -> None:
             current_output_validation = _validate_display_output_dir(
                 out_dir_p, self.router_home
             )
@@ -1987,7 +2293,9 @@ class Cad:
                 )
             if not _same_resolved_path(str(path.parent), out_dir_p):
                 raise OSError(f"evidence path escapes output directory: {path}")
-            _atomic_write_json_no_overwrite(path, payload)
+            _atomic_write_json_no_overwrite(
+                path, payload, before_publish=before_publish
+            )
 
         def finish(status: str, reason: str, *, executed: bool, **extra: object) -> dict:
             payload = {
@@ -2002,7 +2310,11 @@ class Cad:
                 **extra,
             }
             try:
-                write_evidence(receipt_path, payload)
+                write_evidence(
+                    receipt_path,
+                    payload,
+                    before_publish=(pass_prepublish_guard if status == "PASS" else None),
+                )
             except Exception as exc:
                 return {
                     **payload,
@@ -2048,6 +2360,14 @@ class Cad:
                 f"input DWG not found or not a .dwg file: {dwg_path}",
                 executed=False,
             )
+        source_path_error = _path_reparse_error(source)
+        if source_path_error:
+            return finish(
+                "BLOCKED",
+                "input DWG path is not a stable plain-file path: " + source_path_error,
+                executed=False,
+            )
+        source_identity = source.resolve(strict=True)
         original_before = _sha256_head(source, 64).lower()
 
         native_bin = (
@@ -2211,6 +2531,18 @@ class Cad:
             "attended_launch_evidence": execution_state["launch_evidence"],
             **manifest_common,
         }
+        runtime_layout = _validate_display_runtime_layout(
+            out_dir_p, stage_dir, attended_dir, staged, self.router_home
+        )
+        common["output_runtime_validation"] = runtime_layout
+        if not runtime_layout.get("valid"):
+            return finish(
+                "BLOCKED",
+                "display-membership path identity changed during native execution: "
+                + str(runtime_layout.get("reason")),
+                executed=execution_state["launch_observed"],
+                **common,
+            )
         if original_before != original_after:
             return finish(
                 "BLOCKED",
@@ -2252,7 +2584,7 @@ class Cad:
             )
         try:
             raw_job_out_bytes = raw_job_out.read_bytes()
-            native_job = json.loads(raw_job_out_bytes.decode("utf-8-sig"))
+            native_job = _strict_json_loads(raw_job_out_bytes.decode("utf-8-sig"))
         except (OSError, UnicodeError, ValueError) as exc:
             return finish(
                 "BLOCKED",
@@ -2295,10 +2627,33 @@ class Cad:
         # untouched, or SECURELOAD/TRUSTEDPATHS were restored.  Do not let a
         # pre-cleanup receipt or a Python fallback promote it to PASS.
         launcher_receipt = attended.get("envelope")
+        launcher_receipt_path = attended_dir / "attended_job_final_receipt.json"
+        launcher_receipt_sha256 = None
+        launcher_receipt_bytes = None
         receipt_errors = []
         if not isinstance(launcher_receipt, dict):
             receipt_errors.append("missing final receipt")
         else:
+            reported_receipt_path = attended.get("result_json")
+            if not _same_resolved_path(reported_receipt_path, launcher_receipt_path):
+                receipt_errors.append("result_json")
+            elif (
+                not launcher_receipt_path.is_file()
+                or _path_reparse_error(launcher_receipt_path) is not None
+            ):
+                receipt_errors.append("final_receipt_file")
+            else:
+                try:
+                    persisted_launcher_receipt = _load_json_bom(launcher_receipt_path)
+                    if _canonical_json_bytes(persisted_launcher_receipt) != _canonical_json_bytes(
+                        launcher_receipt
+                    ):
+                        receipt_errors.append("final_receipt_bytes")
+                    else:
+                        launcher_receipt_sha256 = _sha256_file(launcher_receipt_path)
+                        launcher_receipt_bytes = launcher_receipt_path.stat().st_size
+                except (OSError, TypeError, UnicodeError, ValueError):
+                    receipt_errors.append("final_receipt_file")
             if launcher_receipt.get("schema") != "ariadne.cad_os.attended_job_result.v1":
                 receipt_errors.append("schema")
             if launcher_receipt.get("phase") != "finalized":
@@ -2307,7 +2662,11 @@ class Cad:
                 receipt_errors.append("status")
             if launcher_receipt.get("operation") != "e2.inspect.xclip_membership":
                 receipt_errors.append("operation")
-            if not isinstance(launcher_receipt.get("launched_pid"), int) or launcher_receipt["launched_pid"] <= 0:
+            if launcher_receipt.get("read_only_operation") is not True:
+                receipt_errors.append("read_only_operation")
+            if launcher_receipt.get("staged_save_attempted") is not False:
+                receipt_errors.append("staged_save_attempted")
+            if not _is_positive_plain_int(launcher_receipt.get("launched_pid")):
                 receipt_errors.append("launched_pid")
             launched_process_name = launcher_receipt.get("launched_process_name")
             if (
@@ -2398,6 +2757,11 @@ class Cad:
                 executed=execution_state["launch_observed"],
                 **common,
             )
+        common["attended_final_receipt_evidence"] = {
+            "path": str(launcher_receipt_path.resolve()),
+            "sha256": launcher_receipt_sha256,
+            "bytes": launcher_receipt_bytes,
+        }
         native = native_job.get("result")
         valid_outer = (
             native_job.get("schema") == "ariadne.autocad_native_job_result.v1"
@@ -2416,6 +2780,13 @@ class Cad:
             return finish(
                 "BLOCKED",
                 "native result is incomplete or was not produced in full_autocad",
+                executed=execution_state["launch_observed"],
+                **common,
+            )
+        if not _same_resolved_path(native.get("drawing_path"), staged):
+            return finish(
+                "BLOCKED",
+                "native drawing_path is not the exact staged DWG requested for inspection",
                 executed=execution_state["launch_observed"],
                 **common,
             )
@@ -2449,20 +2820,26 @@ class Cad:
                 if not isinstance(record, dict):
                     raise ValueError("a visible record is not an object")
                 layer = record.get("source_layer")
-                source_def = str(record.get("source_def_handle") or "")
-                entity_handle = str(record.get("source_entity_handle") or "")
+                source_def = record.get("source_def_handle")
+                entity_handle = record.get("source_entity_handle")
                 lineage = record.get("lineage_path")
                 subentity = record.get("subentity_ordinal")
                 fragment = record.get("clip_fragment_ordinal")
+                active_clips = record.get("active_xclip_handles")
+                p0_world = record.get("p0_world")
+                p1_world = record.get("p1_world")
                 if (
                     layer not in ids_by_layer
-                    or not source_def
-                    or not entity_handle
+                    or not _is_nonempty_string(source_def)
+                    or not _is_nonempty_string(entity_handle)
                     or not isinstance(lineage, list)
-                    or not isinstance(subentity, int)
-                    or subentity < 0
-                    or not isinstance(fragment, int)
-                    or fragment < 0
+                    or not _is_nonnegative_plain_int(subentity)
+                    or not _is_nonnegative_plain_int(fragment)
+                    or not isinstance(active_clips, list)
+                    or any(not _is_nonempty_string(handle) for handle in active_clips)
+                    or len(active_clips) != len(set(active_clips))
+                    or not _is_finite_point2(p0_world)
+                    or not _is_finite_point2(p1_world)
                 ):
                     raise ValueError("a visible record lacks stable native lineage")
 
@@ -2471,21 +2848,26 @@ class Cad:
                     first = lineage[0]
                     if not isinstance(first, dict):
                         raise ValueError("a lineage step is not an object")
-                    root_handle = str(first.get("source_def_handle") or "")
+                    root_handle = first.get("source_def_handle")
+                    if not _is_nonempty_string(root_handle):
+                        raise ValueError("a lineage root handle is not a string")
                 path_uid = _hash_parts("MODELSPACE_ROOT", root_handle)
                 expected_owner = root_handle
                 for step in lineage:
                     if not isinstance(step, dict):
                         raise ValueError("a lineage step is not an object")
-                    owner = str(step.get("source_def_handle") or "")
-                    insert_handle = str(step.get("insert_entity_handle") or "")
-                    target_def = str(step.get("target_def_handle") or "")
+                    owner = step.get("source_def_handle")
+                    insert_handle = step.get("insert_entity_handle")
+                    target_def = step.get("target_def_handle")
                     row = step.get("array_row_index")
                     column = step.get("array_col_index")
                     if (
                         owner != expected_owner
-                        or not insert_handle
-                        or not target_def
+                        or not _is_nonempty_string(owner)
+                        or not _is_nonempty_string(insert_handle)
+                        or not _is_nonempty_string(target_def)
+                        or not _is_nonnegative_plain_int(row)
+                        or not _is_nonnegative_plain_int(column)
                         or row != 0
                         or column != 0
                     ):
@@ -2507,9 +2889,24 @@ class Cad:
                 **common,
             )
 
-        summaries_by_layer = {
-            row.get("layer"): row for row in summaries if isinstance(row, dict)
-        }
+        summaries_by_layer = {}
+        for row in summaries:
+            layer = row.get("layer") if isinstance(row, dict) else None
+            if layer not in ids_by_layer or layer in summaries_by_layer:
+                return finish(
+                    "BLOCKED",
+                    "native layer_summary is ambiguous, duplicated, or names another layer",
+                    executed=execution_state["launch_observed"],
+                    **common,
+                )
+            summaries_by_layer[layer] = row
+        if len(summaries_by_layer) != len(normalized_layers):
+            return finish(
+                "BLOCKED",
+                "native layer_summary does not contain exactly one row per target layer",
+                executed=execution_state["launch_observed"],
+                **common,
+            )
         targets = []
         for index, layer in enumerate(normalized_layers, start=1):
             row = summaries_by_layer.get(layer)
@@ -2533,13 +2930,13 @@ class Cad:
                 "excluded_unsupported_entity_templates"
             )
             if (
-                not isinstance(visible_count, int)
-                or not isinstance(expected_count, int)
-                or not isinstance(clipped_count, int)
-                or not isinstance(template_count, int)
-                or not isinstance(excluded_curved_count, int)
-                or not isinstance(excluded_degenerate_count, int)
-                or not isinstance(excluded_unsupported_template_count, int)
+                not _is_nonnegative_plain_int(visible_count)
+                or not _is_nonnegative_plain_int(expected_count)
+                or not _is_nonnegative_plain_int(clipped_count)
+                or not _is_nonnegative_plain_int(template_count)
+                or not _is_nonnegative_plain_int(excluded_curved_count)
+                or not _is_nonnegative_plain_int(excluded_degenerate_count)
+                or not _is_nonnegative_plain_int(excluded_unsupported_template_count)
                 or min(
                     visible_count,
                     expected_count,
@@ -2616,6 +3013,11 @@ class Cad:
             "geometry_scope": geometry_scope,
             "native_job_out_path": str(raw_evidence.resolve()),
             "native_job_out_sha256": raw_job_out_sha256,
+            "attended_final_receipt": {
+                "path": str(launcher_receipt_path.resolve()),
+                "sha256": launcher_receipt_sha256,
+                "bytes": launcher_receipt_bytes,
+            },
             "native_artifacts": [
                 {
                     "leaf": path.name,
@@ -2681,11 +3083,19 @@ class Cad:
         oracle = {
             "schema": "ariadne.e2.target_population_oracle.v1",
             "oracle": "autocad.native_display_membership.v1",
-            "status": "PASS",
+            "status": "OBSERVED",
+            "claim_scope": "instrument_observation_only",
+            "producer_receipt_required": True,
+            "producer_receipt_path": str(receipt_path.resolve()),
+            "downstream_experiment_guard_required": True,
             "drawing_id": original_before,
             "geometry_scope": geometry_scope,
             "evidence": [
                 {"path": str(raw_evidence.resolve()), "sha256": raw_job_out_sha256},
+                {
+                    "path": str(launcher_receipt_path.resolve()),
+                    "sha256": launcher_receipt_sha256,
+                },
                 {
                     "path": str(binding_path.resolve()),
                     "sha256": binding_sha256,
@@ -2720,14 +3130,104 @@ class Cad:
                 executed=execution_state["launch_observed"],
                 **common,
             )
+        oracle_sha256 = _sha256_file(oracle_path)
+
+        @contextmanager
+        def verify_final_pass_inputs():
+            native_source_paths = [
+                self.router_home / item["path"]
+                for item in _native_source_inputs(self.router_home)
+            ]
+            stability_paths = [
+                out_dir_p,
+                stage_dir,
+                attended_dir,
+                source.parent,
+                source,
+                staged,
+                raw_evidence,
+                launcher_receipt_path,
+                binding_path,
+                oracle_path,
+                Path(manifest_before["path"]),
+                self.router_home / _NATIVE_BUILD_RECIPE_PATH,
+                *required_native,
+                *native_source_paths,
+            ]
+            with _hold_windows_paths_stable(stability_paths):
+                final_layout = _validate_display_runtime_layout(
+                    out_dir_p, stage_dir, attended_dir, staged, self.router_home
+                )
+                if not final_layout.get("valid"):
+                    raise OSError(
+                        "runtime path identity changed before PASS publication: "
+                        + str(final_layout.get("reason"))
+                    )
+                immutable_inputs = (
+                    ("original DWG", source, original_before),
+                    ("staged DWG", staged, staged_before),
+                    ("raw native job", raw_evidence, raw_job_out_sha256),
+                    (
+                        "attended final receipt",
+                        launcher_receipt_path,
+                        launcher_receipt_sha256,
+                    ),
+                    ("binding evidence", binding_path, binding_sha256),
+                    ("observation oracle", oracle_path, oracle_sha256),
+                )
+                for label, evidence_path, expected_sha256 in immutable_inputs:
+                    if (
+                        not evidence_path.is_file()
+                        or _path_reparse_error(evidence_path) is not None
+                        or _sha256_file(evidence_path) != expected_sha256
+                    ):
+                        raise OSError(f"{label} changed before PASS publication")
+                if not _same_resolved_path(
+                    str(source.resolve(strict=True)), source_identity
+                ):
+                    raise OSError(
+                        "original DWG path identity changed before PASS publication"
+                    )
+                if _sha256_file(source) != _sha256_file(staged):
+                    raise OSError(
+                        "staged DWG no longer matches the original before PASS publication"
+                    )
+                final_manifest = _verify_native_build_manifest(
+                    self.router_home, native_bin
+                )
+                if (
+                    not final_manifest["valid"]
+                    or final_manifest["sha256"] != manifest_before["sha256"]
+                ):
+                    raise OSError(
+                        "native build manifest changed before PASS publication: "
+                        + "; ".join(
+                            final_manifest["errors"] or ["manifest SHA changed"]
+                        )
+                    )
+                yield
+
+        pass_prepublish_guard = verify_final_pass_inputs
         return finish(
             "PASS",
             "full AutoCAD/ObjectARX resolved every target segment with conserved native lineage",
             executed=execution_state["launch_observed"],
             target_population_oracle=str(oracle_path),
-            target_population_oracle_sha256=_sha256_file(oracle_path),
+            target_population_oracle_sha256=oracle_sha256,
             binding_evidence=str(binding_path),
             binding_evidence_sha256=binding_sha256,
+            claim_scope="instrument_observation_only",
+            downstream_experiment_guard_required=True,
+            authoritative_completion_marker=str(receipt_path),
+            final_evidence_sha256={
+                "source": original_before,
+                "staged_dwg": staged_before,
+                "native_job_out": raw_job_out_sha256,
+                "attended_final_receipt": launcher_receipt_sha256,
+                "binding": binding_sha256,
+                "observation_oracle": oracle_sha256,
+                "native_build_manifest": manifest_before["sha256"],
+            },
             native_visible_source_segments=sum(
                 target["native_visible_source_segments"] for target in targets
             ),

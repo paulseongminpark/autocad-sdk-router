@@ -55,6 +55,8 @@ def _final_attended_receipt(operation: str, job_out: Path) -> dict:
         "status": "ok",
         "run_id": job_out.parent.name,
         "operation": operation,
+        "read_only_operation": operation == "e2.inspect.xclip_membership",
+        "staged_save_attempted": operation != "e2.inspect.xclip_membership",
         "receipt_authority": "powershell_launcher",
         "recovered_from_launcher_finalization_hang": False,
         "launched_pid": 4242,
@@ -85,6 +87,8 @@ def _completion_receipt(operation: str, job_out: Path, *, cleanup_wait_sec: int 
         "status": "observed",
         "run_id": "run",
         "operation": operation,
+        "read_only_operation": operation == "e2.inspect.xclip_membership",
+        "staged_save_attempted": operation != "e2.inspect.xclip_membership",
         "launched_pid": 4242,
         "launched_process_name": "acad",
         "launched_start_time_utc": "2026-08-10T00:00:00.0000000Z",
@@ -101,6 +105,26 @@ def _completion_receipt(operation: str, job_out: Path, *, cleanup_wait_sec: int 
 # ========================================================================== #
 # 1. build_job_doc -- pure, no I/O
 # ========================================================================== #
+
+
+def test_safety_receipt_parser_rejects_duplicate_and_nonfinite_json():
+    with pytest.raises(ValueError, match="duplicate"):
+        al._strict_json_object('{"status":"ok","status":"blocked"}')
+    with pytest.raises(ValueError, match="non-finite"):
+        al._strict_json_object('{"launched_pid":NaN}')
+
+
+def test_recovery_receipt_writer_never_overwrites_a_competing_authority(tmp_path: Path):
+    receipt = tmp_path / "attended_job_final_receipt.json"
+    authority = b'{"receipt_authority":"powershell_launcher"}\n'
+    receipt.write_bytes(authority)
+
+    with pytest.raises(FileExistsError):
+        al._write_json_atomic(
+            receipt, {"receipt_authority": "python_independent_safety_validator"}
+        )
+
+    assert receipt.read_bytes() == authority
 
 def test_build_job_doc_flat_shape():
     """The ARIADNE_NATIVE_JOB_ARGS env-file channel's job_in.json is FLAT
@@ -1155,12 +1179,39 @@ def test_ps1_writes_a_compact_atomic_completion_receipt_before_cleanup(ps1_src: 
     assert "receipt_authority = 'powershell_launcher'" in ps1_src
 
 
+def test_ps1_does_not_qsave_the_read_only_display_membership_operation(ps1_src: str):
+    assert "$readOnlyOperation = ($Operation -eq 'e2.inspect.xclip_membership')" in ps1_src
+    assert "$saveCommand = if ($readOnlyOperation) { '(princ)' } else { '_QSAVE' }" in ps1_src
+    assert "$saveCommand," in ps1_src
+    assert "read_only_operation = $readOnlyOperation" in ps1_src
+    assert "staged_save_attempted = (-not $readOnlyOperation)" in ps1_src
+
+
 def test_ps1_loads_the_canonical_prebuilt_modules(ps1_src: str):
     """Attended (full acad.exe) loads .dbx + .arx -- NOT .crx, which M07B's
     own docs mark as the coreconsole-only variant."""
-    assert "prebuilt\\2027\\Ariadne.AcadNativeDbx.dbx" in ps1_src
-    assert "prebuilt\\2027\\Ariadne.AcadNative.arx" in ps1_src
-    assert ".crx" not in ps1_src
+    assert "prebuilt\\2027" in ps1_src
+    assert "$nativeLease.artifact_paths['Ariadne.AcadNativeDbx.dbx']" in ps1_src
+    assert "$nativeLease.artifact_paths['Ariadne.AcadNative.arx']" in ps1_src
+    assert "$crx =" not in ps1_src
+
+
+def test_ps1_requires_a_committed_hash_bound_prebuilt_set(ps1_src: str):
+    assert "function Open-NativeDeploymentLease" in ps1_src
+    assert "function Close-NativeDeploymentLease" in ps1_src
+    assert "native_deployment_manifest.json" in ps1_src
+    assert "ariadne.cad_os.native_deployment_manifest.v1" in ps1_src
+    assert "release_build_integrity_bundle" in ps1_src
+    assert "deployment_state -cne 'committed'" in ps1_src
+    assert "build_target -cne 'Rebuild'" in ps1_src
+    assert "document.build_recipe.sha256" in ps1_src
+    assert "claimedSourceDigest = [string]$document.source_tree_digest" in ps1_src
+    assert "Get-NativeSourceDigest $sourceInputs" in ps1_src
+    assert "pe_verification.verified -ne $true" in ps1_src
+    assert "[System.IO.FileShare]::Read" in ps1_src
+    assert "Get-NativeLockedStreamSha256 $artifactStream" in ps1_src
+    assert "$nativeLease = Open-NativeDeploymentLease" in ps1_src
+    assert "Close-NativeDeploymentLease $nativeLease" in ps1_src
 
 
 # ========================================================================== #

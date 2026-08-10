@@ -16,8 +16,8 @@ $ErrorActionPreference = 'Stop'
 # accoreconsole does not load; full acad.exe has them. Drives the SAME one-shot
 # ARIADNE_NATIVE_JOB_ARGS env-file channel the headless coreconsole lane proved
 # (docs/LIVE_JOB_ARGUMENT_CONTRACT.md), reusing the M07B attended-launch pattern
-# (tools/attended/run_attended_m07b.ps1): dedicated PID, staged-doc-only, then QSAVE
-# + QUIT (no interactive pump -- this is a single job, not a live session).
+# (tools/attended/run_attended_m07b.ps1): dedicated PID and staged-doc-only.
+# Mutating operations QSAVE before QUIT; declared read-only operations never save.
 #
 # Security scoping (SECURELOAD/TRUSTEDPATHS): M07B set these to load its own ARX
 # module but never restored them, leaving the launched profile permanently weakened.
@@ -149,6 +149,284 @@ function Get-ProcessIdentityById([int]$ProcessId) {
   return $identity
 }
 
+# NATIVE_DEPLOYMENT_CONSUMER_BEGIN
+$script:NativeDeploymentLeaves = @(
+  'Ariadne.AcadNativeDbx.dbx',
+  'Ariadne.AcadNative.crx',
+  'Ariadne.AcadNative.arx'
+)
+
+function Get-Sha256File {
+  param([string]$Path)
+  $stream = [System.IO.File]::Open($Path, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::Read)
+  $sha = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    -join ($sha.ComputeHash($stream) | ForEach-Object { $_.ToString('x2') })
+  } finally {
+    $sha.Dispose()
+    $stream.Dispose()
+  }
+}
+
+function Get-Sha256Text {
+  param([string]$Text)
+  $encoding = New-Object System.Text.UTF8Encoding($false)
+  $sha = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    $bytes = $encoding.GetBytes($Text)
+    -join ($sha.ComputeHash($bytes) | ForEach-Object { $_.ToString('x2') })
+  } finally {
+    $sha.Dispose()
+  }
+}
+
+function Test-NativeBuildOutputPart {
+  param([string]$Part)
+  $normalized = $Part.ToLowerInvariant()
+  return (
+    $normalized -in @('bin', 'obj', '.vs', 'build') -or
+    $normalized.StartsWith('obj-') -or
+    $normalized.StartsWith('obj_')
+  )
+}
+
+function Get-NativeSourceInputs {
+  $roots = @(
+    (Join-Path $RouterHome 'src\Ariadne.AcadNative'),
+    (Join-Path $RouterHome 'src\Ariadne.AcadNativeDbx')
+  )
+  $inputs = @()
+  foreach ($root in $roots) {
+    if (-not (Test-Path -LiteralPath $root -PathType Container)) {
+      throw "Native source root missing: $root"
+    }
+    $rootItem = Get-Item -LiteralPath $root -Force
+    if (($rootItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+      throw "Native source root is a reparse point: $root"
+    }
+    $pending = New-Object System.Collections.Queue
+    $pending.Enqueue($rootItem.FullName)
+    while ($pending.Count -gt 0) {
+      $current = $pending.Dequeue()
+      foreach ($entry in (Get-ChildItem -LiteralPath $current -Force)) {
+        if (($entry.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+          throw "Native source tree contains a reparse point: $($entry.FullName)"
+        }
+        if ($entry.PSIsContainer) {
+          if (-not (Test-NativeBuildOutputPart $entry.Name)) {
+            $pending.Enqueue($entry.FullName)
+          }
+          continue
+        }
+        $relative = $entry.FullName.Substring($RouterHome.Length).TrimStart('\', '/') -replace '\\', '/'
+        $inputs += [ordered]@{
+          path = $relative
+          sha256 = Get-Sha256File -Path $entry.FullName
+          bytes = [int64]$entry.Length
+        }
+      }
+    }
+  }
+  $inputs = @($inputs | Sort-Object @{ Expression = { $_.path.ToLowerInvariant() } }, @{ Expression = { $_.path } })
+  if ($inputs.Count -eq 0) { throw 'Native source input inventory is empty.' }
+  return $inputs
+}
+
+function Get-NativeSourceDigest {
+  param([object[]]$Inputs)
+  $builder = New-Object System.Text.StringBuilder
+  foreach ($input in $Inputs) {
+    [void]$builder.Append([string]$input.path)
+    [void]$builder.Append([char]0)
+    [void]$builder.Append([string]$input.sha256)
+    [void]$builder.Append([char]0)
+    [void]$builder.Append([string]$input.bytes)
+    [void]$builder.Append("`n")
+  }
+  Get-Sha256Text $builder.ToString()
+}
+
+function Get-NativeLockedStreamSha256 {
+  param([System.IO.FileStream]$Stream)
+  $sha = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    $Stream.Position = 0
+    $digest = -join ($sha.ComputeHash($Stream) | ForEach-Object { $_.ToString('x2') })
+    $Stream.Position = 0
+    return $digest
+  } finally {
+    $sha.Dispose()
+  }
+}
+
+function Read-NativeLockedUtf8Text {
+  param([System.IO.FileStream]$Stream)
+  if ($Stream.Length -le 0 -or $Stream.Length -gt 8MB) {
+    throw "Native manifest size is outside the accepted range: $($Stream.Length)"
+  }
+  $Stream.Position = 0
+  $buffer = New-Object byte[] ([int]$Stream.Length)
+  $offset = 0
+  while ($offset -lt $buffer.Length) {
+    $read = $Stream.Read($buffer, $offset, $buffer.Length - $offset)
+    if ($read -le 0) { throw 'Native manifest ended before its declared length.' }
+    $offset += $read
+  }
+  $Stream.Position = 0
+  return (New-Object System.Text.UTF8Encoding($false, $true)).GetString($buffer)
+}
+
+function Test-NativeLockedX64Pe32Plus {
+  param([System.IO.FileStream]$Stream)
+  if ($Stream.Length -lt 512) { return $false }
+  $reader = New-Object System.IO.BinaryReader($Stream, (New-Object System.Text.UTF8Encoding($false)), $true)
+  try {
+    $Stream.Position = 0
+    if ($reader.ReadByte() -ne 0x4D -or $reader.ReadByte() -ne 0x5A) { return $false }
+    $Stream.Position = 0x3C
+    $peOffset = $reader.ReadInt32()
+    if ($peOffset -lt 0x40 -or ([int64]$peOffset + 26) -gt $Stream.Length) { return $false }
+    $Stream.Position = $peOffset
+    if ($reader.ReadUInt32() -ne 0x00004550) { return $false }
+    if ($reader.ReadUInt16() -ne 0x8664) { return $false }
+    if ($reader.ReadUInt16() -lt 1) { return $false }
+    $Stream.Position = $peOffset + 20
+    $optionalBytes = $reader.ReadUInt16()
+    if ($optionalBytes -lt 0xF0 -or ([int64]$peOffset + 24 + $optionalBytes) -gt $Stream.Length) { return $false }
+    $Stream.Position = $peOffset + 24
+    return ($reader.ReadUInt16() -eq 0x020B)
+  } finally {
+    $reader.Dispose()
+    $Stream.Position = 0
+  }
+}
+
+function Close-NativeDeploymentLease {
+  param($Lease)
+  if ($null -eq $Lease -or $Lease.closed -eq $true) { return }
+  foreach ($stream in @($Lease.artifact_streams)) {
+    if ($null -ne $stream) { $stream.Dispose() }
+  }
+  if ($null -ne $Lease.manifest_stream) { $Lease.manifest_stream.Dispose() }
+  $Lease.closed = $true
+}
+
+function Open-NativeDeploymentLease {
+  param([string]$BinDir, [string]$ManifestLeaf)
+  if ($ManifestLeaf -cnotin @('native_deployment_manifest.json', 'native_build_manifest.json')) {
+    throw "Unsupported native manifest leaf: $ManifestLeaf"
+  }
+  $lease = [pscustomobject]@{
+    bin_dir = $null
+    manifest_kind = if ($ManifestLeaf -ceq 'native_deployment_manifest.json') { 'deployment' } else { 'build' }
+    manifest_path = $null
+    manifest_stream = $null
+    artifact_streams = New-Object System.Collections.ArrayList
+    artifact_paths = @{}
+    closed = $false
+  }
+  try {
+    $directory = Get-Item -LiteralPath $BinDir -Force -ErrorAction Stop
+    if (-not $directory.PSIsContainer -or
+        ($directory.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+      throw "Native bin directory is missing or a reparse point: $BinDir"
+    }
+    $lease.bin_dir = $directory.FullName
+    $lease.manifest_path = Join-Path $directory.FullName $ManifestLeaf
+    $manifestItem = Get-Item -LiteralPath $lease.manifest_path -Force -ErrorAction Stop
+    if ($manifestItem.PSIsContainer -or
+        ($manifestItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+      throw "Native manifest is not a regular file: $($lease.manifest_path)"
+    }
+    $lease.manifest_stream = [System.IO.File]::Open(
+      $lease.manifest_path,
+      [System.IO.FileMode]::Open,
+      [System.IO.FileAccess]::Read,
+      [System.IO.FileShare]::Read
+    )
+    try {
+      $document = (Read-NativeLockedUtf8Text $lease.manifest_stream) | ConvertFrom-Json
+    } catch {
+      throw "Native manifest is invalid JSON: $($_.Exception.Message)"
+    }
+
+    if ($lease.manifest_kind -ceq 'deployment') {
+      if ([string]$document.schema -cne 'ariadne.cad_os.native_deployment_manifest.v1' -or
+          [string]$document.deployment_state -cne 'committed' -or $document.committed -ne $true) {
+        throw 'Native deployment manifest is not a committed v1 marker.'
+      }
+      $claimedSourceDigest = [string]$document.source_tree_digest
+    } else {
+      if ([string]$document.schema -cne 'ariadne.cad_os.native_build_manifest.v1' -or
+          $document.build_snapshot.exact_match -ne $true) {
+        throw 'Native build manifest is not a finalized exact-snapshot v1 manifest.'
+      }
+      $manifestBin = [System.IO.Path]::GetFullPath([string]$document.load_bin_dir).TrimEnd('\')
+      if (-not [string]::Equals($manifestBin, $directory.FullName.TrimEnd('\'), [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Native build manifest load_bin_dir does not match the requested bin directory.'
+      }
+      $claimedSourceDigest = [string]$document.source_tree.digest
+    }
+    if ([string]$document.claim_scope -cne 'release_build_integrity_bundle' -or
+        [string]$document.build_target -cne 'Rebuild' -or
+        [string]$document.configuration -cne 'Release' -or
+        [string]$document.platform -cne 'x64') {
+      throw 'Native manifest is not a Release|x64 Rebuild integrity bundle.'
+    }
+    $recipePath = Join-Path $RouterHome 'tools\build_native_acad.ps1'
+    if ([string]$document.build_recipe.path -cne 'tools/build_native_acad.ps1' -or
+        [string]$document.build_recipe.sha256 -cne (Get-Sha256File $recipePath)) {
+      throw 'Native manifest does not bind to the current build recipe.'
+    }
+    $sourceInputs = @(Get-NativeSourceInputs)
+    $actualSourceDigest = Get-NativeSourceDigest $sourceInputs
+    if ($claimedSourceDigest -notmatch '^[0-9a-f]{64}$' -or
+        $claimedSourceDigest -cne $actualSourceDigest) {
+      throw 'Native manifest source-tree digest does not match the current native sources.'
+    }
+
+    $allRecords = @($document.artifacts)
+    if ($allRecords.Count -ne $script:NativeDeploymentLeaves.Count) {
+      throw 'Native manifest must contain the exact DBX, CRX, and ARX artifact set.'
+    }
+    foreach ($leaf in $script:NativeDeploymentLeaves) {
+      $records = @($allRecords | Where-Object { [string]$_.leaf -ceq $leaf })
+      if ($records.Count -ne 1) {
+        throw "Native manifest must contain exactly one record for $leaf."
+      }
+      $record = $records[0]
+      $artifactPath = Join-Path $directory.FullName $leaf
+      $artifactItem = Get-Item -LiteralPath $artifactPath -Force -ErrorAction Stop
+      if ($artifactItem.PSIsContainer -or
+          ($artifactItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+        throw "Native artifact is not a regular file: $leaf"
+      }
+      $artifactStream = [System.IO.File]::Open(
+        $artifactPath,
+        [System.IO.FileMode]::Open,
+        [System.IO.FileAccess]::Read,
+        [System.IO.FileShare]::Read
+      )
+      [void]$lease.artifact_streams.Add($artifactStream)
+      $lease.artifact_paths[$leaf] = $artifactPath
+      if ($record.exists -ne $true -or $record.current -ne $true -or
+          $record.pe_verification.verified -ne $true -or
+          [string]$record.pe_verification.machine -cne '0x8664' -or
+          [string]$record.pe_verification.format -cne 'PE32+' -or
+          [int64]$record.bytes -ne [int64]$artifactStream.Length -or
+          [string]$record.sha256 -cne (Get-NativeLockedStreamSha256 $artifactStream) -or
+          -not (Test-NativeLockedX64Pe32Plus $artifactStream)) {
+        throw "Native artifact does not match its verified manifest record: $leaf"
+      }
+    }
+    return $lease
+  } catch {
+    Close-NativeDeploymentLease $lease
+    throw
+  }
+}
+# NATIVE_DEPLOYMENT_CONSUMER_END
+
 New-Item -ItemType Directory -Force -Path $RunDir | Out-Null
 $runId = Split-Path -Leaf $RunDir
 $completionReceipt = Join-Path $RunDir 'attended_job_completion.json'
@@ -173,19 +451,22 @@ if (-not (Test-Path -LiteralPath $AcadExe)) {
   exit 2
 }
 
-$dbx = if ([string]::IsNullOrWhiteSpace($NativeBinDir)) {
-  Join-Path $RouterHome 'prebuilt\2027\Ariadne.AcadNativeDbx.dbx'
-} else {
-  Join-Path $NativeBinDir 'Ariadne.AcadNativeDbx.dbx'
+$usingDefaultPrebuilt = [string]::IsNullOrWhiteSpace($NativeBinDir)
+$requestedDbx = if ($usingDefaultPrebuilt) { $null } else { Join-Path $NativeBinDir 'Ariadne.AcadNativeDbx.dbx' }
+$requestedArx = if ($usingDefaultPrebuilt) { $null } else { Join-Path $NativeBinDir 'Ariadne.AcadNative.arx' }
+$binDir = if ($usingDefaultPrebuilt) { Join-Path $RouterHome 'prebuilt\2027' } else { $NativeBinDir }
+$manifestLeaf = if ($usingDefaultPrebuilt) { 'native_deployment_manifest.json' } else { 'native_build_manifest.json' }
+$nativeLease = Open-NativeDeploymentLease -BinDir $binDir -ManifestLeaf $manifestLeaf
+$dbx = [string]$nativeLease.artifact_paths['Ariadne.AcadNativeDbx.dbx']
+$arx = [string]$nativeLease.artifact_paths['Ariadne.AcadNative.arx']
+if (-not $usingDefaultPrebuilt -and
+    (-not [string]::Equals([System.IO.Path]::GetFullPath($requestedDbx), $dbx, [System.StringComparison]::OrdinalIgnoreCase) -or
+     -not [string]::Equals([System.IO.Path]::GetFullPath($requestedArx), $arx, [System.StringComparison]::OrdinalIgnoreCase))) {
+  Close-NativeDeploymentLease $nativeLease
+  throw 'Explicit native module paths escaped the verified build-manifest directory.'
 }
-$arx = if ([string]::IsNullOrWhiteSpace($NativeBinDir)) {
-  Join-Path $RouterHome 'prebuilt\2027\Ariadne.AcadNative.arx'
-} else {
-  Join-Path $NativeBinDir 'Ariadne.AcadNative.arx'
-}
-if (-not (Test-Path -LiteralPath $dbx)) { throw "native dbx missing: $dbx" }
-if (-not (Test-Path -LiteralPath $arx)) { throw "native arx missing: $arx" }
-$binDir = Split-Path -Parent $arx
+
+try {
 
 # ---- Gate 1: pre-existing acad.exe (record; NEVER attach) -------------------
 # PID plus process start time is an identity, unlike a PID alone which Windows
@@ -225,6 +506,8 @@ $secAfter  = Join-Path $RunDir 'security_after.txt'
 $trustedEscaped = $binDir.Replace('\', '\\')
 
 $scr = Join-Path $RunDir 'attended_job.scr'
+$readOnlyOperation = ($Operation -eq 'e2.inspect.xclip_membership')
+$saveCommand = if ($readOnlyOperation) { '(princ)' } else { '_QSAVE' }
 @(
   '(setq _ariadneOsl (getvar "SECURELOAD"))',
   '(setq _ariadneOtp (getvar "TRUSTEDPATHS"))',
@@ -245,7 +528,7 @@ $scr = Join-Path $RunDir 'attended_job.scr'
   '(write-line (itoa (getvar "SECURELOAD")) _f2)',
   '(write-line (getvar "TRUSTEDPATHS") _f2)',
   '(close _f2)',
-  '_QSAVE',
+  $saveCommand,
   '_QUIT',
   ''
 ) | Set-Content -LiteralPath $scr -Encoding ASCII
@@ -320,7 +603,7 @@ try {
         if (-not $jobDone -and -not $proc.HasExited) {
           Log "poll deadline ($($TimeoutSec)s) reached without job_out.json"
         }
-        # This compact signal is written before QSAVE/QUIT cleanup.  It is only
+        # This compact signal is written before save/QUIT cleanup.  It is only
         # usable for Python recovery when both captured identity sets are known.
         if ($jobDone -and $launchedIdentityKnown -and $preIdentityKnown) {
           $completion = [ordered]@{
@@ -329,6 +612,8 @@ try {
             phase = 'cleanup_pending'
             status = 'observed'
             operation = $Operation
+            read_only_operation = $readOnlyOperation
+            staged_save_attempted = (-not $readOnlyOperation)
             launched_pid = $launchedPid
             launched_process_name = $launchedProcessName
             launched_start_time_utc = $launchedStartTimeUtc
@@ -348,7 +633,7 @@ try {
             Log "completion receipt write failed: $($_.Exception.Message)"
           }
         }
-        # Grace period for QSAVE+QUIT to flush and the process to exit on its own.
+        # Grace period for the optional save plus QUIT to flush and exit.
         $proc.Refresh()
         if ($jobDone -and -not $proc.HasExited) {
           Log "job done; waiting up to 30s for the process to quit on its own"
@@ -538,6 +823,8 @@ try {
     phase = 'finalized'
     status = $status
     operation = $Operation
+    read_only_operation = $readOnlyOperation
+    staged_save_attempted = (-not $readOnlyOperation)
     receipt_authority = 'powershell_launcher'
     recovered_from_launcher_finalization_hang = $false
     launched_pid = $launchedPid
@@ -574,4 +861,8 @@ try {
   WriteJson $result $finalReceipt
   Log '--- attended_job_final_receipt ---'
   $result | ConvertTo-Json -Depth 12
+}
+}
+finally {
+  Close-NativeDeploymentLease $nativeLease
 }

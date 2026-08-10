@@ -99,6 +99,64 @@ def test_native_job_wires_spatial_filter_membership_as_a_distinct_experiment_op(
     assert "e2.inspect.xclip_membership" in job
 
 
+def test_inside_intervals_uses_squared_epsilon_for_squared_segment_length():
+    source = ORACLE_SOURCE.read_text(encoding="utf-8")
+    inside_intervals = source[
+        source.index(
+            "static std::vector<std::pair<double, double>> e2InsideIntervals"
+        ) :
+    ]
+    inside_intervals = inside_intervals[
+        : inside_intervals.index("static std::vector<E2Segment2> e2ApplyClip")
+    ]
+
+    epsilon = 1.0e-12
+    counterexample_length = 1.0e-9
+    counterexample_length_squared = counterexample_length * counterexample_length
+    assert epsilon * epsilon < counterexample_length_squared <= epsilon
+
+    assert (
+        "denominator <= kE2GeometryEpsilon * kE2GeometryEpsilon"
+        in inside_intervals
+    )
+    assert "denominator <= kE2GeometryEpsilon)" not in inside_intervals
+
+
+def test_xclip_definition_rejects_geometry_v1_does_not_apply():
+    source = ORACLE_SOURCE.read_text(encoding="utf-8")
+    read_clip = source[source.index("static int e2ReadBlockReferenceClip") :]
+    read_clip = read_clip[: read_clip.index("static bool e2EntityLayerVisible")]
+
+    assert "normal.isEqualTo(AcGeVector3d::kZAxis)" in read_clip
+    assert '"XCLIP_NORMAL_UNSUPPORTED"' in read_clip
+    assert '"tilted_normal"' in read_clip
+    assert "elevation != 0.0" in read_clip
+    assert '"XCLIP_ELEVATION_UNSUPPORTED"' in read_clip
+    assert '"nonzero_elevation"' in read_clip
+    assert (
+        "frontClip == 0.0 && backClip == 0.0"
+        in read_clip
+    )
+    assert (
+        "frontClip == ACDB_INFINITE_XCLIP_DEPTH &&\n"
+        "        backClip == ACDB_INFINITE_XCLIP_DEPTH"
+        in read_clip
+    )
+    assert '"XCLIP_DEPTH_CLIP_UNSUPPORTED"' in read_clip
+    assert '"active_depth_clip"' in read_clip
+    assert "if (!zeroDepth && !infiniteDepth)" in read_clip
+
+    definition_read = read_clip.index("pFilter->getDefinition(")
+    enabled_check = read_clip.index("if (enabled != Adesk::kTrue)")
+    normal_check = read_clip.index("normal.isEqualTo(AcGeVector3d::kZAxis)")
+    polygon_conversion = read_clip.index("AcGePoint2dArray polygon;")
+    assert definition_read < enabled_check < normal_check < polygon_conversion
+
+    assert "unsupported_definition_count" in source
+    assert "unsupported_definition_reasons" in source
+    assert "e2EmitMembershipError(r, state);" in source
+
+
 def test_linear_segments_exclude_degenerate_source_and_world_collapses():
     source = ORACLE_SOURCE.read_text(encoding="utf-8")
 
