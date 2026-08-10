@@ -23,8 +23,8 @@ _MISSING = _Missing()
 
 # These aliases are already accepted by the CADAgent handlers.  They cannot be
 # placed in _TOOLS because tools/list must preserve the published schemas
-# exactly.  The display-membership alias is harmless on the 18-tool main branch
-# and becomes active when that tool lands.
+# exactly. ``cad.inspect_display_membership`` uses the same hidden path aliases
+# as the older inspection tools while keeping the closed schema unchanged.
 _LEGACY_ALIASES: Dict[str, Tuple[str, ...]] = {
     "cad.inspect_drawing": ("dwg_path", "out_dir"),
     "cad.query_entities": ("ir_path",),

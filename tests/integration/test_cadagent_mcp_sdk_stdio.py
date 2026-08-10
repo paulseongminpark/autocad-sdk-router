@@ -106,6 +106,8 @@ async def _exercise_persistent_stdio() -> None:
                 for definition in cadagent_mcp._TOOLS
             }
             actual_schemas = {tool.name: _tool_schema(tool) for tool in listed.tools}
+            assert len(actual_schemas) == 19
+            assert "cad.inspect_display_membership" in actual_schemas
             assert actual_schemas == expected_schemas
 
             resources = await session.list_resources()
@@ -171,6 +173,45 @@ async def _exercise_persistent_stdio() -> None:
                 )
                 assert omitted_job["output_mode"] == "ir"
                 assert null_job["output_mode"] == "extract"
+
+                # The PR66 tool must be callable through the same generated
+                # adapter in both SDK majors.  Its legacy path aliases stay
+                # accepted without leaking into the advertised closed schema.
+                display_out = tmp_path / "display-membership-alias"
+                display = await session.call_tool(
+                    "cad.inspect_display_membership",
+                    {
+                        "dwg_path": str(missing_dwg),
+                        "target_layers": ["W1"],
+                        "out_dir": str(display_out),
+                    },
+                )
+                display_payload = _field(
+                    display, "structuredContent", "structured_content"
+                )
+                assert _field(display, "isError", "is_error") is False
+                assert display_payload["ok"] is True
+                assert display_payload["result"]["status"] == "BLOCKED"
+                assert display_payload["result"]["geometry_scope"] == (
+                    "strict_layer_entities_v1"
+                )
+
+                # Omission selects the handler default above; explicit null is
+                # preserved and rejected by the handler as a structured error.
+                display_null = await session.call_tool(
+                    "cad.inspect_display_membership",
+                    {
+                        "dwg_path": str(missing_dwg),
+                        "target_layers": ["W1"],
+                        "geometry_scope": None,
+                    },
+                )
+                display_null_payload = _field(
+                    display_null, "structuredContent", "structured_content"
+                )
+                assert _field(display_null, "isError", "is_error") is True
+                assert display_null_payload["ok"] is False
+                assert "geometry_scope" in display_null_payload["error"]
 
             # The SDK owns this behavior: unlike the retired private handle_rpc
             # shim, an unregistered tool is a CallToolResult error rather than
