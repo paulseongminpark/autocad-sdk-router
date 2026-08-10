@@ -202,6 +202,18 @@ public sealed class GeometryPayload
     [JsonProperty("position")]
     public PointDto? Position { get; set; }
 
+    [JsonProperty("alignment_point")]
+    public PointDto? AlignmentPoint { get; set; }
+
+    [JsonProperty("is_default_alignment")]
+    public bool? IsDefaultAlignment { get; set; }
+
+    [JsonProperty("horizontal_mode")]
+    public int? HorizontalMode { get; set; }
+
+    [JsonProperty("vertical_mode")]
+    public int? VerticalMode { get; set; }
+
     [JsonProperty("block_name")]
     public string? BlockName { get; set; }
 

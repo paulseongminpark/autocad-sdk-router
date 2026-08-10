@@ -11,12 +11,17 @@ TOOLS = os.path.join(ROOT, "tools")
 if TOOLS not in sys.path:
     sys.path.insert(0, TOOLS)
 
-from ir_builder import build_ir_from_database_graph  # noqa: E402
+import cross_oracle  # noqa: E402
+from ir_builder import build_ir_from_database_graph, build_ir_from_extract  # noqa: E402
 from build_from_ir import build_dxf_from_ir  # noqa: E402
 
 
 NATIVE_SOURCE = os.path.join(
     ROOT, "src", "Ariadne.AcadNative", "AriadneNativeJob.cpp")
+MANAGED_SOURCE = os.path.join(
+    ROOT, "src", "Ariadne.DwgGeometryExtractor", "GeometryExtractor.cs")
+MANAGED_DTOS = os.path.join(
+    ROOT, "src", "Ariadne.DwgGeometryExtractor", "GeometryDtos.cs")
 
 
 def _reload(doc):
@@ -69,6 +74,72 @@ def test_native_text_emits_alignment_state_modes_and_nondefault_point():
     assert '\\"horizontal_mode\\":' in region
     assert '\\"vertical_mode\\":' in region
     assert "alignmentPoint()" in region
+
+
+def test_managed_text_oracle_declares_and_emits_alignment_state():
+    source = open(MANAGED_SOURCE, encoding="utf-8").read()
+    dtos = open(MANAGED_DTOS, encoding="utf-8").read()
+
+    assert "DBText text => ExtractText(text)" in source
+    assert "text.IsDefaultAlignment" in source
+    assert "text.HorizontalMode" in source
+    assert "text.VerticalMode" in source
+    assert "isDefaultAlignment ? null : ToPoint(text.AlignmentPoint)" in source
+    for json_name in (
+        "alignment_point",
+        "is_default_alignment",
+        "horizontal_mode",
+        "vertical_mode",
+    ):
+        assert f'JsonProperty("{json_name}")' in dtos
+
+
+def test_managed_and_native_text_alignment_state_compare_as_certified_data():
+    managed_extract = {
+        "summary": {"modelspace_count": 1},
+        "entities": [{
+            "handle": "10",
+            "type": "TEXT",
+            "layer": "TEXT",
+            "geometry": {
+                "kind": "text",
+                "position": {"x": 10.0, "y": 20.0, "z": 0.0},
+                "alignment_point": {"x": 0.0, "y": 0.0, "z": 0.0},
+                "is_default_alignment": False,
+                "horizontal_mode": 1,
+                "vertical_mode": 2,
+                "text": "origin-aligned",
+                "height": 2.5,
+                "rotation": 0.0,
+            },
+        }],
+    }
+    native_graph = {
+        "modelspace_entities": 1,
+        "entities": [{
+            "handle": "10",
+            "dxf_name": "AcDbText",
+            "layer": "TEXT",
+            "position": [10.0, 20.0, 0.0],
+            "alignment_point": [0.0, 0.0, 0.0],
+            "is_default_alignment": False,
+            "horizontal_mode": 1,
+            "vertical_mode": 2,
+            "text": "origin-aligned",
+            "height": 2.5,
+            "rotation": 0.0,
+        }],
+    }
+
+    managed_ir = build_ir_from_extract(
+        managed_extract, None, {"extractor": "managed_test"})
+    native_ir = build_ir_from_database_graph(
+        native_graph, {"extractor": "native_test"})
+    result = cross_oracle.compare_multiset(managed_ir, native_ir)
+
+    assert result["status"] == cross_oracle.STATUS_OK
+    assert result["exit_code"] == cross_oracle.EXIT_OK
+    assert result["disagreements"] == []
 
 
 def test_nondefault_origin_alignment_restores_modes_and_point_after_reload():
@@ -173,3 +244,39 @@ def test_ray_and_xline_builder_dispatch_survives_reload():
     assert tuple(ray.dxf.unit_vector) == (0.0, 1.0, 0.0)
     assert tuple(xline.dxf.start) == (3.0, 4.0, 0.0)
     assert tuple(xline.dxf.unit_vector) == (1.0, 0.0, 0.0)
+
+
+def test_ray_and_xline_without_explicit_valid_geometry_are_skipped():
+    invalid_geometry = [
+        {},
+        {"base_point": [1.0, 2.0, 0.0]},
+        {"base_point": [1.0, 2.0], "unit_dir": [1.0, 0.0, 0.0]},
+        {"base_point": [1.0, 2.0, 0.0], "unit_dir": [0.0, 0.0, 0.0]},
+        {"base_point": [1.0, "bad", 0.0], "unit_dir": [1.0, 0.0, 0.0]},
+    ]
+    entities = []
+    handle = 30
+    geometry_by_handle = {}
+    for dxf_name, kind in (("AcDbRay", "ray"), ("AcDbXline", "xline")):
+        for geometry in invalid_geometry:
+            geometry_by_handle[str(handle)] = {"kind": kind, **geometry}
+            entities.append({
+                "handle": str(handle),
+                "dxf_name": dxf_name,
+                "layer": "GUIDE",
+            })
+            handle += 1
+
+    graph = {"modelspace_entities": len(entities), "entities": entities}
+    ir = build_ir_from_database_graph(graph, {"dwg_path": "fixture.dwg"})
+    for entity in ir["entities"]:
+        entity["geometry"] = geometry_by_handle[entity["handle"]]
+    doc, report = build_dxf_from_ir(ir)
+    reloaded = _reload(doc).modelspace()
+
+    assert report.added["ray"] == 0
+    assert report.added["xline"] == 0
+    assert report.skipped["ray:no_geom"] == len(invalid_geometry)
+    assert report.skipped["xline:no_geom"] == len(invalid_geometry)
+    assert list(reloaded.query("RAY")) == []
+    assert list(reloaded.query("XLINE")) == []

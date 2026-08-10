@@ -154,6 +154,14 @@ def _p3(value, default=(0.0, 0.0, 0.0)):
     return default
 
 
+def _explicit_p3(value):
+    """Return a finite 3D point only when all three coordinates are explicit."""
+    if not isinstance(value, (list, tuple)) or len(value) != 3:
+        return None
+    point = tuple(_num(component) for component in value)
+    return None if any(component is None for component in point) else point
+
+
 def _p2(value, default=(0.0, 0.0)):
     p = _p3(value, None)
     return default if p is None else (p[0], p[1])
@@ -793,13 +801,21 @@ def _h_leader(ctx, space, ent, g, attr):
 
 
 def _h_ray(ctx, space, ent, g, attr):
-    return space.add_ray(_p3(g.get("base_point")),
-                         _p3(g.get("unit_dir"), (1.0, 0.0, 0.0)), dxfattribs=attr)
+    base_point = _explicit_p3(g.get("base_point"))
+    unit_dir = _explicit_p3(g.get("unit_dir"))
+    if base_point is None or unit_dir is None or not any(unit_dir):
+        ctx.report.skipped["ray:no_geom"] += 1
+        return None
+    return space.add_ray(base_point, unit_dir, dxfattribs=attr)
 
 
 def _h_xline(ctx, space, ent, g, attr):
-    return space.add_xline(_p3(g.get("base_point")),
-                           _p3(g.get("unit_dir"), (1.0, 0.0, 0.0)), dxfattribs=attr)
+    base_point = _explicit_p3(g.get("base_point"))
+    unit_dir = _explicit_p3(g.get("unit_dir"))
+    if base_point is None or unit_dir is None or not any(unit_dir):
+        ctx.report.skipped["xline:no_geom"] += 1
+        return None
+    return space.add_xline(base_point, unit_dir, dxfattribs=attr)
 
 
 def _h_dimension(ctx, space, ent, g, attr):

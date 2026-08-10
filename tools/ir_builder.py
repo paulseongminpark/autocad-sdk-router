@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from pathlib import Path
 
 try:
@@ -366,12 +367,14 @@ def _normalize_geometry(raw_geom):
 
     # pass through unknown/extra fields verbatim (richer engines attach extras)
     for k, v in raw_geom.items():
-        if k in ("kind", "start", "end", "center", "position", "vertices",
-                 "control_points", "normal", "major_axis", "scale"):
+        if k in ("kind", "start", "end", "center", "position", "base_point",
+                 "unit_dir", "alignment_point", "vertices", "control_points",
+                 "normal", "major_axis", "scale"):
             continue
         geom[k] = v
 
-    for key in ("start", "end", "center", "position", "normal", "major_axis", "scale"):
+    for key in ("start", "end", "center", "position", "base_point", "unit_dir",
+                "alignment_point", "normal", "major_axis", "scale"):
         pt = _as_point3(raw_geom.get(key))
         if pt is not None:
             geom[key] = pt
@@ -1610,6 +1613,16 @@ def _find_point_shape_defects(value, path: str = "") -> list[str]:
     return found
 
 
+def _explicit_finite_point3(value):
+    """Return a strict point3 tuple for structural contract checks."""
+    if not isinstance(value, (list, tuple)) or len(value) != 3:
+        return None
+    point = tuple(_to_number(component) for component in value)
+    if any(component is None or not math.isfinite(component) for component in point):
+        return None
+    return point
+
+
 def _validate_ir(ir: dict):
     """Validate an IR dict against the schema if jsonschema is importable.
 
@@ -1658,6 +1671,13 @@ def _validate_ir(ir: dict):
                     errors.append(
                         f"entity[{i}] geometry.{key_path} is an un-normalized "
                         "point object (expected a point array)")
+                if geom.get("kind") in ("ray", "xline"):
+                    base_point = _explicit_finite_point3(geom.get("base_point"))
+                    unit_dir = _explicit_finite_point3(geom.get("unit_dir"))
+                    if base_point is None or unit_dir is None or not any(unit_dir):
+                        errors.append(
+                            f"entity[{i}] geometry kind {geom.get('kind')!r} requires "
+                            "explicit finite base_point and non-zero unit_dir point3 values")
         # F-C1-1 defect A, rich-section variants: symbol_tables.viewports[]
         # center/view_direction/etc, block_table_records[].origin, and
         # block_definitions[].origin surviving as dicts instead of arrays.

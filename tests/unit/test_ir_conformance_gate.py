@@ -115,6 +115,30 @@ class TestIRWriteGate(unittest.TestCase):
         with self.assertRaises(self.ir_builder.IRConformanceError):
             self.ir_builder.assert_ir_conforms(bad)
 
+    def test_ray_and_xline_require_explicit_nonzero_geometry(self):
+        for kind in ("ray", "xline"):
+            good = self.ir_builder.make_fixture_ir()
+            good["entities"][0]["geometry"] = {
+                "kind": kind,
+                "base_point": [1.0, 2.0, 0.0],
+                "unit_dir": [0.0, 1.0, 0.0],
+            }
+            self.assertTrue(self.ir_builder.assert_ir_conforms(good), kind)
+
+            for geometry in (
+                {"kind": kind},
+                {"kind": kind, "base_point": [1.0, 2.0, 0.0]},
+                {
+                    "kind": kind,
+                    "base_point": [1.0, 2.0, 0.0],
+                    "unit_dir": [0.0, 0.0, 0.0],
+                },
+            ):
+                bad = self.ir_builder.make_fixture_ir()
+                bad["entities"][0]["geometry"] = geometry
+                with self.assertRaises(self.ir_builder.IRConformanceError, msg=str(geometry)):
+                    self.ir_builder.assert_ir_conforms(bad)
+
 
 class TestDiffWriteGate(unittest.TestCase):
     """write_diff hard-fails a non-conformant, cad_diff.v1-tagged diff."""
@@ -200,6 +224,24 @@ class TestStructuralFallbackHardening(unittest.TestCase):
             ok, method, errors = self.ir_builder.validate_ir(ir)
         self.assertEqual(method, "structural")
         self.assertFalse(ok)
+
+    def test_fallback_rejects_incomplete_or_zero_direction_ray_and_xline(self):
+        for kind in ("ray", "xline"):
+            for geometry in (
+                {"kind": kind},
+                {
+                    "kind": kind,
+                    "base_point": [1.0, 2.0, 0.0],
+                    "unit_dir": [0.0, 0.0, 0.0],
+                },
+            ):
+                ir = self.ir_builder.make_fixture_ir()
+                ir["entities"][0]["geometry"] = geometry
+                with _no_jsonschema():
+                    ok, method, errors = self.ir_builder.validate_ir(ir)
+                self.assertEqual(method, "structural")
+                self.assertFalse(ok, geometry)
+                self.assertTrue(errors)
 
     def test_fallback_rejects_dict_form_viewport_center(self):
         ir = self.ir_builder.make_fixture_ir()

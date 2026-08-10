@@ -186,7 +186,8 @@ _KNOWN_ENTITY_FIELDS = frozenset({
 })
 
 _KNOWN_GEOMETRY_LEAF_FIELDS = frozenset({
-    "kind", "start", "end", "center", "position", "radius", "major_axis",
+    "kind", "start", "end", "center", "position", "base_point", "unit_dir",
+    "radius", "major_axis",
     "minor_ratio", "start_angle", "end_angle", "normal", "closed", "vertices",
     "text", "height", "rotation", "block_name", "scale", "dimension_type",
     "measurement", "control_points", "degree", "loops", "pattern_name",
