@@ -26,7 +26,10 @@ import hashlib
 import json
 import os
 import shutil
+import stat
+import subprocess
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -44,6 +47,44 @@ DISPLAY_MEMBERSHIP_GEOMETRY_SCOPES = frozenset({
     DISPLAY_MEMBERSHIP_STRICT_LAYER_ENTITIES_V1,
     DISPLAY_MEMBERSHIP_LINEAR_SEGMENTS_V1,
 })
+NATIVE_BUILD_MANIFEST_NAME = "native_build_manifest.json"
+NATIVE_BUILD_MANIFEST_SCHEMA = "ariadne.cad_os.native_build_manifest.v1"
+NATIVE_BUILD_MANIFEST_VERSION = 1
+DISPLAY_MEMBERSHIP_REQUIRED_ARTIFACTS = (
+    "Ariadne.AcadNativeDbx.dbx",
+    "Ariadne.AcadNative.crx",
+    "Ariadne.AcadNative.arx",
+)
+_NATIVE_SOURCE_ROOTS = (
+    Path("src") / "Ariadne.AcadNative",
+    Path("src") / "Ariadne.AcadNativeDbx",
+)
+_NATIVE_BUILD_OUTPUT_DIRS = frozenset({"bin", "obj", ".vs", "build"})
+_NATIVE_BUILD_RECIPE_PATH = Path("tools") / "build_native_acad.ps1"
+_NATIVE_SOURCE_GIT_PATHS = (
+    "src/Ariadne.AcadNative",
+    "src/Ariadne.AcadNativeDbx",
+    ":(exclude)src/Ariadne.AcadNative/bin/**",
+    ":(exclude)src/Ariadne.AcadNative/obj/**",
+    ":(exclude)src/Ariadne.AcadNative/.vs/**",
+    ":(exclude)src/Ariadne.AcadNative/build/**",
+    ":(exclude)src/Ariadne.AcadNative/**/bin/**",
+    ":(exclude)src/Ariadne.AcadNative/**/obj/**",
+    ":(exclude)src/Ariadne.AcadNative/**/.vs/**",
+    ":(exclude)src/Ariadne.AcadNative/**/build/**",
+    ":(exclude)src/Ariadne.AcadNative/**/obj-*/**",
+    ":(exclude)src/Ariadne.AcadNative/**/obj_*/**",
+    ":(exclude)src/Ariadne.AcadNativeDbx/bin/**",
+    ":(exclude)src/Ariadne.AcadNativeDbx/obj/**",
+    ":(exclude)src/Ariadne.AcadNativeDbx/.vs/**",
+    ":(exclude)src/Ariadne.AcadNativeDbx/build/**",
+    ":(exclude)src/Ariadne.AcadNativeDbx/**/bin/**",
+    ":(exclude)src/Ariadne.AcadNativeDbx/**/obj/**",
+    ":(exclude)src/Ariadne.AcadNativeDbx/**/.vs/**",
+    ":(exclude)src/Ariadne.AcadNativeDbx/**/build/**",
+    ":(exclude)src/Ariadne.AcadNativeDbx/**/obj-*/**",
+    ":(exclude)src/Ariadne.AcadNativeDbx/**/obj_*/**",
+)
 
 # Ensure sibling tools/*.py are importable when cadctl is imported by path.
 if str(_THIS_DIR) not in sys.path:
@@ -73,6 +114,549 @@ def _sha256_head(path: Path, n: int = 16) -> str:
         for chunk in iter(lambda: fh.read(1 << 20), b""):
             h.update(chunk)
     return h.hexdigest()[:n].upper()
+
+
+def _sha256_file(path: Path) -> str:
+    """Return the full lowercase SHA-256 of a local evidence file."""
+    return _sha256_head(path, 64).lower()
+
+
+def _canonical_json_bytes(value: object) -> bytes:
+    """Stable JSON encoding used only to compare independently supplied facts."""
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode("utf-8")
+
+
+def _source_tree_digest(inputs: list[dict]) -> str:
+    digest = hashlib.sha256()
+    for entry in inputs:
+        digest.update(
+            f"{entry['path']}\0{entry['sha256']}\0{entry['bytes']}\n".encode("utf-8")
+        )
+    return digest.hexdigest()
+
+
+def _is_native_build_output_component(component: str) -> bool:
+    normalized = component.casefold()
+    return (
+        normalized in _NATIVE_BUILD_OUTPUT_DIRS
+        or normalized.startswith("obj-")
+        or normalized.startswith("obj_")
+    )
+
+
+def _is_reparse_point(path: Path) -> bool:
+    """Treat symbolic links and Windows reparse points as containment escapes."""
+    metadata = os.lstat(path)
+    attributes = getattr(metadata, "st_file_attributes", 0)
+    reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x0400)
+    return stat.S_ISLNK(metadata.st_mode) or bool(attributes & reparse_flag)
+
+
+def _native_source_inputs(router_home: Path) -> list[dict]:
+    """Enumerate the native source tree without build output or reparse inputs."""
+    inputs: list[dict] = []
+    for relative_root in _NATIVE_SOURCE_ROOTS:
+        root = router_home / relative_root
+        if not root.is_dir():
+            raise FileNotFoundError(f"native source root is missing: {root}")
+        for path in root.rglob("*"):
+            relative_to_root = path.relative_to(root)
+            if any(_is_native_build_output_component(part) for part in relative_to_root.parts[:-1]):
+                continue
+            if not path.is_file():
+                continue
+            if _is_reparse_point(path):
+                raise OSError(f"native source input is a reparse point: {path}")
+            raw = path.read_bytes()
+            inputs.append(
+                {
+                    "path": path.relative_to(router_home).as_posix(),
+                    "sha256": hashlib.sha256(raw).hexdigest(),
+                    "bytes": len(raw),
+                }
+            )
+    inputs.sort(key=lambda entry: entry["path"].casefold())
+    if not inputs:
+        raise FileNotFoundError("native source input inventory is empty")
+    return inputs
+
+
+def _native_source_git_state(router_home: Path) -> dict:
+    """Read Git state only for native source inputs, never the whole worktree."""
+    unknown = {
+        "available": False,
+        "head": "UNKNOWN",
+        "native_source_dirty": "UNKNOWN",
+        "native_source_status_sha256": "UNKNOWN",
+    }
+    try:
+        head_result = subprocess.run(
+            ["git", "-C", str(router_home), "rev-parse", "HEAD"],
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=15,
+        )
+        if head_result.returncode != 0:
+            return unknown
+        head = head_result.stdout.decode("utf-8", errors="strict").strip()
+        if not head:
+            return unknown
+        status_result = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(router_home),
+                "status",
+                "--porcelain=v1",
+                "--untracked-files=all",
+                "--",
+                *_NATIVE_SOURCE_GIT_PATHS,
+            ],
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=15,
+        )
+        if status_result.returncode != 0:
+            return unknown
+        status_text = "\n".join(
+            status_result.stdout.decode("utf-8", errors="strict").splitlines()
+        )
+    except (OSError, UnicodeError, subprocess.TimeoutExpired):
+        return unknown
+    return {
+        "available": True,
+        "head": head,
+        "native_source_dirty": bool(status_text),
+        "native_source_status_sha256": hashlib.sha256(
+            status_text.encode("utf-8")
+        ).hexdigest(),
+    }
+
+
+def _build_recipe_state(router_home: Path) -> dict:
+    """Return the exact checked-out build recipe identity, or explicit unknown."""
+    recipe = router_home / _NATIVE_BUILD_RECIPE_PATH
+    try:
+        if not recipe.is_file() or _is_reparse_point(recipe):
+            raise FileNotFoundError(recipe)
+        sha256 = _sha256_file(recipe)
+    except OSError:
+        return {
+            "path": _NATIVE_BUILD_RECIPE_PATH.as_posix(),
+            "sha256": "UNKNOWN",
+            "available": False,
+        }
+    return {
+        "path": _NATIVE_BUILD_RECIPE_PATH.as_posix(),
+        "sha256": sha256,
+        "available": True,
+    }
+
+
+def _same_resolved_path(left: object, right: Path) -> bool:
+    if not isinstance(left, str) or not left:
+        return False
+    try:
+        left_path = Path(left).resolve(strict=False)
+        right_path = right.resolve(strict=False)
+    except (OSError, RuntimeError, ValueError):
+        return False
+    return os.path.normcase(str(left_path)) == os.path.normcase(str(right_path))
+
+
+def _path_reparse_error(path: Path) -> str | None:
+    """Return an error for an existing reparse component on an absolute path."""
+    absolute = Path(os.path.abspath(str(path)))
+    if not absolute.anchor:
+        return f"path is not absolute: {path}"
+    current = Path(absolute.anchor)
+    for component in absolute.parts[1:]:
+        current /= component
+        if not os.path.lexists(current):
+            break
+        try:
+            if _is_reparse_point(current):
+                return f"path crosses a symlink or reparse point: {current}"
+        except OSError as exc:
+            return f"cannot inspect path component {current}: {type(exc).__name__}: {exc}"
+        if current != absolute and not current.is_dir():
+            return f"path component is not a directory: {current}"
+    return None
+
+
+def _display_output_roots(router_home: Path) -> tuple[Path, ...]:
+    temp_root = Path(os.environ.get("TEMP") or tempfile.gettempdir())
+    return (
+        router_home / "staging",
+        router_home / "runs",
+        Path(r"D:\runs"),
+        temp_root,
+    )
+
+
+def _validate_display_output_dir(out_dir: Path, router_home: Path) -> dict:
+    """Resolve output containment, rejecting lexical and reparse-point escapes."""
+    candidate = Path(os.path.abspath(str(out_dir)))
+    candidate_error = _path_reparse_error(candidate)
+    if candidate_error:
+        return {"valid": False, "reason": candidate_error, "path": str(candidate)}
+    if os.path.lexists(candidate) and not candidate.is_dir():
+        return {
+            "valid": False,
+            "reason": f"output path exists but is not a directory: {candidate}",
+            "path": str(candidate),
+        }
+    try:
+        resolved_candidate = candidate.resolve(strict=False)
+    except (OSError, RuntimeError) as exc:
+        return {
+            "valid": False,
+            "reason": f"cannot resolve output path: {type(exc).__name__}: {exc}",
+            "path": str(candidate),
+        }
+    root_errors = []
+    for root in _display_output_roots(router_home):
+        root_error = _path_reparse_error(root)
+        if root_error:
+            root_errors.append(root_error)
+            continue
+        try:
+            resolved_root = root.resolve(strict=False)
+            resolved_candidate.relative_to(resolved_root)
+        except (OSError, RuntimeError, ValueError):
+            continue
+        if os.path.normcase(str(resolved_candidate)) == os.path.normcase(str(resolved_root)):
+            continue
+        return {
+            "valid": True,
+            "path": str(candidate),
+            "resolved_path": str(resolved_candidate),
+            "allowed_root": str(resolved_root),
+        }
+    reason = "output directory is outside permitted staging/, runs/, D:\\runs, or %TEMP% roots"
+    if root_errors:
+        reason += "; permitted-root inspection failed: " + "; ".join(root_errors)
+    return {"valid": False, "reason": reason, "path": str(candidate)}
+
+
+def _ensure_display_output_subdir(out_dir: Path, leaf: str, router_home: Path) -> Path:
+    child = out_dir / leaf
+    if os.path.lexists(child):
+        raise FileExistsError(
+            f"fresh display-membership output subdirectory already exists: {child}"
+        )
+    child.mkdir(parents=False, exist_ok=False)
+    validation = _validate_display_output_dir(out_dir, router_home)
+    if not validation.get("valid"):
+        raise OSError(str(validation.get("reason") or "output containment changed"))
+    try:
+        child.resolve(strict=False).relative_to(out_dir.resolve(strict=False))
+    except (OSError, RuntimeError, ValueError) as exc:
+        raise OSError(f"output subdirectory escapes its containment root: {child}") from exc
+    return child
+
+
+def _validate_display_prelaunch_layout(
+    out_dir: Path,
+    staged_dir: Path,
+    attended_dir: Path,
+    router_home: Path,
+) -> dict:
+    """Require that only this invocation's new staging layout exists at launch."""
+    containment = _validate_display_output_dir(out_dir, router_home)
+    if not containment.get("valid"):
+        return {
+            "valid": False,
+            "reason": "output containment changed: "
+            + str(containment.get("reason")),
+        }
+    try:
+        root_children = {child.name: child for child in out_dir.iterdir()}
+        if set(root_children) != {"staged", "attended"}:
+            return {
+                "valid": False,
+                "reason": "output directory gained unknown children before launch: "
+                + ", ".join(sorted(root_children)),
+            }
+        for name, expected in (("staged", staged_dir), ("attended", attended_dir)):
+            actual = root_children[name]
+            if (
+                not actual.is_dir()
+                or _is_reparse_point(actual)
+                or not _same_resolved_path(str(actual), expected)
+            ):
+                return {
+                    "valid": False,
+                    "reason": f"output {name} directory is not the safe directory created for this job",
+                }
+        staged_children = {child.name: child for child in staged_dir.iterdir()}
+        if set(staged_children) != {"input.dwg"}:
+            return {
+                "valid": False,
+                "reason": "staged output directory gained unknown children before launch: "
+                + ", ".join(sorted(staged_children)),
+            }
+        staged_dwg = staged_children["input.dwg"]
+        if not staged_dwg.is_file() or _is_reparse_point(staged_dwg):
+            return {
+                "valid": False,
+                "reason": "staged DWG is missing or unsafe before launch",
+            }
+        attended_children = list(attended_dir.iterdir())
+        if attended_children:
+            return {
+                "valid": False,
+                "reason": "attended output directory is not fresh before launch: "
+                + ", ".join(sorted(child.name for child in attended_children)),
+            }
+    except OSError as exc:
+        return {
+            "valid": False,
+            "reason": f"cannot inspect fresh output layout: {type(exc).__name__}: {exc}",
+        }
+    return {"valid": True}
+
+
+def _atomic_write_json_no_overwrite(path: Path, payload: dict) -> None:
+    """Publish complete JSON evidence once; a competing destination is an error."""
+    if os.path.lexists(path):
+        raise FileExistsError(f"refusing to overwrite existing evidence: {path}")
+    encoded = (json.dumps(payload, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{path.name}.", suffix=".tmp", dir=str(path.parent)
+    )
+    temporary = Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "wb") as stream:
+            stream.write(encoded)
+            stream.flush()
+            os.fsync(stream.fileno())
+        # os.replace would silently destroy an existing receipt. A same-volume
+        # hard-link creates the final name atomically and fails on a race.
+        os.link(temporary, path)
+    finally:
+        try:
+            temporary.unlink()
+        except FileNotFoundError:
+            pass
+
+
+def _verify_native_build_manifest(router_home: Path, native_bin: Path) -> dict:
+    """Verify that the loadable binaries bind to this exact source checkout."""
+    manifest_path = native_bin / NATIVE_BUILD_MANIFEST_NAME
+    receipt = {
+        "path": str(manifest_path),
+        "sha256": None,
+        "valid": False,
+        "checks": {},
+        "errors": [],
+        "artifact_paths": [],
+    }
+    if not manifest_path.is_file() or _is_reparse_point(manifest_path):
+        receipt["errors"].append("native build manifest is missing or unsafe")
+        return receipt
+    try:
+        manifest_bytes = manifest_path.read_bytes()
+        manifest = json.loads(manifest_bytes.decode("utf-8-sig"))
+    except (OSError, UnicodeError, ValueError) as exc:
+        receipt["errors"].append(
+            f"native build manifest is not parseable: {type(exc).__name__}: {exc}"
+        )
+        return receipt
+    receipt["sha256"] = hashlib.sha256(manifest_bytes).hexdigest()
+    if not isinstance(manifest, dict):
+        receipt["errors"].append("native build manifest is not an object")
+        return receipt
+
+    checks = receipt["checks"]
+    checks["schema"] = (
+        manifest.get("schema") == NATIVE_BUILD_MANIFEST_SCHEMA
+        and manifest.get("schema_version") == NATIVE_BUILD_MANIFEST_VERSION
+    )
+    if not checks["schema"]:
+        receipt["errors"].append("manifest schema/version")
+    checks["configuration"] = manifest.get("configuration") == "Release"
+    checks["platform"] = manifest.get("platform") == "x64"
+    if not checks["configuration"] or not checks["platform"]:
+        receipt["errors"].append("manifest configuration/platform")
+    checks["load_bin_dir"] = _same_resolved_path(manifest.get("load_bin_dir"), native_bin)
+    if not checks["load_bin_dir"]:
+        receipt["errors"].append("manifest load bin directory")
+
+    checkout = manifest.get("checkout")
+    git = checkout.get("git") if isinstance(checkout, dict) else None
+    checks["checkout_root"] = isinstance(checkout, dict) and _same_resolved_path(
+        checkout.get("root"), router_home
+    )
+    if not checks["checkout_root"]:
+        receipt["errors"].append("manifest checkout root")
+    current_git = _native_source_git_state(router_home)
+    checks["git_available"] = (
+        isinstance(git, dict)
+        and git.get("available") is True
+        and current_git.get("available") is True
+    )
+    if not checks["git_available"]:
+        receipt["errors"].append("checkout Git state is UNKNOWN")
+    else:
+        checks["git_head"] = (
+            isinstance(git.get("head"), str)
+            and git.get("head") == current_git.get("head")
+        )
+        checks["git_native_source_dirty"] = (
+            isinstance(git.get("native_source_dirty"), bool)
+            and git.get("native_source_dirty")
+            == current_git.get("native_source_dirty")
+        )
+        checks["git_native_source_status_sha256"] = (
+            isinstance(git.get("native_source_status_sha256"), str)
+            and git.get("native_source_status_sha256")
+            == current_git.get("native_source_status_sha256")
+        )
+        for key in (
+            "git_head",
+            "git_native_source_dirty",
+            "git_native_source_status_sha256",
+        ):
+            if not checks[key]:
+                receipt["errors"].append("manifest " + key.replace("git_", "Git "))
+
+    manifest_recipe = manifest.get("build_recipe")
+    current_recipe = _build_recipe_state(router_home)
+    checks["build_recipe"] = (
+        isinstance(manifest_recipe, dict)
+        and manifest_recipe.get("path") == _NATIVE_BUILD_RECIPE_PATH.as_posix()
+        and isinstance(manifest_recipe.get("sha256"), str)
+        and manifest_recipe.get("sha256").lower() == current_recipe.get("sha256")
+        and current_recipe.get("available") is True
+    )
+    if not checks["build_recipe"]:
+        receipt["errors"].append("manifest build recipe SHA-256")
+
+    source_tree = manifest.get("source_tree")
+    manifest_inputs = source_tree.get("inputs") if isinstance(source_tree, dict) else None
+    normalized_inputs = []
+    if isinstance(manifest_inputs, list):
+        for item in manifest_inputs:
+            if not isinstance(item, dict):
+                normalized_inputs = None
+                break
+            path = item.get("path")
+            sha256 = item.get("sha256")
+            size = item.get("bytes")
+            if (
+                not isinstance(path, str)
+                or not isinstance(sha256, str)
+                or not isinstance(size, int)
+                or isinstance(size, bool)
+            ):
+                normalized_inputs = None
+                break
+            normalized_inputs.append({"path": path, "sha256": sha256, "bytes": size})
+    else:
+        normalized_inputs = None
+    try:
+        actual_inputs = _native_source_inputs(router_home)
+    except (OSError, ValueError) as exc:
+        actual_inputs = None
+        receipt["errors"].append(
+            f"native source inventory is unavailable: {type(exc).__name__}: {exc}"
+        )
+    checks["source_tree"] = (
+        isinstance(source_tree, dict)
+        and source_tree.get("algorithm") == "sha256"
+        and normalized_inputs is not None
+        and actual_inputs is not None
+        and normalized_inputs == actual_inputs
+        and source_tree.get("digest") == _source_tree_digest(actual_inputs)
+    )
+    if not checks["source_tree"]:
+        receipt["errors"].append("native source-tree digest or input inventory")
+
+    artifacts = manifest.get("artifacts")
+    by_leaf: dict[str, dict] = {}
+    if isinstance(artifacts, list):
+        for item in artifacts:
+            if isinstance(item, dict) and isinstance(item.get("leaf"), str):
+                leaf = item["leaf"]
+                if leaf in by_leaf:
+                    receipt["errors"].append(f"duplicate manifest artifact: {leaf}")
+                by_leaf[leaf] = item
+    else:
+        receipt["errors"].append("manifest artifacts")
+    artifact_paths = []
+    artifact_checks = True
+    for leaf in DISPLAY_MEMBERSHIP_REQUIRED_ARTIFACTS:
+        item = by_leaf.get(leaf)
+        path = native_bin / leaf
+        ok = (
+            isinstance(item, dict)
+            and item.get("current") is True
+            and path.is_file()
+            and not _is_reparse_point(path)
+            and isinstance(item.get("bytes"), int)
+            and not isinstance(item.get("bytes"), bool)
+            and item.get("bytes") == path.stat().st_size
+            and isinstance(item.get("sha256"), str)
+            and item.get("sha256").lower() == _sha256_file(path)
+        )
+        checks[f"artifact:{leaf}"] = ok
+        if not ok:
+            artifact_checks = False
+            receipt["errors"].append(f"manifest artifact binding: {leaf}")
+        else:
+            artifact_paths.append(path)
+    checks["artifacts"] = artifact_checks
+    display_membership = manifest.get("display_membership")
+    checks["display_membership_ready"] = (
+        isinstance(display_membership, dict)
+        and display_membership.get("ready") is True
+        and display_membership.get("canonical_arx_current") is True
+        and by_leaf.get("Ariadne.AcadNative.arx", {}).get("current") is True
+    )
+    if not checks["display_membership_ready"]:
+        receipt["errors"].append("canonical ARX is not current for display membership")
+    receipt["artifact_paths"] = [str(path) for path in artifact_paths]
+    receipt["valid"] = not receipt["errors"]
+    return receipt
+
+
+def _attended_execution_state(attended: dict) -> dict:
+    """Separate a constructed command from evidence that a process actually ran."""
+    command = attended.get("command")
+    command_constructed = isinstance(command, (list, tuple)) and bool(command)
+    envelope = attended.get("envelope")
+    receipt_launch = (
+        isinstance(envelope, dict)
+        and isinstance(envelope.get("launched_pid"), int)
+        and not isinstance(envelope.get("launched_pid"), bool)
+        and envelope["launched_pid"] > 0
+    )
+    exit_code = attended.get("exit_code")
+    command_completed = (
+        command_constructed
+        and isinstance(exit_code, int)
+        and not isinstance(exit_code, bool)
+    )
+    return {
+        "command_constructed": command_constructed,
+        "launch_observed": receipt_launch or command_completed,
+        "launch_evidence": (
+            "final_receipt.launched_pid"
+            if receipt_launch
+            else "runner_exit_code"
+            if command_completed
+            else "none"
+        ),
+    }
 
 
 def _hash_parts(*parts: object) -> str:
@@ -1288,10 +1872,85 @@ class Cad:
         ``linear_segments_v1`` instead admits only linear source segments and
         accounts for the excluded candidates in native evidence.
         """
-        out_dir_p = Path(out_dir) if out_dir else (
+        requested_out_dir = Path(out_dir) if out_dir else (
             self.router_home / "runs" / "display_membership" / _ts()
         )
-        out_dir_p.mkdir(parents=True, exist_ok=True)
+        out_dir_p = Path(os.path.abspath(str(requested_out_dir)))
+        out_dir_existed = os.path.lexists(out_dir_p)
+        output_validation = _validate_display_output_dir(out_dir_p, self.router_home)
+        if not output_validation.get("valid"):
+            return {
+                "schema": "ariadne.cadctl.display_membership.v1",
+                "status": "BLOCKED",
+                "reason": "unsafe display-membership output directory: "
+                + str(output_validation.get("reason")),
+                "executed": False,
+                "execution_context": "dedicated_full_autocad",
+                "operation": "e2.inspect.xclip_membership",
+                "out_dir": str(out_dir_p),
+                "geometry_scope": geometry_scope,
+                "output_validation": output_validation,
+            }
+        try:
+            out_dir_p.mkdir(parents=True, exist_ok=True)
+        except OSError as exc:
+            return {
+                "schema": "ariadne.cadctl.display_membership.v1",
+                "status": "BLOCKED",
+                "reason": f"cannot create display-membership output directory: {type(exc).__name__}: {exc}",
+                "executed": False,
+                "execution_context": "dedicated_full_autocad",
+                "operation": "e2.inspect.xclip_membership",
+                "out_dir": str(out_dir_p),
+                "geometry_scope": geometry_scope,
+                "output_validation": output_validation,
+            }
+        output_validation = _validate_display_output_dir(out_dir_p, self.router_home)
+        if not output_validation.get("valid"):
+            return {
+                "schema": "ariadne.cadctl.display_membership.v1",
+                "status": "BLOCKED",
+                "reason": "output directory containment changed before execution: "
+                + str(output_validation.get("reason")),
+                "executed": False,
+                "execution_context": "dedicated_full_autocad",
+                "operation": "e2.inspect.xclip_membership",
+                "out_dir": str(out_dir_p),
+                "geometry_scope": geometry_scope,
+                "output_validation": output_validation,
+            }
+        try:
+            existing_children = sorted(
+                out_dir_p.iterdir(), key=lambda child: child.name.casefold()
+            )
+        except OSError as exc:
+            return {
+                "schema": "ariadne.cadctl.display_membership.v1",
+                "status": "BLOCKED",
+                "reason": "cannot inspect display-membership output directory freshness: "
+                f"{type(exc).__name__}: {exc}",
+                "executed": False,
+                "execution_context": "dedicated_full_autocad",
+                "operation": "e2.inspect.xclip_membership",
+                "out_dir": str(out_dir_p),
+                "geometry_scope": geometry_scope,
+                "output_validation": output_validation,
+            }
+        if existing_children:
+            return {
+                "schema": "ariadne.cadctl.display_membership.v1",
+                "status": "BLOCKED",
+                "reason": "display-membership output directory is not fresh; pre-existing children: "
+                + ", ".join(str(child) for child in existing_children),
+                "executed": False,
+                "execution_context": "dedicated_full_autocad",
+                "operation": "e2.inspect.xclip_membership",
+                "out_dir": str(out_dir_p),
+                "geometry_scope": geometry_scope,
+                "output_validation": output_validation,
+                "out_dir_existed": out_dir_existed,
+                "evidence_preserved": True,
+            }
         receipt_path = out_dir_p / "display_membership_receipt.json"
 
         prior_evidence = [
@@ -1301,7 +1960,7 @@ class Cad:
                 out_dir_p / "display_membership_binding.json",
                 out_dir_p / "target_population_oracle.json",
             )
-            if path.exists()
+            if os.path.lexists(path)
         ]
         if prior_evidence:
             return {
@@ -1317,6 +1976,19 @@ class Cad:
                 "evidence_preserved": True,
             }
 
+        def write_evidence(path: Path, payload: dict) -> None:
+            current_output_validation = _validate_display_output_dir(
+                out_dir_p, self.router_home
+            )
+            if not current_output_validation.get("valid"):
+                raise OSError(
+                    "output containment changed: "
+                    + str(current_output_validation.get("reason"))
+                )
+            if not _same_resolved_path(str(path.parent), out_dir_p):
+                raise OSError(f"evidence path escapes output directory: {path}")
+            _atomic_write_json_no_overwrite(path, payload)
+
         def finish(status: str, reason: str, *, executed: bool, **extra: object) -> dict:
             payload = {
                 "schema": "ariadne.cadctl.display_membership.v1",
@@ -1329,10 +2001,16 @@ class Cad:
                 "geometry_scope": geometry_scope,
                 **extra,
             }
-            receipt_path.write_text(
-                json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
-                encoding="utf-8",
-            )
+            try:
+                write_evidence(receipt_path, payload)
+            except Exception as exc:
+                return {
+                    **payload,
+                    "status": "BLOCKED",
+                    "reason": "failed to atomically publish display-membership receipt: "
+                    f"{type(exc).__name__}: {exc}",
+                    "evidence_write_failed": True,
+                }
             payload["receipt"] = str(receipt_path)
             return payload
 
@@ -1380,31 +2058,56 @@ class Cad:
             / "x64"
             / "Release"
         )
-        required_native = [
-            native_bin / "Ariadne.AcadNativeDbx.dbx",
-            native_bin / "Ariadne.AcadNative.arx",
-        ]
-        missing_native = [str(path) for path in required_native if not path.is_file()]
-        if missing_native:
+        manifest_before = _verify_native_build_manifest(self.router_home, native_bin)
+        manifest_common = {
+            "build_manifest_path": manifest_before["path"],
+            "build_manifest_sha256": manifest_before["sha256"],
+            "build_manifest_validation": {"before": manifest_before},
+        }
+        if not manifest_before["valid"]:
             return finish(
                 "NEEDS_BUILD",
-                "current-checkout attended native build is missing: " + ", ".join(missing_native),
+                "current-checkout native build manifest cannot bind the attended artifacts: "
+                + "; ".join(manifest_before["errors"]),
                 executed=False,
                 original_sha256_before=original_before,
                 native_bin_dir=str(native_bin),
+                **manifest_common,
             )
+        required_native = [Path(path) for path in manifest_before["artifact_paths"]]
 
-        stage_dir = out_dir_p / "staged"
-        stage_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            stage_dir = _ensure_display_output_subdir(
+                out_dir_p, "staged", self.router_home
+            )
+        except OSError as exc:
+            return finish(
+                "BLOCKED",
+                f"cannot prepare safe staged output directory: {type(exc).__name__}: {exc}",
+                executed=False,
+                original_sha256_before=original_before,
+                **manifest_common,
+            )
         staged = stage_dir / "input.dwg"
-        if staged.exists():
+        if os.path.lexists(staged):
             return finish(
                 "BLOCKED",
                 f"refusing to overwrite existing staged DWG: {staged}",
                 executed=False,
                 original_sha256_before=original_before,
+                **manifest_common,
             )
-        shutil.copy2(source, staged)
+        try:
+            shutil.copy2(source, staged)
+        except OSError as exc:
+            return finish(
+                "BLOCKED",
+                f"could not stage original DWG: {type(exc).__name__}: {exc}",
+                executed=False,
+                original_sha256_before=original_before,
+                staged_dwg=str(staged),
+                **manifest_common,
+            )
         try:
             os.chmod(staged, 0o666)
         except OSError:
@@ -1418,9 +2121,38 @@ class Cad:
                 original_sha256_before=original_before,
                 staged_sha256_before=staged_before,
                 staged_dwg=str(staged),
+                **manifest_common,
             )
 
-        attended_dir = out_dir_p / "attended"
+        try:
+            attended_dir = _ensure_display_output_subdir(
+                out_dir_p, "attended", self.router_home
+            )
+        except OSError as exc:
+            return finish(
+                "BLOCKED",
+                f"cannot prepare safe attended output directory: {type(exc).__name__}: {exc}",
+                executed=False,
+                original_sha256_before=original_before,
+                staged_sha256_before=staged_before,
+                staged_dwg=str(staged),
+                **manifest_common,
+            )
+        prelaunch_layout = _validate_display_prelaunch_layout(
+            out_dir_p, stage_dir, attended_dir, self.router_home
+        )
+        if not prelaunch_layout["valid"]:
+            return finish(
+                "BLOCKED",
+                "display-membership output directory is not fresh before native launch: "
+                + str(prelaunch_layout["reason"]),
+                executed=False,
+                original_sha256_before=original_before,
+                staged_sha256_before=staged_before,
+                staged_dwg=str(staged),
+                output_freshness=prelaunch_layout,
+                **manifest_common,
+            )
         try:
             attended = attended_lane.run_attended_native_job(
                 str(staged),
@@ -1439,17 +2171,28 @@ class Cad:
             return finish(
                 "BLOCKED",
                 f"attended AutoCAD runner failed: {type(exc).__name__}: {exc}",
-                executed=True,
+                executed=False,
                 original_sha256_before=original_before,
                 original_sha256_after=original_after,
                 original_unchanged=original_before == original_after,
                 staged_dwg=str(staged),
+                **manifest_common,
             )
 
         original_after = _sha256_head(source, 64).lower()
+        if not isinstance(attended, dict):
+            return finish(
+                "BLOCKED",
+                "attended AutoCAD runner returned no structured execution result",
+                executed=False,
+                original_sha256_before=original_before,
+                original_sha256_after=original_after,
+                original_unchanged=original_before == original_after,
+                staged_dwg=str(staged),
+                **manifest_common,
+            )
+        execution_state = _attended_execution_state(attended)
         raw_job_out = attended_dir / "job_out.json"
-        attended_result_ref = attended.get("result_json")
-        native_job = attended.get("result")
         common = {
             "original_sha256_before": original_before,
             "original_sha256_after": original_after,
@@ -1457,26 +2200,95 @@ class Cad:
             "staged_dwg": str(staged),
             "staged_sha256_before": staged_before,
             "native_bin_dir": str(native_bin),
-            "attended_result_ref": attended_result_ref,
+            "attended_result_ref": str(raw_job_out),
+            "attended_reported_result_ref": attended.get("result_json"),
             "attended_completion_receipt": attended.get("completion_receipt"),
             "stdout": attended.get("stdout_path"),
             "stderr": attended.get("stderr_path"),
             "degraded": bool(attended.get("degraded", False)),
+            "attended_command_constructed": execution_state["command_constructed"],
+            "attended_launch_observed": execution_state["launch_observed"],
+            "attended_launch_evidence": execution_state["launch_evidence"],
+            **manifest_common,
         }
         if original_before != original_after:
             return finish(
                 "BLOCKED",
                 "SAFETY VIOLATION: original DWG changed during attended inspection",
-                executed=True,
+                executed=execution_state["launch_observed"],
                 **common,
             )
         if attended.get("error") or attended.get("timed_out"):
             return finish(
                 "BLOCKED",
                 str(attended.get("error") or "attended AutoCAD run timed out"),
-                executed=True,
+                executed=execution_state["launch_observed"],
                 **common,
             )
+
+        manifest_after = _verify_native_build_manifest(self.router_home, native_bin)
+        common["build_manifest_validation"] = {
+            "before": manifest_before,
+            "after": manifest_after,
+        }
+        if (
+            not manifest_after["valid"]
+            or manifest_after["sha256"] != manifest_before["sha256"]
+        ):
+            return finish(
+                "BLOCKED",
+                "native build manifest drifted after attended execution: "
+                + "; ".join(manifest_after["errors"] or ["manifest SHA changed"]),
+                executed=execution_state["launch_observed"],
+                **common,
+            )
+
+        if not raw_job_out.is_file() or _is_reparse_point(raw_job_out):
+            return finish(
+                "BLOCKED",
+                "native job_out.json evidence is missing or unsafe",
+                executed=execution_state["launch_observed"],
+                **common,
+            )
+        try:
+            raw_job_out_bytes = raw_job_out.read_bytes()
+            native_job = json.loads(raw_job_out_bytes.decode("utf-8-sig"))
+        except (OSError, UnicodeError, ValueError) as exc:
+            return finish(
+                "BLOCKED",
+                f"native job_out.json evidence is not parseable: {type(exc).__name__}: {exc}",
+                executed=execution_state["launch_observed"],
+                **common,
+            )
+        if not isinstance(native_job, dict):
+            return finish(
+                "BLOCKED",
+                "native job_out.json evidence is not an object",
+                executed=execution_state["launch_observed"],
+                **common,
+            )
+        attended_result = attended.get("result")
+        if attended_result is not None:
+            try:
+                result_matches_raw = (
+                    _canonical_json_bytes(attended_result)
+                    == _canonical_json_bytes(native_job)
+                )
+            except (TypeError, ValueError) as exc:
+                return finish(
+                    "BLOCKED",
+                    f"attended in-memory result cannot be bound to raw job_out.json: {type(exc).__name__}: {exc}",
+                    executed=execution_state["launch_observed"],
+                    **common,
+                )
+            if not result_matches_raw:
+                return finish(
+                    "BLOCKED",
+                    "attended in-memory result does not match raw job_out.json evidence",
+                    executed=execution_state["launch_observed"],
+                    **common,
+                )
+        raw_job_out_sha256 = hashlib.sha256(raw_job_out_bytes).hexdigest()
 
         # job_out.json is native-operation evidence only.  It cannot show that
         # the disposable AutoCAD process was closed, the user's sessions were
@@ -1497,16 +2309,73 @@ class Cad:
                 receipt_errors.append("operation")
             if not isinstance(launcher_receipt.get("launched_pid"), int) or launcher_receipt["launched_pid"] <= 0:
                 receipt_errors.append("launched_pid")
+            launched_process_name = launcher_receipt.get("launched_process_name")
+            if (
+                not isinstance(launched_process_name, str)
+                or launched_process_name.casefold() not in {"acad", "acad.exe"}
+            ):
+                receipt_errors.append("launched_process_name")
+            if (
+                not isinstance(launcher_receipt.get("launched_start_time_utc"), str)
+                or not launcher_receipt["launched_start_time_utc"].strip()
+            ):
+                receipt_errors.append("launched_start_time_utc")
             if launcher_receipt.get("dedicated_instance") is not True:
                 receipt_errors.append("dedicated_instance")
             if launcher_receipt.get("timed_out") is not False:
                 receipt_errors.append("timed_out")
             if launcher_receipt.get("launched_pid_closed") is not True:
                 receipt_errors.append("launched_pid_closed")
+            if launcher_receipt.get("launched_pid_identity_verified") is not True:
+                receipt_errors.append("launched_pid_identity_verified")
+            if not isinstance(launcher_receipt.get("launched_pid_reused"), bool):
+                receipt_errors.append("launched_pid_reused")
+            if launcher_receipt.get("pre_existing_identity_verified") is not True:
+                receipt_errors.append("pre_existing_identity_verified")
+            pre_existing_pids = launcher_receipt.get("pre_existing_pids")
+            pre_existing_processes = launcher_receipt.get("pre_existing_processes")
+            pre_existing_still_alive = launcher_receipt.get("pre_existing_still_alive")
+            if (
+                not isinstance(pre_existing_pids, list)
+                or any(
+                    not isinstance(pid, int) or isinstance(pid, bool) or pid <= 0
+                    for pid in pre_existing_pids
+                )
+                or len(pre_existing_pids) != len(set(pre_existing_pids))
+            ):
+                receipt_errors.append("pre_existing_pids")
+            process_pids = (
+                [
+                    process.get("pid")
+                    for process in pre_existing_processes
+                    if isinstance(process, dict)
+                ]
+                if isinstance(pre_existing_processes, list)
+                else []
+            )
+            if (
+                not isinstance(pre_existing_processes, list)
+                or len(pre_existing_processes) != len(pre_existing_pids or [])
+                or len(process_pids) != len(set(process_pids))
+                or set(process_pids) != set(pre_existing_pids or [])
+                or any(
+                    not isinstance(process, dict)
+                    or not isinstance(process.get("process_name"), str)
+                    or process["process_name"].casefold() not in {"acad", "acad.exe"}
+                    or not isinstance(process.get("start_time_utc"), str)
+                    or not process["start_time_utc"].strip()
+                    for process in pre_existing_processes
+                )
+            ):
+                receipt_errors.append("pre_existing_processes")
+            if pre_existing_still_alive != pre_existing_pids:
+                receipt_errors.append("pre_existing_still_alive")
             if launcher_receipt.get("user_session_touched") is not False:
                 receipt_errors.append("user_session_touched")
             if launcher_receipt.get("job_out_present") is not True:
                 receipt_errors.append("job_out_present")
+            if not _same_resolved_path(launcher_receipt.get("job_out"), raw_job_out):
+                receipt_errors.append("job_out")
             if launcher_receipt.get("degraded") is not False or attended.get("degraded", False) is not False:
                 receipt_errors.append("degraded")
             if not isinstance(launcher_receipt.get("security"), dict) or launcher_receipt["security"].get("restored") is not True:
@@ -1520,40 +2389,13 @@ class Cad:
                     receipt_errors.append("recovered_from_launcher_finalization_hang")
                 if launcher_receipt.get("powershell_helper_closed") is not True:
                     receipt_errors.append("powershell_helper_closed")
-                if launcher_receipt.get("launched_pid_identity_verified") is not True:
-                    receipt_errors.append("launched_pid_identity_verified")
-                if launcher_receipt.get("pre_existing_identity_verified") is not True:
-                    receipt_errors.append("pre_existing_identity_verified")
-                if not isinstance(launcher_receipt.get("launched_pid_reused"), bool):
-                    receipt_errors.append("launched_pid_reused")
             else:
                 receipt_errors.append("receipt_authority")
         if receipt_errors:
             return finish(
                 "BLOCKED",
                 "attended launcher final safety receipt is incomplete: " + ", ".join(receipt_errors),
-                executed=True,
-                **common,
-            )
-
-        if not (
-            isinstance(native_job, dict)
-            and native_job.get("schema") == "ariadne.autocad_native_job_result.v1"
-        ) and raw_job_out.is_file():
-            try:
-                exact_job_out = json.loads(raw_job_out.read_text(encoding="utf-8-sig"))
-            except (OSError, ValueError):
-                exact_job_out = None
-            if isinstance(exact_job_out, dict):
-                native_job = exact_job_out
-                attended_result_ref = str(raw_job_out)
-                common["attended_result_ref"] = attended_result_ref
-
-        if not isinstance(native_job, dict):
-            return finish(
-                "BLOCKED",
-                "attended run produced no parseable native job result",
-                executed=True,
+                executed=execution_state["launch_observed"],
                 **common,
             )
         native = native_job.get("result")
@@ -1574,14 +2416,14 @@ class Cad:
             return finish(
                 "BLOCKED",
                 "native result is incomplete or was not produced in full_autocad",
-                executed=True,
+                executed=execution_state["launch_observed"],
                 **common,
             )
         if native.get("geometry_scope") != geometry_scope:
             return finish(
                 "BLOCKED",
                 "native geometry_scope does not match the requested geometry_scope",
-                executed=True,
+                executed=execution_state["launch_observed"],
                 **common,
             )
 
@@ -1596,7 +2438,7 @@ class Cad:
             return finish(
                 "BLOCKED",
                 "native result target layers, summaries, or records are incomplete",
-                executed=True,
+                executed=execution_state["launch_observed"],
                 **common,
             )
 
@@ -1661,7 +2503,7 @@ class Cad:
             return finish(
                 "BLOCKED",
                 f"native visible lineage is invalid: {exc}",
-                executed=True,
+                executed=execution_state["launch_observed"],
                 **common,
             )
 
@@ -1676,7 +2518,7 @@ class Cad:
                 return finish(
                     "BLOCKED",
                     f"native result has no summary for target layer {layer!r}",
-                    executed=True,
+                    executed=execution_state["launch_observed"],
                     **common,
                 )
             visible_count = row.get("native_visible_source_segments")
@@ -1721,7 +2563,7 @@ class Cad:
                 return finish(
                     "BLOCKED",
                     f"native conservation or visible identity count failed for {layer!r}",
-                    executed=True,
+                    executed=execution_state["launch_observed"],
                     **common,
                 )
             targets.append(
@@ -1739,15 +2581,31 @@ class Cad:
                 }
             )
 
-        raw_evidence = attended_dir / "job_out.json"
-        if not raw_evidence.is_file():
+        raw_evidence = raw_job_out
+        if _sha256_file(raw_evidence) != raw_job_out_sha256:
             return finish(
                 "BLOCKED",
-                "native job_out.json evidence is missing",
-                executed=True,
+                "native job_out.json changed after raw evidence was parsed",
+                executed=execution_state["launch_observed"],
                 **common,
             )
-        raw_evidence_hash = _sha256_head(raw_evidence, 64).lower()
+        manifest_before_evidence = _verify_native_build_manifest(
+            self.router_home, native_bin
+        )
+        common["build_manifest_validation"]["before_evidence"] = manifest_before_evidence
+        if (
+            not manifest_before_evidence["valid"]
+            or manifest_before_evidence["sha256"] != manifest_before["sha256"]
+        ):
+            return finish(
+                "BLOCKED",
+                "native build manifest drifted before evidence publication: "
+                + "; ".join(
+                    manifest_before_evidence["errors"] or ["manifest SHA changed"]
+                ),
+                executed=execution_state["launch_observed"],
+                **common,
+            )
         binding_path = out_dir_p / "display_membership_binding.json"
         binding = {
             "schema": "ariadne.e2.native_display_binding.v1",
@@ -1757,18 +2615,68 @@ class Cad:
             "staged_sha256_before": staged_before,
             "geometry_scope": geometry_scope,
             "native_job_out_path": str(raw_evidence.resolve()),
-            "native_job_out_sha256": raw_evidence_hash,
+            "native_job_out_sha256": raw_job_out_sha256,
             "native_artifacts": [
-                {"path": str(path.resolve()), "sha256": _sha256_head(path, 64).lower()}
+                {
+                    "leaf": path.name,
+                    "path": str(path.resolve()),
+                    "sha256": _sha256_file(path),
+                    "bytes": path.stat().st_size,
+                }
                 for path in required_native
             ],
+            "native_build_manifest": {
+                "path": str(Path(manifest_before["path"]).resolve()),
+                "sha256": manifest_before["sha256"],
+                "validation": {
+                    "before": {
+                        "valid": manifest_before["valid"],
+                        "checks": manifest_before["checks"],
+                    },
+                    "after_execution": {
+                        "valid": manifest_after["valid"],
+                        "checks": manifest_after["checks"],
+                    },
+                    "before_evidence": {
+                        "valid": manifest_before_evidence["valid"],
+                        "checks": manifest_before_evidence["checks"],
+                    },
+                },
+            },
             "execution_context": "dedicated_full_autocad",
             "headless_fallback": False,
         }
-        binding_path.write_text(
-            json.dumps(binding, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-        )
+        try:
+            write_evidence(binding_path, binding)
+        except Exception as exc:
+            return finish(
+                "BLOCKED",
+                f"failed to atomically publish binding evidence: {type(exc).__name__}: {exc}",
+                executed=execution_state["launch_observed"],
+                **common,
+            )
+        try:
+            written_binding = _load_json_bom(binding_path)
+            raw_binding_valid = (
+                isinstance(written_binding, dict)
+                and written_binding.get("native_job_out_sha256") == raw_job_out_sha256
+                and _sha256_file(raw_evidence) == raw_job_out_sha256
+            )
+        except (OSError, UnicodeError, ValueError) as exc:
+            return finish(
+                "BLOCKED",
+                f"published binding evidence cannot be verified: {type(exc).__name__}: {exc}",
+                executed=execution_state["launch_observed"],
+                **common,
+            )
+        if not raw_binding_valid:
+            return finish(
+                "BLOCKED",
+                "raw job_out.json SHA does not match published binding evidence",
+                executed=execution_state["launch_observed"],
+                **common,
+            )
+        binding_sha256 = _sha256_file(binding_path)
         oracle_path = out_dir_p / "target_population_oracle.json"
         oracle = {
             "schema": "ariadne.e2.target_population_oracle.v1",
@@ -1777,25 +2685,49 @@ class Cad:
             "drawing_id": original_before,
             "geometry_scope": geometry_scope,
             "evidence": [
-                {"path": str(raw_evidence.resolve()), "sha256": raw_evidence_hash},
+                {"path": str(raw_evidence.resolve()), "sha256": raw_job_out_sha256},
                 {
                     "path": str(binding_path.resolve()),
-                    "sha256": _sha256_head(binding_path, 64).lower(),
+                    "sha256": binding_sha256,
+                },
+                {
+                    "path": str(Path(manifest_before["path"]).resolve()),
+                    "sha256": manifest_before["sha256"],
                 },
             ],
             "targets": targets,
         }
-        oracle_path.write_text(
-            json.dumps(oracle, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-        )
+        manifest_final = _verify_native_build_manifest(self.router_home, native_bin)
+        common["build_manifest_validation"]["final"] = manifest_final
+        if (
+            not manifest_final["valid"]
+            or manifest_final["sha256"] != manifest_before["sha256"]
+            or _sha256_file(raw_evidence) != raw_job_out_sha256
+        ):
+            return finish(
+                "BLOCKED",
+                "native build or raw evidence drifted before oracle publication: "
+                + "; ".join(manifest_final["errors"] or ["manifest or raw SHA changed"]),
+                executed=execution_state["launch_observed"],
+                **common,
+            )
+        try:
+            write_evidence(oracle_path, oracle)
+        except Exception as exc:
+            return finish(
+                "BLOCKED",
+                f"failed to atomically publish target oracle: {type(exc).__name__}: {exc}",
+                executed=execution_state["launch_observed"],
+                **common,
+            )
         return finish(
             "PASS",
             "full AutoCAD/ObjectARX resolved every target segment with conserved native lineage",
-            executed=True,
+            executed=execution_state["launch_observed"],
             target_population_oracle=str(oracle_path),
-            target_population_oracle_sha256=_sha256_head(oracle_path, 64).lower(),
+            target_population_oracle_sha256=_sha256_file(oracle_path),
             binding_evidence=str(binding_path),
+            binding_evidence_sha256=binding_sha256,
             native_visible_source_segments=sum(
                 target["native_visible_source_segments"] for target in targets
             ),
