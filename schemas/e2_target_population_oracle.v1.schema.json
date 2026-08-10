@@ -4,11 +4,29 @@
   "title": "Independent native-display target population oracle",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "oracle", "status", "drawing_id", "evidence", "targets"],
+  "required": [
+    "schema",
+    "oracle",
+    "status",
+    "claim_scope",
+    "producer_receipt_required",
+    "producer_receipt_path",
+    "downstream_experiment_guard_required",
+    "drawing_id",
+    "evidence",
+    "targets"
+  ],
   "properties": {
     "schema": {"const": "ariadne.e2.target_population_oracle.v1"},
     "oracle": {"const": "autocad.native_display_membership.v1"},
-    "status": {"const": "PASS"},
+    "status": {"const": "OBSERVED"},
+    "claim_scope": {"const": "instrument_observation_only"},
+    "producer_receipt_required": {"const": true},
+    "producer_receipt_path": {"type": "string", "minLength": 1},
+    "downstream_experiment_guard_required": {"const": true},
+    "geometry_scope": {
+      "enum": ["strict_layer_entities_v1", "linear_segments_v1"]
+    },
     "drawing_id": {"type": "string", "minLength": 1},
     "evidence": {
       "type": "array",

@@ -175,16 +175,49 @@ def _worldir_probe(*, adapter_balance=True, conservation=True, inserts=1):
     }
 
 
+def _bind_authoritative_target_oracle(tmp_path: Path, oracle: dict) -> dict:
+    receipt_path = tmp_path / "display_membership_receipt.json"
+    oracle_path = tmp_path / "target_population_oracle.json"
+    oracle.update(
+        {
+            "status": "OBSERVED",
+            "claim_scope": "instrument_observation_only",
+            "producer_receipt_required": True,
+            "producer_receipt_path": str(receipt_path.resolve()),
+            "downstream_experiment_guard_required": True,
+            "geometry_scope": "strict_layer_entities_v1",
+        }
+    )
+    oracle_path.write_text(json.dumps(oracle), encoding="utf-8")
+    oracle_sha256 = hashlib.sha256(oracle_path.read_bytes()).hexdigest()
+    receipt = {
+        "schema": "ariadne.cadctl.display_membership.v1",
+        "status": "PASS",
+        "operation": "e2.inspect.xclip_membership",
+        "geometry_scope": oracle["geometry_scope"],
+        "claim_scope": "instrument_observation_only",
+        "downstream_experiment_guard_required": True,
+        "authoritative_completion_marker": str(receipt_path.resolve()),
+        "target_population_oracle": str(oracle_path.resolve()),
+        "target_population_oracle_sha256": oracle_sha256,
+        "final_evidence_sha256": {
+            "source": oracle["drawing_id"],
+            "observation_oracle": oracle_sha256,
+        },
+    }
+    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+    return oracle
+
+
 def _target_oracle(tmp_path: Path, *, w1_visible=1, w2_visible=1):
     def visible_ids(prefix: str, count: int) -> list[str]:
         return [prefix, *(f"{prefix}-{index}" for index in range(2, count + 1))] if count else []
 
     evidence = tmp_path / "native-display.json"
     evidence.write_text('{"oracle":"autocad-native-display"}', encoding="utf-8")
-    return {
+    oracle = {
         "schema": "ariadne.e2.target_population_oracle.v1",
         "oracle": "autocad.native_display_membership.v1",
-        "status": "PASS",
         "drawing_id": "probe",
         "evidence": [
             {
@@ -207,6 +240,11 @@ def _target_oracle(tmp_path: Path, *, w1_visible=1, w2_visible=1):
             },
         ],
     }
+    return _bind_authoritative_target_oracle(tmp_path, oracle)
+
+
+def _authoritative_target_oracle(tmp_path: Path):
+    return _target_oracle(tmp_path)
 
 
 def _target_worldir_probe():
@@ -319,6 +357,61 @@ def test_target_population_gate_opens_only_when_oracle_world_and_model_input_agr
         "model_input_ir",
     }
     assert all(len(value) == 64 for value in result["evidence_payload_sha256"].values())
+
+
+def test_target_population_gate_accepts_only_the_pr66_authoritative_receipt_contract(
+    tmp_path: Path,
+):
+    decision = guard.qualify(
+        required_observables=[
+            "nested_insert_world_segments",
+            "world_lineage",
+            "native_display_membership",
+            "model_input_membership",
+        ],
+        candidate="auto",
+    )
+
+    result = guard.verify_probe(
+        decision,
+        _target_worldir_probe(),
+        target_population_oracle=_authoritative_target_oracle(tmp_path),
+        model_input_output=_model_input("P-W1", "P-W2"),
+    )
+
+    assert result["status"] == guard.READY
+    assert result["reason_code"] == "INSTRUMENT_QUALIFIED"
+
+
+def test_guarded_runner_does_not_start_without_the_pr66_authoritative_receipt(
+    tmp_path: Path,
+):
+    oracle = _target_oracle(tmp_path)
+    Path(oracle["producer_receipt_path"]).unlink()
+    calls = []
+
+    def should_not_run(command, check=False):
+        calls.append(command)
+        raise AssertionError("model command must not run without the final display receipt")
+
+    result = guarded_runner.run_guarded(
+        required_observables=[
+            "nested_insert_world_segments",
+            "world_lineage",
+            "native_display_membership",
+            "model_input_membership",
+        ],
+        command=["python", "model.py"],
+        probe_output=_target_worldir_probe(),
+        target_population_oracle=oracle,
+        model_input_output=_model_input("P-W1", "P-W2"),
+        runner=should_not_run,
+    )
+
+    assert result["guard"]["status"] == guard.NEEDS_PROBE
+    assert result["guard"]["reason_code"] == "TARGET_POPULATION_ORACLE_INVALID"
+    assert result["executed"] is False
+    assert calls == []
 
 
 def test_target_population_gate_needs_build_when_native_display_oracle_is_absent():
@@ -458,6 +551,7 @@ def test_target_population_gate_blocks_native_world_visibility_disagreement(tmp_
 def test_target_population_gate_rejects_same_count_with_different_object_ids(tmp_path: Path):
     oracle = _target_oracle(tmp_path)
     oracle["targets"][0]["native_visible_segment_ids"] = ["P-W1-OTHER"]
+    _bind_authoritative_target_oracle(tmp_path, oracle)
     decision = guard.qualify(
         required_observables=["native_display_membership", "model_input_membership"],
         candidate="auto",

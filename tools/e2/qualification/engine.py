@@ -23,6 +23,14 @@ STATUS_PARTIAL = "PARTIAL_PASS"
 STATUS_DEFERRED = "PASS_WITH_DEFERRAL"
 STATUS_BLOCKED = "BLOCKED"
 WALL_THRESHOLD = 0.5
+EXPECTED_INVARIANT_INTERVENTIONS = frozenset(
+    {
+        "rotate_37_degrees",
+        "translate_large_offset",
+        "scale_coordinates_x1000_consistent",
+        "split_every_segment_at_midpoint",
+    }
+)
 ANTI_WALL_TOKENS = ("DOOR", "FUR", "KIT", "ELEV", "DIM", "TEXT", "수전", "가구")
 WALL_MODEL_REQUIRED_OBSERVABLES = frozenset(
     {
@@ -584,6 +592,174 @@ def _model_diagnostics(
     }
 
 
+def _downstream_experiment_gate(
+    receipt: Mapping[str, Any],
+    candidates: Mapping[str, Any],
+    models: Mapping[str, Any],
+    interventions: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Keep report generation separate from authorization to learn or score."""
+
+    candidate_count = candidates.get("candidate_count")
+    wall_pair_records = candidates.get("wall_pair_records")
+    wall_pair_record_count = len(wall_pair_records) if isinstance(wall_pair_records, list) else 0
+    rules = models.get("rules") if isinstance(models.get("rules"), Mapping) else {}
+    metrics = rules.get("accuracy_metrics") if isinstance(rules, Mapping) else None
+    rules_f1 = metrics.get("f1") if isinstance(metrics, Mapping) else None
+    valid_f1 = (
+        isinstance(rules_f1, (int, float))
+        and not isinstance(rules_f1, bool)
+        and math.isfinite(float(rules_f1))
+        and float(rules_f1) > 0.0
+    )
+
+    invariant_statuses = {
+        str(row.get("intervention")): row.get("status")
+        for row in interventions.get("interventions", []) or []
+        if isinstance(row, Mapping) and row.get("expected_invariant") is True
+    }
+    blocked_expected_invariants = sorted(
+        name
+        for name in EXPECTED_INVARIANT_INTERVENTIONS
+        if invariant_statuses.get(name) != STATUS_PASS
+    )
+    failures = []
+    if receipt.get("schema") != "e2.qualification_receipt.v1":
+        failures.append("QUALIFICATION_RECEIPT_SCHEMA_INVALID")
+    if receipt.get("status") != STATUS_PASS:
+        failures.append("QUALIFICATION_STATUS_NOT_PASS")
+    if not isinstance(candidate_count, int) or isinstance(candidate_count, bool) or candidate_count <= 0:
+        failures.append("NO_WALL_CANDIDATES")
+    if wall_pair_record_count <= 0:
+        failures.append("NO_WALL_PAIR_RECORDS")
+    if not valid_f1:
+        failures.append("RULES_F1_NOT_POSITIVE")
+    if blocked_expected_invariants:
+        failures.append("EXPECTED_INVARIANCE_BLOCKED")
+
+    return {
+        "status": STATUS_BLOCKED if failures else STATUS_PASS,
+        "reason_codes": failures,
+        "qualification_status": receipt.get("status"),
+        "candidate_count": candidate_count,
+        "wall_pair_record_count": wall_pair_record_count,
+        "rules_f1": float(rules_f1) if valid_f1 else None,
+        "expected_invariant_statuses": dict(sorted(invariant_statuses.items())),
+        "blocked_expected_invariants": blocked_expected_invariants,
+    }
+
+
+def validate_downstream_qualification_receipt(path: Path) -> dict[str, Any]:
+    """Validate the persisted receipt before a downstream run is authorized."""
+
+    path = Path(path)
+    try:
+        receipt = _read_json(path)
+    except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as exc:
+        return {
+            "status": STATUS_BLOCKED,
+            "reason_codes": ["QUALIFICATION_RECEIPT_UNREADABLE"],
+            "reason": f"{type(exc).__name__}: {exc}",
+            "path": str(path),
+        }
+
+    gate = receipt.get("downstream_experiment_gate")
+    gate = gate if isinstance(gate, Mapping) else {}
+    candidate_count = gate.get("candidate_count")
+    pair_count = gate.get("wall_pair_record_count")
+    rules_f1 = gate.get("rules_f1")
+    statuses = gate.get("expected_invariant_statuses")
+    statuses = statuses if isinstance(statuses, Mapping) else {}
+    failures: list[str] = []
+    output_errors: list[str] = []
+    output_payloads: dict[str, dict[str, Any]] = {}
+    output_hashes: dict[str, str] = {}
+    outputs = receipt.get("outputs")
+    outputs = outputs if isinstance(outputs, list) else []
+    required_outputs = {
+        "wall_candidates_rules": "wall_candidates_rules.json",
+        "model_diagnostics": "model_diagnostics.json",
+        "intervention_results": "intervention_results.json",
+    }
+    for role, expected_name in required_outputs.items():
+        records = [
+            record
+            for record in outputs
+            if isinstance(record, Mapping) and record.get("role") == role
+        ]
+        if len(records) != 1:
+            output_errors.append(f"{role}: expected exactly one receipt output")
+            continue
+        record = records[0]
+        recorded_path = Path(str(record.get("path") or ""))
+        output_path = recorded_path if recorded_path.is_absolute() else path.parent / expected_name
+        expected_sha256 = str(record.get("sha256") or "").lower()
+        expected_bytes = record.get("bytes")
+        try:
+            if recorded_path.name != expected_name:
+                raise ValueError(f"unexpected output filename {recorded_path.name!r}")
+            if len(expected_sha256) != 64 or any(
+                character not in "0123456789abcdef" for character in expected_sha256
+            ):
+                raise ValueError("invalid recorded SHA-256")
+            if (
+                not isinstance(expected_bytes, int)
+                or isinstance(expected_bytes, bool)
+                or expected_bytes < 0
+            ):
+                raise ValueError("invalid recorded byte count")
+            if not output_path.is_file():
+                raise ValueError("recorded output is missing")
+            observed_sha256 = _sha256(output_path)
+            if observed_sha256 != expected_sha256:
+                raise ValueError("recorded output SHA-256 drifted")
+            if output_path.stat().st_size != expected_bytes:
+                raise ValueError("recorded output byte count drifted")
+            output_payloads[role] = _read_json(output_path)
+            output_hashes[role] = observed_sha256
+        except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as exc:
+            output_errors.append(f"{role}: {type(exc).__name__}: {exc}")
+
+    if output_errors:
+        failures.append("QUALIFICATION_OUTPUT_INVALID")
+    else:
+        recomputed_gate = _downstream_experiment_gate(
+            receipt,
+            output_payloads["wall_candidates_rules"],
+            output_payloads["model_diagnostics"],
+            output_payloads["intervention_results"],
+        )
+        if dict(gate) != recomputed_gate:
+            failures.append("DOWNSTREAM_GATE_EVIDENCE_MISMATCH")
+    if receipt.get("schema") != "e2.qualification_receipt.v1":
+        failures.append("QUALIFICATION_RECEIPT_SCHEMA_INVALID")
+    if receipt.get("status") != STATUS_PASS:
+        failures.append("QUALIFICATION_STATUS_NOT_PASS")
+    if gate.get("status") != STATUS_PASS:
+        failures.append("DOWNSTREAM_GATE_NOT_PASS")
+    if not isinstance(candidate_count, int) or isinstance(candidate_count, bool) or candidate_count <= 0:
+        failures.append("NO_WALL_CANDIDATES")
+    if not isinstance(pair_count, int) or isinstance(pair_count, bool) or pair_count <= 0:
+        failures.append("NO_WALL_PAIR_RECORDS")
+    if (
+        not isinstance(rules_f1, (int, float))
+        or isinstance(rules_f1, bool)
+        or not math.isfinite(float(rules_f1))
+        or float(rules_f1) <= 0.0
+    ):
+        failures.append("RULES_F1_NOT_POSITIVE")
+    if any(statuses.get(name) != STATUS_PASS for name in EXPECTED_INVARIANT_INTERVENTIONS):
+        failures.append("EXPECTED_INVARIANCE_BLOCKED")
+    return {
+        "status": STATUS_BLOCKED if failures else STATUS_PASS,
+        "reason_codes": failures,
+        "path": str(path.resolve()),
+        "sha256": _sha256(path),
+        "validated_output_sha256": output_hashes,
+        "output_errors": output_errors,
+    }
+
+
 def _percent(numerator: int | float, denominator: int | float) -> str:
     return "n/a" if not denominator else f"{100.0 * numerator / denominator:.3f}%"
 
@@ -790,6 +966,28 @@ def build_first_report(spec: Mapping[str, Any], run_dir: Path) -> dict[str, Any]
         if not guard_ok:
             receipt["status"] = STATUS_BLOCKED
 
+    downstream_gate = _downstream_experiment_gate(
+        receipt, candidates, models, interventions
+    )
+    receipt["downstream_experiment_gate"] = downstream_gate
+    receipt["gates"].append(
+        _gate(
+            "downstream_model_learning_or_scoring",
+            downstream_gate["status"],
+            (
+                f"qualification_status={downstream_gate['qualification_status']}; "
+                f"candidates={downstream_gate['candidate_count']}; "
+                f"wall_pairs={downstream_gate['wall_pair_record_count']}; "
+                f"rules_f1={downstream_gate['rules_f1']}; "
+                f"blocked_invariants={downstream_gate['blocked_expected_invariants']}; "
+                f"reasons={downstream_gate['reason_codes']}"
+            ),
+        )
+    )
+    receipt["scope_verdicts"]["downstream_model_learning_or_scoring"] = downstream_gate[
+        "status"
+    ]
+
     output_values = {
         "experiment_spec.json": dict(spec),
         "entity_census.json": census,
@@ -816,4 +1014,5 @@ def build_first_report(spec: Mapping[str, Any], run_dir: Path) -> dict[str, Any]
         "report": str(run_dir / "REPORT.md"),
         "receipt": str(run_dir / "qualification_receipt.json"),
         "candidate_count": candidates["candidate_count"],
+        "downstream_experiment_gate": downstream_gate,
     }

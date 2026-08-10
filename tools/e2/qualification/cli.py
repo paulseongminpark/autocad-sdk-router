@@ -8,9 +8,12 @@ from pathlib import Path
 
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
-    from tools.e2.qualification.engine import build_first_report
+    from tools.e2.qualification.engine import (
+        build_first_report,
+        validate_downstream_qualification_receipt,
+    )
 else:
-    from .engine import build_first_report
+    from .engine import build_first_report, validate_downstream_qualification_receipt
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -51,8 +54,11 @@ def main(argv: list[str] | None = None) -> int:
         ],
     }
     result = build_first_report(spec, args.run_dir)
+    result["downstream_receipt_validation"] = validate_downstream_qualification_receipt(
+        Path(result["receipt"])
+    )
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
-    return 0 if result["status"] != "BLOCKED" else 2
+    return 0 if result["downstream_receipt_validation"]["status"] == "PASS" else 2
 
 
 if __name__ == "__main__":

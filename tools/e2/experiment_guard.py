@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 from pathlib import Path
 from typing import Any, Iterable, Mapping
@@ -343,6 +344,74 @@ def _independent_oracle_receipt_ok(receipt: Mapping[str, Any] | None) -> bool:
     return True
 
 
+def _same_resolved_path(left: Any, right: Any) -> bool:
+    try:
+        return os.path.normcase(str(Path(str(left)).resolve(strict=True))) == os.path.normcase(
+            str(Path(str(right)).resolve(strict=True))
+        )
+    except (OSError, RuntimeError, ValueError):
+        return False
+
+
+def _authoritative_display_receipt_ok(oracle: Mapping[str, Any] | None) -> bool:
+    """Verify the observation-only oracle through PR66's final PASS receipt."""
+
+    if (
+        not isinstance(oracle, Mapping)
+        or oracle.get("status") != "OBSERVED"
+        or oracle.get("claim_scope") != "instrument_observation_only"
+        or oracle.get("producer_receipt_required") is not True
+        or oracle.get("downstream_experiment_guard_required") is not True
+    ):
+        return False
+    evidence = oracle.get("evidence")
+    if not isinstance(evidence, list) or not evidence:
+        return False
+    for record in evidence:
+        if not isinstance(record, Mapping):
+            return False
+        evidence_path = Path(str(record.get("path") or ""))
+        expected = _normalized_sha256(record.get("sha256"))
+        if expected is None or not evidence_path.is_file() or _sha256(evidence_path) != expected:
+            return False
+
+    receipt_path = Path(str(oracle.get("producer_receipt_path") or ""))
+    if not receipt_path.is_file():
+        return False
+    try:
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8-sig"))
+    except (OSError, UnicodeError, ValueError, json.JSONDecodeError):
+        return False
+    if not isinstance(receipt, Mapping):
+        return False
+    oracle_path = Path(str(receipt.get("target_population_oracle") or ""))
+    if not oracle_path.is_file():
+        return False
+    try:
+        persisted_oracle = json.loads(oracle_path.read_text(encoding="utf-8-sig"))
+    except (OSError, UnicodeError, ValueError, json.JSONDecodeError):
+        return False
+    oracle_sha256 = _sha256(oracle_path)
+    final_hashes = receipt.get("final_evidence_sha256")
+    final_hashes = final_hashes if isinstance(final_hashes, Mapping) else {}
+    return (
+        receipt.get("schema") == "ariadne.cadctl.display_membership.v1"
+        and receipt.get("status") == "PASS"
+        and receipt.get("operation") == "e2.inspect.xclip_membership"
+        and receipt.get("claim_scope") == "instrument_observation_only"
+        and receipt.get("downstream_experiment_guard_required") is True
+        and receipt.get("geometry_scope") == oracle.get("geometry_scope")
+        and final_hashes.get("source") == oracle.get("drawing_id")
+        and _normalized_sha256(receipt.get("target_population_oracle_sha256"))
+        == oracle_sha256
+        and _normalized_sha256(final_hashes.get("observation_oracle")) == oracle_sha256
+        and _same_resolved_path(receipt.get("authoritative_completion_marker"), receipt_path)
+        and _same_resolved_path(oracle.get("producer_receipt_path"), receipt_path)
+        and _same_resolved_path(receipt.get("target_population_oracle"), oracle_path)
+        and persisted_oracle == dict(oracle)
+    )
+
+
 def _stable_segment_id(segment: Mapping[str, Any]) -> str:
     return str(
         segment.get("placed_uid")
@@ -374,7 +443,7 @@ def _target_population_check(
         not isinstance(target_oracle, Mapping)
         or target_oracle.get("schema") != "ariadne.e2.target_population_oracle.v1"
         or target_oracle.get("oracle") != "autocad.native_display_membership.v1"
-        or not _independent_oracle_receipt_ok(target_oracle)
+        or not _authoritative_display_receipt_ok(target_oracle)
     ):
         return {
             "status": NEEDS_PROBE,

@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, Sequence
 
 import experiment_guard
+from qualification.engine import validate_downstream_qualification_receipt
 
 
 _DWG_HEADER_CONTRACT = "ASCII_AC10_PLUS_TWO_DIGITS"
@@ -600,6 +601,7 @@ def run_guarded(
     independent_oracle_receipt: Mapping[str, Any] | None = None,
     target_population_oracle: Mapping[str, Any] | None = None,
     model_input_output: Mapping[str, Any] | None = None,
+    qualification_receipt_path: Path | None = None,
     receipt_path: Path | None = None,
     runner: Callable[..., Any] = subprocess.run,
 ) -> dict[str, Any]:
@@ -639,6 +641,11 @@ def run_guarded(
         binding["verified_probe_drawing_id"] = source_identity.get("verified_probe_drawing_id")
 
     result = _base_result(decision=decision, binding=binding, command=command)
+    result["qualification_receipt_validation"] = (
+        validate_downstream_qualification_receipt(qualification_receipt_path)
+        if qualification_receipt_path is not None
+        else {"status": "NOT_REQUIRED", "path": None}
+    )
     receipt_conflicts = _receipt_path_conflicts(receipt_path, binding)
     if receipt_conflicts:
         result["guard"] = _terminal_block(
@@ -692,6 +699,22 @@ def run_guarded(
             result["evidence_authorized"] = False
             binding["terminal_evidence_valid"] = False
             binding["terminal_evidence_validity"] = "NOT_EXECUTED"
+        return _persist_terminal(result, receipt_path)
+
+    if (
+        qualification_receipt_path is not None
+        and result["qualification_receipt_validation"]["status"] != "PASS"
+    ):
+        result["guard"] = _terminal_block(
+            decision,
+            reason_code="QUALIFICATION_RECEIPT_REJECTED",
+            reason=(
+                "The explicit qualification receipt does not authorize downstream model "
+                "learning or scoring, so the command was not started."
+            ),
+        )
+        result["terminal_state"] = "QUALIFICATION_RECEIPT_REJECTED"
+        result["execution_outcome"] = "NOT_EXECUTED_QUALIFICATION_RECEIPT_REJECTED"
         return _persist_terminal(result, receipt_path)
 
     preflight_failure = _persist_preflight(result, receipt_path)
@@ -759,6 +782,10 @@ def run_guarded(
     _record_terminal_evidence(result, binding, post_execution_validation)
     returncode = result["command_exit_code"]
     result["command_succeeded"] = returncode == 0
+    if qualification_receipt_path is not None:
+        result["qualification_receipt_validation"] = (
+            validate_downstream_qualification_receipt(qualification_receipt_path)
+        )
 
     if source_binding_required and post_execution_validation["valid"] is not True:
         result["guard"] = _terminal_block(
@@ -777,6 +804,20 @@ def run_guarded(
     elif not result["command_succeeded"]:
         result["terminal_state"] = "COMMAND_FAILED"
         result["execution_outcome"] = "COMMAND_FAILED"
+    elif (
+        qualification_receipt_path is not None
+        and result["qualification_receipt_validation"]["status"] != "PASS"
+    ):
+        result["guard"] = _terminal_block(
+            decision,
+            reason_code="QUALIFICATION_RECEIPT_REJECTED",
+            reason=(
+                "The command exited zero, but its explicit qualification receipt did not "
+                "authorize downstream model learning or scoring."
+            ),
+        )
+        result["terminal_state"] = "QUALIFICATION_RECEIPT_REJECTED"
+        result["execution_outcome"] = "COMMAND_COMPLETED_QUALIFICATION_REJECTED"
     else:
         result["terminal_state"] = "AUTHORIZED_SUCCESS"
         result["execution_outcome"] = "COMMAND_SUCCEEDED"
@@ -818,6 +859,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--target-population-oracle", type=Path)
     parser.add_argument("--model-input-ir", type=Path)
     parser.add_argument(
+        "--qualification-receipt",
+        type=Path,
+        help="Explicit qualification receipt that must authorize downstream learning or scoring.",
+    )
+    parser.add_argument(
         "--receipt-output",
         type=Path,
         help="Persist a non-terminal preflight marker, then the final terminal receipt.",
@@ -839,6 +885,7 @@ def main(argv: list[str] | None = None) -> int:
         independent_oracle_receipt=_load_probe(args.independent_oracle_receipt),
         target_population_oracle=_load_probe(args.target_population_oracle),
         model_input_output=_load_probe(args.model_input_ir),
+        qualification_receipt_path=args.qualification_receipt,
         receipt_path=args.receipt_output,
     )
     print(json.dumps(result, indent=2, ensure_ascii=False))
