@@ -1181,10 +1181,39 @@ def test_ps1_writes_a_compact_atomic_completion_receipt_before_cleanup(ps1_src: 
 
 def test_ps1_does_not_qsave_the_read_only_display_membership_operation(ps1_src: str):
     assert "$readOnlyOperation = ($Operation -eq 'e2.inspect.xclip_membership')" in ps1_src
-    assert "$saveCommand = if ($readOnlyOperation) { '(princ)' } else { '_QSAVE' }" in ps1_src
-    assert "$saveCommand," in ps1_src
+    assert "$shutdownCommands = @(Get-AttendedShutdownCommands" in ps1_src
+    assert "@($scriptLines + $shutdownCommands)" in ps1_src
     assert "read_only_operation = $readOnlyOperation" in ps1_src
     assert "staged_save_attempted = (-not $readOnlyOperation)" in ps1_src
+
+
+def test_ps1_shutdown_commands_decline_read_only_save_prompt_and_preserve_qsave():
+    launcher = str(PS1_LAUNCHER).replace("'", "''")
+    command = f"""
+$ErrorActionPreference = 'Stop'
+$text = Get-Content -Raw -LiteralPath '{launcher}'
+$start = $text.IndexOf('function Get-AttendedShutdownCommands')
+$end = $text.IndexOf('# NATIVE_DEPLOYMENT_CONSUMER_BEGIN')
+if ($start -lt 0 -or $end -le $start) {{ throw 'shutdown helper boundaries not found' }}
+. ([scriptblock]::Create($text.Substring($start, $end - $start)))
+[ordered]@{{
+  read_only = @(Get-AttendedShutdownCommands -ReadOnlyOperation $true)
+  mutating = @(Get-AttendedShutdownCommands -ReadOnlyOperation $false)
+}} | ConvertTo-Json -Depth 4 -Compress
+"""
+    completed = subprocess.run(
+        ["powershell", "-NoProfile", "-NonInteractive", "-Command", command],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    commands = json.loads(completed.stdout)
+    assert commands["read_only"] == ["(princ)", "_QUIT", "_N", ""]
+    assert commands["mutating"] == ["_QSAVE", "_QUIT", ""]
 
 
 def test_ps1_loads_the_canonical_prebuilt_modules(ps1_src: str):

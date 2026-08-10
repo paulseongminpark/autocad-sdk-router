@@ -149,6 +149,15 @@ function Get-ProcessIdentityById([int]$ProcessId) {
   return $identity
 }
 
+function Get-AttendedShutdownCommands([bool]$ReadOnlyOperation) {
+  if ($ReadOnlyOperation) {
+    # The native read may still dirty AutoCAD's in-memory document state.  A
+    # bare QUIT accepts the save prompt's default Yes, so decline explicitly.
+    return @('(princ)', '_QUIT', '_N', '')
+  }
+  return @('_QSAVE', '_QUIT', '')
+}
+
 # NATIVE_DEPLOYMENT_CONSUMER_BEGIN
 $script:NativeDeploymentLeaves = @(
   'Ariadne.AcadNativeDbx.dbx',
@@ -507,8 +516,8 @@ $trustedEscaped = $binDir.Replace('\', '\\')
 
 $scr = Join-Path $RunDir 'attended_job.scr'
 $readOnlyOperation = ($Operation -eq 'e2.inspect.xclip_membership')
-$saveCommand = if ($readOnlyOperation) { '(princ)' } else { '_QSAVE' }
-@(
+$shutdownCommands = @(Get-AttendedShutdownCommands -ReadOnlyOperation $readOnlyOperation)
+$scriptLines = @(
   '(setq _ariadneOsl (getvar "SECURELOAD"))',
   '(setq _ariadneOtp (getvar "TRUSTEDPATHS"))',
   "(setq _f (open `"$(FS $secBefore)`" `"w`"))",
@@ -527,11 +536,9 @@ $saveCommand = if ($readOnlyOperation) { '(princ)' } else { '_QSAVE' }
   "(setq _f2 (open `"$(FS $secAfter)`" `"w`"))",
   '(write-line (itoa (getvar "SECURELOAD")) _f2)',
   '(write-line (getvar "TRUSTEDPATHS") _f2)',
-  '(close _f2)',
-  $saveCommand,
-  '_QUIT',
-  ''
-) | Set-Content -LiteralPath $scr -Encoding ASCII
+  '(close _f2)'
+)
+@($scriptLines + $shutdownCommands) | Set-Content -LiteralPath $scr -Encoding ASCII
 
 Log "=== attended job run: $runId ==="
 Log "pre-existing acad PIDs: $($preIds -join ',')"
