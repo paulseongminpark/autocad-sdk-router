@@ -1450,18 +1450,6 @@ class Cad:
         raw_job_out = attended_dir / "job_out.json"
         attended_result_ref = attended.get("result_json")
         native_job = attended.get("result")
-        if not (
-            isinstance(native_job, dict)
-            and native_job.get("schema") == "ariadne.autocad_native_job_result.v1"
-        ) and raw_job_out.is_file():
-            try:
-                exact_job_out = json.loads(raw_job_out.read_text(encoding="utf-8-sig"))
-            except (OSError, ValueError):
-                exact_job_out = None
-            if isinstance(exact_job_out, dict):
-                native_job = exact_job_out
-                attended_result_ref = str(raw_job_out)
-
         common = {
             "original_sha256_before": original_before,
             "original_sha256_after": original_after,
@@ -1470,6 +1458,7 @@ class Cad:
             "staged_sha256_before": staged_before,
             "native_bin_dir": str(native_bin),
             "attended_result_ref": attended_result_ref,
+            "attended_completion_receipt": attended.get("completion_receipt"),
             "stdout": attended.get("stdout_path"),
             "stderr": attended.get("stderr_path"),
             "degraded": bool(attended.get("degraded", False)),
@@ -1488,6 +1477,77 @@ class Cad:
                 executed=True,
                 **common,
             )
+
+        # job_out.json is native-operation evidence only.  It cannot show that
+        # the disposable AutoCAD process was closed, the user's sessions were
+        # untouched, or SECURELOAD/TRUSTEDPATHS were restored.  Do not let a
+        # pre-cleanup receipt or a Python fallback promote it to PASS.
+        launcher_receipt = attended.get("envelope")
+        receipt_errors = []
+        if not isinstance(launcher_receipt, dict):
+            receipt_errors.append("missing final receipt")
+        else:
+            if launcher_receipt.get("schema") != "ariadne.cad_os.attended_job_result.v1":
+                receipt_errors.append("schema")
+            if launcher_receipt.get("phase") != "finalized":
+                receipt_errors.append("phase")
+            if launcher_receipt.get("status") != "ok":
+                receipt_errors.append("status")
+            if launcher_receipt.get("operation") != "e2.inspect.xclip_membership":
+                receipt_errors.append("operation")
+            if not isinstance(launcher_receipt.get("launched_pid"), int) or launcher_receipt["launched_pid"] <= 0:
+                receipt_errors.append("launched_pid")
+            if launcher_receipt.get("dedicated_instance") is not True:
+                receipt_errors.append("dedicated_instance")
+            if launcher_receipt.get("timed_out") is not False:
+                receipt_errors.append("timed_out")
+            if launcher_receipt.get("launched_pid_closed") is not True:
+                receipt_errors.append("launched_pid_closed")
+            if launcher_receipt.get("user_session_touched") is not False:
+                receipt_errors.append("user_session_touched")
+            if launcher_receipt.get("job_out_present") is not True:
+                receipt_errors.append("job_out_present")
+            if launcher_receipt.get("degraded") is not False or attended.get("degraded", False) is not False:
+                receipt_errors.append("degraded")
+            if not isinstance(launcher_receipt.get("security"), dict) or launcher_receipt["security"].get("restored") is not True:
+                receipt_errors.append("security.restored")
+            authority = launcher_receipt.get("receipt_authority")
+            if authority == "powershell_launcher":
+                if launcher_receipt.get("recovered_from_launcher_finalization_hang") is not False:
+                    receipt_errors.append("recovered_from_launcher_finalization_hang")
+            elif authority == "python_independent_safety_validator":
+                if launcher_receipt.get("recovered_from_launcher_finalization_hang") is not True:
+                    receipt_errors.append("recovered_from_launcher_finalization_hang")
+                if launcher_receipt.get("powershell_helper_closed") is not True:
+                    receipt_errors.append("powershell_helper_closed")
+                if launcher_receipt.get("launched_pid_identity_verified") is not True:
+                    receipt_errors.append("launched_pid_identity_verified")
+                if launcher_receipt.get("pre_existing_identity_verified") is not True:
+                    receipt_errors.append("pre_existing_identity_verified")
+                if not isinstance(launcher_receipt.get("launched_pid_reused"), bool):
+                    receipt_errors.append("launched_pid_reused")
+            else:
+                receipt_errors.append("receipt_authority")
+        if receipt_errors:
+            return finish(
+                "BLOCKED",
+                "attended launcher final safety receipt is incomplete: " + ", ".join(receipt_errors),
+                executed=True,
+                **common,
+            )
+
+        if not (
+            isinstance(native_job, dict)
+            and native_job.get("schema") == "ariadne.autocad_native_job_result.v1"
+        ) and raw_job_out.is_file():
+            try:
+                exact_job_out = json.loads(raw_job_out.read_text(encoding="utf-8-sig"))
+            except (OSError, ValueError):
+                exact_job_out = None
+            if isinstance(exact_job_out, dict):
+                native_job = exact_job_out
+                attended_result_ref = str(raw_job_out)
+                common["attended_result_ref"] = attended_result_ref
 
         if not isinstance(native_job, dict):
             return finish(

@@ -70,6 +70,28 @@ def _raw_native_result(
     }
 
 
+def _final_launcher_envelope(operation: str, job_out: Path) -> dict:
+    """Compact post-cleanup receipt required before a display PASS."""
+    return {
+        "schema": "ariadne.cad_os.attended_job_result.v1",
+        "phase": "finalized",
+        "status": "ok",
+        "run_id": job_out.parent.name,
+        "operation": operation,
+        "receipt_authority": "powershell_launcher",
+        "recovered_from_launcher_finalization_hang": False,
+        "launched_pid": 4242,
+        "dedicated_instance": True,
+        "timed_out": False,
+        "launched_pid_closed": True,
+        "user_session_touched": False,
+        "job_out": str(job_out),
+        "job_out_present": True,
+        "degraded": False,
+        "security": {"restored": True},
+    }
+
+
 def test_cadctl_display_membership_is_attended_only_hash_bound_and_original_safe(
     tmp_path: Path, monkeypatch
 ):
@@ -106,8 +128,8 @@ def test_cadctl_display_membership_is_attended_only_hash_bound_and_original_safe
             "exit_code": 0,
             "stdout_path": str(run_path / "stdout.txt"),
             "stderr_path": str(run_path / "stderr.txt"),
-            "envelope": {"status": "ok", "dedicated_instance": True},
-            "result_json": str(run_path / "attended_job_result.json"),
+            "envelope": _final_launcher_envelope(operation, job_out),
+            "result_json": str(run_path / "attended_job_final_receipt.json"),
             "result": raw,
             "staged_used": staged_dwg,
             "timed_out": False,
@@ -193,6 +215,7 @@ def test_cadctl_display_membership_binds_linear_scope_and_rejects_native_scope_m
             "result_json": str(run_path / "job_out.json"),
             "stdout_path": None,
             "stderr_path": None,
+            "envelope": _final_launcher_envelope(operation, run_path / "job_out.json"),
             "degraded": False,
         }
 
@@ -230,6 +253,7 @@ def test_cadctl_display_membership_binds_linear_scope_and_rejects_native_scope_m
             "result_json": str(run_path / "job_out.json"),
             "stdout_path": None,
             "stderr_path": None,
+            "envelope": _final_launcher_envelope(operation, run_path / "job_out.json"),
             "degraded": False,
         }
 
@@ -275,13 +299,14 @@ def test_cadctl_display_membership_fails_closed_without_current_native_build(tmp
     assert "Ariadne.AcadNative.arx" in result["reason"]
 
 
-def test_cadctl_display_membership_uses_exact_job_out_in_degraded_attended_mode(
+def test_cadctl_display_membership_rejects_precleanup_receipt_without_final_launcher_verification(
     tmp_path: Path, monkeypatch
 ):
-    """The attended runner deliberately exposes only the inner payload when
-    its PowerShell bookkeeping envelope is late.  The display route must read
-    the exact native outer envelope from job_out.json, not invent one or reject
-    a completed CAD measurement merely because optional bookkeeping lagged.
+    """Raw job_out cannot certify the launcher's cleanup obligations.
+
+    A pre-cleanup receipt deliberately lacks launched-PID closure, user-session
+    safety, and security-restoration proof. Even a valid native measurement
+    must remain BLOCKED rather than being promoted to the route's top-level PASS.
     """
     router = tmp_path / "router"
     native_bin = router / "src" / "Ariadne.AcadNative" / "bin" / "x64" / "Release"
@@ -291,7 +316,7 @@ def test_cadctl_display_membership_uses_exact_job_out_in_degraded_attended_mode(
     source = tmp_path / "source.dwg"
     source.write_bytes(b"immutable-dwg-payload")
 
-    def fake_degraded_attended(staged_dwg, run_dir, operation, args, **kwargs):
+    def fake_precleanup_attended(staged_dwg, run_dir, operation, args, **kwargs):
         run_path = Path(run_dir)
         run_path.mkdir(parents=True, exist_ok=True)
         raw = _raw_native_result()
@@ -302,28 +327,90 @@ def test_cadctl_display_membership_uses_exact_job_out_in_degraded_attended_mode(
             "exit_code": 0,
             "stdout_path": str(run_path / "stdout.txt"),
             "stderr_path": str(run_path / "stderr.txt"),
-            "envelope": {"status": "ok", "degraded": True},
-            "result_json": str(run_path / "attended_job_result.json"),
-            "result": raw["result"],
+            "envelope": {
+                "schema": "ariadne.cad_os.attended_job_completion.v1",
+                "phase": "cleanup_pending",
+                "operation": operation,
+                "dedicated_instance": True,
+                "timed_out": False,
+                "job_out": str(job_out),
+                "job_out_present": True,
+                "cleanup_wait_sec": 45,
+            },
+            "result_json": str(run_path / "attended_job_completion.json"),
+            "result": raw,
             "staged_used": staged_dwg,
             "timed_out": False,
             "error": None,
-            "degraded": True,
-            "degraded_reason": "optional bookkeeping envelope was late",
+            "degraded": False,
+            "degraded_reason": None,
         }
 
     monkeypatch.setattr(
-        cadctl.attended_lane, "run_attended_native_job", fake_degraded_attended
+        cadctl.attended_lane, "run_attended_native_job", fake_precleanup_attended
     )
     out_dir = tmp_path / "out"
     result = cadctl.Cad(router_home=router).inspect_display_membership(
         str(source), ["W1"], str(out_dir)
     )
 
-    assert result["status"] == "PASS"
-    assert result["degraded"] is True
-    assert result["attended_result_ref"] == str(out_dir / "attended" / "job_out.json")
-    assert Path(result["target_population_oracle"]).is_file()
+    assert result["status"] == "BLOCKED"
+    assert result["executed"] is True
+    assert "final" in result["reason"].lower()
+    assert "target_population_oracle" not in result
+
+
+def test_cadctl_display_membership_requires_recovery_authority_evidence(
+    tmp_path: Path, monkeypatch
+):
+    """A Python-authored final receipt is acceptable only when it openly
+    records the independent validator's process-identity and helper-closure
+    evidence.  It must not be a renamed degraded fallback."""
+    router = tmp_path / "router"
+    native_bin = router / "src" / "Ariadne.AcadNative" / "bin" / "x64" / "Release"
+    native_bin.mkdir(parents=True)
+    (native_bin / "Ariadne.AcadNativeDbx.dbx").write_bytes(b"dbx")
+    (native_bin / "Ariadne.AcadNative.arx").write_bytes(b"arx")
+    source = tmp_path / "source.dwg"
+    source.write_bytes(b"immutable-dwg-payload")
+    raw = _raw_native_result()
+
+    def fake_incomplete_recovery(staged_dwg, run_dir, operation, args, **kwargs):
+        run_path = Path(run_dir)
+        run_path.mkdir(parents=True, exist_ok=True)
+        receipt = _final_launcher_envelope(operation, run_path / "job_out.json")
+        receipt.update({
+            "receipt_authority": "python_independent_safety_validator",
+            "recovered_from_launcher_finalization_hang": True,
+            "powershell_helper_closed": False,
+            "launched_pid_identity_verified": True,
+            "pre_existing_identity_verified": True,
+            "launched_pid_reused": False,
+        })
+        return {
+            "command": ["acad.exe"],
+            "exit_code": 0,
+            "stdout_path": str(run_path / "stdout.txt"),
+            "stderr_path": str(run_path / "stderr.txt"),
+            "envelope": receipt,
+            "result_json": str(run_path / "attended_job_final_receipt.json"),
+            "result": raw,
+            "staged_used": staged_dwg,
+            "timed_out": False,
+            "error": None,
+            "degraded": False,
+            "degraded_reason": None,
+        }
+
+    monkeypatch.setattr(
+        cadctl.attended_lane, "run_attended_native_job", fake_incomplete_recovery
+    )
+    result = cadctl.Cad(router_home=router).inspect_display_membership(
+        str(source), ["W1"], str(tmp_path / "out")
+    )
+
+    assert result["status"] == "BLOCKED"
+    assert "powershell_helper_closed" in result["reason"]
 
 
 def test_cadctl_display_membership_rejects_non_native_or_incomplete_result(
@@ -346,7 +433,7 @@ def test_cadctl_display_membership_rejects_non_native_or_incomplete_result(
             "result": raw,
             "error": None,
             "timed_out": False,
-            "envelope": {"status": "ok"},
+            "envelope": _final_launcher_envelope(operation, Path(run_dir) / "job_out.json"),
             "result_json": None,
             "staged_used": staged_dwg,
             "exit_code": 0,

@@ -41,6 +41,53 @@ ROOT = Path(_REPO)
 PS1_LAUNCHER = ROOT / "tools" / "attended" / "run_attended_job.ps1"
 
 
+def _final_attended_receipt(operation: str, job_out: Path) -> dict:
+    """A compact, post-cleanup launcher receipt.
+
+    The native payload remains in job_out.json; the launcher receipt must only
+    certify the dedicated-instance and restoration cleanup that job_out cannot
+    prove by itself.
+    """
+    return {
+        "schema": "ariadne.cad_os.attended_job_result.v1",
+        "phase": "finalized",
+        "status": "ok",
+        "run_id": job_out.parent.name,
+        "operation": operation,
+        "receipt_authority": "powershell_launcher",
+        "recovered_from_launcher_finalization_hang": False,
+        "launched_pid": 4242,
+        "dedicated_instance": True,
+        "timed_out": False,
+        "launched_pid_closed": True,
+        "user_session_touched": False,
+        "job_out": str(job_out),
+        "job_out_present": True,
+        "degraded": False,
+        "security": {"restored": True},
+    }
+
+
+def _completion_receipt(operation: str, job_out: Path, *, cleanup_wait_sec: int = 45) -> dict:
+    """The bounded pre-cleanup signal; intentionally not a success result."""
+    return {
+        "schema": "ariadne.cad_os.attended_job_completion.v1",
+        "phase": "cleanup_pending",
+        "status": "observed",
+        "run_id": "run",
+        "operation": operation,
+        "launched_pid": 4242,
+        "launched_start_time_utc": "2026-08-10T00:00:00.0000000Z",
+        "dedicated_instance": True,
+        "timed_out": False,
+        "job_out": str(job_out),
+        "job_out_present": True,
+        "pre_existing_pids": [],
+        "pre_existing_processes": [],
+        "cleanup_wait_sec": cleanup_wait_sec,
+    }
+
+
 # ========================================================================== #
 # 1. build_job_doc -- pure, no I/O
 # ========================================================================== #
@@ -162,15 +209,20 @@ def test_run_attended_native_job_builds_expected_command_and_parses_result(tmp_p
     launcher.write_text("# stub, never executed in this test\n", encoding="utf-8")
 
     captured = {}
+    native = {
+        "schema": "ariadne.autocad_native_job_result.v1",
+        "status": "ok",
+        "result": {"created": True, "handle": "ABCD"},
+    }
 
     class _FakeProc:
         """Stand-in for the Popen object run_attended_native_job() now uses
         (NOT subprocess.run -- see the comment at the real call site: the
         launcher's own post-job bookkeeping can stall for minutes on this box
         even after the CAD job itself succeeded, so the runner polls for
-        job_out.json/attended_job_result.json directly instead of blocking on
+        job_out.json/final receipt directly instead of blocking on
         the child process's exit). returncode=0 means "already exited" so the
-        very first poll-loop iteration (which finds attended_job_result.json
+        very first poll-loop iteration (which finds the final receipt
         already on disk, written below) breaks out immediately."""
         def __init__(self):
             self.returncode = 0
@@ -184,12 +236,15 @@ def test_run_attended_native_job_builds_expected_command_and_parses_result(tmp_p
     def fake_popen(cmd, cwd, stdout, stderr, text, encoding, errors):
         captured["cmd"] = cmd
         stdout.write("ok\n")
-        # simulate the PS1 having written attended_job_result.json before exit
-        (run_dir / "attended_job_result.json").write_text(json.dumps({
-            "schema": "ariadne.cad_os.attended_job_result.v1", "status": "ok",
-            "result": {"created": True, "handle": "ABCD"},
-            "timed_out": False,
-        }), encoding="utf-8")
+        # The final launcher receipt is compact; the full native payload lives
+        # in job_out.json and is read by the Python side only after cleanup is
+        # certified.
+        job_out = run_dir / "job_out.json"
+        job_out.write_text(json.dumps(native), encoding="utf-8")
+        (run_dir / "attended_job_final_receipt.json").write_text(
+            json.dumps(_final_attended_receipt("write.entity.hatch", job_out)),
+            encoding="utf-8",
+        )
         return _FakeProc()
 
     monkeypatch.setattr(subprocess, "Popen", fake_popen)
@@ -209,7 +264,7 @@ def test_run_attended_native_job_builds_expected_command_and_parses_result(tmp_p
 
     assert res["error"] is None
     assert res["staged_used"] == str(staged)
-    assert res["result"] == {"created": True, "handle": "ABCD"}
+    assert res["result"] == native
     assert res["timed_out"] is False
     assert res["degraded"] is False
 
@@ -241,8 +296,10 @@ def test_run_attended_native_job_threads_isolated_native_bin_dir(tmp_path, monke
 
     def fake_popen(cmd, **kwargs):
         captured["cmd"] = cmd
-        (run_dir / "attended_job_result.json").write_text(
-            json.dumps({"status": "ok", "result": {"status": "ok"}}),
+        job_out = run_dir / "job_out.json"
+        job_out.write_text(json.dumps({"status": "ok", "result": {"status": "ok"}}), encoding="utf-8")
+        (run_dir / "attended_job_final_receipt.json").write_text(
+            json.dumps(_final_attended_receipt("e2.inspect.xclip_membership", job_out)),
             encoding="utf-8",
         )
         return _FakeProc()
@@ -281,7 +338,7 @@ def test_run_attended_native_job_reports_gate1_block_as_error(tmp_path, monkeypa
             pass
 
     def fake_popen(cmd, **kw):
-        (run_dir / "attended_job_result.json").write_text(json.dumps({
+        (run_dir / "attended_job_final_receipt.json").write_text(json.dumps({
             "status": "blocked", "error": "GATE1 FAIL: launched PID collides", "launched_pid": 1234,
         }), encoding="utf-8")
         return _FakeProc()
@@ -293,43 +350,102 @@ def test_run_attended_native_job_reports_gate1_block_as_error(tmp_path, monkeypa
     assert res["staged_used"] is None
 
 
-def test_run_attended_native_job_degrades_gracefully_when_bookkeeping_stalls(tmp_path, monkeypatch):
-    """The box-contention hang this wave found empirically: job_out.json (the
-    AutoLISP/native side's OWN output, written independently of the PS1's
-    finally block) appears and proves the CAD job succeeded, but the
-    launcher's attended_job_result.json bookkeeping never shows up and the
-    launcher process itself never exits either. The lane must surface the
-    REAL job outcome (status/result/security-restore evidence reconstructed
-    directly from job_out.json + the raw security_before/after.txt files)
-    instead of either hanging for the full outer timeout or discarding a
-    genuinely successful CAD write as an unexplained failure."""
+def test_run_attended_native_job_waits_for_final_receipt_after_completion_signal(tmp_path, monkeypatch):
+    """A compact completion receipt arrives before cleanup, then the final
+    receipt follows after the old 30-second fallback boundary. The Python
+    caller must not kill the launcher or switch to a degraded reconstruction
+    while the bounded cleanup window remains open."""
     run_dir = tmp_path / "run"
     run_dir.mkdir()
     launcher = tmp_path / "run_attended_job.ps1"
     launcher.write_text("# stub\n", encoding="utf-8")
 
-    (run_dir / "job_out.json").write_text(json.dumps({
+    job_out = run_dir / "job_out.json"
+    native = {
         "schema": "ariadne.autocad_native_job_result.v1", "status": "ok",
         "result": {"created": True, "class": "AcDbHatch", "handle": "19191"},
-    }), encoding="utf-8")
-    (run_dir / "security_before.txt").write_text("0\nC:/some/trusted/path\n", encoding="utf-8")
-    (run_dir / "security_after.txt").write_text("0\nC:/some/trusted/path\n", encoding="utf-8")
+    }
+    job_out.write_text(json.dumps(native), encoding="utf-8")
+    (run_dir / "attended_job_completion.json").write_text(
+        json.dumps(_completion_receipt("write.entity.hatch", job_out, cleanup_wait_sec=45)),
+        encoding="utf-8",
+    )
 
     class _FakeProc:
-        """Never reports exited -- forces the poll loop to rely purely on the
-        job_out.json/grace-window logic, exactly like the real stalled runs."""
+        """Cleanup is still running until the final receipt is written."""
+        killed = False
+
         def poll(self):
             return None
+
         def kill(self):
-            pass
+            self.killed = True
+
         def wait(self, timeout=None):
             pass
 
-    monkeypatch.setattr(subprocess, "Popen", lambda cmd, **kw: _FakeProc())
+    proc = _FakeProc()
+    monkeypatch.setattr(subprocess, "Popen", lambda cmd, **kw: proc)
 
-    # Fast-forward the internal clock instead of sleeping for real: every
-    # al.time.sleep() call advances a fake monotonic clock by that amount, so
-    # the 30s grace window elapses without the test actually taking 30s.
+    # The final receipt lands after 31 seconds, deliberately later than the
+    # old raw-job_out fallback threshold but inside the receipt's 45-second
+    # cleanup budget.
+    clock = {"t": 1_000_000.0}
+    monkeypatch.setattr(al.time, "monotonic", lambda: clock["t"])
+
+    def advance_clock(seconds):
+        clock["t"] += seconds
+        if clock["t"] >= 1_000_031.0 and not (run_dir / "attended_job_final_receipt.json").exists():
+            (run_dir / "attended_job_final_receipt.json").write_text(
+                json.dumps(_final_attended_receipt("write.entity.hatch", job_out)),
+                encoding="utf-8",
+            )
+
+    monkeypatch.setattr(al.time, "sleep", advance_clock)
+
+    res = al.run_attended_native_job(str(tmp_path / "staged.dwg"), str(run_dir),
+                                     "write.entity.hatch", {}, timeout=60, ps1_launcher=str(launcher))
+
+    assert proc.killed is False
+    assert res["degraded"] is False
+    assert res["timed_out"] is False
+    assert res["error"] is None
+    assert res["result"] == native
+    assert res["envelope"]["security"]["restored"] is True
+    assert res["staged_used"] == str(tmp_path / "staged.dwg")
+
+
+def test_run_attended_native_job_rejects_completion_without_final_safety_receipt(tmp_path, monkeypatch):
+    """A native job output plus pre-cleanup receipt cannot become success.
+
+    It lacks proof that the dedicated process was closed, the user's sessions
+    were untouched, and SECURELOAD/TRUSTEDPATHS were restored.
+    """
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    launcher = tmp_path / "run_attended_job.ps1"
+    launcher.write_text("# stub\n", encoding="utf-8")
+    job_out = run_dir / "job_out.json"
+    job_out.write_text(json.dumps({"status": "ok", "result": {"created": True}}), encoding="utf-8")
+    (run_dir / "attended_job_completion.json").write_text(
+        json.dumps(_completion_receipt("write.entity.hatch", job_out, cleanup_wait_sec=5)),
+        encoding="utf-8",
+    )
+
+    class _FakeProc:
+        killed = False
+
+        def poll(self):
+            return None
+
+        def kill(self):
+            self.killed = True
+
+        def wait(self, timeout=None):
+            pass
+
+    proc = _FakeProc()
+    monkeypatch.setattr(subprocess, "Popen", lambda cmd, **kw: proc)
     clock = {"t": 1_000_000.0}
     monkeypatch.setattr(al.time, "monotonic", lambda: clock["t"])
     monkeypatch.setattr(al.time, "sleep", lambda s: clock.__setitem__("t", clock["t"] + s))
@@ -337,18 +453,126 @@ def test_run_attended_native_job_degrades_gracefully_when_bookkeeping_stalls(tmp
     res = al.run_attended_native_job(str(tmp_path / "staged.dwg"), str(run_dir),
                                      "write.entity.hatch", {}, timeout=60, ps1_launcher=str(launcher))
 
-    assert res["degraded"] is True
-    assert res["degraded_reason"] is not None and "job_out.json" in res["degraded_reason"]
+    assert proc.killed is True
+    assert res["degraded"] is False
     assert res["timed_out"] is False
+    assert res["envelope"] is None
+    assert res["result"] is None
+    assert res["staged_used"] is None
+    assert res["error"] is not None and "final" in res["error"].lower()
+
+
+def test_run_attended_native_job_recovers_final_receipt_only_after_independent_cleanup_checks(
+    tmp_path, monkeypatch
+):
+    """When PowerShell stalls after cleanup, Python may finish the receipt only
+    from independently observable facts: the launched PID is gone, every
+    pre-existing PID remains, and both security values were restored."""
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    launcher = tmp_path / "run_attended_job.ps1"
+    launcher.write_text("# stub\n", encoding="utf-8")
+    job_out = run_dir / "job_out.json"
+    native = {"schema": "ariadne.autocad_native_job_result.v1", "status": "ok", "result": {"created": True}}
+    job_out.write_text(json.dumps(native), encoding="utf-8")
+    (run_dir / "security_before.txt").write_text("0\nC:/trusted\n", encoding="utf-8")
+    (run_dir / "security_after.txt").write_text("0\nC:/trusted\n", encoding="utf-8")
+    completion = _completion_receipt("write.entity.hatch", job_out, cleanup_wait_sec=1)
+    completion["launched_pid"] = 4242
+    completion["pre_existing_pids"] = [3131]
+    completion["pre_existing_processes"] = [{
+        "pid": 3131,
+        "process_name": "acad",
+        "start_time_utc": "2026-08-10T00:00:01.0000000Z",
+    }]
+    (run_dir / "attended_job_completion.json").write_text(json.dumps(completion), encoding="utf-8")
+
+    class _FakeProc:
+        def __init__(self):
+            self.killed = False
+
+        def poll(self):
+            return 0 if self.killed else None
+
+        def kill(self):
+            self.killed = True
+
+        def wait(self, timeout=None):
+            pass
+
+    proc = _FakeProc()
+    monkeypatch.setattr(subprocess, "Popen", lambda cmd, **kw: proc)
+    monkeypatch.setattr(
+        al,
+        "_query_process_identities",
+        lambda pids: {
+            4242: {
+                "pid": 4242,
+                "known": True,
+                "present": False,
+                "process_name": None,
+                "start_time_utc": None,
+            },
+            3131: {
+                "pid": 3131,
+                "known": True,
+                "present": True,
+                "process_name": "acad",
+                "start_time_utc": "2026-08-10T00:00:01.0000000Z",
+            },
+        },
+    )
+    clock = {"t": 1_000_000.0}
+    monkeypatch.setattr(al.time, "monotonic", lambda: clock["t"])
+    monkeypatch.setattr(al.time, "sleep", lambda seconds: clock.__setitem__("t", clock["t"] + seconds))
+
+    res = al.run_attended_native_job(str(tmp_path / "staged.dwg"), str(run_dir),
+                                     "write.entity.hatch", {}, timeout=60, ps1_launcher=str(launcher))
+
+    assert proc.killed is True
     assert res["error"] is None
-    assert res["result"] == {"created": True, "class": "AcDbHatch", "handle": "19191"}
-    assert res["envelope"]["security"]["restored"] is True
+    assert res["degraded"] is False
     assert res["staged_used"] == str(tmp_path / "staged.dwg")
+    assert res["result"] == native
+    assert res["envelope"]["phase"] == "finalized"
+    assert res["envelope"]["receipt_authority"] == "python_independent_safety_validator"
+    assert res["envelope"]["recovered_from_launcher_finalization_hang"] is True
+    assert res["envelope"]["powershell_helper_closed"] is True
+    assert res["envelope"]["launched_pid_identity_verified"] is True
+    assert res["envelope"]["pre_existing_identity_verified"] is True
+    assert res["envelope"]["pre_existing_still_alive"] == [3131]
+    assert res["envelope"]["security"]["restored"] is True
+    assert (run_dir / "attended_job_final_receipt.json").is_file()
+
+
+def test_independent_recovery_blocks_when_process_identity_is_unknown(tmp_path, monkeypatch):
+    """A failed or ambiguous identity lookup is a blocker, never an absent
+    process.  This pins the no-false-PASS branch independently of Popen."""
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    job_out = run_dir / "job_out.json"
+    job_out.write_text(json.dumps({"status": "ok", "result": {}}), encoding="utf-8")
+    (run_dir / "security_before.txt").write_text("0\nC:/trusted\n", encoding="utf-8")
+    (run_dir / "security_after.txt").write_text("0\nC:/trusted\n", encoding="utf-8")
+    completion = _completion_receipt("write.entity.hatch", job_out)
+    monkeypatch.setattr(al, "_query_process_identities", lambda pids: None)
+
+    receipt, error = al._build_independent_recovery_receipt(
+        completion=completion,
+        completion_path=run_dir / "attended_job_completion.json",
+        final_path=run_dir / "attended_job_final_receipt.json",
+        job_out_path=job_out,
+        security_before_path=run_dir / "security_before.txt",
+        security_after_path=run_dir / "security_after.txt",
+    )
+
+    assert receipt is None
+    assert error is not None and "unknown" in error
 
 
 def test_run_attended_native_job_genuine_timeout_when_neither_file_appears(tmp_path, monkeypatch):
     """No fake success on the OTHER side either: if the CAD job produced
-    NEITHER job_out.json NOR attended_job_result.json before the outer
+    NEITHER job_out.json NOR a final launcher receipt before the outer
     deadline, that is a real timeout, not a degraded-but-ok result."""
     run_dir = tmp_path / "run"
     run_dir.mkdir()
@@ -590,7 +814,9 @@ def test_ps1_never_attaches_to_a_pre_existing_session(ps1_src: str):
     """Gate 1: record pre-existing acad PIDs BEFORE launch; abort without
     driving if the launched PID somehow collides; only ever Stop-Process the
     launched PID, never a pre-existing one."""
-    assert "$preIds = @(Get-Process acad" in ps1_src
+    assert "$preProcesses = @(" in ps1_src
+    assert "Get-Process acad -ErrorAction SilentlyContinue" in ps1_src
+    assert "start_time_utc = $started" in ps1_src
     assert "$dedicatedOk = ($preIds -notcontains $launchedPid)" in ps1_src
     assert "Stop-Process -Id $launchedPid -Force" in ps1_src
 
@@ -599,6 +825,38 @@ def test_ps1_has_a_hard_timeout_and_taskkill_fallback(ps1_src: str):
     assert "TimeoutSec" in ps1_src
     assert "$timedOut" in ps1_src
     assert "taskkill fallback" in ps1_src
+
+
+def test_ps1_teardown_prefers_the_launched_process_handle_and_bounds_taskkill(ps1_src: str):
+    """An exited Process object is stronger evidence than a numeric PID, which
+    can be reused. The fallback must also be bounded so it cannot postpone the
+    final safety receipt indefinitely."""
+    assert "if ($null -ne $proc)" in ps1_src
+    assert "$stillRunning = -not $proc.HasExited" in ps1_src
+    assert "$taskkillProc.WaitForExit(10000)" in ps1_src
+    assert "$launchedExited = $false" in ps1_src
+    assert "$launchedExited = $proc.HasExited" in ps1_src
+
+
+def test_ps1_writes_a_compact_atomic_completion_receipt_before_cleanup(ps1_src: str):
+    """The early receipt buys cleanup time, but never carries enough data to
+    be mistaken for the final launcher safety result."""
+    assert "function WriteJsonAtomic" in ps1_src
+    assert "$completionReceipt = Join-Path $RunDir 'attended_job_completion.json'" in ps1_src
+    assert "$finalReceipt = Join-Path $RunDir 'attended_job_final_receipt.json'" in ps1_src
+    assert "schema = 'ariadne.cad_os.attended_job_completion.v1'" in ps1_src
+    assert "phase = 'cleanup_pending'" in ps1_src
+    assert "launched_start_time_utc = $launchedStartTimeUtc" in ps1_src
+    assert "pre_existing_pids = $preIds" in ps1_src
+    assert "pre_existing_processes = $preProcesses" in ps1_src
+    assert "cleanup_wait_sec = $completionCleanupWaitSec" in ps1_src
+    assert "WriteJsonAtomic $completion $completionReceipt" in ps1_src
+    assert ps1_src.index("WriteJsonAtomic $completion $completionReceipt") < ps1_src.index(
+        "# ---- teardown: close ONLY the launched PID"
+    )
+    assert "result = $jobOutObj" not in ps1_src
+    assert "phase = 'finalized'" in ps1_src
+    assert "receipt_authority = 'powershell_launcher'" in ps1_src
 
 
 def test_ps1_loads_the_canonical_prebuilt_modules(ps1_src: str):

@@ -71,6 +71,7 @@ import struct
 import subprocess
 import sys
 import time
+import uuid
 import zlib
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -89,6 +90,11 @@ DEFAULT_ACAD_EXE = r"C:\Program Files\Autodesk\AutoCAD 2027\acad.exe"
 # exceed) run_attended_job.ps1's own -TimeoutSec default.
 DEFAULT_TIMEOUT_SEC = 240
 _PS1_LAUNCHER = os.path.join(_THIS_DIR, "attended", "run_attended_job.ps1")
+_COMPLETION_RECEIPT_SCHEMA = "ariadne.cad_os.attended_job_completion.v1"
+_FINAL_RECEIPT_SCHEMA = "ariadne.cad_os.attended_job_result.v1"
+_COMPLETION_RECEIPT_NAME = "attended_job_completion.json"
+_FINAL_RECEIPT_NAME = "attended_job_final_receipt.json"
+_MAX_CLEANUP_WAIT_SEC = 90
 
 
 def _import_optional(module_name: str):
@@ -125,19 +131,291 @@ def _load_ir(path: str) -> Dict[str, Any]:
         return json.load(fh)
 
 
-def _read_security_pair(path: Path) -> "tuple[Optional[str], Optional[str]]":
-    """Read the 2-line (SECURELOAD, TRUSTEDPATHS) text files the AutoLISP side
-    of run_attended_job.ps1 writes directly (security_before.txt /
-    security_after.txt). Mirrors the PS1's own $secBeforeLines/$secAfterLines
-    parsing so the degraded-envelope path below (see run_attended_native_job)
-    can reconstruct security-restore evidence even when the launcher's OWN
-    attended_job_result.json never gets written."""
-    if not path.is_file():
-        return None, None
-    lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
-    secureload = lines[0] if len(lines) >= 1 else None
-    trustedpaths = lines[1] if len(lines) >= 2 else None
-    return secureload, trustedpaths
+def _read_json_object(path: Path) -> Optional[Dict[str, Any]]:
+    """Load one atomically-written receipt or native result object."""
+    try:
+        value = json.loads(path.read_text(encoding=_JSON_ENCODING))
+    except (OSError, ValueError):
+        return None
+    return value if isinstance(value, dict) else None
+
+
+def _is_positive_int(value: Any) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool) and value > 0
+
+
+def _same_windows_path(left: Any, right: Path) -> bool:
+    """Compare the receipt's absolute path with the run's expected path."""
+    if not isinstance(left, str) or not left:
+        return False
+    try:
+        return os.path.normcase(os.path.abspath(left)) == os.path.normcase(os.path.abspath(str(right)))
+    except (OSError, TypeError, ValueError):
+        return False
+
+
+def _write_json_atomic(path: Path, payload: Dict[str, Any]) -> None:
+    """Durably publish a compact receipt without exposing a partial JSON file."""
+    temporary = path.with_name(".%s.%s.tmp" % (path.name, uuid.uuid4().hex))
+    try:
+        with open(temporary, "w", encoding="utf-8", newline="\n") as fh:
+            json.dump(payload, fh, ensure_ascii=False, sort_keys=True)
+            fh.write("\n")
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.replace(temporary, path)
+    finally:
+        try:
+            temporary.unlink()
+        except FileNotFoundError:
+            pass
+
+
+def _query_process_identities(pids: List[int]) -> Optional[Dict[int, Dict[str, Any]]]:
+    """Read current Windows process identities, returning ``None`` on unknown.
+
+    A numeric PID alone is not a stable process identity on Windows.  The
+    recovery path therefore captures the UTC start time with each PID and uses
+    this read-only query to distinguish an exited process from a later PID
+    reuse.  Any command, parsing, or access failure is deliberately unknown,
+    never treated as an absent process.
+    """
+    ordered_pids = list(dict.fromkeys(pids))
+    if not ordered_pids or any(not _is_positive_int(pid) for pid in ordered_pids):
+        return {} if not ordered_pids else None
+    pid_literals = ",".join(str(pid) for pid in ordered_pids)
+    script = "".join((
+        "$ErrorActionPreference = 'Stop'; ",
+        "$ids = @(%s); $records = @(); " % pid_literals,
+        "foreach ($currentPid in $ids) { ",
+        "  try { ",
+        "    $process = Get-Process -Id $currentPid -ErrorAction Stop; ",
+        "    try { $started = $process.StartTime.ToUniversalTime().ToString('o') } ",
+        "    catch { $started = $null }; ",
+        "    $records += [ordered]@{ pid = [int]$currentPid; known = $true; present = $true; ",
+        "      process_name = [string]$process.ProcessName; start_time_utc = $started } ",
+        "  } catch { ",
+        "    if ($_.CategoryInfo.Category -eq [System.Management.Automation.ErrorCategory]::ObjectNotFound) { ",
+        "      $records += [ordered]@{ pid = [int]$currentPid; known = $true; present = $false; ",
+        "        process_name = $null; start_time_utc = $null } ",
+        "    } else { ",
+        "      $records += [ordered]@{ pid = [int]$currentPid; known = $false; present = $null; ",
+        "        process_name = $null; start_time_utc = $null } ",
+        "    } ",
+        "  } ",
+        "}; [ordered]@{ processes = @($records) } | ConvertTo-Json -Compress -Depth 4",
+    ))
+    try:
+        completed = subprocess.run(
+            [_powershell_exe(), "-NoProfile", "-NonInteractive", "-Command", script],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=5,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if completed.returncode != 0:
+        return None
+    try:
+        parsed = json.loads(completed.stdout)
+    except (TypeError, ValueError):
+        return None
+    records = parsed.get("processes") if isinstance(parsed, dict) else None
+    if not isinstance(records, list):
+        return None
+    found: Dict[int, Dict[str, Any]] = {}
+    for record in records:
+        if not isinstance(record, dict):
+            return None
+        pid = record.get("pid")
+        if not _is_positive_int(pid) or pid not in ordered_pids or pid in found:
+            return None
+        if record.get("known") is not True:
+            return None
+        present = record.get("present")
+        if not isinstance(present, bool):
+            return None
+        if present:
+            if not isinstance(record.get("process_name"), str) or not record["process_name"]:
+                return None
+            if not isinstance(record.get("start_time_utc"), str) or not record["start_time_utc"]:
+                return None
+        found[pid] = record
+    return found if set(found) == set(ordered_pids) else None
+
+
+def _read_security_snapshot(path: Path) -> Optional[List[str]]:
+    """Read the exact two persisted AutoCAD security values, or mark unknown."""
+    try:
+        values = path.read_text(encoding="utf-8-sig").splitlines()
+    except OSError:
+        return None
+    return values if len(values) == 2 else None
+
+
+def _completion_receipt_errors(receipt: Dict[str, Any], *, operation: str,
+                               run_id: str, job_out_path: Path) -> List[str]:
+    """Validate the bounded observation receipt before trusting it for recovery."""
+    errors: List[str] = []
+    if receipt.get("schema") != _COMPLETION_RECEIPT_SCHEMA:
+        errors.append("schema")
+    if receipt.get("phase") != "cleanup_pending":
+        errors.append("phase")
+    if receipt.get("status") != "observed":
+        errors.append("status")
+    if receipt.get("run_id") != run_id:
+        errors.append("run_id")
+    if receipt.get("operation") != operation:
+        errors.append("operation")
+    if not _is_positive_int(receipt.get("launched_pid")):
+        errors.append("launched_pid")
+    started = receipt.get("launched_start_time_utc")
+    if started is not None and (not isinstance(started, str) or not started):
+        errors.append("launched_start_time_utc")
+    if receipt.get("dedicated_instance") is not True:
+        errors.append("dedicated_instance")
+    if receipt.get("timed_out") is not False:
+        errors.append("timed_out")
+    if receipt.get("job_out_present") is not True:
+        errors.append("job_out_present")
+    if not _same_windows_path(receipt.get("job_out"), job_out_path):
+        errors.append("job_out")
+    pre_existing_pids = receipt.get("pre_existing_pids")
+    if not isinstance(pre_existing_pids, list) or any(not _is_positive_int(pid) for pid in pre_existing_pids):
+        errors.append("pre_existing_pids")
+    elif len(set(pre_existing_pids)) != len(pre_existing_pids):
+        errors.append("pre_existing_pids")
+    cleanup_wait = receipt.get("cleanup_wait_sec")
+    if isinstance(cleanup_wait, bool):
+        cleanup_wait = None
+    try:
+        cleanup_wait = int(cleanup_wait)
+    except (TypeError, ValueError):
+        cleanup_wait = None
+    if cleanup_wait is None or cleanup_wait < 1:
+        errors.append("cleanup_wait_sec")
+    return errors
+
+
+def _pre_existing_identity_map(receipt: Dict[str, Any]) -> Optional[Dict[int, Dict[str, str]]]:
+    """Return the identity fixed by the completion receipt for user sessions."""
+    pids = receipt.get("pre_existing_pids")
+    processes = receipt.get("pre_existing_processes")
+    if not isinstance(pids, list) or not isinstance(processes, list):
+        return None
+    expected: Dict[int, Dict[str, str]] = {}
+    for process in processes:
+        if not isinstance(process, dict):
+            return None
+        pid = process.get("pid")
+        name = process.get("process_name")
+        started = process.get("start_time_utc")
+        if (not _is_positive_int(pid) or not isinstance(name, str) or not name
+                or not isinstance(started, str) or not started or pid in expected):
+            return None
+        if name.casefold() not in ("acad", "acad.exe"):
+            return None
+        expected[pid] = {"process_name": name, "start_time_utc": started}
+    return expected if set(expected) == set(pids) else None
+
+
+def _build_independent_recovery_receipt(*, completion: Dict[str, Any],
+                                        completion_path: Path, final_path: Path,
+                                        job_out_path: Path, security_before_path: Path,
+                                        security_after_path: Path) -> tuple[Optional[Dict[str, Any]], Optional[str]]:
+    """Construct a recovery receipt only from independently observed facts.
+
+    This deliberately does not inspect the native result's success semantics:
+    it checks that raw job_out.json exists and parses, then leaves native-result
+    validation to the caller that already owns that contract.
+    """
+    if _read_json_object(job_out_path) is None:
+        return None, "job_out.json is missing or not a parseable JSON object"
+    security_before = _read_security_snapshot(security_before_path)
+    security_after = _read_security_snapshot(security_after_path)
+    if security_before is None or security_after is None:
+        return None, "security restoration evidence is incomplete"
+    if security_before != security_after:
+        return None, "SECURELOAD/TRUSTEDPATHS restoration does not exactly match"
+
+    pre_existing = _pre_existing_identity_map(completion)
+    if pre_existing is None:
+        return None, "pre-existing AutoCAD process identities are incomplete"
+    launched_pid = completion["launched_pid"]
+    identities = _query_process_identities([launched_pid] + list(pre_existing))
+    if identities is None:
+        return None, "process identity query is unknown"
+
+    launched = identities[launched_pid]
+    launched_reused = False
+    if launched["present"]:
+        expected_started = completion.get("launched_start_time_utc")
+        if not isinstance(expected_started, str) or not expected_started:
+            return None, "launched PID is present but its original start time is unknown"
+        if launched.get("start_time_utc") == expected_started:
+            return None, "launched dedicated AutoCAD process is still alive"
+        launched_reused = True
+
+    for pid, expected in pre_existing.items():
+        current = identities[pid]
+        if not current["present"]:
+            return None, "pre-existing user AutoCAD PID %d disappeared" % pid
+        if current.get("process_name", "").casefold() not in ("acad", "acad.exe"):
+            return None, "pre-existing user AutoCAD PID %d was reused" % pid
+        if current.get("start_time_utc") != expected["start_time_utc"]:
+            return None, "pre-existing user AutoCAD PID %d was reused" % pid
+
+    return {
+        "schema": _FINAL_RECEIPT_SCHEMA,
+        "phase": "finalized",
+        "status": "ok",
+        "run_id": completion["run_id"],
+        "operation": completion["operation"],
+        "receipt_authority": "python_independent_safety_validator",
+        "recovered_from_launcher_finalization_hang": True,
+        "powershell_helper_closed": False,
+        "launched_pid": launched_pid,
+        "launched_start_time_utc": completion.get("launched_start_time_utc"),
+        "launched_pid_closed": True,
+        "launched_pid_reused": launched_reused,
+        "launched_pid_identity_verified": True,
+        "dedicated_instance": True,
+        "timed_out": False,
+        "pre_existing_pids": completion["pre_existing_pids"],
+        "pre_existing_processes": completion["pre_existing_processes"],
+        "pre_existing_still_alive": completion["pre_existing_pids"],
+        "pre_existing_identity_verified": True,
+        "user_session_touched": False,
+        "job_out": str(job_out_path),
+        "job_out_present": True,
+        "completion_receipt": str(completion_path),
+        "final_receipt": str(final_path),
+        "degraded": False,
+        "security": {
+            "secureload_before": security_before[0],
+            "secureload_after": security_after[0],
+            "trustedpaths_before": security_before[1],
+            "trustedpaths_after": security_after[1],
+            "restored": True,
+        },
+        "error": None,
+    }, None
+
+
+def _close_and_verify_powershell_helper(proc: Any) -> bool:
+    """Close the exact Popen handle; never target a bare, reusable PID."""
+    try:
+        if proc.poll() is not None:
+            return True
+        proc.kill()
+        proc.wait(timeout=10)
+        return proc.poll() is not None
+    except (OSError, subprocess.SubprocessError, AttributeError):
+        return False
 
 
 # --------------------------------------------------------------------------- #
@@ -228,53 +506,23 @@ def run_attended_native_job(staged_dwg: str, run_dir: str, operation: str,
 
     timed_out = False
     error = None
-    degraded = False
-    degraded_reason = None
-    stdout_text = ""
-    stderr_text = ""
     code = None
-    outer_timeout = timeout + 120  # margin beyond the PS1's own poll+grace+kill budget
+    outer_timeout = timeout + 120  # margin beyond the PS1's own poll+cleanup budget
     job_out_path = run_dir_p / "job_out.json"
-    result_json_path = run_dir_p / "attended_job_result.json"
+    completion_receipt_path = run_dir_p / _COMPLETION_RECEIPT_NAME
+    result_json_path = run_dir_p / _FINAL_RECEIPT_NAME
+    security_before_path = run_dir_p / "security_before.txt"
+    security_after_path = run_dir_p / "security_after.txt"
+    completion_receipt = None
+    completion_deadline = None
 
-    # IMPORTANT: redirect to real FILES, not PIPEs (i.e. do NOT use
-    # capture_output=True / stdout=PIPE here). Windows subprocess.run()
-    # internally calls Popen.communicate(), which waits for the stdout/stderr
-    # PIPES to reach EOF -- and pipe handles are inheritable by default, so a
-    # grandchild process this script launches via `Start-Process` (the
-    # disposable acad.exe instance) can inherit a handle to the SAME pipe,
-    # keeping the write-end open even after the direct child (powershell.exe)
-    # has already exited cleanly.
+    # Redirect to real files, not PIPEs: a launched acad.exe can inherit a
+    # pipe handle and keep Popen.communicate() waiting after PowerShell exits.
     #
-    # IMPORTANT #2 (found AFTER fixing #1 and STILL seeing the same hang):
-    # even with file-based redirection, the launcher's OWN post-job
-    # bookkeeping (a handful of trivial Get-Process/Get-Content/ConvertTo-Json
-    # calls in run_attended_job.ps1's `finally` block, AFTER it already logs
-    # "post-poll: jobDone=True hasExited=True") can itself stall for minutes
-    # on this box, specifically for runs that actually launched acad.exe --
-    # two independent minimal repros (a bare Python->powershell.exe round
-    # trip, and a Start-Process+poll+finally-block repro using a throwaway
-    # nested powershell.exe instead of acad.exe) both completed in under a
-    # second/ten seconds respectively, so this is NOT a generic Python-
-    # subprocess bug and NOT a bug in the launch/poll/bookkeeping PATTERN
-    # itself. Leading hypothesis (not proven -- would need admin access to AV
-    # logs to confirm): on-access scanning of job_out.json/security_after.txt
-    # by endpoint security software, triggered because they were just written
-    # by a process that did unsigned arxload of custom native ARX/DBX
-    # modules, worsened by this box running a dozen+ OTHER concurrent
-    # CAD-OS agents doing similar native-module-load work at the same time.
-    # See build_log.md.
-    #
-    # Fix: do not block on the LAUNCHER PROCESS's own exit at all. Poll for
-    # job_out.json (written by the AutoLISP/native side, independent of the
-    # PS1's own finally block) as the authoritative signal that the CAD job
-    # itself completed, and treat attended_job_result.json (the launcher's
-    # own self-report) as a nice-to-have that is read opportunistically. If
-    # the CAD job clearly succeeded but the launcher's bookkeeping file still
-    # hasn't appeared after a generous grace window, proceed in a clearly-
-    # flagged DEGRADED mode instead of blocking the caller for the full
-    # outer_timeout on bookkeeping that provides no additional CAD evidence.
-    grace_after_job_out = 30.0  # mirrors the PS1's own 30s post-job grace window
+    # The launcher now writes a tiny atomic completion receipt as soon as it
+    # observes job_out.json, before its quit/cleanup work. That receipt is NOT
+    # success evidence: it merely gives this process a bounded window to wait
+    # for the final receipt that proves security restoration and process safety.
     with open(stdout_path, "w", encoding="utf-8", newline="") as out_fh, \
          open(stderr_path, "w", encoding="utf-8", newline="") as err_fh:
         try:
@@ -288,39 +536,85 @@ def run_attended_native_job(staged_dwg: str, run_dir: str, operation: str,
 
         if proc is not None:
             deadline = time.monotonic() + outer_timeout
-            saw_job_out_at = None
             while True:
                 if result_json_path.is_file():
-                    break  # best case: launcher's own full self-report is present
-                if job_out_path.is_file() and saw_job_out_at is None:
-                    saw_job_out_at = time.monotonic()
+                    break
+
+                now = time.monotonic()
+                if completion_receipt is None and completion_receipt_path.is_file():
+                    completion_receipt = _read_json_object(completion_receipt_path)
+                    if completion_receipt is None:
+                        error = "attended completion receipt is not a parseable JSON object"
+                        break
+                    receipt_errors = _completion_receipt_errors(
+                        completion_receipt,
+                        operation=operation,
+                        run_id=run_dir_p.name,
+                        job_out_path=job_out_path,
+                    )
+                    cleanup_wait = completion_receipt.get("cleanup_wait_sec")
+                    try:
+                        cleanup_wait = int(cleanup_wait)
+                    except (TypeError, ValueError):
+                        cleanup_wait = None
+                    if receipt_errors:
+                        error = "invalid attended completion receipt: %s" % ", ".join(receipt_errors)
+                        break
+                    completion_deadline = now + min(cleanup_wait, _MAX_CLEANUP_WAIT_SEC)
+
+                recovery_due = completion_deadline is not None and now >= completion_deadline
                 if proc.poll() is not None:
-                    time.sleep(1.0)  # brief settle window for any last flush
-                    break
-                if saw_job_out_at is not None and (time.monotonic() - saw_job_out_at) >= grace_after_job_out:
-                    degraded = True
-                    degraded_reason = (
-                        "job_out.json appeared (the CAD job itself completed) but "
-                        "attended_job_result.json (the launcher's own bookkeeping "
-                        "self-report) did not appear within %ds of that, and the "
-                        "launcher process itself has not exited either; proceeding "
-                        "on job_out.json + raw security_before/after.txt evidence "
-                        "directly rather than blocking further -- see build_log.md"
-                        % int(grace_after_job_out))
-                    break
-                if time.monotonic() >= deadline:
+                    time.sleep(1.0)  # brief settle window for an atomic final rename
+                    if result_json_path.is_file():
+                        break
+                    if completion_receipt is not None:
+                        # The launcher has already gone away without its own
+                        # final receipt.  Independent recovery below may still
+                        # prove cleanup; raw native output never may.
+                        recovery_due = True
+                    else:
+                        error = "attended launcher exited without a final safety receipt"
+                        break
+                if now >= deadline:
                     timed_out = True
-                    error = ("attended launcher timed out after %ds with neither "
-                              "job_out.json nor attended_job_result.json present "
-                              "(the PS1's own %ds job timeout + grace/kill budget "
-                              "should have fired before this outer deadline)"
-                              % (outer_timeout, timeout))
+                    error = ("attended launcher timed out after %ds without a final "
+                             "safety receipt (PS1 job timeout %ds)" % (outer_timeout, timeout))
+                    break
+                if recovery_due:
+                    recovered_envelope, recovery_error = _build_independent_recovery_receipt(
+                        completion=completion_receipt,
+                        completion_path=completion_receipt_path,
+                        final_path=result_json_path,
+                        job_out_path=job_out_path,
+                        security_before_path=security_before_path,
+                        security_after_path=security_after_path,
+                    )
+                    if recovery_error is not None:
+                        error = "independent launcher-finalization recovery blocked: %s" % recovery_error
+                        break
+                    # A normal PowerShell receipt won a last-moment race: use
+                    # it rather than overwrite it with a recovery receipt.
+                    if result_json_path.is_file():
+                        break
+                    if not _close_and_verify_powershell_helper(proc):
+                        error = "independent launcher-finalization recovery blocked: PowerShell helper did not close"
+                        break
+                    if result_json_path.is_file():
+                        break
+                    recovered_envelope["powershell_helper_closed"] = True
+                    try:
+                        _write_json_atomic(result_json_path, recovered_envelope)
+                    except OSError as exc:
+                        error = "independent launcher-finalization recovery could not write final receipt: %s" % exc
                     break
                 time.sleep(0.5)
 
             code = proc.poll()
-            if code is None:
-                # best-effort cleanup only -- never let teardown block the return
+            if code is None and not result_json_path.is_file():
+                # The completion receipt earns its bounded cleanup window above;
+                # only a missing final receipt is cleaned up from Python. Once
+                # the final safety receipt exists, PowerShell may finish its own
+                # stdout flush without being killed by this caller.
                 try:
                     proc.kill()
                 except OSError:
@@ -331,75 +625,80 @@ def run_attended_native_job(staged_dwg: str, run_dir: str, operation: str,
                     pass
                 code = proc.poll()
 
-    stdout_text = stdout_path.read_text(encoding="utf-8", errors="replace") if stdout_path.is_file() else ""
-    stderr_text = stderr_path.read_text(encoding="utf-8", errors="replace") if stderr_path.is_file() else ""
-
-    result_json = str(result_json_path)
-    envelope = None
-    if result_json_path.is_file():
-        try:
-            envelope = json.loads(result_json_path.read_text(encoding="utf-8-sig"))
-        except (ValueError, OSError):
-            envelope = None
-
-    if envelope is None and degraded and job_out_path.is_file():
-        try:
-            job_out_obj = json.loads(job_out_path.read_text(encoding="utf-8-sig"))
-        except (ValueError, OSError):
-            job_out_obj = None
-        if job_out_obj is not None:
-            sec_before_ld, sec_before_tp = _read_security_pair(run_dir_p / "security_before.txt")
-            sec_after_ld, sec_after_tp = _read_security_pair(run_dir_p / "security_after.txt")
-            restored = (sec_before_ld is not None and sec_before_ld == sec_after_ld
-                        and sec_before_tp == sec_after_tp)
-            envelope = {
-                "schema": "ariadne.cad_os.attended_job_result.v1",
-                "status": "ok" if job_out_obj.get("status") == "ok" else "error",
-                "degraded": True,
-                "degraded_reason": degraded_reason,
-                "operation": operation,
-                "result": job_out_obj.get("result"),
-                "job_out_present": True,
-                "security": {
-                    "secureload_before": sec_before_ld, "secureload_after": sec_after_ld,
-                    "trustedpaths_before": sec_before_tp, "trustedpaths_after": sec_after_tp,
-                    "restored": restored,
-                },
-                "error": None if job_out_obj.get("status") == "ok" else
-                         (job_out_obj.get("error") or "native job reported a non-ok status"),
-            }
-            timed_out = False  # the CAD job demonstrably completed; this is not a timeout
-        else:
-            error = error or "degraded mode but job_out.json could not be parsed"
+    envelope = _read_json_object(result_json_path) if result_json_path.is_file() else None
+    if result_json_path.is_file() and envelope is None and not error:
+        error = "attended final safety receipt is not a parseable JSON object"
 
     result_obj = None
     staged_used = None
-    if envelope:
-        result_obj = envelope.get("result")
-        # QSAVE happens in-place inside the launched session -- staged_dwg IS
-        # the mutated copy once the lane reports its own mechanism succeeded
-        # (job_out.json appeared and parsed). Whether the JOB ITSELF (nested
-        # result.status) succeeded is deliberately NOT gated here -- the
-        # post-inspect diff is this lane's source of truth (mirrors how
-        # patch_engine.apply_staged trusts run_router_cad_job's staged_used
-        # and lets the post-inspect diff reveal a silent native-side failure
-        # as zero added entities, never a fake pass).
-        if envelope.get("status") == "ok":
-            staged_used = staged_dwg
-        if envelope.get("timed_out"):
-            timed_out = True
-        if envelope.get("status") == "error" and not error:
-            error = envelope.get("error") or "attended job reported status=error"
-        if envelope.get("status") == "blocked" and not error:
-            error = envelope.get("error") or "attended job GATE1 blocked"
-        if envelope.get("status") == "timeout" and not error:
-            error = envelope.get("error") or "attended job timed out"
+    if envelope is not None:
+        if envelope.get("status") != "ok":
+            if envelope.get("timed_out") is True or envelope.get("status") == "timeout":
+                timed_out = True
+            error = error or envelope.get("error") or "attended job did not report status=ok"
+        else:
+            receipt_errors = []
+            if envelope.get("schema") != _FINAL_RECEIPT_SCHEMA:
+                receipt_errors.append("schema")
+            if envelope.get("phase") != "finalized":
+                receipt_errors.append("phase")
+            if envelope.get("run_id") != run_dir_p.name:
+                receipt_errors.append("run_id")
+            if envelope.get("operation") != operation:
+                receipt_errors.append("operation")
+            if not isinstance(envelope.get("launched_pid"), int) or envelope["launched_pid"] <= 0:
+                receipt_errors.append("launched_pid")
+            if envelope.get("dedicated_instance") is not True:
+                receipt_errors.append("dedicated_instance")
+            if envelope.get("timed_out") is not False:
+                receipt_errors.append("timed_out")
+            if envelope.get("launched_pid_closed") is not True:
+                receipt_errors.append("launched_pid_closed")
+            if envelope.get("user_session_touched") is not False:
+                receipt_errors.append("user_session_touched")
+            if envelope.get("job_out_present") is not True:
+                receipt_errors.append("job_out_present")
+            if envelope.get("degraded") is not False:
+                receipt_errors.append("degraded")
+            if not isinstance(envelope.get("security"), dict) or envelope["security"].get("restored") is not True:
+                receipt_errors.append("security.restored")
+            authority = envelope.get("receipt_authority")
+            if authority == "powershell_launcher":
+                if envelope.get("recovered_from_launcher_finalization_hang") is not False:
+                    receipt_errors.append("recovered_from_launcher_finalization_hang")
+            elif authority == "python_independent_safety_validator":
+                if envelope.get("recovered_from_launcher_finalization_hang") is not True:
+                    receipt_errors.append("recovered_from_launcher_finalization_hang")
+                if envelope.get("powershell_helper_closed") is not True:
+                    receipt_errors.append("powershell_helper_closed")
+                if envelope.get("launched_pid_identity_verified") is not True:
+                    receipt_errors.append("launched_pid_identity_verified")
+                if envelope.get("pre_existing_identity_verified") is not True:
+                    receipt_errors.append("pre_existing_identity_verified")
+                if not isinstance(envelope.get("launched_pid_reused"), bool):
+                    receipt_errors.append("launched_pid_reused")
+            else:
+                receipt_errors.append("receipt_authority")
+            if receipt_errors:
+                error = error or "invalid attended final safety receipt: %s" % ", ".join(receipt_errors)
+            elif not job_out_path.is_file():
+                error = error or "attended final safety receipt references missing job_out.json"
+            else:
+                result_obj = _read_json_object(job_out_path)
+                if result_obj is None:
+                    error = error or "attended final safety receipt has no parseable job_out.json"
+                else:
+                    staged_used = staged_dwg
+
+    if envelope is None and error is None:
+        error = "attended launcher produced no final safety receipt"
 
     return {"command": cmd, "exit_code": code, "stdout_path": str(stdout_path),
             "stderr_path": str(stderr_path), "envelope": envelope,
-            "result_json": result_json if envelope else None, "result": result_obj,
-            "staged_used": staged_used, "timed_out": timed_out, "error": error,
-            "degraded": degraded, "degraded_reason": degraded_reason}
+            "result_json": str(result_json_path) if envelope else None,
+            "completion_receipt": str(completion_receipt_path) if completion_receipt else None,
+            "result": result_obj, "staged_used": staged_used, "timed_out": timed_out,
+            "error": error, "degraded": False, "degraded_reason": None}
 
 
 # --------------------------------------------------------------------------- #
