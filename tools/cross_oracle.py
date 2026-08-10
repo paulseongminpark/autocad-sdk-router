@@ -186,7 +186,8 @@ _KNOWN_ENTITY_FIELDS = frozenset({
 })
 
 _KNOWN_GEOMETRY_LEAF_FIELDS = frozenset({
-    "kind", "start", "end", "center", "position", "radius", "major_axis",
+    "kind", "start", "end", "center", "position", "base_point", "unit_dir",
+    "radius", "major_axis",
     "minor_ratio", "start_angle", "end_angle", "normal", "closed", "vertices",
     "text", "height", "rotation", "block_name", "scale", "dimension_type",
     "measurement", "control_points", "degree", "loops", "pattern_name",
@@ -214,7 +215,7 @@ _KNOWN_GEOMETRY_LEAF_FIELDS = frozenset({
     # pack-a (#42/#43): TEXT alignment anchor (DXF code 11) + OLE2FRAME
     # embedded-object payload/meta (schemas/dwg_graph_ir.v1.schema.json
     # geometry properties).
-    "alignment_point",
+    "alignment_point", "is_default_alignment", "horizontal_mode", "vertical_mode",
     "ole_type", "ole_version", "ole_user_type", "frame_corners",
     "ole_data_b64", "ole_data_sha256", "ole_data_bytes",
     "ole_data_unavailable_reason",

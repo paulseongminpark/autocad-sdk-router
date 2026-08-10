@@ -154,6 +154,14 @@ def _p3(value, default=(0.0, 0.0, 0.0)):
     return default
 
 
+def _explicit_p3(value):
+    """Return a finite 3D point only when all three coordinates are explicit."""
+    if not isinstance(value, (list, tuple)) or len(value) != 3:
+        return None
+    point = tuple(_num(component) for component in value)
+    return None if any(component is None for component in point) else point
+
+
 def _p2(value, default=(0.0, 0.0)):
     p = _p3(value, None)
     return default if p is None else (p[0], p[1])
@@ -521,10 +529,28 @@ def _h_text(ctx, space, ent, g, attr):
     rotation = _num(g.get("rotation"))
     if rotation:
         dxfattribs["rotation"] = math.degrees(rotation)
+    # #63: ObjectARX explicitly tells us whether alignmentPoint() is valid.
+    # A default-aligned TEXT may expose [0, 0, 0] as a sentinel, so the new
+    # contract uses that state bit.  For pre-#63 IR that has no state bit, the
+    # enum modes are a backwards-compatible signal: a nonzero horizontal or
+    # vertical mode is non-default without inspecting point coordinates.
+    horizontal_mode = _num(g.get("horizontal_mode"))
+    vertical_mode = _num(g.get("vertical_mode"))
+    state = g.get("is_default_alignment")
+    non_default_alignment = (
+        state is False
+        or (state is None and any(mode is not None and mode != 0.0
+                                  for mode in (horizontal_mode, vertical_mode)))
+    )
+    if non_default_alignment:
+        if horizontal_mode is not None:
+            dxfattribs["halign"] = int(horizontal_mode)
+        if vertical_mode is not None:
+            dxfattribs["valign"] = int(vertical_mode)
+        align = g.get("alignment_point")
+        if align is not None:
+            dxfattribs["align_point"] = _p3(align)
     text = space.add_text(str(g.get("text") or ""), dxfattribs=dxfattribs)
-    align = g.get("alignment_point")
-    if align is not None:
-        text.dxf.align_point = _p3(align)
     return text
 
 
@@ -775,13 +801,21 @@ def _h_leader(ctx, space, ent, g, attr):
 
 
 def _h_ray(ctx, space, ent, g, attr):
-    return space.add_ray(_p3(g.get("base_point")),
-                         _p3(g.get("unit_dir"), (1.0, 0.0, 0.0)), dxfattribs=attr)
+    base_point = _explicit_p3(g.get("base_point"))
+    unit_dir = _explicit_p3(g.get("unit_dir"))
+    if base_point is None or unit_dir is None or not any(unit_dir):
+        ctx.report.skipped["ray:no_geom"] += 1
+        return None
+    return space.add_ray(base_point, unit_dir, dxfattribs=attr)
 
 
 def _h_xline(ctx, space, ent, g, attr):
-    return space.add_xline(_p3(g.get("base_point")),
-                           _p3(g.get("unit_dir"), (1.0, 0.0, 0.0)), dxfattribs=attr)
+    base_point = _explicit_p3(g.get("base_point"))
+    unit_dir = _explicit_p3(g.get("unit_dir"))
+    if base_point is None or unit_dir is None or not any(unit_dir):
+        ctx.report.skipped["xline:no_geom"] += 1
+        return None
+    return space.add_xline(base_point, unit_dir, dxfattribs=attr)
 
 
 def _h_dimension(ctx, space, ent, g, attr):
