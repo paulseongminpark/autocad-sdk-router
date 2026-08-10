@@ -15,8 +15,12 @@ query — through one MCP server (`cadagent`), safely (original DWGs stay read-o
 - **AutoCAD** (Windows). The team standard is **AutoCAD 2027** — prebuilt native
   modules ship for it under `prebuilt/2027/`. Other versions: see *Other AutoCAD
   versions* below.
-- **Python 3.10+** (3.12 recommended). The AutoCAD/DWG core is **pure stdlib**; the
-  only dependency is `jsonschema` (installed by `install.ps1`).
+- **Python 3.10+** (3.12 recommended). The AutoCAD/DWG core is **pure stdlib**;
+  the shared MCP host additionally installs **jsonschema + MCP SDK v1**, with
+  the official Python SDK pinned to `mcp==1.27.1` (both come from
+  `requirements.txt`).
+- The compatibility matrix may install `mcp==2.0.0` only into a separate target
+  using `requirements-mcp-sdk-v2.txt`; it must not replace the shared v1 install.
 - **git** (with access to this private repo).
 
 Not required for AutoCAD control: Visual Studio, the ObjectARX SDK, the .NET SDK,
@@ -32,7 +36,8 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 ```
 
 `install.ps1` detects your AutoCAD, verifies the prebuilt modules, installs the core
-dep, runs a status smoke, and **prints an MCP registration block**. Paste that block
+dependencies (`jsonschema` + `mcp==1.27.1`), runs a status smoke, and **prints an MCP
+registration block**. Paste that block
 into your agent (section 3), start a **new** agent session, and you're done.
 
 Smoke it yourself any time:
@@ -43,6 +48,20 @@ python   tools\cadctl_cli.py run --op inspect.layers --dwg <your.dwg>
 ```
 
 The original `<your.dwg>` is never modified — the router works on a staged copy.
+
+To verify or install the shared MCP SDK pin directly:
+
+```powershell
+python -m pip install --disable-pip-version-check -r .\requirements.txt
+python -c "import importlib.metadata as m; assert m.version('mcp') == '1.27.1'; print(m.version('mcp'))"
+```
+
+For the isolated compatibility lane, keep the v2 package out of the shared
+interpreter and let the matrix create/use its target:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\test_cadagent_mcp_sdk_matrix.ps1 -InstallV2
+```
 
 ## 3. Register the MCP server in your agent
 
@@ -145,5 +164,5 @@ are unchanged.
   three modules.
 - **Want a fresh local native build to win over `prebuilt/`** — set
   `$env:ARIADNE_NATIVE_ACAD_BIN_DIR` to your build output dir.
-- **Schema-validation warnings** — `pip install jsonschema` (or re-run
-  `install.ps1`).
+- **Schema-validation or MCP SDK warnings** — re-run `install.ps1`, or install
+  the pinned shared dependencies with `pip install -r requirements.txt`.

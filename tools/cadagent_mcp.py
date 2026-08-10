@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-cadagent_mcp.py -- Lane E MCP shell for the CAD OS Layer (stdio / MOCK).
+cadagent_mcp.py -- CAD OS Layer MCP server (official SDK / stdio).
 
 Exposes the CAD OS Layer as a small set of agent-callable tools:
 
@@ -32,15 +32,12 @@ peer lane has not landed yet (e.g. cad_diff.compute_diff,
 patch_engine.apply_staged) degrade to a truthful not_implemented/unavailable
 result -- never a crash and never a fake success.
 
-Transport: if a real MCP library is importable it could host these tools; in this
-packet no MCP server library is assumed, so this module implements a minimal
-**stdlib JSON-RPC-2.0-over-stdio MOCK** plus a self-describing tools manifest.
-``transport`` is reported as ``"mock"`` so no consumer mistakes it for a
-production MCP endpoint.
+Transport: the official MCP Python SDK owns protocol negotiation, stdio framing,
+ping, lifecycle notifications, and empty resource/resource-template listings.
+This module retains only the CAD tool catalogue and dispatch logic.
 
-Hard rules: standard library ONLY; delegate to shells (no raw SDK); a tool whose
-underlying shell is unavailable returns an explicit error result, never a fake
-success.
+Hard rules: delegate to shells (no raw SDK); a tool whose underlying shell is
+unavailable returns an explicit error result, never a fake success.
 
 Run ``python tools/cadagent_mcp.py`` to print the tools manifest (and exit).
 Run ``python tools/cadagent_mcp.py --serve`` to speak JSON-RPC over stdio.
@@ -52,15 +49,14 @@ import json
 import os
 import sys
 import importlib.util
-from typing import Any, Dict, List, Optional, Callable
+from typing import Any, Dict, List, Callable
 
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 _ROUTER_HOME = os.path.dirname(_THIS_DIR)
 
 SERVER_NAME = "cadagent-mcp"
 SERVER_VERSION = "0.1.0"
-TRANSPORT = "mock"  # stdlib JSON-RPC-over-stdio; not a 3rd-party MCP lib
-PROTOCOL_VERSION = "2025-06-18"  # MCP spec revision this server speaks
+TRANSPORT = "mcp-sdk"  # Official Python MCP SDK high-level stdio server.
 DISPLAY_MEMBERSHIP_GEOMETRY_SCOPES = {
     "strict_layer_entities_v1",
     "linear_segments_v1",
@@ -112,22 +108,6 @@ def _err(message: str, **extra: Any) -> Dict[str, Any]:
     out = {"ok": False, "status": "error", "error": message}
     out.update(extra)
     return out
-
-
-def _tool_result(payload: Dict[str, Any], is_error: bool = False) -> Dict[str, Any]:
-    """Wrap a handler dict into an MCP CallToolResult.
-
-    Real MCP clients require tools/call results to carry a `content` array of
-    content blocks. We serialise the handler's structured dict as one text block
-    (pretty JSON) AND expose it as `structuredContent` for structured-output
-    clients. Without this wrapper a real client rejects every tool invocation.
-    """
-    return {
-        "content": [{"type": "text",
-                     "text": json.dumps(payload, ensure_ascii=False, indent=2)}],
-        "structuredContent": payload,
-        "isError": bool(is_error),
-    }
 
 
 def _cad():
@@ -923,20 +903,38 @@ _DISPATCH: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
 }
 
 
+def _dispatch_tool(name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
+    """Execute one retained CAD handler for self-tests and direct unit coverage.
+
+    The public MCP endpoint is the SDK host in ``serve_stdio``.  This helper is
+    intentionally not a JSON-RPC compatibility surface.
+    """
+    handler = _DISPATCH.get(name)
+    if handler is None:
+        return _err("unknown tool: %s" % name, available=sorted(_DISPATCH))
+    try:
+        result = handler(arguments)
+    except Exception as exc:  # noqa: BLE001 - preserve a truthful result envelope.
+        return _err("tool execution error: %r" % exc, tool=name)
+    if isinstance(result, dict):
+        return result
+    return _err("tool handler returned %s instead of a dict" % type(result).__name__, tool=name)
+
+
 def tools_manifest() -> Dict[str, Any]:
     """Self-describing manifest of the server, its transport, and its tools."""
     return {
         "server": SERVER_NAME,
         "version": SERVER_VERSION,
         "transport": TRANSPORT,
-        "protocol": "jsonrpc-2.0-over-stdio (mock)",
+        "protocol": "official-mcp-sdk-over-stdio",
         "shells": _shell_status(),
         "tools": _TOOLS,
         "notes": [
             "Every tool delegates to a CAD OS Layer shell (cadctl / validator / "
             "patch_engine / cad_diff / visual_report); none touches a raw SDK or "
             "parses a DWG directly.",
-            "transport is 'mock': a stdlib JSON-RPC server, not a production MCP host.",
+            "transport is the official Python MCP SDK high-level stdio host.",
             "cad.patch_dry_run never executes mutations (execution is not_implemented).",
             "cad.patch_apply_staged mutates only a STAGED copy; the original DWG is "
             "READ-ONLY. It degrades to not_implemented until patch_engine.apply_staged lands.",
@@ -954,94 +952,14 @@ def tools_manifest() -> Dict[str, Any]:
 
 
 # --------------------------------------------------------------------------- #
-# Minimal JSON-RPC 2.0 over stdio (mock transport)
+# Official MCP SDK stdio transport
 # --------------------------------------------------------------------------- #
 
-def _rpc_result(req_id: Any, result: Any) -> str:
-    return json.dumps({"jsonrpc": "2.0", "id": req_id, "result": result}, ensure_ascii=False)
+def serve_stdio() -> int:
+    """Run the official SDK's persistent stdio MCP server."""
+    from cadagent_mcp_sdk import serve_stdio as serve_sdk_stdio
 
-
-def _rpc_error(req_id: Any, code: int, message: str, data: Any = None) -> str:
-    err: Dict[str, Any] = {"code": code, "message": message}
-    if data is not None:
-        err["data"] = data
-    return json.dumps({"jsonrpc": "2.0", "id": req_id, "error": err}, ensure_ascii=False)
-
-
-def handle_rpc(request: Dict[str, Any]) -> Optional[str]:
-    """
-    Handle one JSON-RPC request object. Supports:
-      * "initialize"        -> server info + capabilities
-      * "tools/list"        -> the tools manifest
-      * "tools/call"        -> {name, arguments} -> tool result (delegated)
-    Notifications (no "id") return None (no response emitted).
-    """
-    req_id = request.get("id")
-    method = request.get("method")
-    params = request.get("params") or {}
-    is_notification = "id" not in request
-
-    if method == "initialize":
-        # Echo the client's requested protocol version (negotiation); else ours.
-        # Without protocolVersion a real MCP client aborts the handshake -> 0 tools.
-        client_pv = params.get("protocolVersion")
-        res = {"protocolVersion": client_pv or PROTOCOL_VERSION,
-               "capabilities": {"tools": {"listChanged": False}},
-               "serverInfo": {"name": SERVER_NAME, "version": SERVER_VERSION},
-               "transport": TRANSPORT}
-        return None if is_notification else _rpc_result(req_id, res)
-
-    if method == "tools/list":
-        return None if is_notification else _rpc_result(req_id, {"tools": _TOOLS})
-
-    if method == "tools/call":
-        name = params.get("name")
-        arguments = params.get("arguments") or {}
-        handler = _DISPATCH.get(name)
-        if handler is None:
-            return None if is_notification else _rpc_error(
-                req_id, -32601, "unknown tool: %s" % name,
-                data={"available": list(_DISPATCH.keys())})
-        try:
-            result = handler(arguments)
-        except Exception as exc:  # noqa: BLE001
-            return None if is_notification else _rpc_result(
-                req_id, _tool_result(
-                    {"ok": False, "status": "error",
-                     "error": "tool execution error: %r" % exc}, is_error=True))
-        # MCP CallToolResult: wrap the handler dict in content[] + structuredContent.
-        is_err = isinstance(result, dict) and result.get("ok") is False
-        return None if is_notification else _rpc_result(
-            req_id, _tool_result(result, is_error=is_err))
-
-    if method in ("notifications/initialized", "initialized", "notifications/cancelled"):
-        return None  # ack lifecycle notifications silently (no reply)
-    if method == "ping":
-        return None if is_notification else _rpc_result(req_id, {})
-
-    return None if is_notification else _rpc_error(
-        req_id, -32601, "unknown method: %s" % method)
-
-
-def serve_stdio(stdin=None, stdout=None) -> int:
-    """Read newline-delimited JSON-RPC requests from stdin; write responses to stdout."""
-    stdin = stdin or sys.stdin
-    stdout = stdout or sys.stdout
-    for line in stdin:
-        line = line.strip()
-        if not line:
-            continue
-        try:
-            request = json.loads(line)
-        except ValueError:
-            stdout.write(_rpc_error(None, -32700, "parse error") + "\n")
-            stdout.flush()
-            continue
-        response = handle_rpc(request)
-        if response is not None:
-            stdout.write(response + "\n")
-            stdout.flush()
-    return 0
+    return serve_sdk_stdio(sys.modules[__name__])
 
 
 # --------------------------------------------------------------------------- #
@@ -1094,44 +1012,29 @@ def _selftest() -> int:
 
     manifest_names = {t["name"] for t in manifest["tools"]}
 
-    # Dispatch EVERY tool handler through the in-process RPC path with a trivial
-    # arg; confirm each returns a JSON-RPC result whose payload is a dict. A
-    # not_implemented / missing-arg / error dict is acceptable -- a crash is not.
+    # Dispatch EVERY retained handler with a trivial arg; confirm each returns a
+    # dict.  Wire-level behavior is exercised by the persistent-stdio test.
     per_tool: Dict[str, str] = {}
     all_dicts = True
     for name in sorted(_DISPATCH.keys()):
-        call = handle_rpc({
-            "jsonrpc": "2.0", "id": "t-%s" % name, "method": "tools/call",
-            "params": {"name": name, "arguments": _SELFTEST_ARGS.get(name, {})},
-        })
-        if call is None:
-            per_tool[name] = "no-response"
-            all_dicts = False
-            continue
-        obj = json.loads(call)
-        payload = obj.get("result")
-        # tools/call always returns a JSON-RPC "result" wrapping the handler dict.
+        payload = _dispatch_tool(name, _SELFTEST_ARGS.get(name, {}))
         if not isinstance(payload, dict):
             per_tool[name] = "non-dict"
             all_dicts = False
         else:
             # surface the handler's own status word when present
-            sc = payload.get("structuredContent") or {}
-            inner = sc.get("result")
+            inner = payload.get("result")
             status_word = None
             if isinstance(inner, dict):
                 status_word = inner.get("status")
-            per_tool[name] = status_word or ("ok" if sc.get("ok") else "err")
-
-    listed = handle_rpc({"jsonrpc": "2.0", "id": 1, "method": "tools/list"})
+            per_tool[name] = status_word or ("ok" if payload.get("ok") else "err")
 
     ok = (
-        manifest["transport"] == "mock"
+        manifest["transport"] == "mcp-sdk"
         and len(manifest["tools"]) == len(_EXPECTED_TOOLS)
         and manifest_names == _EXPECTED_TOOLS
         # manifest and dispatch table must agree exactly (no orphan tools).
         and set(_DISPATCH.keys()) == manifest_names
-        and listed is not None
         and all_dicts
     )
     print("SELFTEST_OK" if ok else "SELFTEST_FAIL",
