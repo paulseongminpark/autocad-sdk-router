@@ -68,6 +68,87 @@ function WriteJsonAtomic($obj, [string]$path) {
 }
 function WriteJson($obj, $path) { WriteJsonAtomic $obj $path }
 
+function New-ProcessIdentity($process) {
+  # A PID is only one part of the identity.  StartTime is intentionally read
+  # here, before any launch/cleanup decision, so an access failure cannot be
+  # mistaken for a process that is absent or safe to terminate.
+  if ($null -eq $process) { return $null }
+  $processId = 0
+  $processName = $null
+  $startTimeUtc = $null
+  try { $processId = [int]$process.Id } catch { return $null }
+  try { $processName = [string]$process.ProcessName } catch { return $null }
+  try { $startTimeUtc = $process.StartTime.ToUniversalTime().ToString('o') } catch { return $null }
+  if ($processId -le 0 -or [string]::IsNullOrWhiteSpace($processName) -or
+      [string]::IsNullOrWhiteSpace($startTimeUtc)) { return $null }
+  return [ordered]@{
+    pid = $processId
+    process_name = $processName
+    start_time_utc = $startTimeUtc
+    known = $true
+    identity_known = $true
+  }
+}
+
+function Same-ProcessIdentity($expected, $current) {
+  if ($null -eq $expected -or $null -eq $current) { return $false }
+  if ($expected.identity_known -ne $true -or $current.identity_known -ne $true) { return $false }
+  return ([int]$expected.pid -eq [int]$current.pid) -and
+    ([string]::Equals([string]$expected.process_name, [string]$current.process_name,
+      [System.StringComparison]::OrdinalIgnoreCase)) -and
+    ([string]$expected.start_time_utc -ceq [string]$current.start_time_utc)
+}
+
+function Get-AcadProcessSnapshot {
+  # ObjectNotFound is a known empty result.  Any other enumeration failure or
+  # an incomplete process identity is unknown and must fail closed.
+  $processes = @()
+  try {
+    $candidates = @(Get-Process -Name acad -ErrorAction Stop)
+  } catch {
+    if ($_.CategoryInfo.Category -eq [System.Management.Automation.ErrorCategory]::ObjectNotFound) {
+      return [ordered]@{ known = $true; processes = @() }
+    }
+    return [ordered]@{ known = $false; processes = @(); error = $_.Exception.Message }
+  }
+  foreach ($candidate in $candidates) {
+    $identity = New-ProcessIdentity $candidate
+    if ($null -eq $identity) {
+      return [ordered]@{ known = $false; processes = @(); error = 'acad process identity was incomplete' }
+    }
+    $processes += $identity
+  }
+  return [ordered]@{ known = $true; processes = @($processes) }
+}
+
+function Get-ProcessIdentityById([int]$ProcessId) {
+  try {
+    $candidate = Get-Process -Id $ProcessId -ErrorAction Stop
+  } catch {
+    if ($_.CategoryInfo.Category -eq [System.Management.Automation.ErrorCategory]::ObjectNotFound) {
+      return [ordered]@{
+        pid = $ProcessId; known = $true; present = $false
+        process_name = $null; start_time_utc = $null; identity_known = $false
+      }
+    }
+    return [ordered]@{
+      pid = $ProcessId; known = $false; present = $null
+      process_name = $null; start_time_utc = $null; identity_known = $false
+      error = $_.Exception.Message
+    }
+  }
+  $identity = New-ProcessIdentity $candidate
+  if ($null -eq $identity) {
+    return [ordered]@{
+      pid = $ProcessId; known = $false; present = $null
+      process_name = $null; start_time_utc = $null; identity_known = $false
+      error = 'process identity was incomplete'
+    }
+  }
+  $identity['present'] = $true
+  return $identity
+}
+
 New-Item -ItemType Directory -Force -Path $RunDir | Out-Null
 $runId = Split-Path -Leaf $RunDir
 $completionReceipt = Join-Path $RunDir 'attended_job_completion.json'
@@ -110,17 +191,18 @@ $binDir = Split-Path -Parent $arx
 # PID plus process start time is an identity, unlike a PID alone which Windows
 # may reuse after a process exits.  The compact completion receipt carries
 # these facts for Python's independent recovery validator if finalization hangs.
-$preProcesses = @(
-  Get-Process acad -ErrorAction SilentlyContinue | ForEach-Object {
-    $started = $null
-    try { $started = $_.StartTime.ToUniversalTime().ToString('o') } catch {}
-    [ordered]@{
-      pid = [int]$_.Id
-      process_name = [string]$_.ProcessName
-      start_time_utc = $started
-    }
+$preSnapshot = Get-AcadProcessSnapshot
+$preEnumerationKnown = ($preSnapshot.known -eq $true)
+$preProcesses = @($preSnapshot.processes)
+$preIdentityKnown = [bool]$preEnumerationKnown
+foreach ($identity in $preProcesses) {
+  if ($identity.known -ne $true -or $identity.identity_known -ne $true -or
+      [int]$identity.pid -le 0 -or [string]::IsNullOrWhiteSpace([string]$identity.process_name) -or
+      [string]::IsNullOrWhiteSpace([string]$identity.start_time_utc)) {
+    $preIdentityKnown = $false
+    break
   }
-)
+}
 $preIds = @($preProcesses | ForEach-Object { [int]$_.pid })
 
 # ---- build the job (flat shape: {"operation": ..., <op args>} -- the SAME shape
@@ -174,172 +256,250 @@ Log "operation: $Operation"
 
 # state used by the finally block even if something below throws
 $launchedPid = $null
+$launchedProcessName = $null
 $launchedStartTimeUtc = $null
-$dedicatedOk = $true
+$launchedIdentity = $null
+$launchedIdentityKnown = $false
+$dedicatedOk = $preIdentityKnown
 $jobDone = $false
 $timedOut = $false
 $launchedGone = $null
 $launchedExited = $false
 $preStillAlive = @()
+$postProcesses = @()
+$postEnumerationKnown = $false
+$launchedPidQueryKnown = $false
+$launchedPidQueryFailed = $false
+$preExistingIdentityVerified = $false
+$launchedPidIdentityVerified = $false
+$launchedPidReused = $false
+$userSessionTouched = $null
 $proc = $null
 $completionReceiptWritten = $false
 
 try {
-  # ---- launch DEDICATED acad.exe on the STAGED doc only ----------------------
-  # ARIADNE_NATIVE_JOB_ARGS (the AutoCAD command run inside the script) reads this
-  # env var via acedGetEnv/_wgetenv (docs/LIVE_JOB_ARGUMENT_CONTRACT.md). Start-
-  # Process only passes environment variables that are set in THIS calling
-  # process at launch time -- it does not read them from the script file, so this
-  # MUST be set here, not merely written into live_job_args.json. Without it the
-  # command falls back to its documented interactive prompt and hangs forever
-  # (confirmed empirically: this wave's first live run hung past its own timeout
-  # with this line missing -- see build_log.md).
-  $env:ARIADNE_NATIVE_JOB_ARGS = $argsF
-  # Pass one explicitly quoted command line.  PowerShell's string[] form can
-  # lose the grouping of quoted path arguments when it flattens ArgumentList;
-  # the observed failure mode is a healthy acad.exe stuck on the Start page
-  # with neither the DWG nor /b script consumed.  Autodesk's startup contract
-  # also requires /b <script> to be the final parameter pair.
-  $launchArgs = "`"$StagedDwg`" /nologo /b `"$scr`""
-  Log "launch args: $launchArgs"
-  $proc = Start-Process -FilePath $AcadExe -ArgumentList $launchArgs -PassThru
-  $launchedPid = $proc.Id
-  try { $launchedStartTimeUtc = $proc.StartTime.ToUniversalTime().ToString('o') }
-  catch { Log "could not read launched process start time: $($_.Exception.Message)" }
-  Log "launched dedicated acad PID: $launchedPid"
-
-  $dedicatedOk = ($preIds -notcontains $launchedPid)
-  if (-not $dedicatedOk) {
-    Log 'GATE1 FAIL: launched PID collides with a pre-existing session; aborting without driving.'
+  if (-not $preIdentityKnown) {
+    $dedicatedOk = $false
+    Log 'GATE1 FAIL: pre-existing acad process identity enumeration was unknown; aborting before launch.'
   } else {
-    # ---- poll for completion: job_out.json appears, OR process exits, OR timeout
-    $deadline = (Get-Date).AddSeconds($TimeoutSec)
-    while ((Get-Date) -lt $deadline) {
-      if (Test-Path -LiteralPath $jobOut) { $jobDone = $true; Log "job_out.json appeared"; break }
-      $proc.Refresh()
-      if ($proc.HasExited) { Log "process exited on its own (no job_out.json yet)"; break }
-      Start-Sleep -Milliseconds 500
-    }
-    if (-not $jobDone -and -not $proc.HasExited) {
-      Log "poll deadline ($($TimeoutSec)s) reached without job_out.json"
-    }
-    # The native side has produced its output.  Write this deliberately tiny,
-    # atomic receipt BEFORE the normal QSAVE/QUIT wait and finally cleanup so a
-    # Python caller does not mistake late cleanup for an unfinished CAD job.
-    # It is explicitly not the final success receipt: it carries no job_out
-    # payload and cannot prove security restoration or process isolation.
-    if ($jobDone) {
-      $completion = [ordered]@{
-        schema = 'ariadne.cad_os.attended_job_completion.v1'
-        run_id = $runId
-        phase = 'cleanup_pending'
-        status = 'observed'
-        operation = $Operation
-        launched_pid = $launchedPid
-        launched_start_time_utc = $launchedStartTimeUtc
-        dedicated_instance = $dedicatedOk
-        timed_out = $false
-        job_out = $jobOut
-        job_out_present = $true
-        pre_existing_pids = $preIds
-        pre_existing_processes = $preProcesses
-        cleanup_wait_sec = $completionCleanupWaitSec
+    # ---- launch DEDICATED acad.exe on the STAGED doc only --------------------
+    # ARIADNE_NATIVE_JOB_ARGS (the AutoCAD command run inside the script) reads
+    # this env var from the child at launch time; writing the path to disk alone
+    # is not enough to select the non-interactive command.
+    $env:ARIADNE_NATIVE_JOB_ARGS = $argsF
+    # Pass one explicitly quoted command line.  Autodesk requires /b <script>
+    # to be the final parameter pair.
+    $launchArgs = "`"$StagedDwg`" /nologo /b `"$scr`""
+    Log "launch args: $launchArgs"
+    $proc = Start-Process -FilePath $AcadExe -ArgumentList $launchArgs -PassThru
+    if ($null -eq $proc) {
+      $dedicatedOk = $false
+      Log 'GATE1 FAIL: Start-Process returned no process handle.'
+    } else {
+      $launchedPid = [int]$proc.Id
+      $launchedIdentity = New-ProcessIdentity $proc
+      $launchedIdentityKnown = $null -ne $launchedIdentity
+      if ($launchedIdentityKnown) {
+        $launchedProcessName = $launchedIdentity.process_name
+        $launchedStartTimeUtc = $launchedIdentity.start_time_utc
       }
-      try {
-        WriteJsonAtomic $completion $completionReceipt
-        $completionReceiptWritten = $true
-        Log 'wrote compact completion receipt before cleanup'
-      } catch {
-        Log "completion receipt write failed: $($_.Exception.Message)"
-      }
-    }
-    # grace period for QSAVE+QUIT to flush and the process to exit on its own
-    $proc.Refresh()
-    if ($jobDone -and -not $proc.HasExited) {
-      Log "job done; waiting up to 30s for the process to quit on its own"
-      $graceDeadline = (Get-Date).AddSeconds(30)
-      while ((Get-Date) -lt $graceDeadline) {
+      Log "launched dedicated acad PID: $launchedPid"
+      $preCollision = @($preProcesses | Where-Object { Same-ProcessIdentity $_ $launchedIdentity })
+      $dedicatedOk = $preIdentityKnown -and $launchedIdentityKnown -and ($preCollision.Count -eq 0)
+      if (-not $dedicatedOk) {
+        Log 'GATE1 FAIL: launched process identity is unknown or collides with a pre-existing identity; aborting without driving.'
+      } else {
+        # ---- poll for completion: job_out.json appears, OR process exits, OR timeout
+        $deadline = (Get-Date).AddSeconds($TimeoutSec)
+        while ((Get-Date) -lt $deadline) {
+          if (Test-Path -LiteralPath $jobOut) { $jobDone = $true; Log "job_out.json appeared"; break }
+          $proc.Refresh()
+          if ($proc.HasExited) { Log "process exited on its own (no job_out.json yet)"; break }
+          Start-Sleep -Milliseconds 500
+        }
+        if (-not $jobDone -and -not $proc.HasExited) {
+          Log "poll deadline ($($TimeoutSec)s) reached without job_out.json"
+        }
+        # This compact signal is written before QSAVE/QUIT cleanup.  It is only
+        # usable for Python recovery when both captured identity sets are known.
+        if ($jobDone -and $launchedIdentityKnown -and $preIdentityKnown) {
+          $completion = [ordered]@{
+            schema = 'ariadne.cad_os.attended_job_completion.v1'
+            run_id = $runId
+            phase = 'cleanup_pending'
+            status = 'observed'
+            operation = $Operation
+            launched_pid = $launchedPid
+            launched_process_name = $launchedProcessName
+            launched_start_time_utc = $launchedStartTimeUtc
+            dedicated_instance = $dedicatedOk
+            timed_out = $false
+            job_out = $jobOut
+            job_out_present = $true
+            pre_existing_pids = $preIds
+            pre_existing_processes = $preProcesses
+            cleanup_wait_sec = $completionCleanupWaitSec
+          }
+          try {
+            WriteJsonAtomic $completion $completionReceipt
+            $completionReceiptWritten = $true
+            Log 'wrote compact completion receipt before cleanup'
+          } catch {
+            Log "completion receipt write failed: $($_.Exception.Message)"
+          }
+        }
+        # Grace period for QSAVE+QUIT to flush and the process to exit on its own.
         $proc.Refresh()
-        if ($proc.HasExited) { break }
-        Start-Sleep -Milliseconds 500
+        if ($jobDone -and -not $proc.HasExited) {
+          Log "job done; waiting up to 30s for the process to quit on its own"
+          $graceDeadline = (Get-Date).AddSeconds(30)
+          while ((Get-Date) -lt $graceDeadline) {
+            $proc.Refresh()
+            if ($proc.HasExited) { break }
+            Start-Sleep -Milliseconds 500
+          }
+        }
+        $proc.Refresh()
+        $launchedExited = $proc.HasExited
+        $timedOut = -not $jobDone -and -not $launchedExited
+        Log "post-poll: jobDone=$jobDone hasExited=$launchedExited timedOut=$timedOut"
       }
     }
-    $proc.Refresh()
-    $launchedExited = $proc.HasExited
-    $timedOut = -not $jobDone -and -not $launchedExited
-    Log "post-poll: jobDone=$jobDone hasExited=$launchedExited timedOut=$timedOut"
   }
 } catch {
+  $dedicatedOk = $false
   Log "EXCEPTION during launch/poll: $($_.Exception.Message)"
 } finally {
-  # ---- teardown: close ONLY the launched PID (Stop-Process, then a raw
-  # taskkill.exe /T /F last resort) -- wrapped so a teardown failure can never
-  # prevent the result file below from being written (no silent hang/no result).
+  # ---- teardown: close ONLY the launched process handle after revalidating
+  # its captured identity.  A numeric PID is never a sufficient kill target.
   $env:ARIADNE_NATIVE_JOB_ARGS = $null
-  if ($launchedPid) {
+  $stillRunning = $false
+  if ($launchedPid -and $launchedIdentityKnown -and $null -ne $proc) {
     Log "cleanup: launchedExited=$launchedExited"
-    $stillRunning = -not $launchedExited
-    if (-not $launchedExited) {
-      try {
-        if ($null -ne $proc) {
-          $proc.Refresh()
-          $stillRunning = -not $proc.HasExited
+    try {
+      $proc.Refresh()
+      if (-not $proc.HasExited) {
+        $handleIdentity = New-ProcessIdentity $proc
+        if ($null -eq $handleIdentity) {
+          $launchedPidQueryKnown = $false
+          $launchedPidQueryFailed = $true
+          Log 'cleanup: launched process identity became unknown; refusing to terminate it'
+        } elseif (Same-ProcessIdentity $launchedIdentity $handleIdentity) {
+          $stillRunning = $true
         } else {
-          $stillRunning = [bool](Get-Process -Id $launchedPid -ErrorAction SilentlyContinue)
+          $launchedPidReused = $true
+          $launchedPidQueryKnown = $true
+          Log 'cleanup: launched PID now names a different process; refusing to terminate it'
         }
-      } catch {
-        try { $stillRunning = [bool](Get-Process -Id $launchedPid -ErrorAction SilentlyContinue) } catch {}
+      } else {
+        $launchedPidQueryKnown = $true
       }
+    } catch {
+      $launchedPidQueryKnown = $false
+      $launchedPidQueryFailed = $true
+      Log "cleanup: launched process identity query failed: $($_.Exception.Message)"
     }
     if ($stillRunning) {
-      Log "closing launched PID $launchedPid (Stop-Process)"
-      try { Stop-Process -Id $launchedPid -Force -ErrorAction Stop; Log "Stop-Process ok" }
-      catch { Log "Stop-Process failed: $($_.Exception.Message)" }
+      Log "closing launched PID $launchedPid through its exact process handle"
+      try { Stop-Process -InputObject $proc -Force -ErrorAction Stop; Log 'Stop-Process handle close ok' }
+      catch { Log "Stop-Process handle close failed: $($_.Exception.Message)" }
       Start-Sleep -Seconds 1
-      $stillThere = $false
-      try {
-        if ($null -ne $proc) {
-          $proc.Refresh()
-          $stillThere = -not $proc.HasExited
-        } else {
-          $stillThere = [bool](Get-Process -Id $launchedPid -ErrorAction SilentlyContinue)
-        }
-      } catch {
-        try { $stillThere = [bool](Get-Process -Id $launchedPid -ErrorAction SilentlyContinue) } catch {}
+
+      # Re-query the PID and require an exact identity match before the raw
+      # taskkill fallback.  If the query is unknown or the PID was reused, do
+      # not send a kill command to the unrelated process.
+      $afterStop = Get-ProcessIdentityById $launchedPid
+      if ($afterStop.known -ne $true) {
+        $launchedPidQueryKnown = $false
+        $launchedPidQueryFailed = $true
+        $stillThere = $true
+        Log 'cleanup: post-Stop-Process identity query unknown; refusing taskkill fallback'
+      } elseif (-not $afterStop.present) {
+        $launchedPidQueryKnown = $true
+        $stillThere = $false
+      } elseif (Same-ProcessIdentity $launchedIdentity $afterStop) {
+        $launchedPidQueryKnown = $true
+        $stillThere = $true
+      } else {
+        $launchedPidQueryKnown = $true
+        $launchedPidReused = $true
+        $stillThere = $false
+        Log 'cleanup: PID was reused after Stop-Process; refusing taskkill fallback'
       }
       if ($stillThere) {
-        Log "PID $launchedPid still alive after Stop-Process; taskkill fallback (/T /F)"
-        try {
-          $taskkillProc = Start-Process -FilePath 'taskkill.exe' -ArgumentList "/PID $launchedPid /T /F" -PassThru -NoNewWindow
-          if (-not $taskkillProc.WaitForExit(10000)) {
-            Log 'taskkill fallback exceeded 10s; stopping taskkill helper'
-            try { Stop-Process -Id $taskkillProc.Id -Force -ErrorAction Stop } catch {}
-          } else {
-            Log "taskkill exit code: $($taskkillProc.ExitCode)"
-          }
-        } catch { Log "taskkill invocation failed: $($_.Exception.Message)" }
-        Start-Sleep -Seconds 1
+        $taskkillTarget = Get-ProcessIdentityById $launchedPid
+        if ($taskkillTarget.known -eq $true -and $taskkillTarget.present -and
+            (Same-ProcessIdentity $launchedIdentity $taskkillTarget)) {
+          Log "PID $launchedPid still alive after handle close; taskkill fallback (/T /F)"
+          try {
+            $taskkillProc = Start-Process -FilePath 'taskkill.exe' -ArgumentList "/PID $launchedPid /T /F" -PassThru -NoNewWindow
+            if (-not $taskkillProc.WaitForExit(10000)) {
+              Log 'taskkill fallback exceeded 10s; stopping taskkill helper'
+              try { Stop-Process -InputObject $taskkillProc -Force -ErrorAction Stop } catch {}
+            } else {
+              Log "taskkill exit code: $($taskkillProc.ExitCode)"
+            }
+          } catch { Log "taskkill invocation failed: $($_.Exception.Message)" }
+          Start-Sleep -Seconds 1
+        } elseif ($taskkillTarget.known -ne $true) {
+          $launchedPidQueryKnown = $false
+          $launchedPidQueryFailed = $true
+          Log 'cleanup: taskkill identity revalidation unknown; no fallback issued'
+        } else {
+          $launchedPidReused = $true
+          Log 'cleanup: taskkill identity revalidation found PID reuse; no fallback issued'
+        }
       }
     }
+  } elseif ($launchedPid) {
+    Log 'cleanup: launched process identity was unknown; refusing any process termination'
+    $launchedPidQueryKnown = $false
+    $launchedPidQueryFailed = $true
   }
 
   Log 'cleanup: collecting process-safety evidence'
-  $postIds = @()
-  try { $postIds = @(Get-Process acad -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Id) } catch {}
-  $launchedGone = $launchedExited
-  if (-not $launchedGone) {
-    try {
-      if ($null -ne $proc) {
-        $proc.Refresh()
-        $launchedGone = $proc.HasExited
-      } elseif ($launchedPid) {
-        $launchedGone = $postIds -notcontains $launchedPid
+  $postSnapshot = Get-AcadProcessSnapshot
+  $postEnumerationKnown = ($postSnapshot.known -eq $true)
+  $postProcesses = @($postSnapshot.processes)
+  $preExistingIdentityVerified = $preIdentityKnown -and $postEnumerationKnown
+  $preStillAlive = @()
+  if ($preExistingIdentityVerified) {
+    foreach ($expected in $preProcesses) {
+      $current = @($postProcesses | Where-Object { [int]$_.pid -eq [int]$expected.pid }) | Select-Object -First 1
+      if ($null -eq $current -or -not (Same-ProcessIdentity $expected $current)) {
+        $preExistingIdentityVerified = $false
+      } else {
+        $preStillAlive += [int]$expected.pid
       }
-    } catch {
-      if ($launchedPid) { $launchedGone = $postIds -notcontains $launchedPid }
     }
   }
-  $preStillAlive = @($preIds | Where-Object { $postIds -contains $_ })
+  if ($launchedPid -and $launchedIdentityKnown) {
+    $launchedPost = Get-ProcessIdentityById $launchedPid
+    if ($launchedPost.known -ne $true) { $launchedPidQueryFailed = $true }
+    $launchedPidQueryKnown = (-not $launchedPidQueryFailed) -and ($launchedPost.known -eq $true)
+    if ($launchedPidQueryKnown -and -not $launchedPost.present) {
+      $launchedGone = $true
+      $launchedPidIdentityVerified = $true
+    } elseif ($launchedPidQueryKnown -and (Same-ProcessIdentity $launchedIdentity $launchedPost)) {
+      $launchedGone = $false
+      $launchedPidIdentityVerified = $false
+    } elseif ($launchedPidQueryKnown) {
+      $launchedGone = $true
+      $launchedPidReused = $true
+      $launchedPidIdentityVerified = $true
+    } else {
+      $launchedGone = $false
+      $launchedPidIdentityVerified = $false
+    }
+  } else {
+    $launchedGone = $false
+    $launchedPidIdentityVerified = $false
+  }
+  if ($preExistingIdentityVerified) {
+    $userSessionTouched = $false
+  } elseif ($preEnumerationKnown -and $postEnumerationKnown) {
+    $userSessionTouched = $true
+  }
 
   # ---- read back compact launcher safety evidence --------------------------
   Log 'cleanup: collecting security restoration evidence'
@@ -350,11 +510,16 @@ try {
   $secureloadAfter = if ($secAfterLines.Count -ge 1) { $secAfterLines[0] } else { $null }
   $trustedpathsAfter = if ($secAfterLines.Count -ge 2) { $secAfterLines[1] } else { $null }
   $securityRestored = ($secureloadBefore -eq $secureloadAfter) -and ($trustedpathsBefore -eq $trustedpathsAfter) -and ($null -ne $secureloadBefore) -and ($null -ne $trustedpathsBefore)
-  $userSessionTouched = [bool]($preStillAlive.Count -lt $preIds.Count)
   $jobOutPresent = Test-Path -LiteralPath $jobOut
   $finalizationFailures = @()
+  if (-not $preIdentityKnown) { $finalizationFailures += 'pre-existing acad process identity was unknown' }
+  if (-not $launchedIdentityKnown -and $launchedPid) { $finalizationFailures += 'launched acad process identity was unknown' }
+  if (-not $postEnumerationKnown) { $finalizationFailures += 'post-cleanup acad process enumeration was unknown' }
+  if ($launchedPid -and -not $launchedPidQueryKnown) { $finalizationFailures += 'launched PID identity query was unknown' }
+  if ($launchedPid -and -not $launchedPidIdentityVerified) { $finalizationFailures += 'launched PID identity was not verified closed or reused' }
+  if (-not $preExistingIdentityVerified) { $finalizationFailures += 'pre-existing user AutoCAD identities were not exact matches' }
+  if ($null -eq $userSessionTouched -or $userSessionTouched) { $finalizationFailures += 'pre-existing user AutoCAD session safety was not proven' }
   if (-not $launchedGone) { $finalizationFailures += 'launched PID was not confirmed closed' }
-  if ($userSessionTouched) { $finalizationFailures += 'a pre-existing user AutoCAD session disappeared' }
   if (-not $securityRestored) { $finalizationFailures += 'SECURELOAD/TRUSTEDPATHS restoration was not confirmed' }
 
   $status = if (-not $dedicatedOk) { 'blocked' }
@@ -362,7 +527,7 @@ try {
             elseif (-not $jobDone -or -not $jobOutPresent) { 'error' }
             elseif ($finalizationFailures.Count -gt 0) { 'error' }
             else { 'ok' }
-  $errorMessage = if ($status -eq 'blocked') { 'GATE1 FAIL: launched PID collides with a pre-existing session; aborted without driving.' }
+  $errorMessage = if ($status -eq 'blocked') { 'GATE1 FAIL: process identity was unknown or collided with a pre-existing identity; aborted without driving.' }
                   elseif ($status -eq 'timeout') { "no job_out.json within ${TimeoutSec}s and process did not exit on its own" }
                   elseif (-not $jobDone -or -not $jobOutPresent) { 'native job completion was not observed' }
                   elseif ($finalizationFailures.Count -gt 0) { $finalizationFailures -join '; ' }
@@ -376,13 +541,20 @@ try {
     receipt_authority = 'powershell_launcher'
     recovered_from_launcher_finalization_hang = $false
     launched_pid = $launchedPid
+    launched_process_name = $launchedProcessName
     launched_start_time_utc = $launchedStartTimeUtc
     dedicated_instance = $dedicatedOk
     timed_out = $timedOut
     launched_pid_closed = $launchedGone
+    launched_pid_identity_verified = $launchedPidIdentityVerified
+    launched_pid_reused = $launchedPidReused
+    launched_pid_identity_query_known = $launchedPidQueryKnown
     pre_existing_pids = $preIds
     pre_existing_processes = $preProcesses
     pre_existing_still_alive = $preStillAlive
+    pre_existing_identity_verified = $preExistingIdentityVerified
+    pre_existing_identity_query_known = ($preEnumerationKnown -and $postEnumerationKnown)
+    post_processes = $postProcesses
     user_session_touched = $userSessionTouched
     job_in = $jobIn
     job_out = $jobOut

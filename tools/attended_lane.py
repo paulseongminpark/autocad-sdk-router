@@ -197,6 +197,43 @@ def _same_windows_path(left: Any, right: Path) -> bool:
         return False
 
 
+_ACAD_PROCESS_NAMES = frozenset(("acad", "acad.exe"))
+
+
+def _is_nonempty_string(value: Any) -> bool:
+    return isinstance(value, str) and bool(value.strip())
+
+
+def _has_process_identity(record: Any, *, present: bool = True) -> bool:
+    """Return whether a process record carries a complete stable identity.
+
+    ``pid`` by itself is intentionally insufficient.  A present process must
+    expose a non-empty name and UTC start timestamp as well; callers use this
+    helper before treating any process observation as evidence.
+    """
+    if not isinstance(record, dict) or record.get("known") is not True:
+        return False
+    if not _is_positive_int(record.get("pid")):
+        return False
+    if not isinstance(record.get("present"), bool):
+        return False
+    if not present:
+        return True
+    return (_is_nonempty_string(record.get("process_name"))
+            and _is_nonempty_string(record.get("start_time_utc")))
+
+
+def _same_process_identity(expected: Dict[str, Any], current: Dict[str, Any]) -> bool:
+    """Compare PID, process name, and start time as one identity."""
+    if not (_has_process_identity(expected) and _has_process_identity(current)):
+        return False
+    return (
+        expected["pid"] == current["pid"]
+        and expected["process_name"].casefold() == current["process_name"].casefold()
+        and expected["start_time_utc"] == current["start_time_utc"]
+    )
+
+
 def _write_json_atomic(path: Path, payload: Dict[str, Any]) -> None:
     """Durably publish a compact receipt without exposing a partial JSON file."""
     temporary = path.with_name(".%s.%s.tmp" % (path.name, uuid.uuid4().hex))
@@ -221,7 +258,10 @@ def _query_process_identities(pids: List[int]) -> Optional[Dict[int, Dict[str, A
     recovery path therefore captures the UTC start time with each PID and uses
     this read-only query to distinguish an exited process from a later PID
     reuse.  Any command, parsing, or access failure is deliberately unknown,
-    never treated as an absent process.
+    never treated as an absent process.  For a non-empty request, a successful
+    query always returns one record per requested PID; ``present=False`` is the
+    explicit known-empty result, while a missing record (including ``{}``) is
+    malformed/unknown.
     """
     ordered_pids = list(dict.fromkeys(pids))
     if not ordered_pids or any(not _is_positive_int(pid) for pid in ordered_pids):
@@ -316,8 +356,12 @@ def _completion_receipt_errors(receipt: Dict[str, Any], *, operation: str,
         errors.append("operation")
     if not _is_positive_int(receipt.get("launched_pid")):
         errors.append("launched_pid")
-    started = receipt.get("launched_start_time_utc")
-    if started is not None and (not isinstance(started, str) or not started):
+    launched_name = receipt.get("launched_process_name")
+    if not _is_nonempty_string(launched_name):
+        errors.append("launched_process_name")
+    elif launched_name.casefold() not in _ACAD_PROCESS_NAMES:
+        errors.append("launched_process_name")
+    if not _is_nonempty_string(receipt.get("launched_start_time_utc")):
         errors.append("launched_start_time_utc")
     if receipt.get("dedicated_instance") is not True:
         errors.append("dedicated_instance")
@@ -332,6 +376,8 @@ def _completion_receipt_errors(receipt: Dict[str, Any], *, operation: str,
         errors.append("pre_existing_pids")
     elif len(set(pre_existing_pids)) != len(pre_existing_pids):
         errors.append("pre_existing_pids")
+    if _pre_existing_identity_map(receipt) is None:
+        errors.append("pre_existing_processes")
     cleanup_wait = receipt.get("cleanup_wait_sec")
     if isinstance(cleanup_wait, bool):
         cleanup_wait = None
@@ -357,10 +403,10 @@ def _pre_existing_identity_map(receipt: Dict[str, Any]) -> Optional[Dict[int, Di
         pid = process.get("pid")
         name = process.get("process_name")
         started = process.get("start_time_utc")
-        if (not _is_positive_int(pid) or not isinstance(name, str) or not name
-                or not isinstance(started, str) or not started or pid in expected):
+        if (not _is_positive_int(pid) or not _is_nonempty_string(name)
+                or not _is_nonempty_string(started) or pid in expected):
             return None
-        if name.casefold() not in ("acad", "acad.exe"):
+        if name.casefold() not in _ACAD_PROCESS_NAMES:
             return None
         expected[pid] = {"process_name": name, "start_time_utc": started}
     return expected if set(expected) == set(pids) else None
@@ -389,27 +435,40 @@ def _build_independent_recovery_receipt(*, completion: Dict[str, Any],
     if pre_existing is None:
         return None, "pre-existing AutoCAD process identities are incomplete"
     launched_pid = completion["launched_pid"]
+    launched_expected = {
+        "pid": launched_pid,
+        "known": True,
+        "present": True,
+        "process_name": completion.get("launched_process_name"),
+        "start_time_utc": completion.get("launched_start_time_utc"),
+    }
+    if not _has_process_identity(launched_expected):
+        return None, "launched process identity is incomplete; start time is unknown"
+    if launched_expected["process_name"].casefold() not in _ACAD_PROCESS_NAMES:
+        return None, "launched process identity is not acad.exe"
     identities = _query_process_identities([launched_pid] + list(pre_existing))
-    if identities is None:
+    if not isinstance(identities, dict):
         return None, "process identity query is unknown"
 
-    launched = identities[launched_pid]
+    launched = identities.get(launched_pid)
+    if not _has_process_identity(launched, present=False):
+        return None, "process identity query is unknown or incomplete"
     launched_reused = False
     if launched["present"]:
-        expected_started = completion.get("launched_start_time_utc")
-        if not isinstance(expected_started, str) or not expected_started:
-            return None, "launched PID is present but its original start time is unknown"
-        if launched.get("start_time_utc") == expected_started:
+        if not _has_process_identity(launched):
+            return None, "launched process identity query is unknown"
+        if _same_process_identity(launched_expected, launched):
             return None, "launched dedicated AutoCAD process is still alive"
         launched_reused = True
 
     for pid, expected in pre_existing.items():
-        current = identities[pid]
+        current = identities.get(pid)
+        if not _has_process_identity(current):
+            return None, "pre-existing user AutoCAD PID %d identity is unknown" % pid
         if not current["present"]:
             return None, "pre-existing user AutoCAD PID %d disappeared" % pid
-        if current.get("process_name", "").casefold() not in ("acad", "acad.exe"):
-            return None, "pre-existing user AutoCAD PID %d was reused" % pid
-        if current.get("start_time_utc") != expected["start_time_utc"]:
+        expected_identity = {"pid": pid, "known": True, "present": True, **expected}
+        if not _same_process_identity(expected_identity, current):
             return None, "pre-existing user AutoCAD PID %d was reused" % pid
 
     return {
@@ -422,6 +481,7 @@ def _build_independent_recovery_receipt(*, completion: Dict[str, Any],
         "recovered_from_launcher_finalization_hang": True,
         "powershell_helper_closed": False,
         "launched_pid": launched_pid,
+        "launched_process_name": completion["launched_process_name"],
         "launched_start_time_utc": completion.get("launched_start_time_utc"),
         "launched_pid_closed": True,
         "launched_pid_reused": launched_reused,
@@ -725,12 +785,35 @@ def run_attended_native_job(staged_dwg: str, run_dir: str, operation: str,
                 receipt_errors.append("operation")
             if not isinstance(envelope.get("launched_pid"), int) or envelope["launched_pid"] <= 0:
                 receipt_errors.append("launched_pid")
+            if not _is_nonempty_string(envelope.get("launched_process_name")):
+                receipt_errors.append("launched_process_name")
+            elif envelope["launched_process_name"].casefold() not in _ACAD_PROCESS_NAMES:
+                receipt_errors.append("launched_process_name")
+            if not _is_nonempty_string(envelope.get("launched_start_time_utc")):
+                receipt_errors.append("launched_start_time_utc")
             if envelope.get("dedicated_instance") is not True:
                 receipt_errors.append("dedicated_instance")
             if envelope.get("timed_out") is not False:
                 receipt_errors.append("timed_out")
             if envelope.get("launched_pid_closed") is not True:
                 receipt_errors.append("launched_pid_closed")
+            if envelope.get("launched_pid_identity_verified") is not True:
+                receipt_errors.append("launched_pid_identity_verified")
+            if not isinstance(envelope.get("launched_pid_reused"), bool):
+                receipt_errors.append("launched_pid_reused")
+            if _pre_existing_identity_map(envelope) is None:
+                receipt_errors.append("pre_existing_processes")
+            if envelope.get("pre_existing_identity_verified") is not True:
+                receipt_errors.append("pre_existing_identity_verified")
+            pre_ids = envelope.get("pre_existing_pids")
+            pre_alive = envelope.get("pre_existing_still_alive")
+            if (not isinstance(pre_ids, list)
+                    or any(not _is_positive_int(pid) for pid in pre_ids)
+                    or len(set(pre_ids)) != len(pre_ids)):
+                receipt_errors.append("pre_existing_pids")
+            if (not isinstance(pre_alive, list) or not isinstance(pre_ids, list)
+                    or pre_alive != pre_ids):
+                receipt_errors.append("pre_existing_still_alive")
             if envelope.get("user_session_touched") is not False:
                 receipt_errors.append("user_session_touched")
             if envelope.get("job_out_present") is not True:
@@ -748,12 +831,6 @@ def run_attended_native_job(staged_dwg: str, run_dir: str, operation: str,
                     receipt_errors.append("recovered_from_launcher_finalization_hang")
                 if envelope.get("powershell_helper_closed") is not True:
                     receipt_errors.append("powershell_helper_closed")
-                if envelope.get("launched_pid_identity_verified") is not True:
-                    receipt_errors.append("launched_pid_identity_verified")
-                if envelope.get("pre_existing_identity_verified") is not True:
-                    receipt_errors.append("pre_existing_identity_verified")
-                if not isinstance(envelope.get("launched_pid_reused"), bool):
-                    receipt_errors.append("launched_pid_reused")
             else:
                 receipt_errors.append("receipt_authority")
             if receipt_errors:

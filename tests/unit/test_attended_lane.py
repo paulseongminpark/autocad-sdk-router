@@ -25,6 +25,7 @@ import json
 import os
 import subprocess
 import sys
+from types import SimpleNamespace
 from pathlib import Path
 
 import pytest
@@ -57,9 +58,17 @@ def _final_attended_receipt(operation: str, job_out: Path) -> dict:
         "receipt_authority": "powershell_launcher",
         "recovered_from_launcher_finalization_hang": False,
         "launched_pid": 4242,
+        "launched_process_name": "acad",
+        "launched_start_time_utc": "2026-08-10T00:00:00.0000000Z",
         "dedicated_instance": True,
         "timed_out": False,
         "launched_pid_closed": True,
+        "launched_pid_identity_verified": True,
+        "launched_pid_reused": False,
+        "pre_existing_pids": [],
+        "pre_existing_processes": [],
+        "pre_existing_still_alive": [],
+        "pre_existing_identity_verified": True,
         "user_session_touched": False,
         "job_out": str(job_out),
         "job_out_present": True,
@@ -77,6 +86,7 @@ def _completion_receipt(operation: str, job_out: Path, *, cleanup_wait_sec: int 
         "run_id": "run",
         "operation": operation,
         "launched_pid": 4242,
+        "launched_process_name": "acad",
         "launched_start_time_utc": "2026-08-10T00:00:00.0000000Z",
         "dedicated_instance": True,
         "timed_out": False,
@@ -671,6 +681,165 @@ def test_independent_recovery_blocks_when_process_identity_is_unknown(tmp_path, 
     assert error is not None and "unknown" in error
 
 
+def test_process_identity_query_distinguishes_known_absent_from_query_failure(monkeypatch):
+    """A successful query reports an absent PID explicitly; command/parsing
+    failure remains ``None`` and cannot be interpreted as process exit."""
+    monkeypatch.setattr(
+        al.subprocess,
+        "run",
+        lambda *args, **kwargs: SimpleNamespace(
+            returncode=0,
+            stdout=json.dumps({
+                "processes": [{
+                    "pid": 4242,
+                    "known": True,
+                    "present": False,
+                    "process_name": None,
+                    "start_time_utc": None,
+                }]
+            }),
+        ),
+    )
+    absent = al._query_process_identities([4242])
+    assert absent is not None
+    assert absent[4242]["present"] is False
+
+    monkeypatch.setattr(
+        al.subprocess,
+        "run",
+        lambda *args, **kwargs: SimpleNamespace(returncode=0, stdout='{"processes":[]}'),
+    )
+    assert al._query_process_identities([4242]) is None
+
+
+def test_independent_recovery_blocks_when_launched_start_time_is_unknown(tmp_path, monkeypatch):
+    """A gone PID is not enough: the original launched identity must include
+    a nonempty start time before recovery can certify it as closed."""
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    job_out = run_dir / "job_out.json"
+    job_out.write_text(json.dumps({"status": "ok", "result": {}}), encoding="utf-8")
+    (run_dir / "security_before.txt").write_text("0\nC:/trusted\n", encoding="utf-8")
+    (run_dir / "security_after.txt").write_text("0\nC:/trusted\n", encoding="utf-8")
+    completion = _completion_receipt("write.entity.hatch", job_out)
+    completion["launched_start_time_utc"] = None
+    monkeypatch.setattr(al, "_query_process_identities", lambda pids: {
+        4242: {"pid": 4242, "known": True, "present": False,
+               "process_name": None, "start_time_utc": None},
+    })
+
+    receipt, error = al._build_independent_recovery_receipt(
+        completion=completion,
+        completion_path=run_dir / "attended_job_completion.json",
+        final_path=run_dir / "attended_job_final_receipt.json",
+        job_out_path=job_out,
+        security_before_path=run_dir / "security_before.txt",
+        security_after_path=run_dir / "security_after.txt",
+    )
+
+    assert receipt is None
+    assert error is not None and "start time" in error
+
+
+def test_independent_recovery_blocks_when_identity_query_returns_empty_mapping(tmp_path, monkeypatch):
+    """An empty query result is not the same as a successful absent-PID
+    record; missing requested records must remain unknown and fail closed."""
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    job_out = run_dir / "job_out.json"
+    job_out.write_text(json.dumps({"status": "ok", "result": {}}), encoding="utf-8")
+    (run_dir / "security_before.txt").write_text("0\nC:/trusted\n", encoding="utf-8")
+    (run_dir / "security_after.txt").write_text("0\nC:/trusted\n", encoding="utf-8")
+    completion = _completion_receipt("write.entity.hatch", job_out)
+    monkeypatch.setattr(al, "_query_process_identities", lambda pids: {})
+
+    receipt, error = al._build_independent_recovery_receipt(
+        completion=completion,
+        completion_path=run_dir / "attended_job_completion.json",
+        final_path=run_dir / "attended_job_final_receipt.json",
+        job_out_path=job_out,
+        security_before_path=run_dir / "security_before.txt",
+        security_after_path=run_dir / "security_after.txt",
+    )
+
+    assert receipt is None
+    assert error is not None and "unknown" in error
+
+
+def test_independent_recovery_reports_launched_pid_reuse(tmp_path, monkeypatch):
+    """A different process at the captured PID is reported as reuse, not as
+    the original launched process still being alive."""
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    job_out = run_dir / "job_out.json"
+    job_out.write_text(json.dumps({"status": "ok", "result": {}}), encoding="utf-8")
+    (run_dir / "security_before.txt").write_text("0\nC:/trusted\n", encoding="utf-8")
+    (run_dir / "security_after.txt").write_text("0\nC:/trusted\n", encoding="utf-8")
+    completion = _completion_receipt("write.entity.hatch", job_out)
+    monkeypatch.setattr(al, "_query_process_identities", lambda pids: {
+        4242: {"pid": 4242, "known": True, "present": True,
+               "process_name": "acad", "start_time_utc": "2026-08-10T00:01:00.0000000Z"},
+    })
+
+    receipt, error = al._build_independent_recovery_receipt(
+        completion=completion,
+        completion_path=run_dir / "attended_job_completion.json",
+        final_path=run_dir / "attended_job_final_receipt.json",
+        job_out_path=job_out,
+        security_before_path=run_dir / "security_before.txt",
+        security_after_path=run_dir / "security_after.txt",
+    )
+
+    assert error is None
+    assert receipt is not None
+    assert receipt["launched_pid_identity_verified"] is True
+    assert receipt["launched_pid_reused"] is True
+
+
+def test_powershell_authority_requires_identity_booleans(tmp_path, monkeypatch):
+    """The Python validator must not trust the normal launcher authority
+    unless it explicitly proves both launched and pre-existing identities."""
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    staged = tmp_path / "staged.dwg"
+    staged.write_bytes(b"fake-dwg")
+    launcher = tmp_path / "run_attended_job.ps1"
+    launcher.write_text("# stub\n", encoding="utf-8")
+    job_out = run_dir / "job_out.json"
+    native = {"status": "ok", "result": {"created": True}}
+
+    class _FakeProc:
+        returncode = 0
+
+        def poll(self):
+            return self.returncode
+
+        def kill(self):
+            pass
+
+        def wait(self, timeout=None):
+            pass
+
+    def fake_popen(cmd, **kwargs):
+        job_out.write_text(json.dumps(native), encoding="utf-8")
+        receipt = _final_attended_receipt("write.entity.hatch", job_out)
+        receipt.pop("pre_existing_identity_verified")
+        receipt.pop("launched_pid_identity_verified")
+        (run_dir / "attended_job_final_receipt.json").write_text(
+            json.dumps(receipt), encoding="utf-8"
+        )
+        return _FakeProc()
+
+    monkeypatch.setattr(subprocess, "Popen", fake_popen)
+    res = al.run_attended_native_job(
+        str(staged), str(run_dir), "write.entity.hatch", {}, ps1_launcher=str(launcher)
+    )
+
+    assert res["result"] is None
+    assert res["staged_used"] is None
+    assert res["error"] is not None and "identity" in res["error"]
+
+
 def test_run_attended_native_job_genuine_timeout_when_neither_file_appears(tmp_path, monkeypatch):
     """No fake success on the OTHER side either: if the CAD job produced
     NEITHER job_out.json NOR a final launcher receipt before the outer
@@ -912,14 +1081,32 @@ def test_ps1_sets_the_job_args_env_var_before_launch(ps1_src: str):
 
 
 def test_ps1_never_attaches_to_a_pre_existing_session(ps1_src: str):
-    """Gate 1: record pre-existing acad PIDs BEFORE launch; abort without
-    driving if the launched PID somehow collides; only ever Stop-Process the
-    launched PID, never a pre-existing one."""
-    assert "$preProcesses = @(" in ps1_src
-    assert "Get-Process acad -ErrorAction SilentlyContinue" in ps1_src
-    assert "start_time_utc = $started" in ps1_src
-    assert "$dedicatedOk = ($preIds -notcontains $launchedPid)" in ps1_src
-    assert "Stop-Process -Id $launchedPid -Force" in ps1_src
+    """Gate 1 records complete identities before launch and only closes the
+    exact launched process object after identity revalidation."""
+    assert "function Get-AcadProcessSnapshot" in ps1_src
+    assert "$preSnapshot = Get-AcadProcessSnapshot" in ps1_src
+    assert "identity_known = $true" in ps1_src
+    assert "$preIdentityKnown" in ps1_src
+    assert "Same-ProcessIdentity" in ps1_src
+    assert "Stop-Process -InputObject $proc -Force" in ps1_src
+    assert "Stop-Process -Id $launchedPid -Force" not in ps1_src
+
+
+def test_ps1_receipt_requires_and_reports_process_identity_evidence(ps1_src: str):
+    """PID intersections are not sufficient evidence for either side of the
+    lifecycle.  The receipt must carry explicit identity verification flags
+    and a separate PID-reuse result."""
+    for field in (
+        "pre_existing_identity_verified = $preExistingIdentityVerified",
+        "launched_pid_identity_verified = $launchedPidIdentityVerified",
+        "launched_pid_reused = $launchedPidReused",
+        "launched_process_name = $launchedProcessName",
+        "launched_start_time_utc = $launchedStartTimeUtc",
+    ):
+        assert field in ps1_src
+    assert "Get-ProcessIdentityById" in ps1_src
+    assert "$postEnumerationKnown" in ps1_src
+    assert "$preIds | Where-Object" not in ps1_src
 
 
 def test_ps1_has_a_hard_timeout_and_taskkill_fallback(ps1_src: str):
@@ -932,11 +1119,19 @@ def test_ps1_teardown_prefers_the_launched_process_handle_and_bounds_taskkill(ps
     """An exited Process object is stronger evidence than a numeric PID, which
     can be reused. The fallback must also be bounded so it cannot postpone the
     final safety receipt indefinitely."""
-    assert "if ($null -ne $proc)" in ps1_src
-    assert "$stillRunning = -not $proc.HasExited" in ps1_src
+    assert "$launchedPid -and $launchedIdentityKnown -and $null -ne $proc" in ps1_src
+    assert "$proc.Refresh()" in ps1_src
+    assert "Stop-Process -InputObject $proc -Force" in ps1_src
+    assert "Stop-Process -InputObject $taskkillProc -Force" in ps1_src
     assert "$taskkillProc.WaitForExit(10000)" in ps1_src
     assert "$launchedExited = $false" in ps1_src
-    assert "$launchedExited = $proc.HasExited" in ps1_src
+    assert "$launchedPidIdentityVerified" in ps1_src
+    assert "Get-Process -Id $ProcessId" in ps1_src
+    assert "Stop-Process -Id $launchedPid" not in ps1_src
+    revalidate_idx = ps1_src.index("$taskkillTarget = Get-ProcessIdentityById $launchedPid")
+    taskkill_idx = ps1_src.index("Start-Process -FilePath 'taskkill.exe'")
+    assert revalidate_idx < taskkill_idx
+    assert "Same-ProcessIdentity $launchedIdentity $taskkillTarget" in ps1_src
 
 
 def test_ps1_writes_a_compact_atomic_completion_receipt_before_cleanup(ps1_src: str):
@@ -953,7 +1148,7 @@ def test_ps1_writes_a_compact_atomic_completion_receipt_before_cleanup(ps1_src: 
     assert "cleanup_wait_sec = $completionCleanupWaitSec" in ps1_src
     assert "WriteJsonAtomic $completion $completionReceipt" in ps1_src
     assert ps1_src.index("WriteJsonAtomic $completion $completionReceipt") < ps1_src.index(
-        "# ---- teardown: close ONLY the launched PID"
+        "# ---- teardown: close ONLY the launched process handle"
     )
     assert "result = $jobOutObj" not in ps1_src
     assert "phase = 'finalized'" in ps1_src
