@@ -188,7 +188,7 @@ function Get-NativeSourceGitState {
   $git = Get-Command git -CommandType Application -ErrorAction SilentlyContinue
   if (-not $git) { return $unknown }
   try {
-    $headLines = & $git.Source -c "safe.directory=$RouterHome" -C $RouterHome rev-parse HEAD 2>$null
+    $headLines = & $git.Source -C $RouterHome rev-parse HEAD 2>$null
     if ($LASTEXITCODE -ne 0) { return $unknown }
     $head = (@($headLines) -join "`n").Trim()
     if ([string]::IsNullOrWhiteSpace($head)) { return $unknown }
@@ -197,7 +197,6 @@ function Get-NativeSourceGitState {
     # inventory's output exclusions, so build output cannot make source state
     # look dirty either.
     $statusArgs = @(
-      '-c', "safe.directory=$RouterHome",
       '-C', $RouterHome,
       'status', '--porcelain=v1', '--untracked-files=all', '--',
       'src/Ariadne.AcadNative',

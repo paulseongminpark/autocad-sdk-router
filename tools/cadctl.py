@@ -300,12 +300,9 @@ def _native_source_git_state(router_home: Path) -> dict:
         "native_source_status_sha256": "UNKNOWN",
     }
     try:
-        safe_directory = f"safe.directory={router_home.resolve()}"
         head_result = subprocess.run(
             [
                 "git",
-                "-c",
-                safe_directory,
                 "-C",
                 str(router_home),
                 "rev-parse",
@@ -324,8 +321,6 @@ def _native_source_git_state(router_home: Path) -> dict:
         status_result = subprocess.run(
             [
                 "git",
-                "-c",
-                safe_directory,
                 "-C",
                 str(router_home),
                 "status",
