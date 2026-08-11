@@ -35,7 +35,11 @@ def _copy_committed_fixture(tmp_path: Path) -> tuple[Path, Path]:
         Path("src") / "Ariadne.AcadNative",
         Path("src") / "Ariadne.AcadNativeDbx",
     ):
-        shutil.copytree(ROOT / relative, router / relative)
+        shutil.copytree(
+            ROOT / relative,
+            router / relative,
+            ignore=shutil.ignore_patterns("bin", "obj"),
+        )
     recipe = Path("tools") / "build_native_acad.ps1"
     (router / recipe).parent.mkdir(parents=True)
     shutil.copy2(ROOT / recipe, router / recipe)
