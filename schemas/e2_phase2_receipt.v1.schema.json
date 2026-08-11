@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ariadne.local/schemas/e2_phase2_receipt.v1.schema.json",
+  "title": "E2 model-assisted jury receipt",
+  "type": "object",
+  "required": ["schema", "status", "experiment_id", "outputs", "claim_boundary"],
+  "properties": {
+    "schema": {"const": "e2.phase2_receipt.v1"},
+    "status": {"enum": ["PASS", "PARTIAL_PASS", "PASS_WITH_DEFERRAL", "BLOCKED", "RETRACTED"]},
+    "experiment_id": {"type": "string", "minLength": 1, "pattern": "\\S"},
+    "source": {"type": "object", "required": ["path", "sha256", "read_only"]},
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["gate", "status", "evidence"],
+        "properties": {
+          "gate": {"type": "string"},
+          "status": {"enum": ["PASS", "PARTIAL_PASS", "PASS_WITH_DEFERRAL", "BLOCKED", "RETRACTED"]},
+          "evidence": {"type": "string"}
+        }
+      }
+    },
+    "inputs": {"type": "array", "items": {"type": "object"}},
+    "outputs": {"type": "array", "items": {"type": "object"}},
+    "headline": {"type": "object"},
+    "claim_boundary": {"type": "string"},
+    "reason_code": {"type": "string"},
+    "reason": {"type": "string"},
+    "requested_source": {"type": ["object", "null"]},
+    "executed": {"type": "boolean"},
+    "terminal_authorized": {"type": "boolean"},
+    "model_runtime_loaded": {"type": "boolean"},
+    "jury_constructed": {"type": "boolean"}
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": ["reason_code"],
+        "properties": {
+          "reason_code": {"const": "SEALED_DOWNSTREAM_EXECUTOR_REQUIRED"}
+        }
+      },
+      "then": {
+        "required": [
+          "reason",
+          "requested_source",
+          "executed",
+          "terminal_authorized",
+          "model_runtime_loaded",
+          "jury_constructed"
+        ],
+        "properties": {
+          "status": {"const": "BLOCKED"},
+          "executed": {"const": false},
+          "terminal_authorized": {"const": false},
+          "model_runtime_loaded": {"const": false},
+          "jury_constructed": {"const": false},
+          "outputs": {"maxItems": 0}
+        }
+      },
+      "else": {
+        "required": ["source", "gates", "inputs", "headline"]
+      }
+    }
+  ]
+}

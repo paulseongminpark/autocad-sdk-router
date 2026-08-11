@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ariadne.local/schemas/e2_model_assisted_spec.v1.schema.json",
+  "title": "E2 model-assisted jury specification",
+  "type": "object",
+  "required": ["schema", "experiment_id", "created_at", "target", "source", "first_run", "frozen_transfer_harness", "required_interventions", "review_policy"],
+  "properties": {
+    "schema": {"const": "e2.model_assisted_spec.v1"},
+    "experiment_id": {"type": "string", "minLength": 1},
+    "created_at": {"type": "string"},
+    "target": {"type": "string", "minLength": 1},
+    "source": {
+      "type": "object",
+      "required": ["path", "sha256", "read_only"],
+      "properties": {
+        "path": {"type": "string"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+        "read_only": {"const": true}
+      }
+    },
+    "first_run": {"type": "string"},
+    "frozen_transfer_harness": {"type": "string"},
+    "required_interventions": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "review_policy": {
+      "type": "object",
+      "required": ["public_limit", "audit_count", "sealed_holdout_count"],
+      "properties": {
+        "public_limit": {"type": "integer", "minimum": 0},
+        "audit_count": {"type": "integer", "minimum": 0},
+        "sealed_holdout_count": {"type": "integer", "minimum": 1}
+      }
+    }
+  }
+}

@@ -147,6 +147,152 @@ def _canonical_endpoints(p0: np.ndarray, p1: np.ndarray) -> tuple[np.ndarray, np
     return (p0, p1) if left <= right else (p1, p0)
 
 
+def _signed_area(points: Sequence[np.ndarray]) -> float:
+    return 0.5 * sum(
+        float(points[index][0] * points[(index + 1) % len(points)][1])
+        - float(points[(index + 1) % len(points)][0] * points[index][1])
+        for index in range(len(points))
+    )
+
+
+def _clip_spec(
+    entity: Mapping[str, Any], parent_transform: np.ndarray, child_transform: np.ndarray
+) -> dict[str, Any] | None:
+    raw_clip = entity.get("clip")
+    if not isinstance(raw_clip, Mapping):
+        return None
+    raw_boundary = raw_clip.get("boundary_owner")
+    if not isinstance(raw_boundary, list) or len(raw_boundary) < 2:
+        raise OracleFailure("INVALID_XCLIP", "XCLIP boundary requires at least two points")
+    owner_points = [_point2(point, "XCLIP boundary point") for point in raw_boundary]
+    if len(owner_points) == 2:
+        x0 = min(float(owner_points[0][0]), float(owner_points[1][0]))
+        y0 = min(float(owner_points[0][1]), float(owner_points[1][1]))
+        x1 = max(float(owner_points[0][0]), float(owner_points[1][0]))
+        y1 = max(float(owner_points[0][1]), float(owner_points[1][1]))
+        if x1 - x0 <= GEOMETRY_EPSILON or y1 - y0 <= GEOMETRY_EPSILON:
+            raise OracleFailure("DEGENERATE_XCLIP", "rectangular XCLIP has zero area")
+        owner_points = [
+            np.array([x0, y0]),
+            np.array([x1, y0]),
+            np.array([x1, y1]),
+            np.array([x0, y1]),
+        ]
+    boundary_space = str(raw_clip.get("boundary_space") or "owner_definition")
+    if boundary_space == "referenced_block_local":
+        clip_to_world = child_transform
+    elif boundary_space == "owner_definition":
+        clip_to_world = parent_transform
+    else:
+        raise OracleFailure(
+            "INVALID_XCLIP_SPACE",
+            f"unsupported XCLIP boundary space {boundary_space!r}",
+        )
+    world_points = [_apply(clip_to_world, point) for point in owner_points]
+    area = _signed_area(world_points)
+    if abs(area) <= GEOMETRY_EPSILON:
+        raise OracleFailure("DEGENERATE_XCLIP", "XCLIP polygon has zero area")
+    return {
+        "polygon": world_points,
+        "inverted": bool(raw_clip.get("inverted", False)),
+    }
+
+
+def _cross2(a: np.ndarray, b: np.ndarray) -> float:
+    return float(a[0] * b[1] - a[1] * b[0])
+
+
+def _point_on_segment(point: np.ndarray, a: np.ndarray, b: np.ndarray) -> bool:
+    edge = b - a
+    offset = point - a
+    if abs(_cross2(edge, offset)) > GEOMETRY_EPSILON * max(1.0, float(np.linalg.norm(edge))):
+        return False
+    projection = float(np.dot(offset, edge))
+    return -GEOMETRY_EPSILON <= projection <= float(np.dot(edge, edge)) + GEOMETRY_EPSILON
+
+
+def _point_in_polygon(point: np.ndarray, polygon: Sequence[np.ndarray]) -> bool:
+    inside = False
+    x, y = float(point[0]), float(point[1])
+    for index in range(len(polygon)):
+        a = polygon[index]
+        b = polygon[(index + 1) % len(polygon)]
+        if _point_on_segment(point, a, b):
+            return True
+        ay, by = float(a[1]), float(b[1])
+        if (ay > y) == (by > y):
+            continue
+        x_cross = float(a[0]) + (y - ay) * (float(b[0]) - float(a[0])) / (by - ay)
+        if x < x_cross:
+            inside = not inside
+    return inside
+
+
+def _inside_intervals(
+    p0: np.ndarray,
+    p1: np.ndarray,
+    polygon: Sequence[np.ndarray],
+) -> list[tuple[float, float]]:
+    direction = p1 - p0
+    denominator = float(np.dot(direction, direction))
+    if denominator <= GEOMETRY_EPSILON:
+        return []
+    breaks = [0.0, 1.0]
+    for index in range(len(polygon)):
+        a = polygon[index]
+        edge = polygon[(index + 1) % len(polygon)] - a
+        delta = a - p0
+        cross = _cross2(direction, edge)
+        if abs(cross) > GEOMETRY_EPSILON:
+            t = _cross2(delta, edge) / cross
+            u = _cross2(delta, direction) / cross
+            if -GEOMETRY_EPSILON <= t <= 1.0 + GEOMETRY_EPSILON and -GEOMETRY_EPSILON <= u <= 1.0 + GEOMETRY_EPSILON:
+                breaks.append(min(1.0, max(0.0, t)))
+            continue
+        if abs(_cross2(delta, direction)) <= GEOMETRY_EPSILON:
+            for endpoint in (a, a + edge):
+                t = float(np.dot(endpoint - p0, direction)) / denominator
+                if -GEOMETRY_EPSILON <= t <= 1.0 + GEOMETRY_EPSILON:
+                    breaks.append(min(1.0, max(0.0, t)))
+    ordered: list[float] = []
+    for value in sorted(breaks):
+        if not ordered or value - ordered[-1] > GEOMETRY_EPSILON:
+            ordered.append(value)
+    intervals: list[tuple[float, float]] = []
+    for start, end in zip(ordered, ordered[1:]):
+        if end - start <= GEOMETRY_EPSILON:
+            continue
+        midpoint = p0 + ((start + end) / 2.0) * direction
+        if _point_in_polygon(midpoint, polygon):
+            intervals.append((start, end))
+    return intervals
+
+
+def _apply_clip(
+    fragments: list[tuple[np.ndarray, np.ndarray]],
+    clip_spec: Mapping[str, Any],
+) -> list[tuple[np.ndarray, np.ndarray]]:
+    polygon = clip_spec["polygon"]
+    inverted = bool(clip_spec.get("inverted", False))
+    output: list[tuple[np.ndarray, np.ndarray]] = []
+    for p0, p1 in fragments:
+        inside = _inside_intervals(p0, p1, polygon)
+        direction = p1 - p0
+        selected = inside
+        if inverted:
+            selected = []
+            cursor = 0.0
+            for start, end in inside:
+                if start - cursor > GEOMETRY_EPSILON:
+                    selected.append((cursor, start))
+                cursor = max(cursor, end)
+            if 1.0 - cursor > GEOMETRY_EPSILON:
+                selected.append((cursor, 1.0))
+        for start, end in selected:
+            output.append((p0 + start * direction, p0 + end * direction))
+    return output
+
+
 def _entity_kind(entity: Mapping[str, Any]) -> str:
     raw = entity.get("kind", entity.get("type", entity.get("dxftype", "")))
     return str(raw).strip().upper().replace("-", "_")
@@ -322,6 +468,7 @@ def _adapt_flat_seg_ir(ir: Mapping[str, Any]) -> dict[str, Any]:
             "kind": segment.get("kind", "SEGMENT"),
             "handle": _as_handle(handle, f"segment {index} handle/sid"),
             "pts": segment.get("pts", segment.get("points")),
+            "layer": segment.get("source_layer", segment.get("layer", "")),
         }
         entities.append(entity)
     return {
@@ -372,18 +519,24 @@ def expand_world_ir(
         "reachable_primitive_entity_instances": 0,
         "reachable_insert_placements": 0,
         "expected_segment_instances": 0,
+        "visible_source_segment_instances": 0,
         "emitted_segment_instances": 0,
+        "clipped_away_segment_instances": 0,
+        "partially_clipped_segment_instances": 0,
+        "clip_generated_fragment_instances": 0,
         "empty_block_placements": 0,
         "discarded_partial_segments": 0,
         "conservation_delta": 0,
         "conservation_ok": False,
         "entity_entries": [],
+        "placement_paths": {},
         "zero_output_entries": [],
     }
     failures: list[dict[str, Any]] = []
     placed: list[dict[str, Any]] = []
     input_mode = "unknown"
     drawing_id = "unknown"
+    adapter_ledger: dict[str, Any] | None = None
 
     try:
         if max_depth < 0:
@@ -393,6 +546,8 @@ def expand_world_ir(
         ir = _canonical_input(input_ir)
         input_mode = str(ir.get("_input_mode", "definition_graph"))
         drawing_id = str(ir.get("drawing_id", "unknown"))
+        if isinstance(ir.get("adapter_ledger"), Mapping):
+            adapter_ledger = dict(ir["adapter_ledger"])
         raw_definitions = ir.get("definitions")
         if not isinstance(raw_definitions, Mapping) or not raw_definitions:
             raise OracleFailure("INVALID_INPUT", "definitions must be a non-empty object")
@@ -449,6 +604,7 @@ def expand_world_ir(
             active_edges: frozenset[tuple[str, str, str, int, int]],
             depth: int,
             inherited_array_member: bool,
+            active_clips: tuple[dict[str, Any], ...],
         ) -> None:
             if depth > max_depth:
                 raise OracleFailure(
@@ -458,6 +614,18 @@ def expand_world_ir(
                     placement_path_uid=path_uid,
                 )
             definition = definitions[definition_handle]
+            ledger["placement_paths"][path_uid] = {
+                "source_def_handle": definition_handle,
+                "lineage_path": copy.deepcopy(lineage_path),
+                "active_xclips": [
+                    {
+                        "source_def_handle": str(clip.get("source_def_handle") or ""),
+                        "insert_entity_handle": str(clip.get("insert_entity_handle") or ""),
+                        "inverted": bool(clip.get("inverted", False)),
+                    }
+                    for clip in active_clips
+                ],
+            }
             entities = definition["entities"]
             if not entities:
                 ledger["empty_block_placements"] += 1
@@ -524,6 +692,12 @@ def expand_world_ir(
                                 "array_col_index": column,
                             }
                             ledger["reachable_insert_placements"] += 1
+                            clip_polygon = _clip_spec(entity, parent_transform, world_transform)
+                            child_clips = active_clips
+                            if clip_polygon is not None:
+                                clip_polygon["source_def_handle"] = definition_handle
+                                clip_polygon["insert_entity_handle"] = entity_handle
+                                child_clips = active_clips + (clip_polygon,)
                             visit(
                                 target_handle,
                                 world_transform,
@@ -532,6 +706,7 @@ def expand_world_ir(
                                 active_edges | {edge_key},
                                 depth + 1,
                                 inherited_array_member or is_array,
+                                child_clips,
                             )
                     continue
 
@@ -558,6 +733,8 @@ def expand_world_ir(
                     )
 
                 before = len(placed)
+                clipped_before = ledger["clipped_away_segment_instances"]
+                visible_before = ledger["visible_source_segment_instances"]
                 linear = parent_transform[:2, :2]
                 determinant = float(np.linalg.det(linear))
                 singular_values = np.linalg.svd(linear, compute_uv=False)
@@ -578,42 +755,67 @@ def expand_world_ir(
                             source_def_handle=definition_handle,
                             placement_path_uid=path_uid,
                         )
-                    p0_world, p1_world = _canonical_endpoints(p0_world, p1_world)
-                    placed_uid = _hash_parts(path_uid, entity_handle, ordinal)
-                    placed.append(
-                        {
-                            "placed_uid": placed_uid,
-                            "lineage_id": placed_uid,
-                            "source_entity_handle": entity_handle,
-                            "source_def_handle": definition_handle,
-                            "root_def_handle": root_handle,
-                            "placement_path_uid": path_uid,
-                            "lineage_path": copy.deepcopy(lineage_path),
-                            "subentity_ordinal": ordinal,
-                            "kind": str(local_segment.get("kind", "segment")),
-                            "p0_world": [float(p0_world[0]), float(p0_world[1])],
-                            "p1_world": [float(p1_world[0]), float(p1_world[1])],
-                            "transform_flags": {
-                                "mirrored": determinant < 0.0,
-                                "nonuniform_scaled": nonuniform,
-                                "array_member": inherited_array_member,
-                            },
-                        }
+                    fragments = [(p0_world, p1_world)]
+                    for clip_spec in active_clips:
+                        fragments = _apply_clip(fragments, clip_spec)
+                        if not fragments:
+                            break
+                    if not fragments:
+                        ledger["clipped_away_segment_instances"] += 1
+                        continue
+                    ledger["visible_source_segment_instances"] += 1
+                    changed_by_clip = (
+                        len(fragments) != 1
+                        or float(np.linalg.norm(fragments[0][0] - p0_world)) > GEOMETRY_EPSILON
+                        or float(np.linalg.norm(fragments[0][1] - p1_world)) > GEOMETRY_EPSILON
                     )
-                    ledger["emitted_segment_instances"] += 1
-                    if len(placed) > max_instances:
-                        raise OracleFailure(
-                            "RESOURCE_MAX_INSTANCES",
-                            f"maximum segment instances {max_instances} exceeded",
-                            entity_handle=entity_handle,
-                            source_def_handle=definition_handle,
-                            placement_path_uid=path_uid,
+                    if changed_by_clip:
+                        ledger["partially_clipped_segment_instances"] += 1
+                    ledger["clip_generated_fragment_instances"] += max(0, len(fragments) - 1)
+                    for fragment_ordinal, (fragment_p0, fragment_p1) in enumerate(fragments):
+                        fragment_p0, fragment_p1 = _canonical_endpoints(fragment_p0, fragment_p1)
+                        placed_uid = _hash_parts(
+                            path_uid, entity_handle, ordinal, fragment_ordinal
                         )
+                        placed.append(
+                            {
+                                "placed_uid": placed_uid,
+                                "lineage_id": placed_uid,
+                                "source_entity_handle": entity_handle,
+                                "source_def_handle": definition_handle,
+                                "source_layer": str(entity.get("layer") or ""),
+                                "root_def_handle": root_handle,
+                                "placement_path_uid": path_uid,
+                                "lineage_path": copy.deepcopy(lineage_path),
+                                "subentity_ordinal": ordinal,
+                                "clip_fragment_ordinal": fragment_ordinal,
+                                "kind": str(local_segment.get("kind", "segment")),
+                                "p0_world": [float(fragment_p0[0]), float(fragment_p0[1])],
+                                "p1_world": [float(fragment_p1[0]), float(fragment_p1[1])],
+                                "transform_flags": {
+                                    "mirrored": determinant < 0.0,
+                                    "nonuniform_scaled": nonuniform,
+                                    "array_member": inherited_array_member,
+                                    "clipped": changed_by_clip,
+                                },
+                            }
+                        )
+                        ledger["emitted_segment_instances"] += 1
+                        if len(placed) > max_instances:
+                            raise OracleFailure(
+                                "RESOURCE_MAX_INSTANCES",
+                                f"maximum segment instances {max_instances} exceeded",
+                                entity_handle=entity_handle,
+                                source_def_handle=definition_handle,
+                                placement_path_uid=path_uid,
+                            )
                 emitted_count = len(placed) - before
-                if emitted_count != expected_count:
+                clipped_count = ledger["clipped_away_segment_instances"] - clipped_before
+                visible_count = ledger["visible_source_segment_instances"] - visible_before
+                if visible_count + clipped_count != expected_count:
                     raise OracleFailure(
                         "SILENT_DROP",
-                        f"entity {entity_handle}: transformed emission mismatch",
+                        f"entity {entity_handle}: source-segment clip accounting mismatch",
                         entity_handle=entity_handle,
                         source_def_handle=definition_handle,
                         placement_path_uid=path_uid,
@@ -622,10 +824,17 @@ def expand_world_ir(
                     {
                         "source_def_handle": definition_handle,
                         "source_entity_handle": entity_handle,
+                        "source_layer": str(entity.get("layer") or ""),
                         "placement_path_uid": path_uid,
                         "expected_segments": expected_count,
+                        "visible_source_segments": visible_count,
                         "emitted_segments": emitted_count,
-                        "status": "PRESERVED",
+                        "clipped_away_segments": clipped_count,
+                        "status": (
+                            "CLIPPED"
+                            if clipped_count or emitted_count != visible_count
+                            else "PRESERVED"
+                        ),
                     }
                 )
 
@@ -637,13 +846,16 @@ def expand_world_ir(
             frozenset(),
             0,
             False,
+            (),
         )
 
         placed_uids = [segment["placed_uid"] for segment in placed]
         if len(placed_uids) != len(set(placed_uids)):
             raise OracleFailure("DUPLICATE_PLACED_UID", "placed_uid values are not unique")
         ledger["conservation_delta"] = (
-            ledger["expected_segment_instances"] - ledger["emitted_segment_instances"]
+            ledger["expected_segment_instances"]
+            - ledger["visible_source_segment_instances"]
+            - ledger["clipped_away_segment_instances"]
         )
         if ledger["conservation_delta"] != 0:
             raise OracleFailure(
@@ -659,13 +871,15 @@ def expand_world_ir(
         failures.append(exc.as_dict())
         ledger["discarded_partial_segments"] = len(placed)
         ledger["conservation_delta"] = (
-            ledger["expected_segment_instances"] - ledger["emitted_segment_instances"]
+            ledger["expected_segment_instances"]
+            - ledger["visible_source_segment_instances"]
+            - ledger["clipped_away_segment_instances"]
         )
         ledger["conservation_ok"] = False
         placed = []
         status = "FAIL"
 
-    return {
+    result = {
         "oracle": ORACLE_VERSION,
         "status": status,
         "drawing_id": drawing_id,
@@ -674,6 +888,9 @@ def expand_world_ir(
         "conservation_ledger": ledger,
         "failure_ledger": failures,
     }
+    if adapter_ledger is not None:
+        result["adapter_ledger"] = adapter_ledger
+    return result
 
 
 @dataclass(frozen=True)
@@ -1157,16 +1374,30 @@ def run_selftest() -> tuple[list[SelfTestResult], str]:
     )
     rename_result_a = expand_world_ir(rename_a)
     rename_result_b = expand_world_ir(rename_b)
+    rename_geometry_a = [
+        {key: value for key, value in segment.items() if key != "source_layer"}
+        for segment in rename_result_a["segments"]
+    ]
+    rename_geometry_b = [
+        {key: value for key, value in segment.items() if key != "source_layer"}
+        for segment in rename_result_b["segments"]
+    ]
+    source_layers_preserved = (
+        [segment.get("source_layer") for segment in rename_result_a["segments"]] == ["WALL_A"]
+        and [segment.get("source_layer") for segment in rename_result_b["segments"]] == ["RENAMED"]
+    )
     rename_equal = (
         rename_result_a["status"] == "PASS"
         and rename_result_b["status"] == "PASS"
-        and rename_result_a["segments"] == rename_result_b["segments"]
+        and rename_geometry_a == rename_geometry_b
+        and source_layers_preserved
     )
     tests.append(
         SelfTestResult(
             "transform_name_rename_parity",
             rename_equal,
-            f"status_a={rename_result_a['status']} status_b={rename_result_b['status']} segment_parity={rename_equal}",
+            f"status_a={rename_result_a['status']} status_b={rename_result_b['status']} "
+            f"geometry_parity={rename_geometry_a == rename_geometry_b} source_layers_preserved={source_layers_preserved}",
         )
     )
 

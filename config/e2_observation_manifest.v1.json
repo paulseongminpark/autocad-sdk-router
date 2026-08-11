@@ -1,0 +1,28 @@
+{
+  "schema": "e2.observation_manifest.v1",
+  "target": "wall and evidence-grounded drawing world model",
+  "required_scopes": [
+    "source_identity",
+    "modelspace_entities",
+    "block_definition_entities",
+    "block_reference_transforms",
+    "xclip_boundaries",
+    "drawing_units",
+    "entity_decode_status",
+    "unsupported_entity_accounting",
+    "world_placement_conservation"
+  ],
+  "claim_classes": {
+    "observed": "A primary native payload contains the field and its source hash matches the DWG.",
+    "preserved": "An independently counted conservation equation balances after transformation.",
+    "excluded": "The source item is named and counted in a loss ledger.",
+    "unknown": "No evidence surface proves presence or absence.",
+    "wall": "Requires labels or human review; geometric candidates alone are not truth."
+  },
+  "fail_closed_rules": [
+    "No absence claim from an unsupported or skipped observation section.",
+    "No model quality metric from an unlabeled drawing.",
+    "No invisible block geometry may enter wall scoring when an active XCLIP excludes it.",
+    "No tool is qualified by process exit code alone."
+  ]
+}

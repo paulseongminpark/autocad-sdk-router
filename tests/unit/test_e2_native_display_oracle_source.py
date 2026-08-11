@@ -238,12 +238,12 @@ def test_linear_scope_preserves_curved_and_unsupported_exclusion_accounting():
     assert "E2PrimitiveSegment" in source
 
 
-def test_xclip_membership_does_not_change_unrelated_block_record_origin_json():
+def test_xclip_membership_remains_separate_from_block_record_json():
     job = JOB_SOURCE.read_text(encoding="utf-8")
     block_record_function = job[job.index("static std::string blockTableRecordsJson") :]
     block_record_function = block_record_function[
         : block_record_function.index("static std::string layoutsRichJson")
     ]
 
-    assert "pBTR->origin()" not in block_record_function
-    assert '\\"origin\\":[' not in block_record_function
+    assert "runE2NativeXclipMembership" not in block_record_function
+    assert "e2.inspect.xclip_membership" not in block_record_function

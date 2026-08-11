@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ariadne.local/schemas/e2_wall_hypotheses.v1.schema.json",
+  "title": "E2 wall hypotheses",
+  "type": "object",
+  "required": ["schema", "status", "source_candidate_count", "hypothesis_count", "accounted_candidate_count", "balance_ok", "hypotheses"],
+  "properties": {
+    "schema": {"const": "e2.wall_hypotheses.v1"},
+    "status": {"const": "PASS"},
+    "source_candidate_count": {"type": "integer", "minimum": 0},
+    "hypothesis_count": {"type": "integer", "minimum": 0},
+    "accounted_candidate_count": {"type": "integer", "minimum": 0},
+    "balance_ok": {"const": true},
+    "hypotheses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["hypothesis_id", "member_handles", "member_count", "bbox_world"],
+        "properties": {
+          "hypothesis_id": {"type": "string", "pattern": "^wh_[0-9a-f]{16}$"},
+          "member_handles": {"type": "array", "minItems": 2, "items": {"type": "string"}},
+          "member_count": {"type": "integer", "minimum": 2},
+          "bbox_world": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "number"}}
+        }
+      }
+    }
+  }
+}

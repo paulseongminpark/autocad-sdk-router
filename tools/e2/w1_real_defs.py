@@ -157,7 +157,7 @@ def _fast_core(P1, P2, D, L, U, ANG, MID, prm, i0_range, i1_range):
 
             d = np.abs(ANG[i0:i1, None] - ANG[None, j0:j1])
             d = np.minimum(d, 180.0 - d)
-            near = (d <= atol) & ~selfmask
+            near = (d <= atol + evidence_grid.ANGLE_EPS_DEG) & ~selfmask
 
             dx1 = P1[j0:j1, 0][None, :] - ip1[:, 0][:, None]
             dy1 = P1[j0:j1, 1][None, :] - ip1[:, 1][:, None]
@@ -169,13 +169,18 @@ def _fast_core(P1, P2, D, L, U, ANG, MID, prm, i0_range, i1_range):
             thi = np.maximum(ta, tb)
             ovlen = np.maximum(np.minimum(il[:, None], thi) - np.maximum(0.0, tlo), 0.0)
             ov = ovlen / np.minimum(il[:, None], L[j0:j1][None, :])
+            # Match the scalar scorer's dimensionless contact tolerance.
+            # This removes coordinate-frame-dependent false overlap at shared
+            # endpoints without changing any material overlap observation.
+            ov = np.where(ov <= evidence_grid.OVERLAP_EPS_RATIO, 0.0, ov)
 
             mx = MID[j0:j1, 0][None, :] - ip1[:, 0][:, None]
             my = MID[j0:j1, 1][None, :] - ip1[:, 1][:, None]
             off = np.abs(mx * (-iu[:, 1][:, None]) + my * (iu[:, 0][:, None]))
 
             cand = near & (ov > 0.0)
-            key_flag = np.where(cand & (ov >= ovmin), 0, np.where(cand, 1, 2)).astype(np.float64)
+            overlap_qualified = ov >= ovmin - evidence_grid.OVERLAP_EPS_RATIO
+            key_flag = np.where(cand & overlap_qualified, 0, np.where(cand, 1, 2)).astype(np.float64)
             key_off = np.where(cand, off, np.inf)
             comp = key_flag * 1e18 + key_off
             bidx = np.argmin(comp, axis=1)
@@ -186,7 +191,12 @@ def _fast_core(P1, P2, D, L, U, ANG, MID, prm, i0_range, i1_range):
             tb_flag[o0:o1][upd] = key_flag[rows, bidx][upd].astype(np.int8)
             tb_off[o0:o1][upd] = key_off[rows, bidx][upd]
 
-            pval = np.where(near & (ov >= ovmin) & (off >= lo) & (off <= hi), ov, 0.0)
+            band_eps = evidence_grid._band_epsilon(lo, hi)
+            pval = np.where(
+                near & overlap_qualified & (off >= lo - band_eps) & (off <= hi + band_eps),
+                ov,
+                0.0,
+            )
             bmax = pval.max(axis=1)
             um = bmax > best_ov[o0:o1]
             best_ov[o0:o1][um] = bmax[um]

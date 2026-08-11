@@ -3499,6 +3499,7 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
                 }
             }
             const std::string handle = handleOf(pBTR);
+            const AcGePoint3d origin = pBTR->origin();
             std::string sortentsJson;
             AcDbSortentsTable* pSortents = nullptr;
             if (pBTR->getSortentsTable(
@@ -3535,6 +3536,7 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
                 << ",\"is_layout\":" << (isLayout ? "true" : "false")
                 << ",\"is_anonymous\":" << (isAnon ? "true" : "false")
                 << ",\"is_xref\":" << (isXref ? "true" : "false")
+                << ",\"origin\":[" << origin.x << "," << origin.y << "," << origin.z << "]"
                 << ",\"entity_count\":" << entityCount;
             if (!sortentsJson.empty())
                 arr << ",\"sortents\":" << sortentsJson;
@@ -3546,7 +3548,8 @@ static std::string blockTableRecordsJson(AcDbDatabase* pDb, int& btrCount,
                     defs << ",";
                 dfirst = false;
                 defs << "{\"handle\":\"" << jsonEscape(handle) << "\""
-                     << ",\"name\":\"" << jsonEscape(name) << "\"";
+                     << ",\"name\":\"" << jsonEscape(name) << "\""
+                     << ",\"origin\":[" << origin.x << "," << origin.y << "," << origin.z << "]";
                 if (isAnon)
                     defs << ",\"anonymous\":true";
                 defs << ",\"entity_count\":" << entityCount

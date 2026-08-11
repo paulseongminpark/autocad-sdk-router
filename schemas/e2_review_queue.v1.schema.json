@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ariadne.local/schemas/e2_review_queue.v1.schema.json",
+  "title": "E2 human review queue",
+  "type": "object",
+  "required": ["schema", "status", "selection_frozen_before_human_labels", "public_total_count", "sealed_holdout_count", "deferred_unqueued_count", "population_balance_ok", "public_and_holdout_disjoint", "public_queue", "sealed_holdout_queue"],
+  "properties": {
+    "schema": {"const": "e2.review_queue.v1"},
+    "status": {"const": "PASS"},
+    "selection_frozen_before_human_labels": {"const": true},
+    "public_total_count": {"type": "integer", "minimum": 0},
+    "sealed_holdout_count": {"type": "integer", "minimum": 1},
+    "deferred_unqueued_count": {"type": "integer", "minimum": 0},
+    "population_balance_ok": {"const": true},
+    "public_and_holdout_disjoint": {"const": true},
+    "public_queue": {"type": "array", "items": {"$ref": "#/$defs/item"}},
+    "sealed_holdout_queue": {"type": "array", "items": {"$ref": "#/$defs/item"}}
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "required": ["hypothesis_id", "lane", "allowed_labels", "human_label", "geometry"],
+      "properties": {
+        "hypothesis_id": {"type": "string"},
+        "lane": {"enum": ["targeted_review", "silver_audit", "consensus_audit", "sealed_holdout"]},
+        "allowed_labels": {"type": "array", "minItems": 4, "maxItems": 4},
+        "human_label": {"type": ["string", "null"]},
+        "geometry": {"type": "object"}
+      }
+    }
+  }
+}
