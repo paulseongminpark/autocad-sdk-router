@@ -11,11 +11,11 @@
                          "path":  "tools/build_native_acad.ps1",
                          "sha256":  "4dd2c9598a07956db8055ffde7532198951609b117d4a6289e0274e5737d2f3c"
                      },
-    "source_tree_digest":  "35822803b71fceeb57602af7df5e50c421fd9ca4799b5bfe2bf58da88836ddd4",
+    "source_tree_digest":  "a446c0c53799586e125ba080938fd7594d7b27ee986aac62c1290a819603fc13",
     "artifacts":  [
                       {
                           "leaf":  "Ariadne.AcadNativeDbx.dbx",
-                          "sha256":  "d5846dde1798cec6fa61be3dffb13e92344eb1599f27ed04dd3885d12d9aaf3f",
+                          "sha256":  "e9d7b866295b89902f6f982e84383a3b385eef8ddd33a2c8a3203a79d7d99283",
                           "bytes":  54272,
                           "current":  true,
                           "exists":  true,
@@ -32,7 +32,7 @@
                       },
                       {
                           "leaf":  "Ariadne.AcadNative.crx",
-                          "sha256":  "65f441e564c0ee4d3937716cc9a5a656d4ef6ac06a14ae6f49fca00d65f6c205",
+                          "sha256":  "4c65e63fb522b1c73aaf9fe91bc8b40e31aae1c9ac22516bfda9e3627ec2f39d",
                           "bytes":  1175552,
                           "current":  true,
                           "exists":  true,
@@ -41,7 +41,7 @@
                                                   "format":  "PE32+",
                                                   "machine":  "0x8664",
                                                   "minimum_bytes":  512,
-                                                  "pe_header_offset":  296,
+                                                  "pe_header_offset":  288,
                                                   "section_count":  6,
                                                   "optional_header_bytes":  240,
                                                   "reason":  "MZ, PE, x64 machine, section table, and PE32+ optional header checks passed."
@@ -49,7 +49,7 @@
                       },
                       {
                           "leaf":  "Ariadne.AcadNative.arx",
-                          "sha256":  "bb58b3cfa7d2a5c639a6b32c2918208105892294a569ba76f90f30670613e150",
+                          "sha256":  "0b498dd165d61a50e0f9facf640695b88477b0f31c663e1c2a5e1c66d0f14271",
                           "bytes":  1184256,
                           "current":  true,
                           "exists":  true,
@@ -58,7 +58,7 @@
                                                   "format":  "PE32+",
                                                   "machine":  "0x8664",
                                                   "minimum_bytes":  512,
-                                                  "pe_header_offset":  288,
+                                                  "pe_header_offset":  280,
                                                   "section_count":  6,
                                                   "optional_header_bytes":  240,
                                                   "reason":  "MZ, PE, x64 machine, section table, and PE32+ optional header checks passed."
