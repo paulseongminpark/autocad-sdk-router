@@ -44,53 +44,16 @@ class _QualificationBundleLock:
         stream.seek(0)
         return raw
 
-    def authorization_digest(
-        self,
-        receipt_path: Path,
-        authorization_context: Mapping[str, Any],
-    ) -> str:
-        receipt_key = receipt_path.resolve(strict=True)
-        receipt_raw = self._read_stream(self._streams[receipt_key])
-        receipt = json.loads(
-            receipt_raw.decode("utf-8-sig"),
-            parse_constant=lambda token: (_ for _ in ()).throw(
-                ValueError(f"non-finite JSON number {token!r}")
-            ),
-        )
-        if not isinstance(receipt, Mapping):
-            raise ValueError("qualification receipt must be a JSON object")
-        hashes: dict[str, dict[str, str]] = {"evidence": {}, "outputs": {}}
-        for section in ("evidence", "outputs"):
-            records = receipt.get(section)
-            if not isinstance(records, list):
-                raise ValueError(f"qualification receipt {section} must be a list")
-            for record in records:
-                if not isinstance(record, Mapping):
-                    raise ValueError(f"qualification receipt {section} record must be an object")
-                role = record.get("role")
-                relative = record.get("path")
-                if not isinstance(role, str) or not isinstance(relative, str):
-                    raise ValueError("qualification bundle record is incomplete")
-                key = (receipt_path.parent / relative).resolve(strict=True)
-                raw = self._read_stream(self._streams[key])
-                hashes[section][role] = hashlib.sha256(raw).hexdigest()
-        material = {
-            "receipt_sha256": hashlib.sha256(receipt_raw).hexdigest(),
-            "evidence_sha256": dict(sorted(hashes["evidence"].items())),
-            "output_sha256": dict(sorted(hashes["outputs"].items())),
-            "authorization_context": dict(authorization_context),
+    def bound_file_snapshot(self, path: Path) -> dict[str, Any]:
+        key = path.resolve(strict=True)
+        stream = self._streams[key]
+        raw = self._read_stream(stream)
+        return {
+            "canonical_target": str(key),
+            "sha256": hashlib.sha256(raw).hexdigest(),
+            "file_identity": _native_file_identity(os.fstat(stream.fileno())),
+            "observed_signature": raw[:6],
         }
-        canonical = (
-            json.dumps(
-                material,
-                ensure_ascii=False,
-                sort_keys=True,
-                separators=(",", ":"),
-                allow_nan=False,
-            )
-            + "\n"
-        ).encode("utf-8")
-        return hashlib.sha256(canonical).hexdigest()
 
     def close(self) -> None:
         while self._streams:
@@ -98,15 +61,7 @@ class _QualificationBundleLock:
             try:
                 stream.seek(0)
                 try:
-                    if os.name == "nt":
-                        import msvcrt
-
-                        msvcrt.locking(
-                            stream.fileno(),
-                            msvcrt.LK_UNLCK,
-                            max(1, os.fstat(stream.fileno()).st_size),
-                        )
-                    else:
+                    if os.name != "nt":
                         import fcntl
 
                         fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
@@ -127,67 +82,100 @@ def _path_is_reparse(path: Path) -> bool:
     return path.is_symlink() or bool(reparse_flag and attributes & reparse_flag) or is_junction()
 
 
-def _qualification_bundle_paths(receipt_path: Path) -> list[Path]:
-    root = receipt_path.parent.resolve(strict=True)
-    raw = receipt_path.read_bytes()
-    receipt = json.loads(
-        raw.decode("utf-8-sig"),
-        parse_constant=lambda token: (_ for _ in ()).throw(
-            ValueError(f"non-finite JSON number {token!r}")
-        ),
+def _open_read_snapshot(path: Path) -> Any:
+    """Open a readable snapshot that denies concurrent write/delete on Windows."""
+
+    resolved = path.resolve(strict=True)
+    if os.name != "nt":
+        stream = resolved.open("rb")
+        try:
+            import fcntl
+
+            fcntl.flock(stream.fileno(), fcntl.LOCK_SH | fcntl.LOCK_NB)
+            return stream
+        except BaseException:
+            stream.close()
+            raise
+
+    import ctypes
+    import msvcrt
+    from ctypes import wintypes
+
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    create_file = kernel32.CreateFileW
+    create_file.argtypes = (
+        wintypes.LPCWSTR,
+        wintypes.DWORD,
+        wintypes.DWORD,
+        wintypes.LPVOID,
+        wintypes.DWORD,
+        wintypes.DWORD,
+        wintypes.HANDLE,
     )
-    if not isinstance(receipt, Mapping):
-        raise ValueError("qualification receipt must be a JSON object")
-    paths = [receipt_path]
-    for section in ("evidence", "outputs"):
-        records = receipt.get(section)
-        if not isinstance(records, list):
-            raise ValueError(f"qualification receipt {section} must be a list")
-        for record in records:
-            if not isinstance(record, Mapping):
-                raise ValueError(f"qualification receipt {section} record must be an object")
-            recorded_path = record.get("path")
-            if not isinstance(recorded_path, str) or not recorded_path:
-                raise ValueError("qualification bundle path must be a non-empty string")
-            relative = Path(recorded_path)
-            if relative.is_absolute() or ".." in relative.parts:
-                raise ValueError("qualification bundle path escaped the receipt run root")
-            target = receipt_path.parent / relative
-            resolved = target.resolve(strict=True)
-            if resolved != root and root not in resolved.parents:
-                raise ValueError("qualification bundle path escaped the receipt run root")
-            if _path_is_reparse(target):
-                raise ValueError("qualification bundle path is a symlink, junction, or reparse point")
-            paths.append(target)
-    return list(dict.fromkeys(paths))
-
-
-def _lock_qualification_bundle(receipt_path: Path) -> _QualificationBundleLock:
-    streams: dict[Path, Any] = {}
+    create_file.restype = wintypes.HANDLE
+    handle = create_file(
+        str(resolved),
+        0x80000000,  # GENERIC_READ
+        0x00000001,  # FILE_SHARE_READ only: no concurrent write or delete
+        None,
+        3,  # OPEN_EXISTING
+        0x00000080,  # FILE_ATTRIBUTE_NORMAL
+        None,
+    )
+    invalid_handle = wintypes.HANDLE(-1).value
+    if handle == invalid_handle:
+        raise ctypes.WinError(ctypes.get_last_error(), filename=str(resolved))
     try:
-        for path in _qualification_bundle_paths(receipt_path):
-            stream = path.open("rb")
+        descriptor = msvcrt.open_osfhandle(
+            int(handle), os.O_RDONLY | getattr(os, "O_BINARY", 0)
+        )
+    except BaseException:
+        kernel32.CloseHandle(handle)
+        raise
+    try:
+        return os.fdopen(descriptor, "rb")
+    except BaseException:
+        os.close(descriptor)
+        raise
+
+
+def _lock_bound_evidence(binding: Mapping[str, Any]) -> _QualificationBundleLock:
+    """Hold the exact source/probe files through an allowed observation command."""
+
+    paths: list[Path] = []
+    for name in ("source", "probe"):
+        canonical = binding.get(f"{name}_canonical_target")
+        if not isinstance(canonical, str) or not canonical:
+            raise ValueError(f"{name} canonical target is not bound")
+        path = Path(canonical)
+        if _path_is_reparse(path) or _path_is_reparse(path.parent):
+            raise ValueError(f"{name} path is a symlink, junction, or reparse point")
+        paths.append(path)
+
+    streams: dict[Path, Any] = {}
+    lock = _QualificationBundleLock(streams)
+    try:
+        for path in paths:
+            stream = _open_read_snapshot(path)
             try:
                 stream.seek(0)
-                if os.name == "nt":
-                    import msvcrt
-
-                    msvcrt.locking(
-                        stream.fileno(),
-                        msvcrt.LK_NBRLCK,
-                        max(1, os.fstat(stream.fileno()).st_size),
-                    )
-                else:
-                    import fcntl
-
-                    fcntl.flock(stream.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
                 streams[path.resolve(strict=True)] = stream
             except BaseException:
                 stream.close()
                 raise
-        return _QualificationBundleLock(streams)
+
+        for name, path in zip(("source", "probe"), paths):
+            snapshot = lock.bound_file_snapshot(path)
+            requested = Path(str(binding[f"{name}_requested_path"]))
+            if not (
+                requested.resolve(strict=True) == path.resolve(strict=True)
+                and snapshot["sha256"] == binding.get(f"{name}_sha256")
+                and snapshot["file_identity"] == binding.get(f"{name}_file_identity")
+            ):
+                raise ValueError(f"{name} changed before its locked snapshot was acquired")
+        return lock
     except BaseException:
-        _QualificationBundleLock(streams).close()
+        lock.close()
         raise
 
 
@@ -217,6 +205,27 @@ def _observation_command_allowed(command: Sequence[str]) -> bool:
             and not arguments[index + 1].startswith("-")
             for index in range(0, len(arguments), 2)
         )
+    )
+
+
+def _run_allowed_command(
+    runner: Callable[..., Any], command: Sequence[str]
+) -> Any:
+    """Invoke the real subprocess with a closed Python import environment."""
+
+    if runner is not subprocess.run:
+        return runner(list(command), check=False)
+    environment = {
+        key: value
+        for key, value in os.environ.items()
+        if not key.upper().startswith("PYTHON")
+    }
+    environment["PYTHONNOUSERSITE"] = "1"
+    return runner(
+        list(command),
+        check=False,
+        cwd=_OBSERVATION_SCRIPT.parent,
+        env=environment,
     )
 
 
@@ -545,6 +554,66 @@ def _revalidate_evidence(binding: Mapping[str, Any]) -> dict[str, Any]:
     }
     _revalidate_one(binding=binding, result=result, name="source", reason_prefix="SOURCE_DRAWING")
     _revalidate_one(binding=binding, result=result, name="probe", reason_prefix="PROBE_FILE")
+    if not result["reasons"]:
+        result["status"] = "VALID"
+        result["valid"] = True
+    return result
+
+
+def _revalidate_locked_evidence(
+    binding: Mapping[str, Any], lock: _QualificationBundleLock
+) -> dict[str, Any]:
+    """Validate source/probe from the same locked handles held through the runner."""
+
+    result: dict[str, Any] = {
+        "status": "INVALID",
+        "valid": False,
+        "reasons": [],
+        "validation_contract": "LOCKED_OPEN_HANDLES_HELD_THROUGH_RUNNER",
+    }
+    stable_identity_keys = ("device", "inode", "file_index", "size")
+    for name, reason_prefix in (("source", "SOURCE_DRAWING"), ("probe", "PROBE_FILE")):
+        requested = Path(str(binding.get(f"{name}_requested_path") or ""))
+        canonical = Path(str(binding.get(f"{name}_canonical_target") or ""))
+        expected_identity = binding.get(f"{name}_file_identity")
+        expected_identity = expected_identity if isinstance(expected_identity, Mapping) else {}
+        try:
+            snapshot = lock.bound_file_snapshot(canonical)
+            requested_target = requested.resolve(strict=True)
+        except (OSError, ValueError, KeyError) as error:
+            result["reasons"].append(f"{reason_prefix}_LOCKED_SNAPSHOT_UNAVAILABLE: {error}")
+            continue
+        actual_identity = snapshot["file_identity"]
+        requested_matches = requested_target == canonical.resolve(strict=True)
+        identity_matches = all(
+            actual_identity.get(key) == expected_identity.get(key)
+            for key in stable_identity_keys
+        )
+        sha256_matches = snapshot["sha256"] == binding.get(f"{name}_sha256")
+        result[f"{name}_requested_path"] = str(requested)
+        result[f"{name}_canonical_target"] = snapshot["canonical_target"]
+        result[f"{name}_file_identity"] = actual_identity
+        result[f"{name}_sha256"] = snapshot["sha256"]
+        result[f"{name}_requested_path_matches_preflight"] = requested_matches
+        result[f"{name}_canonical_target_matches_preflight"] = (
+            snapshot["canonical_target"] == str(canonical)
+        )
+        result[f"{name}_file_identity_matches_preflight"] = identity_matches
+        result[f"{name}_sha256_matches_preflight"] = sha256_matches
+        result[f"{name}_matches_preflight"] = all(
+            (requested_matches, identity_matches, sha256_matches)
+        )
+        if not requested_matches:
+            result["reasons"].append(f"{reason_prefix}_REQUESTED_PATH_CHANGED")
+        if not identity_matches:
+            result["reasons"].append(f"{reason_prefix}_FILE_IDENTITY_CHANGED")
+        if not sha256_matches:
+            result["reasons"].append(f"{reason_prefix}_HASH_CHANGED")
+        if name == "source":
+            source_format = _dwg_format_validation(snapshot["observed_signature"])
+            result["source_format_validation"] = source_format
+            if source_format["valid"] is not True:
+                result["reasons"].append("SOURCE_DRAWING_FORMAT_INVALID")
     if not result["reasons"]:
         result["status"] = "VALID"
         result["valid"] = True
@@ -1029,7 +1098,11 @@ def run_guarded(
     if (
         execution_purpose == "downstream_learning_or_scoring"
         and qualification_receipt_path is not None
-        and result["qualification_receipt_validation"]["status"] != "PASS"
+        and result["qualification_receipt_validation"].get(
+            "integrity_status",
+            result["qualification_receipt_validation"].get("status"),
+        )
+        != "PASS"
     ):
         result["guard"] = _terminal_block(
             decision,
@@ -1041,6 +1114,26 @@ def run_guarded(
         )
         result["terminal_state"] = "QUALIFICATION_RECEIPT_REJECTED"
         result["execution_outcome"] = "NOT_EXECUTED_QUALIFICATION_RECEIPT_REJECTED"
+        return _persist_terminal(result, receipt_path)
+
+    if execution_purpose == "downstream_learning_or_scoring":
+        result["guard"] = _terminal_block(
+            decision,
+            reason_code="SEALED_DOWNSTREAM_EXECUTOR_REQUIRED",
+            reason=(
+                "The qualification bundle is internally consistent, but an arbitrary "
+                "host command cannot prove that it consumed only the qualified source, "
+                "model, checkpoint, and independent gold. Downstream execution stays "
+                "blocked until a registered OS-confined sealed executor is available."
+            ),
+        )
+        result["terminal_state"] = "SEALED_DOWNSTREAM_EXECUTOR_REQUIRED"
+        result["execution_outcome"] = (
+            "NOT_EXECUTED_SEALED_DOWNSTREAM_EXECUTOR_REQUIRED"
+        )
+        result["evidence_authorized"] = False
+        binding["terminal_evidence_valid"] = False
+        binding["terminal_evidence_validity"] = "EXECUTION_NOT_CONFINED"
         return _persist_terminal(result, receipt_path)
 
     preflight_failure = _persist_preflight(result, receipt_path)
@@ -1063,92 +1156,36 @@ def run_guarded(
         binding["terminal_evidence_validity"] = "INVALIDATED_BEFORE_SPAWN"
         return _persist_terminal(result, receipt_path)
 
-    if (
-        execution_purpose == "downstream_learning_or_scoring"
-        and qualification_receipt_path is not None
-    ):
-        pre_spawn_receipt_validation = validate_downstream_qualification_receipt(
-            qualification_receipt_path,
-            authorization_context=authorization_context,
-        )
-        if (
-            pre_spawn_receipt_validation.get("status") != "PASS"
-            or pre_spawn_receipt_validation.get("authorization_snapshot_digest")
-            != validation_digest
-        ):
-            result["qualification_receipt_validation"] = pre_spawn_receipt_validation
-            result["guard"] = _terminal_block(
-                decision,
-                reason_code="QUALIFICATION_RECEIPT_INVALIDATED_BEFORE_SPAWN",
-                reason=(
-                    "The qualification receipt or one of its bound artifacts changed "
-                    "after preflight and before spawn."
-                ),
-            )
-            result["terminal_state"] = "QUALIFICATION_RECEIPT_INVALIDATED_BEFORE_SPAWN"
-            result["execution_outcome"] = (
-                "NOT_EXECUTED_QUALIFICATION_RECEIPT_INVALIDATED_BEFORE_SPAWN"
-            )
-            if source_binding_required:
-                result["evidence_authorized"] = False
-            return _persist_terminal(result, receipt_path)
-        result["qualification_receipt_validation"] = pre_spawn_receipt_validation
-
-    qualification_bundle_lock: _QualificationBundleLock | None = None
-    if (
-        execution_purpose == "downstream_learning_or_scoring"
-        and qualification_receipt_path is not None
-    ):
+    bound_evidence_lock: _QualificationBundleLock | None = None
+    if source_binding_required:
         try:
-            qualification_bundle_lock = _lock_qualification_bundle(
-                qualification_receipt_path
-            )
-            locked_digest = qualification_bundle_lock.authorization_digest(
-                qualification_receipt_path,
-                authorization_context,
-            )
-        except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as error:
-            if qualification_bundle_lock is not None:
-                qualification_bundle_lock.close()
+            bound_evidence_lock = _lock_bound_evidence(binding)
+        except (OSError, ValueError) as error:
             result["guard"] = _terminal_block(
                 decision,
-                reason_code="QUALIFICATION_SNAPSHOT_LOCK_FAILED",
+                reason_code="EVIDENCE_SNAPSHOT_LOCK_FAILED",
                 reason=(
-                    "The qualification receipt bundle could not be held as one "
-                    "exclusive pre-spawn snapshot."
+                    "The exact source drawing and probe could not be held as one "
+                    "locked pre-spawn snapshot."
                 ),
             )
-            result["terminal_state"] = "QUALIFICATION_SNAPSHOT_LOCK_FAILED"
-            result["execution_outcome"] = "NOT_EXECUTED_QUALIFICATION_SNAPSHOT_LOCK_FAILED"
-            result["qualification_snapshot_lock_error_type"] = type(error).__name__
+            result["terminal_state"] = "EVIDENCE_SNAPSHOT_LOCK_FAILED"
+            result["execution_outcome"] = "NOT_EXECUTED_EVIDENCE_SNAPSHOT_LOCK_FAILED"
+            result["evidence_snapshot_lock_error_type"] = type(error).__name__
+            result["evidence_authorized"] = False
             return _persist_terminal(result, receipt_path)
-        if (
-            locked_digest != validation_digest
-        ):
-            qualification_bundle_lock.close()
-            result["guard"] = _terminal_block(
-                decision,
-                reason_code="QUALIFICATION_RECEIPT_INVALIDATED_BEFORE_SPAWN",
-                reason=(
-                    "The locked qualification bundle did not match the authorized "
-                    "content-addressed snapshot."
-                ),
-            )
-            result["terminal_state"] = "QUALIFICATION_RECEIPT_INVALIDATED_BEFORE_SPAWN"
-            result["execution_outcome"] = (
-                "NOT_EXECUTED_QUALIFICATION_RECEIPT_INVALIDATED_BEFORE_SPAWN"
-            )
-            return _persist_terminal(result, receipt_path)
-        assert result["qualification_authorization_snapshot"] is not None
-        result["qualification_authorization_snapshot"]["lock_contract"] = (
-            "LOCKED_OPEN_HANDLES_HELD_THROUGH_RUNNER"
-        )
+        binding["validation_contract"] = "LOCKED_OPEN_HANDLES_HELD_THROUGH_RUNNER"
 
+    locked_post_execution_validation: dict[str, Any] | None = None
     try:
         try:
-            completed = runner(list(command), check=False)
+            completed = _run_allowed_command(runner, command)
         except Exception as error:
-            post_execution_validation = _revalidate_evidence(binding)
+            post_execution_validation = (
+                _revalidate_locked_evidence(binding, bound_evidence_lock)
+                if bound_evidence_lock is not None
+                else _revalidate_evidence(binding)
+            )
             binding["post_execution_validation"] = post_execution_validation
             _record_terminal_evidence(result, binding, post_execution_validation)
             binding["terminal_evidence_valid"] = False
@@ -1162,9 +1199,14 @@ def run_guarded(
             result["execution_outcome"] = "RUNNER_EXCEPTION"
             result["runner_error_type"] = type(error).__name__
             return _persist_terminal(result, receipt_path)
+        locked_post_execution_validation = (
+            _revalidate_locked_evidence(binding, bound_evidence_lock)
+            if bound_evidence_lock is not None
+            else _revalidate_evidence(binding)
+        )
     finally:
-        if qualification_bundle_lock is not None:
-            qualification_bundle_lock.close()
+        if bound_evidence_lock is not None:
+            bound_evidence_lock.close()
 
     result["executed"] = True
     try:
@@ -1186,22 +1228,15 @@ def run_guarded(
         result["runner_result_type"] = type(completed).__name__
         return _persist_terminal(result, receipt_path)
 
-    post_execution_validation = _revalidate_evidence(binding)
+    post_execution_validation = (
+        locked_post_execution_validation
+        if locked_post_execution_validation is not None
+        else _revalidate_evidence(binding)
+    )
     binding["post_execution_validation"] = post_execution_validation
     _record_terminal_evidence(result, binding, post_execution_validation)
     returncode = result["command_exit_code"]
     result["command_succeeded"] = returncode == 0
-    if (
-        execution_purpose == "downstream_learning_or_scoring"
-        and qualification_receipt_path is not None
-    ):
-        result["qualification_receipt_validation"] = (
-            validate_downstream_qualification_receipt(
-                qualification_receipt_path,
-                authorization_context=authorization_context,
-            )
-        )
-
     if source_binding_required and post_execution_validation["valid"] is not True:
         result["guard"] = _terminal_block(
             decision,
@@ -1219,21 +1254,6 @@ def run_guarded(
     elif not result["command_succeeded"]:
         result["terminal_state"] = "COMMAND_FAILED"
         result["execution_outcome"] = "COMMAND_FAILED"
-    elif (
-        execution_purpose == "downstream_learning_or_scoring"
-        and qualification_receipt_path is not None
-        and result["qualification_receipt_validation"]["status"] != "PASS"
-    ):
-        result["guard"] = _terminal_block(
-            decision,
-            reason_code="QUALIFICATION_RECEIPT_REJECTED",
-            reason=(
-                "The command exited zero, but its explicit qualification receipt did not "
-                "authorize downstream model learning or scoring."
-            ),
-        )
-        result["terminal_state"] = "QUALIFICATION_RECEIPT_REJECTED"
-        result["execution_outcome"] = "COMMAND_COMPLETED_QUALIFICATION_REJECTED"
     else:
         result["terminal_state"] = "AUTHORIZED_SUCCESS"
         result["execution_outcome"] = "COMMAND_SUCCEEDED"

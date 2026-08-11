@@ -59,9 +59,20 @@
         "execution_purpose": {"const": "downstream_learning_or_scoring"},
         "required_observables": {
           "type": "array",
-          "minItems": 1,
+          "minItems": 7,
+          "maxItems": 7,
           "uniqueItems": true,
-          "items": {"type": "string", "minLength": 1}
+          "items": {
+            "enum": [
+              "nested_insert_world_segments",
+              "world_lineage",
+              "silent_drop_detection",
+              "xclip_preservation",
+              "source_document_identity",
+              "native_display_membership",
+              "model_input_membership"
+            ]
+          }
         }
       }
     },

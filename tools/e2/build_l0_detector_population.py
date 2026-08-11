@@ -6,11 +6,15 @@ visible after INSERT transforms, layer/entity visibility and XCLIP.  This tool
 independently expands the full native graph to WorldIR, requires exact stable-ID
 agreement with that oracle, and then separates two files:
 
-* ``detector_truth.json`` retains the owner-supplied W1/W2 layer labels;
-* ``detector_input.seg.json`` is exact SEG-IR v1 with blank layer names and
-  unknown labels, so a detector cannot read its own answer.
+* ``detector_truth.json`` retains only the owner-supplied W1/W2 positive
+  *layer* anchor; every object label remains ``UNKNOWN``;
+* ``detector_input.seg.json`` is exact SEG-IR v1 with drawing-salted,
+  collision-free layer pseudonyms and unknown labels.  It preserves only the
+  within-drawing layer partition, so a detector cannot read the owner's names.
 
-Arc chords are accounted for but are outside the v1 linear detector universe.
+The layer anchor does not prove W1/W2 purity, wall completeness, or any
+object-level negative.  Arc chords are accounted for but are outside the v1
+linear detector universe.
 """
 from __future__ import annotations
 
@@ -18,6 +22,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -131,13 +136,16 @@ def _oracle_ids(
     }
 
 
-def _model_segment(segment: Mapping[str, Any]) -> dict[str, Any]:
+def _model_segment(
+    segment: Mapping[str, Any], layer_pseudonyms: Mapping[str, str]
+) -> dict[str, Any]:
     segment_id = _stable_id(segment)
+    source_layer = str(segment.get("source_layer") or "")
     return {
         "sid": segment_id,
         "handle": segment_id,
         "pts": [list(segment["p0_world"]), list(segment["p1_world"])],
-        "layer": "",
+        "layer": layer_pseudonyms[source_layer],
         "kind": str(segment.get("kind") or "line"),
         "label": "unknown",
         "source": "native",
@@ -148,8 +156,9 @@ def _truth_record(segment: Mapping[str, Any]) -> dict[str, Any]:
     layer = str(segment.get("source_layer") or "")
     return {
         "placed_uid": _stable_id(segment),
-        "label": "wall" if layer in WALL_LAYERS else "non_wall",
-        "wall_subtype": layer.rsplit("$", 1)[-1] if layer in WALL_LAYERS else None,
+        "object_label": "UNKNOWN",
+        "layer_anchor": "POSITIVE_UNLABELED" if layer in WALL_LAYERS else "UNKNOWN",
+        "owner_wall_layer": layer if layer in WALL_LAYERS else None,
         "source_layer": layer,
         "kind": str(segment.get("kind") or ""),
         "source_entity_handle": str(segment.get("source_entity_handle") or ""),
@@ -158,7 +167,28 @@ def _truth_record(segment: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def _validate_model_input(model: Mapping[str, Any], expected_ids: set[str]) -> dict[str, Any]:
+def _drawing_local_layer_pseudonyms(
+    layers: Iterable[str], drawing_id: str
+) -> dict[str, str]:
+    unique_layers = set(layers)
+    salted_order = sorted(
+        unique_layers,
+        key=lambda layer: (
+            hashlib.sha256(f"{drawing_id}\0{layer}".encode("utf-8")).digest(),
+            layer,
+        ),
+    )
+    return {
+        layer: f"L{index:06d}"
+        for index, layer in enumerate(salted_order, start=1)
+    }
+
+
+def _validate_model_input(
+    model: Mapping[str, Any],
+    expected_ids: set[str],
+    expected_layer_by_id: Mapping[str, str],
+) -> dict[str, Any]:
     expected_top = {"ir", "drawing_id", "units", "scale_mm_per_unit", "segments"}
     if set(model) != expected_top or model.get("ir") != "seg.v1":
         raise ValueError("detector input is not exact SEG-IR v1")
@@ -173,7 +203,9 @@ def _validate_model_input(model: Mapping[str, Any], expected_ids: set[str]) -> d
         if (
             not segment_id
             or segment.get("sid") != segment_id
-            or segment.get("layer") != ""
+            or not isinstance(segment.get("layer"), str)
+            or re.fullmatch(r"L\d{6}", str(segment.get("layer"))) is None
+            or segment.get("layer") != expected_layer_by_id.get(segment_id)
             or segment.get("label") != "unknown"
             or segment.get("source") != "native"
             or segment.get("kind") not in LINEAR_KINDS
@@ -192,10 +224,16 @@ def _validate_model_input(model: Mapping[str, Any], expected_ids: set[str]) -> d
     leaked_names = [name for name in WALL_LAYERS if name in serialized]
     if leaked_names:
         raise ValueError("detector input serialized payload contains owner label-layer names")
+    observed_layers = {str(segment["layer"]) for segment in segments}
+    expected_layers = set(expected_layer_by_id.values())
+    if observed_layers != expected_layers:
+        raise ValueError("detector input did not preserve the source-layer partition")
     return {
         "exact_seg_ir_v1": True,
         "stable_id_count": len(observed),
-        "blank_layer_count": len(observed),
+        "blank_layer_count": 0,
+        "pseudonymous_layer_count": len(observed_layers),
+        "source_layer_partition_preserved": True,
         "unknown_label_count": len(observed),
         "source_layer_fields": 0,
         "wall_layer_name_occurrences": 0,
@@ -311,7 +349,20 @@ def build_population(
         ]
 
         truth_records = sorted((_truth_record(segment) for segment in linear_segments), key=lambda row: row["placed_uid"])
-        model_segments = sorted((_model_segment(segment) for segment in linear_segments), key=lambda row: row["handle"])
+        source_layers = {
+            str(segment.get("source_layer") or "") for segment in linear_segments
+        }
+        layer_pseudonyms = _drawing_local_layer_pseudonyms(
+            source_layers, source_before
+        )
+        expected_layer_by_id = {
+            _stable_id(segment): layer_pseudonyms[str(segment.get("source_layer") or "")]
+            for segment in linear_segments
+        }
+        model_segments = sorted(
+            (_model_segment(segment, layer_pseudonyms) for segment in linear_segments),
+            key=lambda row: row["handle"],
+        )
         model = {
             "ir": "seg.v1",
             "drawing_id": source_before,
@@ -319,16 +370,17 @@ def build_population(
             "scale_mm_per_unit": 1.0,
             "segments": model_segments,
         }
-        leakage = _validate_model_input(model, consensus_ids)
-        label_counts = Counter(row["label"] for row in truth_records)
+        leakage = _validate_model_input(model, consensus_ids, expected_layer_by_id)
+        anchor_counts = Counter(row["layer_anchor"] for row in truth_records)
         kind_counts = Counter(str(segment.get("kind")) for segment in raw_segments)
         layer_counts = Counter(str(segment.get("source_layer") or "") for segment in linear_segments)
 
         truth = {
-            "schema": "ariadne.e2.l0.detector_truth.v1",
+            "schema": "ariadne.e2.l0.detector_label_anchors.v1",
             "drawing_id": source_before,
             "candidate_scope": "xclip_visible_linear_segments_v1",
-            "label_authority": "owner_complete_binary_layer_contract",
+            "label_authority": "owner_layer_positive_only",
+            "object_truth_completeness": "UNKNOWN",
             "positive_layers": list(WALL_LAYERS),
             "label_contract": {
                 "path": str(label_contract.resolve()),
@@ -349,16 +401,11 @@ def build_population(
             "model_input": {"path": str(model_path), "sha256": _sha256(model_path)},
         }
         has_dispute = bool(native_only_ids or worldir_only_ids)
-        terminal_status = PASS_WITH_DEFERRAL if has_dispute else PASS
-        reason_code = (
-            "DUAL_ORACLE_CONSENSUS_WITH_DISPUTED_SEGMENTS"
-            if has_dispute
-            else "DETECTOR_POPULATION_QUALIFIED"
-        )
+        terminal_status = PASS_WITH_DEFERRAL
+        reason_code = "LABEL_COMPLETENESS_UNKNOWN"
         reason = (
-            "The model population is the exact native/WorldIR consensus; disputed visible IDs are quarantined."
-            if has_dispute
-            else "Native full-AutoCAD membership, WorldIR, truth IDs and cue-free SEG-IR are exact."
+            "The candidate population is instrument-qualified, but W1/W2 provide only a positive "
+            "layer anchor. Object purity, negative labels and wall completeness remain unknown."
         )
         native_only_by_layer = {
             layer: len(ids & native_only_ids)
@@ -396,8 +443,17 @@ def build_population(
             worldir_visible_linear_candidates=len(world_linear_id_set),
             native_visible_linear_candidates=len(native_ids),
             qualified_linear_candidates=len(consensus_ids),
-            positive_segments=label_counts["wall"],
-            negative_segments=label_counts["non_wall"],
+            known_wall_layer_members=anchor_counts["POSITIVE_UNLABELED"],
+            unlabeled_layer_members=anchor_counts["UNKNOWN"],
+            object_positive_gold_segments=0,
+            object_negative_gold_segments=0,
+            object_unknown_segments=len(truth_records),
+            observation_status=PASS_WITH_DEFERRAL if has_dispute else PASS,
+            observation_reason_code=(
+                "DUAL_ORACLE_CONSENSUS_WITH_DISPUTED_SEGMENTS"
+                if has_dispute
+                else "DETECTOR_POPULATION_QUALIFIED"
+            ),
             excluded_arc_chords=len(arc_segments),
             disputed_segments={
                 "native_only_count": len(native_only_ids),

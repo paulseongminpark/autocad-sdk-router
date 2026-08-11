@@ -9,8 +9,9 @@
 > incompatible with the current v1 authoritative contract, so they must not be
 > silently treated as current evidence.
 >
-> As of 2026-08-11, PR #69 is Draft and `BLOCKED` pending target-population
-> source/receipt/hash contract hardening.
+> Every present-tense statement below belongs to that historical snapshot.
+> Current implementation, CI and merge status must be established from the
+> current source, receipts and GitHub checks rather than inferred from this file.
 
 ## Status and objective
 

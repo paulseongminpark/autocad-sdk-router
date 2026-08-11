@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Evidence-bound qualification and first-report assembly for E2.
+"""Evidence-bound qualification and instrument-snapshot assembly for E2.
 
-The module has two public operations. ``qualify`` judges already-loaded
-evidence; ``build_first_report`` writes the bounded artifact set for one run.
-It never treats an unlabeled drawing as a model-quality benchmark.
+``qualify`` judges already-loaded evidence. The former public first-report
+runner is fail-closed until a sealed executor can prove exact input consumption
+and confinement. Internal snapshot assembly never treats an unlabeled drawing
+as a model-quality benchmark.
 """
 from __future__ import annotations
 
@@ -21,6 +22,19 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping
 
 from jsonschema import Draft202012Validator
+
+from .sealed_executor import refusal_receipt
+
+try:
+    from target_population_oracle import (
+        TargetPopulationContractError,
+        validate_target_population_oracle,
+    )
+except ImportError:  # support ``import tools.e2.qualification.engine``
+    from ..target_population_oracle import (
+        TargetPopulationContractError,
+        validate_target_population_oracle,
+    )
 
 
 STATUS_PASS = "PASS"
@@ -306,11 +320,18 @@ def _gate(gate: str, status: str, evidence: str) -> dict[str, str]:
 
 
 def _runtime_wall_guard_qualified(guard: Mapping[str, Any]) -> bool:
-    required = set(guard.get("required_observables") or [])
+    raw_required = guard.get("required_observables")
+    required = (
+        set(raw_required)
+        if isinstance(raw_required, list)
+        and len(raw_required) == len(WALL_MODEL_REQUIRED_OBSERVABLES)
+        and all(isinstance(item, str) and item for item in raw_required)
+        else set()
+    )
     target_population = guard.get("target_population")
     return (
         guard.get("status") == "READY"
-        and WALL_MODEL_REQUIRED_OBSERVABLES <= required
+        and required == WALL_MODEL_REQUIRED_OBSERVABLES
         and isinstance(target_population, Mapping)
         and bool(target_population)
     )
@@ -961,6 +982,297 @@ def _downstream_experiment_gate(
     }
 
 
+def _payload_sha256(value: Mapping[str, Any]) -> str:
+    return hashlib.sha256(
+        json.dumps(
+            value,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        ).encode("utf-8")
+    ).hexdigest()
+
+
+def _stable_segment_id(value: Mapping[str, Any]) -> str:
+    return str(
+        value.get("placed_uid")
+        or value.get("lineage_id")
+        or value.get("handle")
+        or ""
+    )
+
+
+def _validate_wall_evidence_bundle(
+    *,
+    receipt: Mapping[str, Any],
+    evidence: Mapping[str, Mapping[str, Any]],
+    guard: Mapping[str, Any],
+) -> tuple[list[str], list[str], set[str]]:
+    """Validate the raw observation payloads and their target-population join."""
+
+    evidence_errors: list[str] = []
+    population_errors: list[str] = []
+    source = receipt.get("source")
+    source = source if isinstance(source, Mapping) else {}
+    source_sha256 = str(source.get("sha256") or "")
+    experiment_id = str(receipt.get("experiment_id") or "")
+    native = evidence.get("native_ir", {})
+    adapter = evidence.get("adapter_ir", {})
+    world = evidence.get("world_ir", {})
+    oracle = evidence.get("target_population_oracle", {})
+    model = evidence.get("model_input_ir", {})
+
+    try:
+        validate_target_population_oracle(
+            oracle,
+            expected_source_sha256=source_sha256,
+            expected_geometry_scope="linear_segments_v1",
+        )
+    except TargetPopulationContractError as exc:
+        evidence_errors.append(
+            f"target_population_oracle producer authority is invalid: "
+            f"{exc.reason_code}: {exc}"
+        )
+
+    native_source = native.get("source")
+    native_source = native_source if isinstance(native_source, Mapping) else {}
+    diagnostics = native.get("diagnostics")
+    diagnostics = diagnostics if isinstance(diagnostics, Mapping) else {}
+    if not (
+        native.get("schema") == "ariadne.dwg_graph_ir.v1"
+        and native.get("coverage_level") == "native_full"
+        and native_source.get("sha256") == source_sha256
+        and isinstance(diagnostics.get("errors"), list)
+        and not diagnostics.get("errors")
+    ):
+        evidence_errors.append("native_ir schema, source identity, or diagnostics are invalid")
+
+    adapter_ledger = adapter.get("adapter_ledger")
+    adapter_ledger = adapter_ledger if isinstance(adapter_ledger, Mapping) else {}
+    if not (
+        adapter.get("ir") == "worldir.input.v1"
+        and adapter.get("status") == STATUS_PASS
+        and adapter.get("drawing_id") == source_sha256
+        and adapter_ledger.get("balance_ok") is True
+    ):
+        evidence_errors.append("adapter_ir schema, source identity, or balance is invalid")
+
+    conservation = world.get("conservation_ledger")
+    conservation = conservation if isinstance(conservation, Mapping) else {}
+    world_segments = world.get("segments")
+    if not (
+        world.get("oracle") == "worldir.oracle.v1"
+        and world.get("status") == STATUS_PASS
+        and world.get("drawing_id") == source_sha256
+        and conservation.get("conservation_ok") is True
+        and isinstance(world_segments, list)
+        and bool(world_segments)
+    ):
+        evidence_errors.append("world_ir schema, source identity, or conservation is invalid")
+
+    targets = oracle.get("targets")
+    model_segments = model.get("segments")
+    if not (
+        oracle.get("schema") == "ariadne.e2.target_population_oracle.v1"
+        and oracle.get("drawing_id") == source_sha256
+        and isinstance(targets, list)
+        and bool(targets)
+    ):
+        evidence_errors.append("target_population_oracle schema or source identity is invalid")
+        targets = []
+    if not (
+        model.get("ir") == "seg.v1"
+        and model.get("drawing_id") == source_sha256
+        and isinstance(model_segments, list)
+        and bool(model_segments)
+    ):
+        evidence_errors.append("model_input_ir schema or source identity is invalid")
+        model_segments = []
+
+    world_ids_by_layer: dict[str, set[str]] = defaultdict(set)
+    world_seen: set[str] = set()
+    for index, row in enumerate(world_segments or []):
+        if not isinstance(row, Mapping):
+            population_errors.append(f"world segment[{index}] is not an object")
+            continue
+        segment_id = _stable_segment_id(row)
+        layer = str(row.get("source_layer") or "")
+        if not segment_id or not layer or segment_id in world_seen:
+            population_errors.append(f"world segment[{index}] has invalid identity or layer")
+            continue
+        world_seen.add(segment_id)
+        world_ids_by_layer[layer].add(segment_id)
+
+    model_ids_by_layer: dict[str, set[str]] = defaultdict(set)
+    model_seen: set[str] = set()
+    for index, row in enumerate(model_segments or []):
+        if not isinstance(row, Mapping):
+            population_errors.append(f"model segment[{index}] is not an object")
+            continue
+        segment_id = _stable_segment_id(row)
+        layer = str(row.get("source_layer", row.get("layer", "")) or "")
+        if not segment_id or not layer or segment_id in model_seen:
+            population_errors.append(f"model segment[{index}] has invalid identity or layer")
+            continue
+        model_seen.add(segment_id)
+        model_ids_by_layer[layer].add(segment_id)
+
+    if world_seen != model_seen:
+        population_errors.append(
+            "WorldIR and model-input stable-ID populations do not match exactly"
+        )
+
+    target_ids_by_name: dict[str, set[str]] = {}
+    for index, target in enumerate(targets or []):
+        if not isinstance(target, Mapping):
+            population_errors.append(f"target[{index}] is not an object")
+            continue
+        target_id = str(target.get("target_id") or "")
+        layer = str(target.get("layer") or "")
+        raw_ids = target.get("native_visible_segment_ids")
+        declared = target.get("native_visible_source_segments")
+        ids = set(raw_ids) if isinstance(raw_ids, list) and all(isinstance(item, str) and item for item in raw_ids) else set()
+        if (
+            not target_id
+            or target_id in target_ids_by_name
+            or not layer
+            or not ids
+            or len(ids) != len(raw_ids or [])
+            or not isinstance(declared, int)
+            or isinstance(declared, bool)
+            or declared != len(ids)
+        ):
+            population_errors.append(f"target[{index}] has invalid identity or counts")
+            continue
+        target_ids_by_name[target_id] = ids
+        if world_ids_by_layer.get(layer) != ids or model_ids_by_layer.get(layer) != ids:
+            population_errors.append(
+                f"target[{target_id}] does not match WorldIR and model-input stable IDs"
+            )
+
+    expected_observables = sorted(WALL_MODEL_REQUIRED_OBSERVABLES)
+    guard_hashes = guard.get("evidence_payload_sha256")
+    guard_hashes = guard_hashes if isinstance(guard_hashes, Mapping) else {}
+    expected_hashes = {
+        role: _payload_sha256(evidence[role])
+        for role in ("world_ir", "target_population_oracle", "model_input_ir")
+        if role in evidence
+    }
+    if not (
+        guard.get("schema") == "ariadne.e2.guard_decision.v1"
+        and guard.get("status") == "READY"
+        and guard.get("reason_code") == "INSTRUMENT_QUALIFIED"
+        and guard.get("experiment_id") == experiment_id
+        and guard.get("drawing_id") == source_sha256
+        and sorted(set(guard.get("required_observables") or [])) == expected_observables
+        and dict(guard_hashes) == expected_hashes
+        and isinstance(guard.get("target_population"), Mapping)
+        and set(guard.get("target_population") or {}) == set(target_ids_by_name)
+    ):
+        population_errors.append("guard decision is not bound to the exact qualified population")
+
+    return evidence_errors, population_errors, set(model_seen)
+
+
+def _validate_complete_object_evaluation(
+    *,
+    receipt: Mapping[str, Any],
+    truth: Mapping[str, Any],
+    predictions: Mapping[str, Any],
+    models: Mapping[str, Any],
+    expected_population_ids: set[str],
+) -> tuple[list[str], list[str]]:
+    """Recompute the rule confusion matrix from raw object truth and scores."""
+
+    errors: list[str] = []
+    population_errors: list[str] = []
+    source = receipt.get("source")
+    source = source if isinstance(source, Mapping) else {}
+    drawing_id = str(source.get("sha256") or "")
+    experiment_id = str(receipt.get("experiment_id") or "")
+    if not (
+        truth.get("schema") == "ariadne.e2.l0.object_truth.v1"
+        and truth.get("experiment_id") == experiment_id
+        and truth.get("drawing_id") == drawing_id
+        and truth.get("label_authority") == "independent_complete_object_truth"
+        and truth.get("object_truth_completeness") == "COMPLETE"
+        and truth.get("candidate_scope") == "xclip_visible_linear_segments_v1"
+    ):
+        return ["object truth is not independently complete, scoped, or run-bound"], []
+    if not (
+        predictions.get("schema") == "ariadne.e2.l0.baseline_predictions.v1"
+        and predictions.get("experiment_id") == experiment_id
+        and predictions.get("drawing_id") == drawing_id
+        and isinstance(predictions.get("model_sha256"), str)
+        and len(str(predictions.get("model_sha256"))) == 64
+        and isinstance(predictions.get("checkpoint_sha256"), str)
+        and len(str(predictions.get("checkpoint_sha256"))) == 64
+    ):
+        return ["predictions are not model/checkpoint/source/run-bound"], []
+
+    truth_by_id: dict[str, str] = {}
+    for index, row in enumerate(truth.get("records") or []):
+        if not isinstance(row, Mapping):
+            errors.append(f"truth record[{index}] is not an object")
+            continue
+        segment_id = str(row.get("placed_uid") or "")
+        label = str(row.get("label") or "")
+        if not segment_id or segment_id in truth_by_id or label not in {"wall", "non_wall"}:
+            errors.append(f"truth record[{index}] has invalid identity or label")
+            continue
+        truth_by_id[segment_id] = label
+    threshold = _finite_number(predictions.get("threshold"))
+    score_by_id: dict[str, float] = {}
+    for index, row in enumerate(predictions.get("rows") or []):
+        if not isinstance(row, Mapping):
+            errors.append(f"prediction row[{index}] is not an object")
+            continue
+        segment_id = str(row.get("placed_uid") or "")
+        score = _finite_number(row.get("score"))
+        if not segment_id or segment_id in score_by_id or score is None:
+            errors.append(f"prediction row[{index}] has invalid identity or score")
+            continue
+        score_by_id[segment_id] = score
+    if not truth_by_id or set(truth_by_id) != set(score_by_id) or threshold is None:
+        errors.append("truth and prediction stable-ID populations do not match")
+        return errors, population_errors
+    if set(truth_by_id) != expected_population_ids:
+        population_errors.append(
+            "truth and prediction stable-ID populations do not match the qualified model population"
+        )
+        return errors, population_errors
+    if set(truth_by_id.values()) != {"wall", "non_wall"}:
+        errors.append("complete object truth must exercise both binary classes")
+        return errors, population_errors
+
+    tp = fp = fn = 0
+    for segment_id, label in truth_by_id.items():
+        predicted_wall = score_by_id[segment_id] >= threshold
+        if predicted_wall and label == "wall":
+            tp += 1
+        elif predicted_wall:
+            fp += 1
+        elif label == "wall":
+            fn += 1
+    denominator = 2 * tp + fp + fn
+    recomputed_f1 = 2.0 * tp / denominator if denominator else None
+    rules = models.get("rules")
+    rules = rules if isinstance(rules, Mapping) else {}
+    metrics = rules.get("accuracy_metrics")
+    metrics = metrics if isinstance(metrics, Mapping) else {}
+    if not (
+        metrics.get("true_positive") == tp
+        and metrics.get("false_positive") == fp
+        and metrics.get("false_negative") == fn
+        and _finite_number(metrics.get("f1")) is not None
+        and recomputed_f1 is not None
+        and math.isclose(float(metrics["f1"]), recomputed_f1, rel_tol=0.0, abs_tol=1e-12)
+    ):
+        errors.append("declared confusion/F1 does not match raw truth and predictions")
+    return errors, population_errors
+
+
 def validate_downstream_qualification_receipt(
     path: Path,
     *,
@@ -980,6 +1292,8 @@ def validate_downstream_qualification_receipt(
     except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as exc:
         return {
             "status": STATUS_BLOCKED,
+            "integrity_status": STATUS_BLOCKED,
+            "execution_authorized": False,
             "reason_codes": ["QUALIFICATION_RECEIPT_UNREADABLE"],
             "reason": f"{type(exc).__name__}: {exc}",
             "path": str(path),
@@ -996,6 +1310,7 @@ def validate_downstream_qualification_receipt(
     output_errors: list[str] = []
     evidence_errors: list[str] = []
     output_payloads: dict[str, dict[str, Any]] = {}
+    evidence_payloads: dict[str, dict[str, Any]] = {}
     output_hashes: dict[str, str] = {}
     evidence_hashes: dict[str, str] = {}
     schema_errors = _schema_errors(receipt)
@@ -1007,6 +1322,9 @@ def validate_downstream_qualification_receipt(
         "wall_candidates_rules": "wall_candidates_rules.json",
         "model_diagnostics": "model_diagnostics.json",
         "intervention_results": "intervention_results.json",
+        "object_truth": "object_truth.json",
+        "baseline_predictions": "baseline_predictions.json",
+        "guard_decision": "guard_decision.json",
     }
     outputs = receipt.get("outputs")
     outputs = outputs if isinstance(outputs, list) else []
@@ -1042,27 +1360,58 @@ def validate_downstream_qualification_receipt(
 
     evidence = receipt.get("evidence")
     evidence = evidence if isinstance(evidence, list) else []
-    required_evidence = {"native_ir", "adapter_ir", "world_ir"}
+    required_evidence = {
+        "native_ir",
+        "adapter_ir",
+        "world_ir",
+        "target_population_oracle",
+        "model_input_ir",
+    }
     evidence_roles = [
         record.get("role") for record in evidence if isinstance(record, Mapping)
     ]
     if set(evidence_roles) != required_evidence or len(evidence_roles) != len(
         required_evidence
     ):
-        evidence_errors.append("evidence roles must be exactly native_ir, adapter_ir, world_ir")
+        evidence_errors.append(
+            "evidence roles must be exactly native_ir, adapter_ir, world_ir, "
+            "target_population_oracle, model_input_ir"
+        )
     else:
         for record in evidence:
             assert isinstance(record, Mapping)
             role = str(record["role"])
             try:
-                _, observed_sha256 = _validated_file_record(run_root, record)
+                payload, observed_sha256 = _validated_file_record(run_root, record)
+                evidence_payloads[role] = payload
                 evidence_hashes[role] = observed_sha256
             except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as exc:
                 evidence_errors.append(f"{role}: {type(exc).__name__}: {exc}")
 
-    if output_errors:
-        failures.append("QUALIFICATION_OUTPUT_INVALID")
-    elif required_outputs.keys() <= output_payloads.keys():
+    qualified_population_ids: set[str] = set()
+    if evidence_errors:
+        failures.append("QUALIFICATION_EVIDENCE_INVALID")
+    elif required_evidence <= evidence_payloads.keys() and "guard_decision" in output_payloads:
+        semantic_errors, population_errors, qualified_population_ids = (
+            _validate_wall_evidence_bundle(
+                receipt=receipt,
+                evidence=evidence_payloads,
+                guard=output_payloads["guard_decision"],
+            )
+        )
+        if semantic_errors:
+            evidence_errors.extend(semantic_errors)
+            failures.append("QUALIFICATION_EVIDENCE_INVALID")
+        if population_errors:
+            evidence_errors.extend(population_errors)
+            failures.append("QUALIFICATION_POPULATION_BINDING_MISMATCH")
+
+    gate_outputs = {
+        "wall_candidates_rules",
+        "model_diagnostics",
+        "intervention_results",
+    }
+    if gate_outputs <= output_payloads.keys():
         recomputed_gate = _downstream_experiment_gate(
             receipt,
             output_payloads["wall_candidates_rules"],
@@ -1072,8 +1421,37 @@ def validate_downstream_qualification_receipt(
         failures.extend(recomputed_gate["reason_codes"])
         if dict(gate) != recomputed_gate:
             failures.append("DOWNSTREAM_GATE_EVIDENCE_MISMATCH")
-    if evidence_errors:
-        failures.append("QUALIFICATION_EVIDENCE_INVALID")
+    if required_outputs.keys() <= output_payloads.keys():
+        experiment_id = receipt.get("experiment_id")
+        source_record = receipt.get("source")
+        source_record = source_record if isinstance(source_record, Mapping) else {}
+        source_sha256 = source_record.get("sha256")
+        for role in ("wall_candidates_rules", "model_diagnostics", "intervention_results"):
+            payload = output_payloads[role]
+            if (
+                payload.get("experiment_id") != experiment_id
+                or payload.get("source_sha256") != source_sha256
+            ):
+                output_errors.append(f"{role}: output is not source/run-bound")
+        evaluation_errors, evaluation_population_errors = (
+            _validate_complete_object_evaluation(
+                receipt=receipt,
+                truth=output_payloads["object_truth"],
+                predictions=output_payloads["baseline_predictions"],
+                models=output_payloads["model_diagnostics"],
+                expected_population_ids=qualified_population_ids,
+            )
+        )
+        if evaluation_errors:
+            output_errors.extend(evaluation_errors)
+            failures.append("QUALIFICATION_EVALUATION_EVIDENCE_INVALID")
+        if evaluation_population_errors:
+            output_errors.extend(evaluation_population_errors)
+            failures.append("QUALIFICATION_POPULATION_BINDING_MISMATCH")
+        if output_errors:
+            failures.append("QUALIFICATION_OUTPUT_INVALID")
+    if output_errors:
+        failures.append("QUALIFICATION_OUTPUT_INVALID")
 
     context = dict(authorization_context or {})
     source = receipt.get("source")
@@ -1101,6 +1479,12 @@ def validate_downstream_qualification_receipt(
             and all(isinstance(item, str) and item for item in authorized_observables)
             else None
         )
+        expected_observables = sorted(WALL_MODEL_REQUIRED_OBSERVABLES)
+        if (
+            current_observables != expected_observables
+            or authorized_observables != expected_observables
+        ):
+            failures.append("QUALIFICATION_OBSERVABLE_SCOPE_INCOMPLETE")
         if current_observables is None or current_observables != authorized_observables:
             failures.append("QUALIFICATION_OBSERVABLE_SCOPE_MISMATCH")
         try:
@@ -1177,9 +1561,17 @@ def validate_downstream_qualification_receipt(
         authorization_snapshot_digest = None
         failures.append("QUALIFICATION_COMMAND_CONTEXT_INVALID")
 
-    reason_codes = list(dict.fromkeys(failures))
+    integrity_reason_codes = list(dict.fromkeys(failures))
+    integrity_status = STATUS_BLOCKED if integrity_reason_codes else STATUS_PASS
+    reason_codes = list(
+        dict.fromkeys(
+            [*integrity_reason_codes, "SEALED_DOWNSTREAM_EXECUTOR_REQUIRED"]
+        )
+    )
     return {
-        "status": STATUS_BLOCKED if reason_codes else STATUS_PASS,
+        "status": STATUS_BLOCKED,
+        "integrity_status": integrity_status,
+        "execution_authorized": False,
         "reason_codes": reason_codes,
         "path": str(path.resolve()),
         "sha256": receipt_sha256,
@@ -1314,7 +1706,22 @@ anti-wall은 아직 라벨에서 귀납한 술어가 아니다. 아래는 `DOOR`
 
 
 def build_first_report(spec: Mapping[str, Any], run_dir: Path) -> dict[str, Any]:
-    """Build the complete first-report artifact set in ``run_dir``."""
+    """Refuse unsealed public scoring before reading inputs or creating outputs."""
+
+    return refusal_receipt(
+        requested_receipt_schema="e2.qualification_receipt.v1",
+        experiment_id=spec.get("experiment_id"),
+        entrypoint="tools.e2.qualification.engine.build_first_report",
+        claim_boundary="no direct rule or model scoring; sealed executor required",
+    )
+
+
+def _build_instrument_snapshot(spec: Mapping[str, Any], run_dir: Path) -> dict[str, Any]:
+    """Assemble an internal instrument snapshot for qualification tests.
+
+    This is not a public execution seam. A future sealed executor may call this
+    helper only after it has bound and confined the exact qualified inputs.
+    """
 
     run_dir = Path(run_dir)
     run_dir.mkdir(parents=True, exist_ok=True)

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Run a fail-closed, unlabeled intervention cell on a revision-pair candidate.
+"""Pure company-pair analysis helpers with a retired public experiment runner.
 
 The primary geometry scope excludes every segment descended from an INSERT that
 owns an active XCLIP.  The XCLIP-visible WorldIR remains a diagnostic surface;
-raw expansion counts remain a negative control.  Model quality is intentionally
-not estimated because the source drawings carry no compatible wall truth.
+raw expansion counts remain a negative control.  Public ``run`` and CLI calls
+stop before analysis until the registered sealed E2 executor exists.
 """
 from __future__ import annotations
 
@@ -26,6 +26,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from tools.e2 import experiment_guard, w1_real_defs  # noqa: E402
 from tools.e2.qualification import engine  # noqa: E402
+from tools.e2.qualification.sealed_executor import refusal_receipt  # noqa: E402
 
 
 PASS = "PASS"
@@ -484,80 +485,12 @@ layer 이름 제거 결과가 0인 것은 회사 관습에 견고하다는 증�
 
 
 def run(spec: Mapping[str, Any], run_dir: Path, prereg: Path) -> dict[str, Any]:
-    run_dir = Path(run_dir)
-    run_dir.mkdir(parents=True, exist_ok=True)
-    prereg_hash = _sha256(prereg)
-    environments = []
-    for name in ("approval", "implementation"):
-        environments.append(_process_environment(name, spec[name], run_dir))
-
-    critical_ok = all(
-        row["source"]["sha256_before"] == row["source"]["sha256_after"]
-        and row["scope"]["status"] == PASS
-        and row["parity"]["status"] == PASS
-        for row in environments
+    return refusal_receipt(
+        requested_receipt_schema="e2.company_pair_intervention_receipt.v1",
+        experiment_id=spec.get("experiment_id"),
+        entrypoint="tools.e2.company_pair_intervention.run",
+        claim_boundary="no direct experiment execution; sealed executor required",
     )
-    receipt = {
-        "schema": "e2.company_pair_intervention_receipt.v1",
-        "status": PARTIAL if critical_ok else BLOCKED,
-        "created_at": _utc_now(),
-        "experiment_id": spec["experiment_id"],
-        "prereg": {**_file_record(prereg), "sha256_at_start": prereg_hash},
-        "environments": environments,
-        "model_status": {
-            "rules": "RAN_EXPLORATORY_UNLABELED",
-            "gbdt": "NOT_RUN_INCOMPATIBLE_INPUT_AND_LABEL_CONTRACT",
-            "gnn": "NOT_RUN_PENDING_FEATURE_GRAPH_PARITY",
-            "transformers": "NOT_RUN_NO_QUALIFIED_CHECKPOINT_INPUT_CONTRACT",
-        },
-        "accuracy_metrics": None,
-        "claim_boundary": "observation conservation and rule invariance only; no wall accuracy or revision identity claim",
-        "code_provenance": [
-            _file_record(Path(__file__)),
-            _file_record(Path(w1_real_defs.__file__)),
-            _file_record(Path(w1_real_defs.evidence_grid.__file__)),
-            _file_record(Path(engine.__file__)),
-        ],
-    }
-    correction_path = run_dir / "NUMERIC_COUNTEREXAMPLE.md"
-    if correction_path.is_file():
-        receipt["tool_correction"] = _file_record(correction_path)
-    pair_summary = {
-        "schema": "e2.company_pair_environment_summary.v1",
-        "pair_status": "EXACT_FILENAME_CANDIDATE_NOT_TRUTH",
-        "rows": [
-            {
-                "environment": row["environment"],
-                "main_only_segments": row["scope"]["main_only_segments"],
-                "visible_segments": row["scope"]["world_visible_segments"],
-                "xclip_descendant_visible_segments": row["scope"]["xclip_descendant_visible_segments"],
-                "rule_candidates": row["rules"]["baseline"]["positive_handles_at_0_5"],
-                "rule_candidate_rate": row["rules"]["baseline"]["positive_rate"],
-                "invariance_failures": [
-                    item["intervention"]
-                    for item in row["rules"]["interventions"]
-                    if item["result"] == "INVARIANCE_FAIL"
-                ],
-            }
-            for row in environments
-        ],
-        "warning": "Rows describe different drawing revisions and are not paired semantic accuracy observations.",
-    }
-    _write_json(run_dir / "experiment_spec.json", spec)
-    _write_json(run_dir / "pair_summary.json", pair_summary)
-    _write_json(run_dir / "qualification_receipt.json", receipt)
-    (run_dir / "REPORT.md").write_text(_render_report(receipt), encoding="utf-8", newline="\n")
-    final_artifacts = [
-        run_dir / "experiment_spec.json",
-        run_dir / "pair_summary.json",
-        run_dir / "REPORT.md",
-        prereg,
-    ]
-    if correction_path.is_file():
-        final_artifacts.append(correction_path)
-    receipt["outputs"] = [_file_record(path) for path in final_artifacts]
-    _write_json(run_dir / "qualification_receipt.json", receipt)
-    return receipt
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -566,26 +499,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--run-dir", type=Path, required=True)
     parser.add_argument("--prereg", type=Path, required=True)
     args = parser.parse_args(argv)
-    receipt = run(_read_json(args.spec), args.run_dir, args.prereg)
-    print(
-        json.dumps(
-            {
-                "status": receipt["status"],
-                "experiment_id": receipt["experiment_id"],
-                "environments": [
-                    {
-                        "environment": row["environment"],
-                        "main_only_segments": row["scope"]["main_only_segments"],
-                        "candidates": row["candidate_count"],
-                    }
-                    for row in receipt["environments"]
-                ],
-            },
-            ensure_ascii=False,
-            indent=2,
-        )
-    )
-    return 0 if receipt["status"] != BLOCKED else 2
+    receipt = run({}, args.run_dir, args.prereg)
+    print(json.dumps(receipt, ensure_ascii=False, indent=2))
+    return 2
 
 
 if __name__ == "__main__":

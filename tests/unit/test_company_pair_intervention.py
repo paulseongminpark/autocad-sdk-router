@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -14,6 +15,7 @@ from tools.e2.company_pair_intervention import (  # noqa: E402
     measure_interventions,
     scorer_parity,
 )
+from tools.e2 import company_pair_intervention as pair_runner  # noqa: E402
 from tools.e2 import w1_real_defs  # noqa: E402
 from tools.e2.qualification import engine  # noqa: E402
 
@@ -214,3 +216,41 @@ def test_subnanometer_worldir_noise_at_400mm_survives_translation():
     assert baseline["per_handle"]["a"]["evidence"]["parallel"] == 1.0
     assert translated["per_handle"]["a"] == baseline["per_handle"]["a"]
     assert translated["per_handle"]["b"] == baseline["per_handle"]["b"]
+
+
+def test_public_pair_runner_stops_before_unsealed_experiment_work(tmp_path: Path):
+    run_dir = tmp_path / "run"
+
+    result = pair_runner.run(
+        {"experiment_id": "blocked-pair"},
+        run_dir,
+        tmp_path / "missing-prereg.md",
+    )
+
+    assert result["status"] == "BLOCKED"
+    assert result["reason_code"] == "SEALED_DOWNSTREAM_EXECUTOR_REQUIRED"
+    assert result["executed"] is False
+    assert result["terminal_authorized"] is False
+    assert not run_dir.exists()
+
+
+def test_public_pair_cli_returns_the_same_terminal_refusal(tmp_path: Path, capsys):
+    spec = tmp_path / "spec.json"
+    spec.write_text(json.dumps({"experiment_id": "blocked-pair-cli"}), encoding="utf-8")
+
+    exit_code = pair_runner.main(
+        [
+            "--spec",
+            str(spec),
+            "--run-dir",
+            str(tmp_path / "run"),
+            "--prereg",
+            str(tmp_path / "missing-prereg.md"),
+        ]
+    )
+    output = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 2
+    assert output["status"] == "BLOCKED"
+    assert output["reason_code"] == "SEALED_DOWNSTREAM_EXECUTOR_REQUIRED"
+    assert output["executed"] is False

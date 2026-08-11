@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import inspect
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -32,7 +33,7 @@ def _inputs(tmp_path: Path) -> tuple[Path, Path, Path, Path]:
                 "sid": segment_id,
                 "handle": segment_id,
                 "pts": [[float(index), 0.0], [float(index + 1), 0.0]],
-                "layer": "",
+                "layer": f"L{(0 if index < 2 else 1) + 1:06d}",
                 "kind": "line",
                 "label": "unknown",
                 "source": "native",
@@ -41,10 +42,11 @@ def _inputs(tmp_path: Path) -> tuple[Path, Path, Path, Path]:
         ],
     }
     truth = {
-        "schema": "ariadne.e2.l0.detector_truth.v1",
+        "schema": "ariadne.e2.l0.object_truth.v1",
         "drawing_id": model["drawing_id"],
         "candidate_scope": "xclip_visible_linear_segments_v1",
-        "label_authority": "owner_complete_binary_layer_contract",
+        "label_authority": "independent_complete_object_truth",
+        "object_truth_completeness": "COMPLETE",
         "positive_layers": ["W1", "W2"],
         "label_contract": {"path": "SPEC.md", "sha256": "0" * 64},
         "records": [
@@ -82,70 +84,27 @@ def _inputs(tmp_path: Path) -> tuple[Path, Path, Path, Path]:
     return population_path, model_path, truth_path, transfer
 
 
-class _FakeJury:
-    def __init__(self, _: Path) -> None:
-        pass
-
-    def artifact_receipt(self) -> dict:
-        return {"schema": "fixture", "status": "PASS", "checks": {}}
-
-    def score_baseline(self, model: dict) -> dict:
-        ids = [segment["handle"] for segment in model["segments"]]
-        scores = {
-            "rules": [0.9, 0.8, 0.4, 0.1],
-            "gbdt": [0.7, 0.6, 0.3, 0.2],
-            "gnn": [0.95, 0.55, 0.45, 0.05],
-        }
-        return {
-            "schema": "e2.segment_juror_baseline.v1",
-            "status": "FROZEN_TRANSFER_SCORES",
-            **{arm: dict(zip(ids, values)) for arm, values in scores.items()},
-            "diagnostics": {
-                "input_segments": len(ids),
-                "rule_scored_handles": len(ids),
-                "gbdt_scored_handles": len(ids),
-                "gnn_scored_handles": len(ids),
-                "graph_edge_count": 3,
-                "graph_feature_count": 17,
-                "gbdt_feature_count": 12,
-            },
-        }
-
-
-def test_run_scores_every_id_and_keeps_extended_arms_blocked(tmp_path: Path):
+def test_complete_object_truth_still_requires_sealed_executor_before_jury(
+    tmp_path: Path,
+):
     population, model, truth, transfer = _inputs(tmp_path)
+
     result = runner.run(
         population_receipt_path=population,
         model_input_path=model,
         truth_path=truth,
         transfer_harness=transfer,
         out_dir=tmp_path / "out",
-        jury_factory=_FakeJury,
     )
 
-    assert result["status"] == "PARTIAL_PASS"
-    assert set(result["executed_arms"]) == {"rules", "gbdt", "gnn"}
-    assert all(row["status"] == "PASS" for row in result["executed_arms"].values())
-    assert set(result["blocked_arms"]) == {"sympointv2", "vecformer", "graph_transformer"}
-    metrics = json.loads((tmp_path / "out" / "segment_metrics.json").read_text(encoding="utf-8"))
-    assert metrics["segment_count"] == 4
-    assert metrics["positive_count"] == 2
-    assert metrics["arms"]["rules"]["average_precision"] == 1.0
-    assert metrics["arms"]["rules"]["operating_point"] == {
-        "threshold": 0.5,
-        "threshold_policy": "fixed_0.5_diagnostic_not_tuned_on_this_drawing",
-        "tp": 2,
-        "fp": 0,
-        "fn": 0,
-        "tn": 2,
-        "precision": 1.0,
-        "recall": 1.0,
-        "f1": 1.0,
-        "predicted_positive_count": 2,
-        "predicted_negative_count": 2,
-    }
-    predictions = json.loads((tmp_path / "out" / "baseline_predictions.json").read_text(encoding="utf-8"))
-    assert len(predictions["rows"]) == 4
+    assert result["status"] == "BLOCKED"
+    assert result["reason_code"] == "SEALED_DOWNSTREAM_EXECUTOR_REQUIRED"
+    assert not (tmp_path / "out" / "segment_metrics.json").exists()
+    assert not (tmp_path / "out" / "baseline_predictions.json").exists()
+
+
+def test_unsealed_baseline_runner_has_no_model_factory_seam() -> None:
+    assert "jury_factory" not in inspect.signature(runner.run).parameters
 
 
 def test_run_blocks_layer_cue_before_jury_execution(tmp_path: Path):
@@ -163,12 +122,148 @@ def test_run_blocks_layer_cue_before_jury_execution(tmp_path: Path):
         truth_path=truth,
         transfer_harness=transfer,
         out_dir=tmp_path / "out",
-        jury_factory=_FakeJury,
     )
 
     assert result["status"] == "BLOCKED"
     assert result["reason_code"] == "MODEL_ARM_EXECUTION_FAILED"
     assert "label cue" in result["reason"]
+    assert not (tmp_path / "out" / "segment_metrics.json").exists()
+
+
+def test_complete_object_truth_accepts_only_drawing_local_layer_pseudonyms(tmp_path: Path):
+    population, model, truth, _ = _inputs(tmp_path)
+    model_value = json.loads(model.read_text(encoding="utf-8"))
+    assert all(re.fullmatch(r"L\d{6}", row["layer"]) for row in model_value["segments"])
+
+    _, loaded_model, truth_by_id = runner._load_contract(population, model, truth)
+
+    assert len(loaded_model["segments"]) == len(truth_by_id) == 4
+
+
+def test_complete_object_truth_rejects_a_pseudonym_that_merges_source_layers(tmp_path: Path):
+    population, model, truth, transfer = _inputs(tmp_path)
+    model_value = json.loads(model.read_text(encoding="utf-8"))
+    model_value["segments"][2]["layer"] = "L000001"
+    model.write_text(json.dumps(model_value), encoding="utf-8")
+    receipt = json.loads(population.read_text(encoding="utf-8"))
+    receipt["artifacts"]["model_input"]["sha256"] = _sha256(model)
+    population.write_text(json.dumps(receipt), encoding="utf-8")
+
+    result = runner.run(
+        population_receipt_path=population,
+        model_input_path=model,
+        truth_path=truth,
+        transfer_harness=transfer,
+        out_dir=tmp_path / "out",
+    )
+
+    assert result["status"] == "BLOCKED"
+    assert result["reason_code"] == "MODEL_ARM_EXECUTION_FAILED"
+    assert "source-layer partition" in result["reason"]
+    assert not (tmp_path / "out" / "segment_metrics.json").exists()
+
+
+def test_complete_object_truth_rejects_pseudonyms_that_split_one_source_layer(tmp_path: Path):
+    population, model, truth, transfer = _inputs(tmp_path)
+    model_value = json.loads(model.read_text(encoding="utf-8"))
+    model_value["segments"][1]["layer"] = "L000003"
+    model.write_text(json.dumps(model_value), encoding="utf-8")
+    receipt = json.loads(population.read_text(encoding="utf-8"))
+    receipt["artifacts"]["model_input"]["sha256"] = _sha256(model)
+    population.write_text(json.dumps(receipt), encoding="utf-8")
+
+    result = runner.run(
+        population_receipt_path=population,
+        model_input_path=model,
+        truth_path=truth,
+        transfer_harness=transfer,
+        out_dir=tmp_path / "out",
+    )
+
+    assert result["status"] == "BLOCKED"
+    assert result["reason_code"] == "MODEL_ARM_EXECUTION_FAILED"
+    assert "source-layer partition" in result["reason"]
+    assert not (tmp_path / "out" / "segment_metrics.json").exists()
+
+
+def test_run_blocks_positive_layer_anchor_before_jury_execution(tmp_path: Path):
+    population, model, truth, transfer = _inputs(tmp_path)
+    truth_value = json.loads(truth.read_text(encoding="utf-8"))
+    truth_value["schema"] = "ariadne.e2.l0.detector_label_anchors.v1"
+    truth_value["label_authority"] = "owner_layer_positive_only"
+    truth_value["object_truth_completeness"] = "UNKNOWN"
+    for record in truth_value["records"]:
+        record["object_label"] = "UNKNOWN"
+        record["layer_anchor"] = (
+            "POSITIVE_UNLABELED"
+            if record["source_layer"] in {"W1", "W2"}
+            else "UNKNOWN"
+        )
+        record.pop("label")
+    truth.write_text(json.dumps(truth_value), encoding="utf-8")
+    receipt = json.loads(population.read_text(encoding="utf-8"))
+    receipt["status"] = "PASS_WITH_DEFERRAL"
+    receipt["reason_code"] = "LABEL_COMPLETENESS_UNKNOWN"
+    receipt["artifacts"]["truth"]["sha256"] = _sha256(truth)
+    population.write_text(json.dumps(receipt), encoding="utf-8")
+    result = runner.run(
+        population_receipt_path=population,
+        model_input_path=model,
+        truth_path=truth,
+        transfer_harness=transfer,
+        out_dir=tmp_path / "out",
+    )
+
+    assert result["status"] == "BLOCKED"
+    assert result["reason_code"] == "LABEL_COMPLETENESS_UNKNOWN"
+    assert not (tmp_path / "out" / "segment_metrics.json").exists()
+    assert not (tmp_path / "out" / "baseline_predictions.json").exists()
+
+
+def test_run_blocks_object_metrics_when_complete_truth_is_only_self_declared_unknown(
+    tmp_path: Path,
+):
+    population, model, truth, transfer = _inputs(tmp_path)
+    truth_value = json.loads(truth.read_text(encoding="utf-8"))
+    truth_value["object_truth_completeness"] = "UNKNOWN"
+    truth.write_text(json.dumps(truth_value), encoding="utf-8")
+    receipt = json.loads(population.read_text(encoding="utf-8"))
+    receipt["artifacts"]["truth"]["sha256"] = _sha256(truth)
+    population.write_text(json.dumps(receipt), encoding="utf-8")
+    result = runner.run(
+        population_receipt_path=population,
+        model_input_path=model,
+        truth_path=truth,
+        transfer_harness=transfer,
+        out_dir=tmp_path / "out",
+    )
+
+    assert result["status"] == "BLOCKED"
+    assert result["reason_code"] == "LABEL_COMPLETENESS_UNKNOWN"
+    assert not (tmp_path / "out" / "segment_metrics.json").exists()
+
+
+def test_run_blocks_object_metrics_when_complete_truth_has_only_one_class(
+    tmp_path: Path,
+):
+    population, model, truth, transfer = _inputs(tmp_path)
+    truth_value = json.loads(truth.read_text(encoding="utf-8"))
+    for record in truth_value["records"]:
+        record["label"] = "wall"
+    truth.write_text(json.dumps(truth_value), encoding="utf-8")
+    receipt = json.loads(population.read_text(encoding="utf-8"))
+    receipt["artifacts"]["truth"]["sha256"] = _sha256(truth)
+    population.write_text(json.dumps(receipt), encoding="utf-8")
+    result = runner.run(
+        population_receipt_path=population,
+        model_input_path=model,
+        truth_path=truth,
+        transfer_harness=transfer,
+        out_dir=tmp_path / "out",
+    )
+
+    assert result["status"] == "BLOCKED"
+    assert result["reason_code"] == "LABEL_COMPLETENESS_UNKNOWN"
     assert not (tmp_path / "out" / "segment_metrics.json").exists()
 
 
@@ -178,3 +273,14 @@ def test_frozen_jury_uses_the_sealed_a4_rule_library():
     assert 'self.components["rules_lib"].evaluate' in source
     assert "rule_scorer" not in source
     assert "/ 16.0" in source
+
+
+def test_report_retracts_layer_only_binary_metrics():
+    report = (
+        REPO / "reports" / "e2" / "E2_L0_LINEAR_SEGMENT_BASELINES_20260807.md"
+    ).read_text(encoding="utf-8")
+
+    assert report.startswith("상태: **RETRACTED**")
+    assert "LABEL_COMPLETENESS_UNKNOWN" in report
+    assert "7,189개는 음성 정답이 아니다" in report
+    assert "AP·PR-AUC·confusion matrix는 모두 철회" in report

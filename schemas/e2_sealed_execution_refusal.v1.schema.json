@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ariadne.local/schemas/e2_sealed_execution_refusal.v1.schema.json",
+  "title": "E2 sealed-executor refusal receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "requested_receipt_schema",
+    "status",
+    "reason_code",
+    "reason",
+    "experiment_id",
+    "entrypoint",
+    "input_accessed",
+    "executed",
+    "terminal_authorized",
+    "model_runtime_loaded",
+    "output_accessed",
+    "outputs",
+    "claim_boundary"
+  ],
+  "properties": {
+    "schema": {"const": "e2.sealed_execution_refusal.v1"},
+    "requested_receipt_schema": {"type": "string", "minLength": 1},
+    "status": {"const": "BLOCKED"},
+    "reason_code": {"const": "SEALED_DOWNSTREAM_EXECUTOR_REQUIRED"},
+    "reason": {"type": "string", "minLength": 1},
+    "experiment_id": {
+      "oneOf": [
+        {"type": "string", "minLength": 1, "pattern": "\\S"},
+        {"type": "null"}
+      ]
+    },
+    "entrypoint": {"type": "string", "minLength": 1},
+    "input_accessed": {"const": false},
+    "executed": {"const": false},
+    "terminal_authorized": {"const": false},
+    "model_runtime_loaded": {"const": false},
+    "output_accessed": {"const": false},
+    "outputs": {"type": "array", "maxItems": 0},
+    "claim_boundary": {"type": "string", "minLength": 1}
+  }
+}

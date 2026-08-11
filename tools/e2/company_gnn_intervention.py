@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Qualify and intervene on the frozen E2 GNN using unlabeled company SEG-IR.
+"""Pure GNN intervention helpers with a retired public experiment runner.
 
-This runner is deliberately fail-closed.  It reuses the sealed C1 loader and
-inference path, proves the company graph input contract, and only then measures
-paired prediction stability.  It never treats a model prediction as wall truth.
+Public ``run`` and CLI calls stop before importing a checkpoint or reading an
+input until the registered sealed E2 executor exists.
 """
 from __future__ import annotations
 
@@ -21,6 +20,12 @@ from pathlib import Path
 from typing import Any, Callable, Mapping
 
 import numpy as np
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from tools.e2.qualification.sealed_executor import refusal_receipt  # noqa: E402
 
 
 PASS = "PASS"
@@ -801,94 +806,12 @@ def _artifact_manifest(run_dir: Path) -> dict[str, Any]:
 
 
 def run(spec: Mapping[str, Any], run_dir: Path, prereg: Path) -> dict[str, Any]:
-    run_dir.mkdir(parents=True, exist_ok=True)
-    prereg_record = _file_record(prereg)
-    c1_path = Path(spec["c1_path"])
-    c1 = _import_module(c1_path, "e2_company_frozen_c1")
-    integrity = c1.verify_integrity()
-    components = c1.load_components()
-
-    replay = compare_runtime_replay(
-        _read_json(Path(spec["sealed_smoke_report"])),
-        _read_json(Path(spec["runtime_replay_report"])),
+    return refusal_receipt(
+        requested_receipt_schema="e2.company_gnn_intervention_receipt.v1",
+        experiment_id=spec.get("experiment_id"),
+        entrypoint="tools.e2.company_gnn_intervention.run",
+        claim_boundary="no direct model inference; sealed executor required",
     )
-    _write_json(run_dir / "runtime_replay_comparison.json", replay)
-    environments: list[dict[str, Any]] = []
-
-    for environment_name in ("approval", "implementation"):
-        environment_spec = spec["environments"][environment_name]
-        source = Path(environment_spec["source_dwg"])
-        expected_source_hash = str(environment_spec["source_sha256"]).lower()
-        before_hash = _sha256(source)
-        environment: dict[str, Any] = {
-            "environment": environment_name,
-            "source": {"path": str(source.resolve()), "sha256_before": before_hash},
-            "seg_ir": _file_record(Path(environment_spec["seg_ir"])),
-        }
-        if before_hash != expected_source_hash:
-            environment["status"] = BLOCKED
-            environment["error"] = "source hash did not match the preregistered value"
-            environments.append(environment)
-            continue
-        seg_ir = _read_json(Path(environment_spec["seg_ir"]))
-        contract = qualify_graph_contract(seg_ir, components)
-        environment["contract"] = contract
-        env_dir = run_dir / environment_name
-        _write_json(env_dir / "graph_contract.json", contract)
-        if replay["status"] != PASS or contract["status"] != PASS:
-            environment["status"] = BLOCKED
-            environment["error"] = "runtime replay or company graph input contract failed"
-        else:
-            baseline, interventions = measure_interventions(seg_ir, c1, components)
-            _write_json(env_dir / "baseline_predictions.json", baseline)
-            _write_json(env_dir / "gnn_interventions.json", interventions)
-            environment["status"] = PARTIAL_PASS
-            environment["baseline_summary"] = baseline["summary"]
-            environment["interventions"] = interventions["interventions"]
-        after_hash = _sha256(source)
-        environment["source"]["sha256_after"] = after_hash
-        if after_hash != before_hash:
-            environment["status"] = BLOCKED
-            environment["error"] = "source DWG changed during read-only inference"
-        environments.append(environment)
-
-    critical_ok = replay["status"] == PASS and all(
-        environment.get("status") == PARTIAL_PASS
-        and environment["source"]["sha256_before"] == environment["source"]["sha256_after"]
-        for environment in environments
-    )
-    receipt = {
-        "schema": "e2.company_gnn_intervention_receipt.v1",
-        "status": PARTIAL_PASS if critical_ok else BLOCKED,
-        "created_at": _utc_now(),
-        "experiment_id": spec["experiment_id"],
-        "prereg": prereg_record,
-        "input_contract_amendment": _file_record(Path(spec["input_contract_amendment"])),
-        "integrity": integrity,
-        "runtime_replay": replay,
-        "environments": environments,
-        "model_status": {
-            "frozen_gnn": "RAN_EXPLORATORY_UNLABELED" if critical_ok else "BLOCKED_BY_INPUT_CONTRACT",
-            "gbdt": "NOT_RUN_INCOMPATIBLE_ABSOLUTE_SCALE_CONTRACT",
-            "vecformer": "NOT_RUN_NO_QUALIFIED_CHECKPOINT_INPUT_CONTRACT",
-            "graph_transformer": "NOT_RUN_NO_QUALIFIED_CHECKPOINT_INPUT_CONTRACT",
-        },
-        "accuracy_metrics": None,
-        "claim_boundary": "input compatibility and paired representation stability only; no wall accuracy",
-        "code_provenance": [
-            _file_record(Path(__file__)),
-            _file_record(c1_path),
-            _file_record(Path(c1.GNN_FORMAL_PATH)),
-            *[dict(value) for value in integrity.values()],
-        ],
-    }
-    _write_json(run_dir / "experiment_spec.json", spec)
-    _write_json(run_dir / "model_receipt.json", receipt)
-    (run_dir / "MODEL_REPORT.md").write_text(
-        _render_report(receipt), encoding="utf-8", newline="\n"
-    )
-    _write_json(run_dir / "artifact_manifest.json", _artifact_manifest(run_dir))
-    return receipt
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -897,28 +820,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--run-dir", type=Path, required=True)
     parser.add_argument("--prereg", type=Path, required=True)
     args = parser.parse_args(argv)
-    receipt = run(_read_json(args.spec), args.run_dir, args.prereg)
-    print(
-        json.dumps(
-            {
-                "status": receipt["status"],
-                "experiment_id": receipt["experiment_id"],
-                "runtime_replay": receipt["runtime_replay"]["status"],
-                "environments": [
-                    {
-                        "environment": row["environment"],
-                        "status": row["status"],
-                        "contract": row.get("contract", {}).get("status"),
-                        "candidates": row.get("baseline_summary", {}).get("candidate_count_at_0_5"),
-                    }
-                    for row in receipt["environments"]
-                ],
-            },
-            ensure_ascii=False,
-            indent=2,
-        )
-    )
-    return 0 if receipt["status"] != BLOCKED else 2
+    receipt = run({}, args.run_dir, args.prereg)
+    print(json.dumps(receipt, ensure_ascii=False, indent=2))
+    return 2
 
 
 if __name__ == "__main__":

@@ -12,8 +12,9 @@
 > 자동 승격해서는 안 된다.
 >
 > 기록 기준 commit: `b4621e60d14f5bdef1859eee9c504a9ef79848a6`.
-> 현재 PR #69는 Draft이며 target-population 계약 보강이 끝날 때까지
-> `BLOCKED`로 취급한다. 현재 suite/merge 상태의 정본이 아니라 역사 증거다.
+> 아래의 현재형 표현과 실행 결과는 모두 그 commit 당시의 기록이다.
+> 현재 구현·CI·병합 상태의 정본이 아니며, 현행 source·receipt·GitHub
+> checks를 다시 검증하지 않고 이 문서를 현재 권위로 사용할 수 없다.
 
 ## 결론
 
@@ -180,7 +181,9 @@ Native oracle v1은 `LINE`과 직선 구간 `LWPOLYLINE`만 지원한다. 곡선
 
 ## 재현 명령
 
-아래 명령은 현재 checkout의 CLI와 실제 증거 경로에 맞춘 것이다. native route와 model builder는 기존 evidence를 덮어쓰지 않으므로 재현 시 output 디렉터리를 새로 지정해야 한다.
+아래 명령은 기록 commit 당시의 역사적 실행 절차다. 현재 runbook이 아니며,
+legacy oracle 형식과 고정된 로컬 증거 경로를 포함하므로 그대로 실행해서
+현행 자격이나 성능을 주장해서는 안 된다.
 
 ### 집중 테스트
 

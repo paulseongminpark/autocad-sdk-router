@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import sys
 from pathlib import Path
 
@@ -22,6 +23,7 @@ from tools.e2.company_gnn_intervention import (  # noqa: E402
     transform_translate,
     validate_seg_ir,
 )
+from tools.e2 import company_gnn_intervention as gnn_runner  # noqa: E402
 
 
 def _seg_ir() -> dict:
@@ -133,3 +135,47 @@ def test_unconsumed_edge_attributes_are_a_sidecar_warning_not_gnn_input_drift():
     assert result["status"] == PASS
     assert result["edge_attribute_sidecar_status"] == "SIDECAR_ORDER_SENSITIVITY"
     assert result["max_edge_attribute_delta"] == 0.125
+
+
+def test_public_gnn_runner_stops_before_model_import(tmp_path: Path, monkeypatch):
+    import_attempts: list[Path] = []
+
+    def forbidden_import(path: Path, _: str):
+        import_attempts.append(path)
+        raise AssertionError("unsealed model import reached")
+
+    monkeypatch.setattr(gnn_runner, "_import_module", forbidden_import)
+    run_dir = tmp_path / "run"
+    result = gnn_runner.run(
+        {"experiment_id": "blocked-gnn", "c1_path": str(tmp_path / "c1.py")},
+        run_dir,
+        tmp_path / "missing-prereg.md",
+    )
+
+    assert result["status"] == "BLOCKED"
+    assert result["reason_code"] == "SEALED_DOWNSTREAM_EXECUTOR_REQUIRED"
+    assert result["executed"] is False
+    assert import_attempts == []
+    assert not run_dir.exists()
+
+
+def test_public_gnn_cli_returns_the_same_terminal_refusal(tmp_path: Path, capsys):
+    spec = tmp_path / "spec.json"
+    spec.write_text(json.dumps({"experiment_id": "blocked-gnn-cli"}), encoding="utf-8")
+
+    exit_code = gnn_runner.main(
+        [
+            "--spec",
+            str(spec),
+            "--run-dir",
+            str(tmp_path / "run"),
+            "--prereg",
+            str(tmp_path / "missing-prereg.md"),
+        ]
+    )
+    output = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 2
+    assert output["status"] == "BLOCKED"
+    assert output["reason_code"] == "SEALED_DOWNSTREAM_EXECUTOR_REQUIRED"
+    assert output["executed"] is False

@@ -1,7 +1,8 @@
-# Reproducible dependencies for the complete non-live GitHub test suite.
-# Production protocol dependencies remain in requirements.txt. The complete
-# suite additionally exercises ezdxf, the OpenCV/scikit-image visual gate, and
-# the E2 baseline metrics; unrelated optional geometry engines stay on-demand.
+# Top-level dependencies for the complete non-live GitHub test suite.
+# CI-only direct packages are pinned below, while requirements.txt constraints
+# and transitive packages remain resolver-selected. This is a compatibility
+# manifest, not a fully reproducible lockfile. Unrelated optional geometry
+# engines stay on-demand.
 
 -r requirements.txt
 

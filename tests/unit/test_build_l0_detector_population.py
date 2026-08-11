@@ -53,7 +53,7 @@ def _native_graph(drawing_id: str) -> dict:
                 "handle": "A",
                 "name": "A",
                 "origin": [0, 0, 0],
-                "entity_count": 4,
+                "entity_count": 5,
                 "def_entities": [
                     {
                         "handle": "WALL_VISIBLE",
@@ -78,6 +78,14 @@ def _native_graph(drawing_id: str) -> dict:
                         "space": "block",
                         "layer": "N1",
                         "geometry": {"kind": "line", "start": [1, 1, 0], "end": [4, 1, 0]},
+                    },
+                    {
+                        "handle": "OTHER_VISIBLE_2",
+                        "dxf_name": "LINE",
+                        "owner_handle": "A",
+                        "space": "block",
+                        "layer": "N1",
+                        "geometry": {"kind": "line", "start": [1, 1.5, 0], "end": [4, 1.5, 0]},
                     },
                     {
                         "handle": "ARC_VISIBLE",
@@ -246,6 +254,56 @@ def _world_and_ids(graph: dict) -> tuple[dict, dict[str, set[str]]]:
     return world, by_layer
 
 
+def _build_layer_mapping(tmp_path: Path, source_bytes: bytes) -> dict[str, str]:
+    tmp_path.mkdir()
+    source = tmp_path / "source.dwg"
+    source.write_bytes(source_bytes)
+    drawing_id = hashlib.sha256(source_bytes).hexdigest()
+    graph_value = _native_graph(drawing_id)
+    graph = tmp_path / "full_native_graph.json"
+    graph.write_text(json.dumps(graph_value), encoding="utf-8")
+    _, by_layer = _world_and_ids(graph_value)
+    full_oracle = tmp_path / "full_oracle.json"
+    _write_oracle(full_oracle, drawing_id, by_layer, geometry_scope="linear_segments_v1")
+    positive_oracle = tmp_path / "positive_oracle.json"
+    _write_oracle(
+        positive_oracle,
+        drawing_id,
+        {layer: by_layer.get(layer, set()) for layer in builder.WALL_LAYERS},
+        geometry_scope=None,
+    )
+    contract = tmp_path / "SPEC.md"
+    contract.write_text("owner positive layer anchors only", encoding="utf-8")
+    result = builder.build_population(
+        native_graph=graph,
+        source_dwg=source,
+        full_linear_oracle=full_oracle,
+        positive_oracle=positive_oracle,
+        label_contract=contract,
+        out_dir=tmp_path / "out",
+    )
+    assert result["status"] == "PASS_WITH_DEFERRAL"
+    truth = json.loads((tmp_path / "out" / "detector_truth.json").read_text(encoding="utf-8"))
+    model = json.loads((tmp_path / "out" / "detector_input.seg.json").read_text(encoding="utf-8"))
+    source_layer_by_id = {
+        record["placed_uid"]: record["source_layer"] for record in truth["records"]
+    }
+    return {
+        source_layer_by_id[row["handle"]]: row["layer"] for row in model["segments"]
+    }
+
+
+def test_layer_pseudonyms_are_salted_per_drawing_without_changing_the_partition(
+    tmp_path: Path,
+):
+    first = _build_layer_mapping(tmp_path / "first", b"immutable-dwg-0")
+    second = _build_layer_mapping(tmp_path / "second", b"immutable-dwg-2")
+
+    assert set(first) == set(second) == {builder.WALL_LAYERS[0], "N1"}
+    assert set(first.values()) == set(second.values()) == {"L000001", "L000002"}
+    assert first != second
+
+
 def test_build_population_separates_truth_and_cue_free_model_input(tmp_path: Path):
     source = tmp_path / "source.dwg"
     source.write_bytes(b"immutable-dwg")
@@ -270,7 +328,10 @@ def test_build_population_separates_truth_and_cue_free_model_input(tmp_path: Pat
         geometry_scope=None,
     )
     contract = tmp_path / "SPEC.md"
-    contract.write_text("W1/W2 are wall; every other segment is non-wall.\n", encoding="utf-8")
+    contract.write_text(
+        "W1/W2 are owner-supplied positive layer anchors; object truth completeness is unknown.\n",
+        encoding="utf-8",
+    )
 
     result = builder.build_population(
         native_graph=graph,
@@ -281,20 +342,47 @@ def test_build_population_separates_truth_and_cue_free_model_input(tmp_path: Pat
         out_dir=tmp_path / "out",
     )
 
-    assert result["status"] == "PASS"
-    assert result["qualified_linear_candidates"] == 2
-    assert result["positive_segments"] == 1
-    assert result["negative_segments"] == 1
+    assert result["status"] == "PASS_WITH_DEFERRAL"
+    assert result["reason_code"] == "LABEL_COMPLETENESS_UNKNOWN"
+    assert result["qualified_linear_candidates"] == 3
+    assert result["known_wall_layer_members"] == 1
+    assert result["unlabeled_layer_members"] == 2
+    assert result["object_positive_gold_segments"] == 0
+    assert result["object_negative_gold_segments"] == 0
+    assert result["object_unknown_segments"] == 3
     assert result["excluded_arc_chords"] == sum(
         segment["kind"] == "arc-chord" for segment in world["segments"]
     )
     model = json.loads((tmp_path / "out" / "detector_input.seg.json").read_text(encoding="utf-8"))
     assert set(model) == {"ir", "drawing_id", "units", "scale_mm_per_unit", "segments"}
     assert all(set(segment) == builder.SEGMENT_KEYS for segment in model["segments"])
-    assert all(segment["layer"] == "" and segment["label"] == "unknown" for segment in model["segments"])
-    assert builder.WALL_LAYERS[0] not in json.dumps(model, ensure_ascii=False)
+    assert all(
+        segment["layer"].startswith("L")
+        and len(segment["layer"]) == 7
+        and segment["label"] == "unknown"
+        for segment in model["segments"]
+    )
     truth = json.loads((tmp_path / "out" / "detector_truth.json").read_text(encoding="utf-8"))
-    assert {record["label"] for record in truth["records"]} == {"wall", "non_wall"}
+    truth_by_id = {record["placed_uid"]: record for record in truth["records"]}
+    model_by_id = {segment["handle"]: segment for segment in model["segments"]}
+    for left_id, left_truth in truth_by_id.items():
+        for right_id, right_truth in truth_by_id.items():
+            assert (
+                left_truth["source_layer"] == right_truth["source_layer"]
+            ) == (
+                model_by_id[left_id]["layer"] == model_by_id[right_id]["layer"]
+            )
+    assert result["layer_leakage_guard"]["source_layer_partition_preserved"] is True
+    assert result["layer_leakage_guard"]["blank_layer_count"] == 0
+    assert builder.WALL_LAYERS[0] not in json.dumps(model, ensure_ascii=False)
+    assert truth["schema"] == "ariadne.e2.l0.detector_label_anchors.v1"
+    assert truth["label_authority"] == "owner_layer_positive_only"
+    assert truth["object_truth_completeness"] == "UNKNOWN"
+    assert {record["object_label"] for record in truth["records"]} == {"UNKNOWN"}
+    assert {record["layer_anchor"] for record in truth["records"]} == {
+        "POSITIVE_UNLABELED",
+        "UNKNOWN",
+    }
     assert {record["placed_uid"] for record in truth["records"]} == {
         segment["handle"] for segment in model["segments"]
     }
@@ -322,7 +410,7 @@ def test_build_population_quarantines_full_oracle_identity_drift(tmp_path: Path)
         geometry_scope=None,
     )
     contract = tmp_path / "SPEC.md"
-    contract.write_text("complete binary owner labels", encoding="utf-8")
+    contract.write_text("owner positive layer anchors only", encoding="utf-8")
 
     result = builder.build_population(
         native_graph=graph,
@@ -334,8 +422,9 @@ def test_build_population_quarantines_full_oracle_identity_drift(tmp_path: Path)
     )
 
     assert result["status"] == "PASS_WITH_DEFERRAL"
-    assert result["reason_code"] == "DUAL_ORACLE_CONSENSUS_WITH_DISPUTED_SEGMENTS"
-    assert result["qualified_linear_candidates"] == 2
+    assert result["reason_code"] == "LABEL_COMPLETENESS_UNKNOWN"
+    assert result["observation_reason_code"] == "DUAL_ORACLE_CONSENSUS_WITH_DISPUTED_SEGMENTS"
+    assert result["qualified_linear_candidates"] == 3
     assert result["disputed_segments"]["native_only_count"] == 1
     assert result["disputed_segments"]["worldir_only_count"] == 0
     assert (tmp_path / "out" / "detector_input.seg.json").is_file()

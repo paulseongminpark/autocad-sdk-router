@@ -884,12 +884,14 @@ def _matching_source_bound_inputs(tmp_path: Path, *, receipt_name: str):
     return requirements, source, probe_path, tmp_path / receipt_name
 
 
-def test_guarded_runner_invalidates_terminal_receipt_when_runner_mutates_probe(tmp_path: Path):
+def test_guarded_runner_holds_probe_bytes_immutable_through_runner(tmp_path: Path):
     requirements, source, probe_path, receipt_path = _matching_source_bound_inputs(
         tmp_path, receipt_name="probe-mutated-receipt.json"
     )
     mutated_probe = _worldir_probe()
     mutated_probe["drawing_id"] = "b" * 64
+    probe_before = probe_path.read_bytes()
+
     def mutating_runner(command, check=False):
         probe_path.write_text(json.dumps(mutated_probe), encoding="utf-8")
         return _Completed(0)
@@ -907,33 +909,30 @@ def test_guarded_runner_invalidates_terminal_receipt_when_runner_mutates_probe(t
     final = _assert_authoritative_receipt(result, receipt_path)
     binding = final["evidence_binding"]
     assert final["guard"]["status"] == guard.BLOCKED
-    assert final["guard"]["reason_code"] == "EVIDENCE_BINDING_INVALIDATED_AFTER_EXECUTION"
-    assert final["executed"] is True
-    assert final["command_exit_code"] == 0
-    assert final["command_succeeded"] is True
-    assert final["evidence_authorized"] is False
-    assert final["execution_outcome"] == "COMMAND_COMPLETED_EVIDENCE_INVALIDATED"
+    assert final["guard"]["reason_code"] == "RUNNER_INVOCATION_FAILED"
+    assert final["executed"] is False
+    assert final["command_exit_code"] is None
+    assert final["command_succeeded"] is False
+    assert final["runner_error_type"] == "PermissionError"
+    assert final["execution_outcome"] == "RUNNER_EXCEPTION"
     assert final["terminal_authorized"] is False
-    assert binding["post_execution_validation"]["valid"] is False
-    assert binding["post_execution_validation"]["probe_matches_preflight"] is False
-    assert binding["post_execution_validation"]["probe_sha256"] == hashlib.sha256(
-        probe_path.read_bytes()
-    ).hexdigest()
+    assert binding["post_execution_validation"]["valid"] is True
+    assert binding["post_execution_validation"]["probe_matches_preflight"] is True
+    assert probe_path.read_bytes() == probe_before
     assert binding["terminal_evidence_valid"] is False
-    assert binding["terminal_evidence_validity"] == "INVALIDATED_AFTER_EXECUTION"
+    assert binding["terminal_evidence_validity"] == "RUNNER_EXCEPTION"
 
 
-def test_guarded_runner_invalidates_terminal_receipt_when_runner_mutates_source(tmp_path: Path):
+def test_guarded_runner_holds_source_bytes_immutable_through_runner(tmp_path: Path):
     requirements, source, probe_path, receipt_path = _matching_source_bound_inputs(
         tmp_path, receipt_name="source-mutated-receipt.json"
     )
 
-    class Completed:
-        returncode = 0
+    source_before = source.read_bytes()
 
     def mutating_runner(command, check=False):
         source.write_bytes(b"source bytes changed during command")
-        return Completed()
+        return _Completed(0)
 
     result = guarded_runner.run_guarded(
         required_observables=requirements,
@@ -948,17 +947,43 @@ def test_guarded_runner_invalidates_terminal_receipt_when_runner_mutates_source(
     final = _assert_authoritative_receipt(result, receipt_path)
     binding = final["evidence_binding"]
     assert final["guard"]["status"] == guard.BLOCKED
-    assert final["guard"]["reason_code"] == "EVIDENCE_BINDING_INVALIDATED_AFTER_EXECUTION"
+    assert final["guard"]["reason_code"] == "RUNNER_INVOCATION_FAILED"
+    assert final["executed"] is False
+    assert final["command_succeeded"] is False
+    assert final["runner_error_type"] == "PermissionError"
+    assert final["terminal_authorized"] is False
+    assert binding["post_execution_validation"]["valid"] is True
+    assert binding["post_execution_validation"]["source_matches_preflight"] is True
+    assert source.read_bytes() == source_before
+    assert binding["terminal_evidence_validity"] == "RUNNER_EXCEPTION"
+
+
+def test_guarded_runner_allows_readers_of_locked_source_and_probe(tmp_path: Path):
+    requirements, source, probe_path, receipt_path = _matching_source_bound_inputs(
+        tmp_path, receipt_name="read-locked-evidence-receipt.json"
+    )
+
+    def reading_runner(command, check=False):
+        assert source.read_bytes().startswith(b"AC10")
+        assert json.loads(probe_path.read_text(encoding="utf-8"))["oracle"] == "worldir.oracle.v1"
+        return _Completed(0)
+
+    result = guarded_runner.run_guarded(
+        required_observables=requirements,
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
+        probe_path=probe_path,
+        source_drawing=source,
+        receipt_path=receipt_path,
+        runner=reading_runner,
+    )
+
+    final = _assert_authoritative_receipt(result, receipt_path)
+    assert final["guard"]["reason_code"] == "INSTRUMENT_QUALIFIED", final
+    assert final["guard"]["status"] == guard.READY, final
     assert final["executed"] is True
     assert final["command_succeeded"] is True
-    assert final["evidence_authorized"] is False
-    assert final["terminal_authorized"] is False
-    assert binding["post_execution_validation"]["valid"] is False
-    assert binding["post_execution_validation"]["source_matches_preflight"] is False
-    assert binding["post_execution_validation"]["source_sha256"] == hashlib.sha256(
-        source.read_bytes()
-    ).hexdigest()
-    assert binding["terminal_evidence_validity"] == "INVALIDATED_AFTER_EXECUTION"
+    assert final["evidence_binding"]["post_execution_validation"]["valid"] is True
 
 
 def test_guarded_runner_blocks_pre_spawn_probe_mutation_and_does_not_execute(tmp_path: Path, monkeypatch):
@@ -1267,6 +1292,33 @@ def test_guarded_runner_executes_only_after_ready_probe():
     assert calls == [OBSERVATION_COMMAND]
 
 
+def test_observation_subprocess_does_not_inherit_python_code_injection_paths(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    injected = tmp_path / "pythonpath"
+    injected.mkdir()
+    marker = tmp_path / "sitecustomize-ran.txt"
+    (injected / "sitecustomize.py").write_text(
+        "from pathlib import Path\n"
+        f"Path({str(marker)!r}).write_text('executed', encoding='utf-8')\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("PYTHONPATH", str(injected))
+
+    result = guarded_runner.run_guarded(
+        required_observables=["modelspace_geometry", "block_definitions"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
+        probe_output=_rich_ir(),
+    )
+
+    assert result["guard"]["status"] == guard.READY
+    assert result["executed"] is True
+    assert result["command_exit_code"] == guard.EXIT_CODES[guard.NEEDS_TOOL]
+    assert not marker.exists()
+
+
 def test_guarded_runner_writes_preflight_and_final_receipt(tmp_path: Path):
     receipt_path = tmp_path / "guard.json"
 
@@ -1430,9 +1482,9 @@ def test_guarded_runner_invalidates_byte_identical_directory_alias_retarget(
     )
     assert binding[f"{bound_kind}_canonical_target"] == str(expected_a.resolve())
     validation = binding["post_execution_validation"]
-    assert validation[f"{bound_kind}_canonical_target_matches_preflight"] is False
-    assert f"{prefix}_CANONICAL_TARGET_CHANGED" in validation["reasons"]
-    assert f"{prefix}_FILE_IDENTITY_CHANGED" in validation["reasons"]
+    assert validation[f"{bound_kind}_canonical_target_matches_preflight"] is True
+    assert validation[f"{bound_kind}_requested_path_matches_preflight"] is False
+    assert f"{prefix}_REQUESTED_PATH_CHANGED" in validation["reasons"]
 
 
 @pytest.mark.parametrize("bound_kind", ["source", "probe"])
@@ -1443,6 +1495,7 @@ def test_guarded_runner_invalidates_byte_identical_replacement_when_observable(
         tmp_path, receipt_name=f"{bound_kind}-replacement-receipt.json"
     )
     target = source if bound_kind == "source" else probe_path
+    target_before = target.read_bytes()
     replacement = tmp_path / f"replacement-{target.name}"
     replacement.write_bytes(target.read_bytes())
 
@@ -1462,17 +1515,15 @@ def test_guarded_runner_invalidates_byte_identical_replacement_when_observable(
 
     final = _assert_authoritative_receipt(result, receipt_path)
     validation = final["evidence_binding"]["post_execution_validation"]
-    if validation[f"{bound_kind}_file_identity_matches_preflight"] is True:
-        pytest.skip("the platform did not expose a changed identity/stat fingerprint")
-    prefix = "SOURCE_DRAWING" if bound_kind == "source" else "PROBE_FILE"
     assert final["guard"]["status"] == guard.BLOCKED
-    assert final["guard"]["reason_code"] == "EVIDENCE_BINDING_INVALIDATED_AFTER_EXECUTION"
-    assert final["command_succeeded"] is True
+    assert final["guard"]["reason_code"] == "RUNNER_INVOCATION_FAILED"
+    assert final["executed"] is False
+    assert final["command_succeeded"] is False
+    assert final["runner_error_type"] == "PermissionError"
     assert final["terminal_authorized"] is False
-    assert any(
-        reason in validation["reasons"]
-        for reason in (f"{prefix}_FILE_IDENTITY_CHANGED", f"{prefix}_FILE_STAT_CHANGED")
-    )
+    assert validation["valid"] is True
+    assert validation[f"{bound_kind}_matches_preflight"] is True
+    assert target.read_bytes() == target_before
 
 
 @pytest.mark.parametrize("bound_kind", ["source", "probe"])
@@ -1481,6 +1532,7 @@ def test_guarded_runner_invalidates_source_or_probe_deletion(tmp_path: Path, bou
         tmp_path, receipt_name=f"{bound_kind}-deleted-receipt.json"
     )
     target = source if bound_kind == "source" else probe_path
+    target_before = target.read_bytes()
 
     def deleting_runner(command, check=False):
         target.unlink()
@@ -1497,16 +1549,16 @@ def test_guarded_runner_invalidates_source_or_probe_deletion(tmp_path: Path, bou
     )
 
     final = _assert_authoritative_receipt(result, receipt_path)
-    prefix = "SOURCE_DRAWING" if bound_kind == "source" else "PROBE_FILE"
     assert final["guard"]["status"] == guard.BLOCKED
-    assert final["guard"]["reason_code"] == "EVIDENCE_BINDING_INVALIDATED_AFTER_EXECUTION"
-    assert final["command_succeeded"] is True
-    assert final["evidence_authorized"] is False
+    assert final["guard"]["reason_code"] == "RUNNER_INVOCATION_FAILED"
+    assert final["executed"] is False
+    assert final["command_succeeded"] is False
+    assert final["runner_error_type"] == "PermissionError"
     assert final["terminal_authorized"] is False
-    assert any(
-        reason.startswith(f"{prefix}_UNAVAILABLE")
-        for reason in final["evidence_binding"]["post_execution_validation"]["reasons"]
-    )
+    validation = final["evidence_binding"]["post_execution_validation"]
+    assert validation["valid"] is True
+    assert validation[f"{bound_kind}_matches_preflight"] is True
+    assert target.read_bytes() == target_before
 
 
 def test_guarded_runner_blocks_malformed_probe_with_a_terminal_receipt(tmp_path: Path):

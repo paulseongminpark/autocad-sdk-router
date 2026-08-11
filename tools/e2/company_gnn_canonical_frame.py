@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Test a physical-mm, centered coordinate adapter for the frozen E2 GNN."""
+"""Pure canonical-frame helpers with a retired public GNN runner."""
 from __future__ import annotations
 
 import argparse
@@ -15,6 +15,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from tools.e2 import company_gnn_intervention as base
+from tools.e2.qualification.sealed_executor import refusal_receipt
 
 
 ROUND_DIGITS_MM = 6
@@ -284,38 +285,12 @@ def _render_report(receipt: Mapping[str, Any]) -> str:
 
 
 def run(spec: Mapping[str, Any], run_dir: Path, prereg: Path) -> dict[str, Any]:
-    run_dir.mkdir(parents=True, exist_ok=True)
-    c1_path = Path(spec["c1_path"])
-    c1 = base._import_module(c1_path, "e2_company_canonical_c1")
-    integrity = c1.verify_integrity()
-    components = c1.load_components()
-    environments = [
-        _process_environment(name, spec["environments"][name], run_dir, c1, components)
-        for name in ("approval", "implementation")
-    ]
-    repair_pass = all(environment.get("status") == base.PASS for environment in environments)
-    receipt = {
-        "schema": "e2.company_gnn_canonical_frame_receipt.v1",
-        "status": base.PARTIAL_PASS if repair_pass else base.BLOCKED,
-        "repair_status": base.PASS if repair_pass else base.BLOCKED,
-        "created_at": base._utc_now(),
-        "experiment_id": spec["experiment_id"],
-        "prereg": base._file_record(prereg),
-        "integrity": integrity,
-        "environments": environments,
-        "accuracy_metrics": None,
-        "claim_boundary": "origin and unit representation repair only; no wall accuracy",
-        "code_provenance": [
-            base._file_record(Path(__file__)),
-            base._file_record(Path(base.__file__)),
-            base._file_record(c1_path),
-        ],
-    }
-    base._write_json(run_dir / "experiment_spec.json", spec)
-    base._write_json(run_dir / "repair_receipt.json", receipt)
-    (run_dir / "REPORT.md").write_text(_render_report(receipt), encoding="utf-8", newline="\n")
-    base._write_json(run_dir / "artifact_manifest.json", base._artifact_manifest(run_dir))
-    return receipt
+    return refusal_receipt(
+        requested_receipt_schema="e2.company_gnn_canonical_frame_receipt.v1",
+        experiment_id=spec.get("experiment_id"),
+        entrypoint="tools.e2.company_gnn_canonical_frame.run",
+        claim_boundary="no direct model inference; sealed executor required",
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -324,22 +299,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--run-dir", type=Path, required=True)
     parser.add_argument("--prereg", type=Path, required=True)
     args = parser.parse_args(argv)
-    receipt = run(base._read_json(args.spec), args.run_dir, args.prereg)
-    print(
-        json.dumps(
-            {
-                "status": receipt["status"],
-                "repair_status": receipt["repair_status"],
-                "environments": [
-                    {"environment": row["environment"], "status": row["status"]}
-                    for row in receipt["environments"]
-                ],
-            },
-            ensure_ascii=False,
-            indent=2,
-        )
-    )
-    return 0 if receipt["repair_status"] == base.PASS else 2
+    receipt = run({}, args.run_dir, args.prereg)
+    print(json.dumps(receipt, ensure_ascii=False, indent=2))
+    return 2
 
 
 if __name__ == "__main__":

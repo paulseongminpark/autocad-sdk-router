@@ -10,14 +10,15 @@ if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
     from tools.e2.qualification.engine import (
         build_first_report,
-        validate_downstream_qualification_receipt,
     )
 else:
-    from .engine import build_first_report, validate_downstream_qualification_receipt
+    from .engine import build_first_report
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Build the evidence-bound E2 first report.")
+    parser = argparse.ArgumentParser(
+        description="Refuse unsealed E2 scoring until a sealed executor is available."
+    )
     parser.add_argument("--experiment-id", required=True)
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--source-sha256", required=True)
@@ -54,11 +55,8 @@ def main(argv: list[str] | None = None) -> int:
         ],
     }
     result = build_first_report(spec, args.run_dir)
-    result["downstream_receipt_validation"] = validate_downstream_qualification_receipt(
-        Path(result["receipt"])
-    )
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
-    return 0 if result["downstream_receipt_validation"]["status"] == "PASS" else 2
+    return 2
 
 
 if __name__ == "__main__":

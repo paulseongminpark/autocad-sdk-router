@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import sys
 from pathlib import Path
 
@@ -13,6 +14,7 @@ from tools.e2.company_gnn_canonical_frame import (  # noqa: E402
     canonicalize_physical_frame,
     compare_canonical_geometry,
 )
+from tools.e2 import company_gnn_canonical_frame as canonical_runner  # noqa: E402
 from tools.e2.company_gnn_intervention import (  # noqa: E402
     PASS,
     transform_consistent_scale,
@@ -59,3 +61,47 @@ def test_canonical_frame_collapses_translation_and_unit_reexpression():
     assert compare_canonical_geometry(baseline, translated)["status"] == PASS
     assert compare_canonical_geometry(baseline, scaled)["status"] == PASS
     assert baseline == translated == scaled
+
+
+def test_public_canonical_runner_stops_before_model_import(tmp_path: Path, monkeypatch):
+    import_attempts: list[Path] = []
+
+    def forbidden_import(path: Path, _: str):
+        import_attempts.append(path)
+        raise AssertionError("unsealed model import reached")
+
+    monkeypatch.setattr(canonical_runner.base, "_import_module", forbidden_import)
+    run_dir = tmp_path / "run"
+    result = canonical_runner.run(
+        {"experiment_id": "blocked-canonical", "c1_path": str(tmp_path / "c1.py")},
+        run_dir,
+        tmp_path / "missing-prereg.md",
+    )
+
+    assert result["status"] == "BLOCKED"
+    assert result["reason_code"] == "SEALED_DOWNSTREAM_EXECUTOR_REQUIRED"
+    assert result["executed"] is False
+    assert import_attempts == []
+    assert not run_dir.exists()
+
+
+def test_public_canonical_cli_returns_the_same_terminal_refusal(tmp_path: Path, capsys):
+    spec = tmp_path / "spec.json"
+    spec.write_text(json.dumps({"experiment_id": "blocked-canonical-cli"}), encoding="utf-8")
+
+    exit_code = canonical_runner.main(
+        [
+            "--spec",
+            str(spec),
+            "--run-dir",
+            str(tmp_path / "run"),
+            "--prereg",
+            str(tmp_path / "missing-prereg.md"),
+        ]
+    )
+    output = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 2
+    assert output["status"] == "BLOCKED"
+    assert output["reason_code"] == "SEALED_DOWNSTREAM_EXECUTOR_REQUIRED"
+    assert output["executed"] is False
