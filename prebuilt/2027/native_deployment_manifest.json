@@ -14,7 +14,7 @@
     "source_tree":  {
                         "algorithm":  "sha256",
                         "canonicalization":  "crlf_to_lf_unless_nul",
-                        "digest":  "d472dbc83cd1398cf07cb1bdd8f1bc22546d95c7dc97c89eed155e08e27e5b4a",
+                        "digest":  "1dfca7dd3605f080a5d67bb0433917274859d84b5fba3b6b630c84d98e6e67ca",
                         "inputs":  [
                                        {
                                            "path":  "src/Ariadne.AcadNative/Ariadne.AcadNative.arx.vcxproj",
@@ -58,8 +58,8 @@
                                        },
                                        {
                                            "path":  "src/Ariadne.AcadNative/families/m08c_handlers.inc",
-                                           "sha256":  "015e0826bda710af1fa60b32fbc62999436095fa67f1f631d709c33148a081cc",
-                                           "bytes":  40200
+                                           "sha256":  "8ce20bdb6758bfb96e1560cae6f19176f1b7abc95a52ab5aeac21ba9207964dd",
+                                           "bytes":  44566
                                        },
                                        {
                                            "path":  "src/Ariadne.AcadNative/families/m08d_handlers.inc",
@@ -68,8 +68,8 @@
                                        },
                                        {
                                            "path":  "src/Ariadne.AcadNative/families/m08e_handlers.inc",
-                                           "sha256":  "db2d7430712a8df010dff2477b5ffb6d5a298323367672e7a39b94319cbba2e5",
-                                           "bytes":  103579
+                                           "sha256":  "d0f5ae6acc32cf90f32b0c73655bcff4afac0f68ef9cd6ba50b9cfe2d32bd849",
+                                           "bytes":  99596
                                        },
                                        {
                                            "path":  "src/Ariadne.AcadNative/families/m08f_handlers.inc",
@@ -173,7 +173,7 @@
                                        }
                                    ]
                     },
-    "source_tree_digest":  "d472dbc83cd1398cf07cb1bdd8f1bc22546d95c7dc97c89eed155e08e27e5b4a",
+    "source_tree_digest":  "1dfca7dd3605f080a5d67bb0433917274859d84b5fba3b6b630c84d98e6e67ca",
     "source_authority":  {
                              "source_inventory_authoritative":  true,
                              "captured_inputs_match_head":  true,
@@ -184,7 +184,7 @@
     "compilation_tree":  {
                              "algorithm":  "sha256",
                              "byte_representation":  "canonical_lf_unless_nul_mirror_bytes",
-                             "digest":  "d472dbc83cd1398cf07cb1bdd8f1bc22546d95c7dc97c89eed155e08e27e5b4a",
+                             "digest":  "1dfca7dd3605f080a5d67bb0433917274859d84b5fba3b6b630c84d98e6e67ca",
                              "inputs":  [
                                             {
                                                 "path":  "src/Ariadne.AcadNative/Ariadne.AcadNative.arx.vcxproj",
@@ -228,8 +228,8 @@
                                             },
                                             {
                                                 "path":  "src/Ariadne.AcadNative/families/m08c_handlers.inc",
-                                                "sha256":  "015e0826bda710af1fa60b32fbc62999436095fa67f1f631d709c33148a081cc",
-                                                "bytes":  40200
+                                                "sha256":  "8ce20bdb6758bfb96e1560cae6f19176f1b7abc95a52ab5aeac21ba9207964dd",
+                                                "bytes":  44566
                                             },
                                             {
                                                 "path":  "src/Ariadne.AcadNative/families/m08d_handlers.inc",
@@ -238,8 +238,8 @@
                                             },
                                             {
                                                 "path":  "src/Ariadne.AcadNative/families/m08e_handlers.inc",
-                                                "sha256":  "db2d7430712a8df010dff2477b5ffb6d5a298323367672e7a39b94319cbba2e5",
-                                                "bytes":  103579
+                                                "sha256":  "d0f5ae6acc32cf90f32b0c73655bcff4afac0f68ef9cd6ba50b9cfe2d32bd849",
+                                                "bytes":  99596
                                             },
                                             {
                                                 "path":  "src/Ariadne.AcadNative/families/m08f_handlers.inc",
@@ -343,7 +343,7 @@
                                             }
                                         ]
                          },
-    "compilation_tree_digest":  "d472dbc83cd1398cf07cb1bdd8f1bc22546d95c7dc97c89eed155e08e27e5b4a",
+    "compilation_tree_digest":  "1dfca7dd3605f080a5d67bb0433917274859d84b5fba3b6b630c84d98e6e67ca",
     "source_provenance":  {
                               "compilation_input":  "immutable_starting_snapshot_mirror",
                               "mirror_ephemeral":  true,
@@ -357,7 +357,7 @@
     "artifacts":  [
                       {
                           "leaf":  "Ariadne.AcadNativeDbx.dbx",
-                          "sha256":  "330157e9e0c41ff16205678ca556a5122f1548dc20292f1d525573cdae4d4db6",
+                          "sha256":  "ab6d59ea05b22f6619203898fbac7387b85e09d8463afa7db87c888660bb91fe",
                           "bytes":  54272,
                           "current":  true,
                           "exists":  true,
@@ -374,8 +374,8 @@
                       },
                       {
                           "leaf":  "Ariadne.AcadNative.crx",
-                          "sha256":  "3aae1f442e0642c1bcc8aa3548e6214243bad9ffdc4c7453846399186f294a71",
-                          "bytes":  1177600,
+                          "sha256":  "e968c8bdc7e13ca780da53c76df767d939ac8464561478ea25296f6648646e05",
+                          "bytes":  1176576,
                           "current":  true,
                           "exists":  true,
                           "pe_verification":  {
@@ -391,8 +391,8 @@
                       },
                       {
                           "leaf":  "Ariadne.AcadNative.arx",
-                          "sha256":  "a9c3ed5cd047da9057630216518e3c988f308792b690353797f1fb0536349515",
-                          "bytes":  1186304,
+                          "sha256":  "d78e0373c2c441990da58800fc0e08ce114968723673ffc7e514796de19d1cc1",
+                          "bytes":  1184256,
                           "current":  true,
                           "exists":  true,
                           "pe_verification":  {
