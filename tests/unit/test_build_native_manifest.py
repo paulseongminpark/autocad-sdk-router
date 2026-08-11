@@ -1022,6 +1022,8 @@ def test_native_build_compiles_only_the_starting_immutable_source_mirror(
     env = _git_safe_directory_env(router)
     env.update(
         {
+            "TEMP": str(tmp_path),
+            "TMP": str(tmp_path),
             "NATIVE_ABA_MODE": "new-file",
             "NATIVE_ABA_STATUS": str(status_path),
             "NATIVE_ABA_ROUTER": str(router),
@@ -1057,7 +1059,7 @@ def test_native_build_compiles_only_the_starting_immutable_source_mirror(
     status = json.loads(status_path.read_text(encoding="utf-8"))
     assert status["project_is_mirror"] is True
     assert status["injected_visible_from_project"] is False
-    assert Path(status["project"]).is_relative_to(Path(os.environ["TEMP"]))
+    assert Path(status["project"]).is_relative_to(tmp_path)
     assert result["build_manifest_verification"]["verified"] is True
     assert not (source.parent / "temporary_compiler_input.hpp").exists()
 
