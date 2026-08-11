@@ -569,19 +569,19 @@ def test_committed_deployment_rejects_rehashed_noncanonical_compilation_bytes(
         router / "src" / "Ariadne.AcadNative" / "AriadneNativeJob.cpp"
     )
     source_raw = source_path.read_bytes()
-    normalized = source_raw.replace(b"\r\n", b"\n")
-    producer_raw = normalized.replace(b"\n", b"\r\n")
-    if producer_raw == source_raw:
-        producer_raw = normalized
-    assert producer_raw != source_raw
+    canonical = source_raw.replace(b"\r\n", b"\n")
+    noncanonical = source_raw
+    if noncanonical == canonical:
+        noncanonical = canonical.replace(b"\n", b"\r\n")
+    assert noncanonical != canonical
 
     relative_path = "src/Ariadne.AcadNative/AriadneNativeJob.cpp"
     compilation_inputs = manifest["compilation_tree"]["inputs"]
     record = next(
         item for item in compilation_inputs if item["path"] == relative_path
     )
-    record["sha256"] = hashlib.sha256(producer_raw).hexdigest()
-    record["bytes"] = len(producer_raw)
+    record["sha256"] = hashlib.sha256(noncanonical).hexdigest()
+    record["bytes"] = len(noncanonical)
     compilation_digest = native_integrity._source_tree_digest(compilation_inputs)
     manifest["compilation_tree"]["digest"] = compilation_digest
     manifest["compilation_tree_digest"] = compilation_digest
