@@ -1,0 +1,109 @@
+name: CADAgent CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cadagent-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-tests:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-ci.txt
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-ci.txt
+      - name: Run the complete non-live test suite
+        run: python -m pytest tests -q
+
+  mcp-sdk-matrix:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-mcp-sdk-v2.txt
+      - name: Install the production MCP SDK
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest -r requirements.txt
+      - name: Exercise official MCP SDK 1.x and isolated 2.x over stdio
+        shell: powershell
+        run: .\tools\test_cadagent_mcp_sdk_matrix.ps1 -PythonExe python -InstallV2
+
+  powershell-syntax:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse every PowerShell tool
+        shell: powershell
+        run: |
+          $allErrors = @()
+          $trackedScripts = @(git ls-files -- '*.ps1')
+          if ($LASTEXITCODE -ne 0 -or $trackedScripts.Count -eq 0) {
+            throw 'Unable to enumerate tracked PowerShell files.'
+          }
+          $trackedScripts | ForEach-Object {
+            $tokens = $null
+            $parseErrors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              (Join-Path $env:GITHUB_WORKSPACE $_),
+              [ref]$tokens,
+              [ref]$parseErrors
+            )
+            if ($parseErrors) {
+              $allErrors += $parseErrors | ForEach-Object {
+                "$($_.Extent.File):$($_.Extent.StartLineNumber): $($_.Message)"
+              }
+            }
+          }
+          if ($allErrors.Count -ne 0) {
+            $allErrors | Write-Error
+            exit 1
+          }
+
+  native-integrity:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - name: Install contract-test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest -r requirements.txt
+      - name: Verify native source, deployment marker, and consumers agree
+        run: >-
+          python -m pytest -q
+          tests/unit/test_committed_native_deployment.py
+          tests/unit/test_build_native_manifest.py
+          tests/test_native_arx_dbx_contract.py
+          tests/unit/test_native_deployment_consumers.py
+          tests/unit/test_e2_display_membership_route.py

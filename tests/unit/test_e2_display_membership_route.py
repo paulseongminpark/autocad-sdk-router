@@ -189,6 +189,11 @@ def _source_tree_digest(inputs: list[dict]) -> str:
     return digest.hexdigest()
 
 
+def _canonical_native_text(data: bytes) -> bytes:
+    """Mirror the public LF identity while keeping this fixture independent."""
+    return data.replace(b"\r\n", b"\n")
+
+
 def _fake_x64_pe(tag: bytes) -> bytes:
     """Small independent PE32+ DLL fixture; it is structural, never executable."""
     image = bytearray(512)
@@ -248,12 +253,12 @@ def _prepare_current_native_checkout(router: Path) -> Path:
     dbx_src = router / "src" / "Ariadne.AcadNativeDbx"
     native_bin = native_src / "bin" / "x64" / "Release"
     native_bin.mkdir(parents=True)
-    (native_src / "AriadneNativeJob.cpp").write_text("// native source\n", encoding="utf-8")
+    (native_src / "AriadneNativeJob.cpp").write_bytes(b"// native source\n")
     (dbx_src / "AriadneDbxEntry.cpp").parent.mkdir(parents=True, exist_ok=True)
-    (dbx_src / "AriadneDbxEntry.cpp").write_text("// dbx source\n", encoding="utf-8")
+    (dbx_src / "AriadneDbxEntry.cpp").write_bytes(b"// dbx source\n")
     recipe = router / "tools" / "build_native_acad.ps1"
     recipe.parent.mkdir(parents=True, exist_ok=True)
-    recipe.write_text("# fixture native build recipe\n", encoding="utf-8")
+    recipe.write_bytes(b"# fixture native build recipe\n")
     (router / ".gitignore").write_text("bin/\nobj/\n.vs/\nbuild/\n", encoding="utf-8")
 
     _git(router, "init", "-q")
@@ -279,7 +284,7 @@ def _prepare_current_native_checkout(router: Path) -> Path:
 
     source_inputs = []
     for path in sorted((native_src / "AriadneNativeJob.cpp", dbx_src / "AriadneDbxEntry.cpp"), key=lambda p: p.as_posix()):
-        payload = path.read_bytes()
+        payload = _canonical_native_text(path.read_bytes())
         source_inputs.append(
             {
                 "path": path.relative_to(router).as_posix(),
@@ -301,7 +306,9 @@ def _prepare_current_native_checkout(router: Path) -> Path:
         },
         "build_recipe": {
             "path": "tools/build_native_acad.ps1",
-            "sha256": hashlib.sha256(recipe.read_bytes()).hexdigest(),
+            "sha256": hashlib.sha256(
+                _canonical_native_text(recipe.read_bytes())
+            ).hexdigest(),
         },
         "source_tree": {
             "algorithm": "sha256",

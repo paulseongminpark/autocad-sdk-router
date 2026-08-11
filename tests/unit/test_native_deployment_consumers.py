@@ -20,6 +20,10 @@ LEAVES = (
 )
 
 
+def _canonical_text_bytes(data: bytes) -> bytes:
+    return data.replace(b"\r\n", b"\n")
+
+
 def _minimal_pe(seed: int) -> bytes:
     payload = bytearray(512)
     payload[0:2] = b"MZ"
@@ -48,7 +52,7 @@ def _source_inputs(router: Path) -> list[dict[str, object]]:
             ):
                 continue
             if path.is_file():
-                data = path.read_bytes()
+                data = _canonical_text_bytes(path.read_bytes())
                 records.append(
                     {
                         "path": path.relative_to(router).as_posix(),
@@ -74,14 +78,14 @@ def _native_fixture(tmp_path: Path, *, manifest_leaf: str) -> tuple[Path, Path]:
     (router / "src" / "Ariadne.AcadNativeDbx").mkdir(parents=True)
     (router / "tools").mkdir(parents=True)
     deploy.mkdir(parents=True)
-    (router / "src" / "Ariadne.AcadNative" / "native.cpp").write_text(
-        "// native\n", encoding="utf-8"
+    (router / "src" / "Ariadne.AcadNative" / "native.cpp").write_bytes(
+        b"// native\n"
     )
-    (router / "src" / "Ariadne.AcadNativeDbx" / "dbx.cpp").write_text(
-        "// dbx\n", encoding="utf-8"
+    (router / "src" / "Ariadne.AcadNativeDbx" / "dbx.cpp").write_bytes(
+        b"// dbx\n"
     )
     recipe = router / "tools" / "build_native_acad.ps1"
-    recipe.write_text("# recipe\n", encoding="utf-8")
+    recipe.write_bytes(b"# recipe\n")
 
     artifacts = []
     for seed, leaf in enumerate(LEAVES, start=1):
@@ -111,7 +115,9 @@ def _native_fixture(tmp_path: Path, *, manifest_leaf: str) -> tuple[Path, Path]:
         "build_target": "Rebuild",
         "build_recipe": {
             "path": "tools/build_native_acad.ps1",
-            "sha256": hashlib.sha256(recipe.read_bytes()).hexdigest(),
+            "sha256": hashlib.sha256(
+                _canonical_text_bytes(recipe.read_bytes())
+            ).hexdigest(),
         },
         "artifacts": artifacts,
     }
@@ -189,6 +195,33 @@ def test_consumer_rejects_stale_source_digest(tmp_path: Path, consumer: Path):
 
     assert completed.returncode != 0
     assert "source-tree digest" in completed.stderr.lower()
+
+
+@pytest.mark.parametrize("consumer", CONSUMERS, ids=lambda path: path.name)
+def test_consumer_accepts_equivalent_crlf_checkout(
+    tmp_path: Path, consumer: Path
+):
+    router, deploy = _native_fixture(
+        tmp_path, manifest_leaf="native_deployment_manifest.json"
+    )
+    for path in (
+        router / "src" / "Ariadne.AcadNative" / "native.cpp",
+        router / "src" / "Ariadne.AcadNativeDbx" / "dbx.cpp",
+        router / "tools" / "build_native_acad.ps1",
+    ):
+        path.write_bytes(path.read_bytes().replace(b"\n", b"\r\n"))
+
+    completed = _run_consumer(
+        consumer,
+        router,
+        deploy,
+        "native_deployment_manifest.json",
+        "$lease = Open-NativeDeploymentLease -BinDir $bin -ManifestLeaf $manifestLeaf; "
+        "try { $lease.manifest_kind } finally { Close-NativeDeploymentLease $lease }",
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert completed.stdout.strip() == "deployment"
 
 
 @pytest.mark.parametrize("consumer", CONSUMERS, ids=lambda path: path.name)
