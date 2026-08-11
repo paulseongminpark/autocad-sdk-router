@@ -71,21 +71,8 @@ class TestOpDagBuild(unittest.TestCase):
                           "op_dag node set must equal the operations.v2.json catalogue set "
                           "exactly (missing=%r invented=%r)" % (missing, invented))
         self.assertEqual(len(self.nodes), len(self.catalogue), "no duplicate op_id nodes")
-        # w3-dimstyle adds one new op (write.dimstyle.create) -- 517 -> 518.
-        # w3-ltts adds two more (write.linetype.create, write.textstyle.create)
-        # -- 518 -> 519 -> 520. P10 adds a fourth (modify.entity.xdata) --
-        # 520 -> 521. p4-poly2d adds a fifth (write.entity.polyline2d.deep) --
-        # 521 -> 522. p9-tables2 adds three more (write.ucs.create,
-        # write.view.create, write.vport.create) -- 522 -> 523 -> 524 -> 525.
-        # wave-5/6 coordinated merge adds sixteen (w5-anchor x4, w6-layerstate x4,
-        # w6-dynblk x3, w6-section x3, w6-sheetset x2 blocked) -- 525 -> 541.
-        # wave-7 adds four headless python ops (inspect.entity.identity_contract,
-        # inspect.xdata.semantic_anchor, run.corpus.batch, verify.cross_engine.dwg)
-        # -- 541 -> 545. w7-native adds five (materials x3 + annoscale x2) -- 545 -> 550.
-        # P3 assoc-relink adds write.block.relink_hatch_assoc -- 550 -> 551.
-        self.assertEqual(len(self.nodes), 551, "operations.v2.json is currently 551 ops; a "
-                                                "count drift here means the catalogue changed "
-                                                "underneath this test, not a generator bug")
+        self.assertEqual(self.dag["totals"]["node_count"], len(self.catalogue))
+        self.assertEqual(self.dag["totals"]["catalogue_count"], len(self.catalogue))
 
     def test_no_cycles(self):
         acyclic, cycle = odg.topo_check(

@@ -3,7 +3,8 @@ param(
   [string]$Platform = 'x64',
   [string]$RouterHome = '',
   [string]$OutputRoot = '',
-  [string]$TargetSuffix = ''
+  [string]$TargetSuffix = '',
+  [string]$MSBuildExe = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -21,6 +22,12 @@ $claimScope = if ($Configuration -ieq 'Release') {
 }
 
 function Resolve-MSBuild {
+  if (-not [string]::IsNullOrWhiteSpace($MSBuildExe)) {
+    if (-not (Test-Path -LiteralPath $MSBuildExe -PathType Leaf)) {
+      throw "Explicit MSBuild executable is missing: $MSBuildExe"
+    }
+    return (Resolve-Path -LiteralPath $MSBuildExe).Path
+  }
   $preferred = @(
     'C:\Program Files\Microsoft Visual Studio\2026\Community\MSBuild\Current\Bin\amd64\MSBuild.exe',
     'C:\Program Files\Microsoft Visual Studio\2026\Community\MSBuild\Current\Bin\MSBuild.exe'
@@ -69,9 +76,8 @@ function Get-Sha256Bytes {
   }
 }
 
-function Get-CanonicalNativeSourceBytes {
-  param([string]$Path)
-  [byte[]]$raw = [System.IO.File]::ReadAllBytes($Path)
+function ConvertTo-CanonicalNativeSourceBytes {
+  param([byte[]]$Raw)
   if ([Array]::IndexOf($raw, [byte]0) -ge 0) {
     Write-Output -NoEnumerate $raw
     return
@@ -93,6 +99,28 @@ function Get-CanonicalNativeSourceBytes {
   Write-Output -NoEnumerate $canonical
 }
 
+function Get-CanonicalNativeSourceBytes {
+  param([string]$Path)
+  [byte[]]$raw = [System.IO.File]::ReadAllBytes($Path)
+  Write-Output -NoEnumerate (ConvertTo-CanonicalNativeSourceBytes -Raw $raw)
+}
+
+function Read-NativeBuildInputStreamBytes {
+  param([System.IO.FileStream]$Stream)
+  $Stream.Position = 0
+  $buffer = New-Object System.IO.MemoryStream
+  try {
+    $Stream.CopyTo($buffer)
+    [byte[]]$raw = $buffer.ToArray()
+  } finally {
+    $buffer.Dispose()
+  }
+  if ([int64]$raw.Length -ne [int64]$Stream.Length) {
+    throw "Native build input changed while its held handle was read: $($Stream.Name)"
+  }
+  Write-Output -NoEnumerate $raw
+}
+
 function Test-NativeBuildOutputPart {
   param([string]$Part)
   $normalized = $Part.ToLowerInvariant()
@@ -103,12 +131,12 @@ function Test-NativeBuildOutputPart {
   )
 }
 
-function Get-NativeSourceInputs {
+function Get-NativeSourcePathRecords {
   $roots = @(
     (Join-Path $RouterHome 'src\Ariadne.AcadNative'),
     (Join-Path $RouterHome 'src\Ariadne.AcadNativeDbx')
   )
-  $inputs = @()
+  $paths = @()
   foreach ($root in $roots) {
     if (-not (Test-Path -LiteralPath $root -PathType Container)) {
       throw "Native source root missing: $root"
@@ -132,18 +160,50 @@ function Get-NativeSourceInputs {
           continue
         }
         $relative = $entry.FullName.Substring($RouterHome.Length).TrimStart('\', '/') -replace '\\', '/'
-        [byte[]]$sourceBytes = Get-CanonicalNativeSourceBytes -Path $entry.FullName
-        $inputs += [ordered]@{
+        $paths += [pscustomobject][ordered]@{
           path = $relative
-          sha256 = Get-Sha256Bytes -Bytes $sourceBytes
-          bytes = [int64]$sourceBytes.Length
+          full_path = $entry.FullName
         }
       }
     }
   }
-  $inputs = @($inputs | Sort-Object @{ Expression = { $_.path.ToLowerInvariant() } }, @{ Expression = { $_.path } })
-  if ($inputs.Count -eq 0) { throw 'Native source input inventory is empty.' }
-  return $inputs
+  $paths = @($paths | Sort-Object @{ Expression = { $_.path.ToLowerInvariant() } }, @{ Expression = { $_.path } })
+  if ($paths.Count -eq 0) { throw 'Native source input inventory is empty.' }
+  return $paths
+}
+
+function Get-NativeSourceState {
+  $canonicalInputs = @()
+  $compilationInputs = @()
+  $authorityInputs = @()
+  foreach ($record in @(Get-NativeSourcePathRecords)) {
+    [byte[]]$raw = [System.IO.File]::ReadAllBytes($record.full_path)
+    [byte[]]$canonical = ConvertTo-CanonicalNativeSourceBytes -Raw $raw
+    $canonicalInputs += [ordered]@{
+      path = $record.path
+      sha256 = Get-Sha256Bytes -Bytes $canonical
+      bytes = [int64]$canonical.Length
+    }
+    $compilationInputs += [ordered]@{
+      path = $record.path
+      sha256 = Get-Sha256Bytes -Bytes $raw
+      bytes = [int64]$raw.Length
+    }
+    $authorityInputs += [pscustomobject][ordered]@{
+      kind = 'source'
+      path = $record.path
+      raw = $raw
+    }
+  }
+  return [pscustomobject][ordered]@{
+    canonical_inputs = $canonicalInputs
+    compilation_inputs = $compilationInputs
+    authority_inputs = $authorityInputs
+  }
+}
+
+function Get-NativeSourceInputs {
+  return @((Get-NativeSourceState).canonical_inputs)
 }
 
 function Get-NativeSourceDigest {
@@ -178,40 +238,246 @@ function Test-NativeSourceStatusLine {
   return $false
 }
 
+function Invoke-NativeGitText {
+  param([string[]]$Arguments)
+  $git = Get-Command git -CommandType Application -ErrorAction SilentlyContinue |
+    Select-Object -First 1
+  if (-not $git) { throw 'git executable is unavailable.' }
+
+  # Git's repository-selection environment variables take precedence over -C.
+  # Run every producer observation with a closed, restored command environment
+  # so inherited GIT_DIR/GIT_WORK_TREE/config cannot redirect provenance to a
+  # clean decoy repository.
+  $savedGitEnvironment = [ordered]@{}
+  foreach ($entry in @(Get-ChildItem Env:)) {
+    if ($entry.Name.StartsWith('GIT_', [System.StringComparison]::OrdinalIgnoreCase)) {
+      $savedGitEnvironment[$entry.Name] = $entry.Value
+    }
+  }
+  try {
+    foreach ($name in @($savedGitEnvironment.Keys)) {
+      Remove-Item -LiteralPath ("Env:$name") -ErrorAction SilentlyContinue
+    }
+    $env:GIT_OPTIONAL_LOCKS = '0'
+    $env:GIT_NO_REPLACE_OBJECTS = '1'
+    $env:GIT_CONFIG_NOSYSTEM = '1'
+    $env:GIT_CONFIG_GLOBAL = 'NUL'
+    $env:GIT_TERMINAL_PROMPT = '0'
+    $output = & $git.Source --no-optional-locks `
+      -c 'core.fsmonitor=false' `
+      -c 'core.autocrlf=true' `
+      -c "safe.directory=$RouterHome" `
+      -C $RouterHome @Arguments 2>$null
+    $exitCode = $LASTEXITCODE
+    if ($exitCode -ne 0) { throw "git command failed with exit $exitCode." }
+    return (@($output) -join "`n")
+  } finally {
+    foreach ($entry in @(Get-ChildItem Env:)) {
+      if ($entry.Name.StartsWith('GIT_', [System.StringComparison]::OrdinalIgnoreCase)) {
+        Remove-Item -LiteralPath ("Env:$($entry.Name)") -ErrorAction SilentlyContinue
+      }
+    }
+    foreach ($name in @($savedGitEnvironment.Keys)) {
+      Set-Item -LiteralPath ("Env:$name") -Value $savedGitEnvironment[$name]
+    }
+  }
+}
+
+function Get-GitBlobObjectId {
+  param([byte[]]$Bytes, [string]$ObjectFormat)
+  $algorithm = if ($ObjectFormat -ceq 'sha1') {
+    [System.Security.Cryptography.SHA1]::Create()
+  } elseif ($ObjectFormat -ceq 'sha256') {
+    [System.Security.Cryptography.SHA256]::Create()
+  } else {
+    throw "Unsupported Git object format: $ObjectFormat"
+  }
+  $stream = New-Object System.IO.MemoryStream
+  try {
+    [byte[]]$header = [System.Text.Encoding]::ASCII.GetBytes("blob $($Bytes.Length)`0")
+    $stream.Write($header, 0, $header.Length)
+    $stream.Write($Bytes, 0, $Bytes.Length)
+    $stream.Position = 0
+    return -join ($algorithm.ComputeHash($stream) | ForEach-Object { $_.ToString('x2') })
+  } finally {
+    $algorithm.Dispose()
+    $stream.Dispose()
+  }
+}
+
+function Get-NativeTrackedSourcePaths {
+  $records = Invoke-NativeGitText @(
+    'ls-files', '-z', '--cached', '--',
+    'src/Ariadne.AcadNative',
+    'src/Ariadne.AcadNativeDbx'
+  )
+  $paths = @()
+  foreach ($record in @($records -split "`0")) {
+    if ([string]::IsNullOrEmpty($record)) { continue }
+    $path = $record.Replace('\', '/')
+    $inScope = (
+      $path.StartsWith('src/Ariadne.AcadNative/', [System.StringComparison]::Ordinal) -or
+      $path.StartsWith('src/Ariadne.AcadNativeDbx/', [System.StringComparison]::Ordinal)
+    )
+    if (-not $inScope) { throw "Git returned an out-of-scope native path: $path" }
+    $isBuildOutput = $false
+    foreach ($part in @($path -split '/')) {
+      if (Test-NativeBuildOutputPart $part) { $isBuildOutput = $true; break }
+    }
+    if (-not $isBuildOutput) { $paths += $path }
+  }
+  $paths = @($paths | Sort-Object @{ Expression = { $_.ToLowerInvariant() } }, @{ Expression = { $_ } })
+  if ($paths.Count -eq 0 -or @($paths | Select-Object -Unique).Count -ne $paths.Count) {
+    throw 'Tracked native source inventory is empty or duplicated.'
+  }
+  return $paths
+}
+
+function Get-NativeCapturedHeadAuthority {
+  param([object[]]$Inputs, [string]$GitHead)
+  $result = [ordered]@{
+    source_inventory_authoritative = $false
+    captured_inputs_match_head = $false
+    tracked_source_path_count = 0
+    tracked_source_inventory_sha256 = 'UNKNOWN'
+    reason = 'Native source authority was not verified.'
+  }
+  try {
+    if ($GitHead -notmatch '^(?:[0-9a-f]{40}|[0-9a-f]{64})$') {
+      throw 'Exact Git HEAD is unavailable.'
+    }
+    $trackedPaths = @(Get-NativeTrackedSourcePaths)
+    $capturedSourcePaths = @($Inputs | Where-Object { [string]$_.kind -ceq 'source' } |
+      ForEach-Object { [string]$_.path } |
+      Sort-Object @{ Expression = { $_.ToLowerInvariant() } }, @{ Expression = { $_ } })
+    $inventoryExact = $capturedSourcePaths.Count -eq $trackedPaths.Count
+    if ($inventoryExact) {
+      for ($index = 0; $index -lt $trackedPaths.Count; $index++) {
+        if ([string]$capturedSourcePaths[$index] -cne [string]$trackedPaths[$index]) {
+          $inventoryExact = $false
+          break
+        }
+      }
+    }
+    $inventoryBuilder = New-Object System.Text.StringBuilder
+    foreach ($path in $trackedPaths) {
+      [void]$inventoryBuilder.Append($path)
+      [void]$inventoryBuilder.Append([char]0)
+      [void]$inventoryBuilder.Append("`n")
+    }
+    $result.tracked_source_path_count = $trackedPaths.Count
+    $result.tracked_source_inventory_sha256 = Get-Sha256Text $inventoryBuilder.ToString()
+    $result.source_inventory_authoritative = $inventoryExact
+    if (-not $inventoryExact) {
+      $result.reason = 'Captured native inputs are not exactly the cached tracked-only Git inventory.'
+      return [pscustomobject]$result
+    }
+
+    $objectFormat = (Invoke-NativeGitText @('rev-parse', '--show-object-format')).Trim()
+    $allMatch = $true
+    foreach ($input in @($Inputs)) {
+      $path = [string]$input.path
+      [byte[]]$raw = [byte[]]$input.raw
+      [byte[]]$canonical = ConvertTo-CanonicalNativeSourceBytes -Raw $raw
+      $capturedOid = Get-GitBlobObjectId -Bytes $canonical -ObjectFormat $objectFormat
+      $headOid = (Invoke-NativeGitText @('rev-parse', '--verify', "${GitHead}:$path")).Trim()
+      if ($headOid -notmatch '^(?:[0-9a-f]{40}|[0-9a-f]{64})$' -or $capturedOid -cne $headOid) {
+        $allMatch = $false
+        break
+      }
+    }
+    $result.captured_inputs_match_head = $allMatch
+    $result.reason = if ($allMatch) {
+      'Captured canonical source and build-recipe bytes match exact HEAD blobs.'
+    } else {
+      'At least one captured canonical input does not match its exact HEAD blob.'
+    }
+    return [pscustomobject]$result
+  } catch {
+    $result.reason = "Native source authority verification failed: $($_.Exception.Message)"
+    return [pscustomobject]$result
+  }
+}
+
+function Get-HiddenNativeIndexFlagCount {
+  param([string]$Records)
+  $count = 0
+  foreach ($record in @($Records -split "`0")) {
+    if ([string]::IsNullOrEmpty($record)) { continue }
+    $tag = [int][char]$record[0]
+    if ($record[0] -ceq 'S' -or ($tag -ge [int][char]'a' -and $tag -le [int][char]'z')) {
+      $count++
+    }
+  }
+  return $count
+}
+
 function Get-NativeSourceGitState {
   $unknown = [ordered]@{
     available = $false
     head = 'UNKNOWN'
     native_source_dirty = 'UNKNOWN'
     native_source_status_sha256 = 'UNKNOWN'
+    index_visibility_sha256 = 'UNKNOWN'
+    checks = [ordered]@{
+      git_available = $false
+      repo_root_exact = $false
+      index_visibility_unmodified = 'UNKNOWN'
+      start_end_consistent = $false
+    }
   }
-  $git = Get-Command git -CommandType Application -ErrorAction SilentlyContinue |
-    Select-Object -First 1
-  if (-not $git) { return $unknown }
   try {
-    $headLines = & $git.Source -C $RouterHome rev-parse HEAD 2>$null
-    if ($LASTEXITCODE -ne 0) { return $unknown }
-    $head = (@($headLines) -join "`n").Trim()
-    if ([string]::IsNullOrWhiteSpace($head)) { return $unknown }
-    # Do not bind a native build to unrelated tracked products such as the
-    # router status report.  The explicit source pathspec mirrors the source
-    # inventory's output exclusions, so build output cannot make source state
-    # look dirty either.
+    $topLevel = (Invoke-NativeGitText @('rev-parse', '--show-toplevel')).Trim()
+    $resolvedTopLevel = (Resolve-Path -LiteralPath $topLevel).Path
+    if (-not [string]::Equals(
+        $resolvedTopLevel,
+        $RouterHome,
+        [System.StringComparison]::OrdinalIgnoreCase
+      )) {
+      return $unknown
+    }
     $statusArgs = @(
-      '-C', $RouterHome,
       'status', '--porcelain=v1', '--untracked-files=all', '--',
       'src/Ariadne.AcadNative',
       'src/Ariadne.AcadNativeDbx'
     )
-    $statusLines = @(& $git.Source @statusArgs 2>$null) |
+    $visibilityArgs = @(
+      'ls-files', '-v', '-z', '--',
+      'src/Ariadne.AcadNative',
+      'src/Ariadne.AcadNativeDbx'
+    )
+    $headStart = (Invoke-NativeGitText @('rev-parse', 'HEAD')).Trim()
+    $statusStart = @((Invoke-NativeGitText $statusArgs) -split "`r?`n") |
       Where-Object { Test-NativeSourceStatusLine ([string]$_) }
-    if ($LASTEXITCODE -ne 0) { return $unknown }
-    $statusText = @($statusLines) -join "`n"
+    $statusStartText = @($statusStart) -join "`n"
+    $visibilityStart = Invoke-NativeGitText $visibilityArgs
+    $headEnd = (Invoke-NativeGitText @('rev-parse', 'HEAD')).Trim()
+    $statusEnd = @((Invoke-NativeGitText $statusArgs) -split "`r?`n") |
+      Where-Object { Test-NativeSourceStatusLine ([string]$_) }
+    $statusEndText = @($statusEnd) -join "`n"
+    $visibilityEnd = Invoke-NativeGitText $visibilityArgs
+    if ($headStart -notmatch '^[0-9a-f]{40}$' -or $headEnd -notmatch '^[0-9a-f]{40}$') {
+      return $unknown
+    }
+    $consistent = (
+      $headStart -ceq $headEnd -and
+      $statusStartText -ceq $statusEndText -and
+      $visibilityStart -ceq $visibilityEnd
+    )
+    if (-not $consistent) { return $unknown }
+    $visibilityUnmodified = (Get-HiddenNativeIndexFlagCount $visibilityStart) -eq 0
     return [ordered]@{
       available = $true
-      head = $head
-      native_source_dirty = (-not [string]::IsNullOrEmpty($statusText))
-      native_source_status_sha256 = Get-Sha256Text $statusText
+      head = $headStart
+      native_source_dirty = (-not [string]::IsNullOrEmpty($statusStartText))
+      native_source_status_sha256 = Get-Sha256Text $statusStartText
+      index_visibility_sha256 = Get-Sha256Text $visibilityStart
+      checks = [ordered]@{
+        git_available = $true
+        repo_root_exact = $true
+        index_visibility_unmodified = $visibilityUnmodified
+        start_end_consistent = $true
+      }
     }
   } catch {
     return $unknown
@@ -231,15 +497,244 @@ function Get-BuildRecipeState {
   }
 }
 
+function Open-NativeBuildInputLease {
+  $sourcePaths = @(Get-NativeSourcePathRecords)
+  $recipeRelative = 'tools/build_native_acad.ps1'
+  $recipePath = Join-Path $RouterHome ($recipeRelative -replace '/', '\\')
+  if (-not (Test-Path -LiteralPath $recipePath -PathType Leaf)) {
+    throw "Native build recipe missing: $recipePath"
+  }
+  $recipeItem = Get-Item -LiteralPath $recipePath -Force
+  if (($recipeItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+    throw "Native build recipe is a reparse point: $recipePath"
+  }
+
+  $tempRoot = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath()).TrimEnd('\', '/')
+  $mirrorLeaf = '.ariadne-native-source-' + [guid]::NewGuid().ToString('N')
+  $mirrorRoot = Join-Path $tempRoot $mirrorLeaf
+  [System.IO.Directory]::CreateDirectory($mirrorRoot) | Out-Null
+  $handles = New-Object 'System.Collections.Generic.List[System.IO.FileStream]'
+  $captures = @()
+  $mirrorCaptures = @()
+  $leaseReady = $false
+  try {
+    # Open the complete requested set before reading any bytes.  FileShare.Read
+    # lets the compiler read but denies writers and delete/rename replacement
+    # until publication completes.
+    foreach ($record in $sourcePaths) {
+      $stream = [System.IO.File]::Open(
+        $record.full_path,
+        [System.IO.FileMode]::Open,
+        [System.IO.FileAccess]::Read,
+        [System.IO.FileShare]::Read
+      )
+      [void]$handles.Add($stream)
+      $captures += [pscustomobject][ordered]@{
+        kind = 'source'
+        path = $record.path
+        full_path = $record.full_path
+        stream = $stream
+      }
+    }
+    $recipeStream = [System.IO.File]::Open(
+      $recipePath,
+      [System.IO.FileMode]::Open,
+      [System.IO.FileAccess]::Read,
+      [System.IO.FileShare]::Read
+    )
+    [void]$handles.Add($recipeStream)
+    $captures += [pscustomobject][ordered]@{
+      kind = 'recipe'
+      path = $recipeRelative
+      full_path = $recipePath
+      stream = $recipeStream
+    }
+
+    $sourceInputs = @()
+    $compilationInputs = @()
+    $authorityInputs = @()
+    $recipeState = $null
+    foreach ($capture in $captures) {
+      [byte[]]$raw = Read-NativeBuildInputStreamBytes -Stream $capture.stream
+      [byte[]]$canonical = ConvertTo-CanonicalNativeSourceBytes -Raw $raw
+      $authorityInputs += [pscustomobject][ordered]@{
+        kind = $capture.kind
+        path = $capture.path
+        raw = $raw
+      }
+      $mirrorPath = Join-Path $mirrorRoot ($capture.path -replace '/', '\\')
+      $mirrorParent = [System.IO.Path]::GetDirectoryName($mirrorPath)
+      [System.IO.Directory]::CreateDirectory($mirrorParent) | Out-Null
+      [System.IO.File]::WriteAllBytes($mirrorPath, $raw)
+      $mirrorStream = [System.IO.File]::Open(
+        $mirrorPath,
+        [System.IO.FileMode]::Open,
+        [System.IO.FileAccess]::Read,
+        [System.IO.FileShare]::Read
+      )
+      [void]$handles.Add($mirrorStream)
+      $mirrorCaptures += [pscustomobject][ordered]@{
+        kind = $capture.kind
+        path = $capture.path
+        stream = $mirrorStream
+        expected_sha256 = Get-Sha256Bytes -Bytes $raw
+        expected_bytes = [int64]$raw.Length
+      }
+      [System.IO.File]::SetAttributes($mirrorPath, [System.IO.FileAttributes]::ReadOnly)
+      if ($capture.kind -ceq 'source') {
+        $sourceInputs += [ordered]@{
+          path = $capture.path
+          sha256 = Get-Sha256Bytes -Bytes $canonical
+          bytes = [int64]$canonical.Length
+        }
+        $compilationInputs += [ordered]@{
+          path = $capture.path
+          sha256 = Get-Sha256Bytes -Bytes $raw
+          bytes = [int64]$raw.Length
+        }
+      } else {
+        $recipeState = [ordered]@{
+          path = $capture.path
+          sha256 = Get-Sha256Bytes -Bytes $canonical
+        }
+      }
+    }
+    $gitState = Get-NativeSourceGitState
+    $sourceAuthority = Get-NativeCapturedHeadAuthority `
+      -Inputs $authorityInputs `
+      -GitHead ([string]$gitState.head)
+    $snapshot = [ordered]@{
+      source_tree = [ordered]@{
+        algorithm = 'sha256'
+        canonicalization = 'crlf_to_lf_unless_nul'
+        digest = Get-NativeSourceDigest $sourceInputs
+        inputs = $sourceInputs
+      }
+      compilation_tree = [ordered]@{
+        algorithm = 'sha256'
+        byte_representation = 'raw_mirror_bytes'
+        digest = Get-NativeSourceDigest $compilationInputs
+        inputs = $compilationInputs
+      }
+      git = $gitState
+      source_authority = $sourceAuthority
+      build_recipe = $recipeState
+    }
+    $lease = [pscustomobject][ordered]@{
+      snapshot = $snapshot
+      mirror_root = $mirrorRoot
+      temp_root = $tempRoot
+      handles = $handles.ToArray()
+      mirror_captures = $mirrorCaptures
+    }
+    $leaseReady = $true
+    return $lease
+  } finally {
+    if (-not $leaseReady) {
+      Close-NativeBuildInputLease -Lease ([pscustomobject][ordered]@{
+        mirror_root = $mirrorRoot
+        temp_root = $tempRoot
+        handles = $handles.ToArray()
+      })
+    }
+  }
+}
+
+function Assert-NativeBuildMirrorStable {
+  param([object]$Lease)
+  if ($null -eq $Lease -or @($Lease.mirror_captures).Count -eq 0) {
+    throw 'Native build mirror has no held input captures.'
+  }
+  $actualCompilationInputs = @()
+  $recipeCount = 0
+  foreach ($capture in @($Lease.mirror_captures)) {
+    [byte[]]$raw = Read-NativeBuildInputStreamBytes -Stream $capture.stream
+    $actualSha256 = Get-Sha256Bytes -Bytes $raw
+    if ([int64]$raw.Length -ne [int64]$capture.expected_bytes -or
+        $actualSha256 -cne [string]$capture.expected_sha256) {
+      throw "Native build mirror input changed after capture: $($capture.path)"
+    }
+    if ([string]$capture.kind -ceq 'source') {
+      $actualCompilationInputs += [ordered]@{
+        path = [string]$capture.path
+        sha256 = $actualSha256
+        bytes = [int64]$raw.Length
+      }
+    } elseif ([string]$capture.kind -ceq 'recipe') {
+      $recipeCount++
+    } else {
+      throw "Native build mirror contains an unknown input kind: $($capture.kind)"
+    }
+  }
+  if ($recipeCount -ne 1) {
+    throw "Native build mirror must contain exactly one build recipe; found $recipeCount."
+  }
+  $expectedInputsJson = @($Lease.snapshot.compilation_tree.inputs) | ConvertTo-Json -Depth 12 -Compress
+  $actualInputsJson = @($actualCompilationInputs) | ConvertTo-Json -Depth 12 -Compress
+  $actualDigest = Get-NativeSourceDigest $actualCompilationInputs
+  if ($actualInputsJson -cne $expectedInputsJson -or
+      $actualDigest -cne [string]$Lease.snapshot.compilation_tree.digest) {
+    throw 'Native build mirror raw compilation inputs do not match the starting snapshot.'
+  }
+  return $true
+}
+
+function Close-NativeBuildInputLease {
+  param([object]$Lease)
+  if ($null -eq $Lease) { return }
+  foreach ($handle in @($Lease.handles)) {
+    if ($null -ne $handle) { $handle.Dispose() }
+  }
+  if (-not [System.IO.Directory]::Exists([string]$Lease.mirror_root)) { return }
+  $resolvedMirror = (Resolve-Path -LiteralPath $Lease.mirror_root).Path
+  $resolvedTemp = (Resolve-Path -LiteralPath $Lease.temp_root).Path.TrimEnd('\', '/')
+  $mirrorParent = [System.IO.Path]::GetDirectoryName($resolvedMirror).TrimEnd('\', '/')
+  $mirrorLeaf = [System.IO.Path]::GetFileName($resolvedMirror)
+  $mirrorItem = Get-Item -LiteralPath $resolvedMirror -Force
+  $isReparse = (($mirrorItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0)
+  if (-not [string]::Equals($mirrorParent, $resolvedTemp, [System.StringComparison]::OrdinalIgnoreCase) -or
+      $mirrorLeaf -notmatch '^\.ariadne-native-source-[0-9a-f]{32}$' -or
+      $isReparse) {
+    throw "Refusing recursive native mirror cleanup outside verified TEMP: $resolvedMirror"
+  }
+  foreach ($file in @(Get-ChildItem -LiteralPath $resolvedMirror -File -Recurse -Force)) {
+    $file.Attributes = [System.IO.FileAttributes]::Normal
+  }
+  [System.IO.Directory]::Delete($resolvedMirror, $true)
+}
+
 function Get-NativeBuildSnapshot {
-  $inputs = @(Get-NativeSourceInputs)
+  $sourceState = Get-NativeSourceState
+  $inputs = @($sourceState.canonical_inputs)
+  $compilationInputs = @($sourceState.compilation_inputs)
+  $gitState = Get-NativeSourceGitState
+  $recipeRelative = 'tools/build_native_acad.ps1'
+  [byte[]]$recipeRaw = [System.IO.File]::ReadAllBytes((Join-Path $RouterHome 'tools\build_native_acad.ps1'))
+  $authorityInputs = @($sourceState.authority_inputs) + @(
+    [pscustomobject][ordered]@{
+      kind = 'recipe'
+      path = $recipeRelative
+      raw = $recipeRaw
+    }
+  )
+  $sourceAuthority = Get-NativeCapturedHeadAuthority `
+    -Inputs $authorityInputs `
+    -GitHead ([string]$gitState.head)
   return [ordered]@{
     source_tree = [ordered]@{
       algorithm = 'sha256'
+      canonicalization = 'crlf_to_lf_unless_nul'
       digest = Get-NativeSourceDigest $inputs
       inputs = $inputs
     }
-    git = Get-NativeSourceGitState
+    compilation_tree = [ordered]@{
+      algorithm = 'sha256'
+      byte_representation = 'raw_mirror_bytes'
+      digest = Get-NativeSourceDigest $compilationInputs
+      inputs = $compilationInputs
+    }
+    git = $gitState
+    source_authority = $sourceAuthority
     build_recipe = Get-BuildRecipeState
   }
 }
@@ -312,7 +807,12 @@ function Get-NativePeVerification {
     }
     $stream.Position = $peOffset + 20
     $optionalHeaderBytes = $reader.ReadUInt16()
+    $characteristics = $reader.ReadUInt16()
     $verification.optional_header_bytes = [int]$optionalHeaderBytes
+    if (($characteristics -band 0x2000) -eq 0) {
+      $verification.reason = 'PE image is not marked as a DLL (IMAGE_FILE_DLL 0x2000).'
+      return [pscustomobject]$verification
+    }
     if ($optionalHeaderBytes -lt 0xF0 -or ([int64]$peOffset + 24 + $optionalHeaderBytes) -gt [int64]$stream.Length) {
       $verification.reason = 'PE32+ optional header is truncated.'
       return [pscustomobject]$verification
@@ -325,7 +825,7 @@ function Get-NativePeVerification {
     }
     $verification.format = 'PE32+'
     $verification.verified = $true
-    $verification.reason = 'MZ, PE, x64 machine, section table, and PE32+ optional header checks passed.'
+    $verification.reason = 'MZ, PE, x64 machine, DLL characteristic, section table, and PE32+ optional header checks passed.'
     return [pscustomobject]$verification
   } catch {
     $verification.reason = "PE inspection failed: $($_.Exception.Message)"
@@ -340,14 +840,188 @@ function New-NativeArtifactRecord {
   param([string]$BinDir, [string]$Leaf, [bool]$Current)
   $path = Join-Path $BinDir $Leaf
   $exists = Test-Path -LiteralPath $path -PathType Leaf
-  $peVerification = Get-NativePeVerification -Path $path
+  if (-not $exists) {
+    return [ordered]@{
+      leaf = $Leaf
+      sha256 = 'UNKNOWN'
+      bytes = [int64]0
+      current = $Current
+      exists = $false
+      pe_verification = Get-NativePeVerificationFromBytes -Bytes ([byte[]]@())
+    }
+  }
+  [byte[]]$bytes = [System.IO.File]::ReadAllBytes($path)
+  return New-NativeArtifactRecordFromBytes -Leaf $Leaf -Bytes $bytes -Current $Current
+}
+
+function Get-NativePeVerificationFromBytes {
+  param([byte[]]$Bytes)
+  $verification = [ordered]@{
+    verified = $false
+    format = 'UNKNOWN'
+    machine = 'UNKNOWN'
+    minimum_bytes = [int64]512
+    pe_header_offset = [int64]-1
+    section_count = 0
+    optional_header_bytes = 0
+    reason = 'Artifact bytes were not inspected.'
+  }
+  if ([int64]$Bytes.Length -lt $verification.minimum_bytes) {
+    $verification.reason = "Artifact is too small to be a native load module ($($Bytes.Length) bytes)."
+    return [pscustomobject]$verification
+  }
+  $stream = $null
+  $reader = $null
+  try {
+    $stream = New-Object System.IO.MemoryStream(,$Bytes)
+    $reader = New-Object System.IO.BinaryReader($stream)
+    if ($reader.ReadByte() -ne 0x4D -or $reader.ReadByte() -ne 0x5A) {
+      $verification.reason = 'DOS MZ signature is missing.'
+      return [pscustomobject]$verification
+    }
+    $stream.Position = 0x3C
+    $peOffset = $reader.ReadInt32()
+    $verification.pe_header_offset = [int64]$peOffset
+    if ($peOffset -lt 0x40 -or ([int64]$peOffset + 26) -gt [int64]$stream.Length) {
+      $verification.reason = 'PE header offset is outside the artifact.'
+      return [pscustomobject]$verification
+    }
+    $stream.Position = $peOffset
+    if ($reader.ReadUInt32() -ne 0x00004550) {
+      $verification.reason = 'PE signature is missing.'
+      return [pscustomobject]$verification
+    }
+    $machine = $reader.ReadUInt16()
+    $sections = $reader.ReadUInt16()
+    $verification.machine = ('0x{0:X4}' -f $machine)
+    $verification.section_count = [int]$sections
+    if ($machine -ne 0x8664) {
+      $verification.reason = "PE machine is $($verification.machine), not x64 (0x8664)."
+      return [pscustomobject]$verification
+    }
+    if ($sections -lt 1) {
+      $verification.reason = 'PE file has no sections.'
+      return [pscustomobject]$verification
+    }
+    $stream.Position = $peOffset + 20
+    $optionalHeaderBytes = $reader.ReadUInt16()
+    $characteristics = $reader.ReadUInt16()
+    $verification.optional_header_bytes = [int]$optionalHeaderBytes
+    if ($optionalHeaderBytes -lt 0xF0 -or ([int64]$peOffset + 24 + $optionalHeaderBytes) -gt [int64]$stream.Length) {
+      $verification.reason = 'PE32+ optional header is truncated.'
+      return [pscustomobject]$verification
+    }
+    if (($characteristics -band 0x2000) -eq 0) {
+      $verification.reason = 'PE image is not marked as a DLL (IMAGE_FILE_DLL 0x2000).'
+      return [pscustomobject]$verification
+    }
+    $stream.Position = $peOffset + 24
+    $optionalMagic = $reader.ReadUInt16()
+    if ($optionalMagic -ne 0x020B) {
+      $verification.reason = ('Optional-header magic is 0x{0:X4}, not PE32+ (0x020B).' -f $optionalMagic)
+      return [pscustomobject]$verification
+    }
+    $verification.format = 'PE32+'
+    $verification.verified = $true
+    $verification.reason = 'MZ, PE, x64 machine, DLL characteristic, section table, and PE32+ optional header checks passed.'
+    return [pscustomobject]$verification
+  } catch {
+    $verification.reason = "PE inspection failed: $($_.Exception.Message)"
+    return [pscustomobject]$verification
+  } finally {
+    if ($reader) { $reader.Dispose() }
+    if ($stream) { $stream.Dispose() }
+  }
+}
+
+function New-NativeArtifactRecordFromBytes {
+  param([string]$Leaf, [byte[]]$Bytes, [bool]$Current)
   return [ordered]@{
     leaf = $Leaf
-    sha256 = if ($exists) { Get-Sha256File $path } else { 'UNKNOWN' }
-    bytes = if ($exists) { [int64](Get-Item -LiteralPath $path).Length } else { [int64]0 }
+    sha256 = Get-Sha256Bytes -Bytes $Bytes
+    bytes = [int64]$Bytes.Length
     current = $Current
-    exists = $exists
-    pe_verification = $peVerification
+    exists = $true
+    pe_verification = Get-NativePeVerificationFromBytes -Bytes $Bytes
+  }
+}
+
+function Open-NativeArtifactLease {
+  param([string]$BinDir, [object[]]$Specs)
+  if (-not (Test-Path -LiteralPath $BinDir -PathType Container)) {
+    throw "Native build output directory missing: $BinDir"
+  }
+  $handles = New-Object 'System.Collections.Generic.List[System.IO.FileStream]'
+  $captures = @()
+  $complete = $false
+  try {
+    $seen = @{}
+    foreach ($spec in @($Specs)) {
+      $leaf = [string]$spec.leaf
+      if ([System.IO.Path]::GetFileName($leaf) -cne $leaf -or $seen.ContainsKey($leaf)) {
+        throw "Native artifact lease requires unique plain leaves: $leaf"
+      }
+      $seen[$leaf] = $true
+      $path = Join-Path $BinDir $leaf
+      if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+        if ($spec.required -eq $true) { throw "Required native artifact is missing: $leaf" }
+        $captures += [pscustomobject][ordered]@{ spec = $spec; stream = $null }
+        continue
+      }
+      $item = Get-Item -LiteralPath $path -Force
+      if (($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+        throw "Native artifact is a reparse point: $path"
+      }
+      $stream = [System.IO.File]::Open(
+        $path,
+        [System.IO.FileMode]::Open,
+        [System.IO.FileAccess]::Read,
+        [System.IO.FileShare]::Read
+      )
+      [void]$handles.Add($stream)
+      $captures += [pscustomobject][ordered]@{ spec = $spec; stream = $stream }
+    }
+
+    $records = @()
+    $contents = [ordered]@{}
+    foreach ($capture in $captures) {
+      if ($null -eq $capture.stream) {
+        $records += [ordered]@{
+          leaf = [string]$capture.spec.leaf
+          sha256 = 'UNKNOWN'
+          bytes = [int64]0
+          current = [bool]$capture.spec.current
+          exists = $false
+          pe_verification = Get-NativePeVerificationFromBytes -Bytes ([byte[]]@())
+        }
+        continue
+      }
+      [byte[]]$bytes = Read-NativeBuildInputStreamBytes -Stream $capture.stream
+      $contents[[string]$capture.spec.leaf] = $bytes
+      $records += New-NativeArtifactRecordFromBytes `
+        -Leaf ([string]$capture.spec.leaf) `
+        -Bytes $bytes `
+        -Current ([bool]$capture.spec.current)
+    }
+    $lease = [pscustomobject][ordered]@{
+      records = $records
+      contents = $contents
+      handles = $handles.ToArray()
+    }
+    $complete = $true
+    return $lease
+  } finally {
+    if (-not $complete) {
+      foreach ($handle in @($handles.ToArray())) { $handle.Dispose() }
+    }
+  }
+}
+
+function Close-NativeArtifactLease {
+  param([object]$Lease)
+  if ($null -eq $Lease) { return }
+  foreach ($handle in @($Lease.handles)) {
+    if ($null -ne $handle) { $handle.Dispose() }
   }
 }
 
@@ -398,7 +1072,8 @@ function Confirm-NativeBuildManifest {
     [string]$ExpectedBuildTarget,
     [string]$ExpectedConfiguration,
     [string]$ExpectedPlatform,
-    [string]$ExpectedSourceTreeDigest
+    [string]$ExpectedSourceTreeDigest,
+    [string]$ExpectedCompilationTreeDigest
   )
   if (-not (Test-Path -LiteralPath $ManifestPath -PathType Leaf)) {
     throw "Native build manifest is missing: $ManifestPath"
@@ -420,11 +1095,22 @@ function Confirm-NativeBuildManifest {
       throw "Native build manifest $($entry.Key) mismatch: expected '$($entry.Value)', got '$($document.($entry.Key))'."
     }
   }
-  if ([string]$document.source_tree.digest -cne $ExpectedSourceTreeDigest) {
+  if ([string]$document.source_tree.algorithm -cne 'sha256' -or
+      [string]$document.source_tree.canonicalization -cne 'crlf_to_lf_unless_nul' -or
+      [string]$document.source_tree.digest -cne $ExpectedSourceTreeDigest) {
     throw 'Native build manifest source-tree digest does not match the post-build snapshot.'
+  }
+  if ([string]$document.compilation_tree.algorithm -cne 'sha256' -or
+      [string]$document.compilation_tree.byte_representation -cne 'raw_mirror_bytes' -or
+      [string]$document.compilation_tree.digest -cne $ExpectedCompilationTreeDigest) {
+    throw 'Native build manifest does not identify the raw bytes compiled from the immutable mirror.'
   }
   if ($document.build_snapshot.exact_match -ne $true) {
     throw 'Native build manifest does not record an exact pre/post source snapshot match.'
+  }
+  if ([string]$document.build_snapshot.input_mode -cne 'immutable_starting_snapshot_mirror' -or
+      [string]$document.source_provenance.compilation_input -cne 'immutable_starting_snapshot_mirror') {
+    throw 'Native build manifest does not bind compilation to the immutable starting source mirror.'
   }
   if (-not (Test-Path -LiteralPath ([string]$document.load_bin_dir) -PathType Container)) {
     throw "Native build manifest load_bin_dir is missing: $($document.load_bin_dir)"
@@ -464,6 +1150,7 @@ function Confirm-NativeBuildManifest {
     platform = $ExpectedPlatform
     load_bin_dir = (Resolve-Path -LiteralPath ([string]$document.load_bin_dir)).Path
     source_tree_digest = $ExpectedSourceTreeDigest
+    compilation_tree_digest = $ExpectedCompilationTreeDigest
     artifacts = $verifiedArtifacts
   }
 }
@@ -473,6 +1160,9 @@ function Confirm-NativeDeploymentManifest {
     [string]$ManifestPath,
     [string[]]$RequiredLeaves,
     [string]$ExpectedSourceTreeDigest,
+    [object[]]$ExpectedSourceInputs,
+    [string]$ExpectedCompilationTreeDigest,
+    [object[]]$ExpectedCompilationInputs,
     [string]$ExpectedBuildRecipeSha256
   )
   if (-not (Test-Path -LiteralPath $ManifestPath -PathType Leaf)) {
@@ -494,10 +1184,23 @@ function Confirm-NativeDeploymentManifest {
       [string]$document.platform -cne 'x64') {
     throw 'Native deployment marker exceeds or contradicts the Release|x64 Rebuild integrity claim.'
   }
-  if ([string]$document.source_tree_digest -cne $ExpectedSourceTreeDigest -or
+  $expectedSourceInputsJson = @($ExpectedSourceInputs) | ConvertTo-Json -Depth 12 -Compress
+  $observedSourceInputsJson = @($document.source_tree.inputs) | ConvertTo-Json -Depth 12 -Compress
+  $expectedCompilationInputsJson = @($ExpectedCompilationInputs) | ConvertTo-Json -Depth 12 -Compress
+  $observedCompilationInputsJson = @($document.compilation_tree.inputs) | ConvertTo-Json -Depth 12 -Compress
+  if ([string]$document.source_tree.algorithm -cne 'sha256' -or
+      [string]$document.source_tree.canonicalization -cne 'crlf_to_lf_unless_nul' -or
+      [string]$document.source_tree.digest -cne $ExpectedSourceTreeDigest -or
+      $observedSourceInputsJson -cne $expectedSourceInputsJson -or
+      [string]$document.source_tree_digest -cne $ExpectedSourceTreeDigest -or
+      [string]$document.compilation_tree.algorithm -cne 'sha256' -or
+      [string]$document.compilation_tree.byte_representation -cne 'raw_mirror_bytes' -or
+      [string]$document.compilation_tree.digest -cne $ExpectedCompilationTreeDigest -or
+      $observedCompilationInputsJson -cne $expectedCompilationInputsJson -or
+      [string]$document.compilation_tree_digest -cne $ExpectedCompilationTreeDigest -or
       [string]$document.build_recipe.path -cne 'tools/build_native_acad.ps1' -or
       [string]$document.build_recipe.sha256 -cne $ExpectedBuildRecipeSha256) {
-    throw 'Native deployment marker does not bind to the verified source tree and build recipe.'
+    throw 'Native deployment marker does not bind to the exact verified source inventory and build recipe.'
   }
   $deployDir = Split-Path -Parent $ManifestPath
   foreach ($leaf in $RequiredLeaves) {
@@ -528,7 +1231,8 @@ function Publish-NativePrebuiltSet {
     [string]$DeployDir,
     [string[]]$Leaves,
     [object]$BuildManifestVerification,
-    [object]$SourceSnapshot
+    [object]$SourceSnapshot,
+    [object]$ArtifactContents
   )
   $canonicalLeaves = @('Ariadne.AcadNativeDbx.dbx', 'Ariadne.AcadNative.crx', 'Ariadne.AcadNative.arx')
   if (@(Compare-Object -ReferenceObject $canonicalLeaves -DifferenceObject @($Leaves)).Count -ne 0) {
@@ -537,12 +1241,22 @@ function Publish-NativePrebuiltSet {
   if ($SourceSnapshot.git.available -ne $true) {
     throw 'Git checkout identity is unavailable; refusing prebuilt publication.'
   }
+  if ($SourceSnapshot.git.native_source_dirty -ne $false -or
+      $SourceSnapshot.source_authority.source_inventory_authoritative -ne $true -or
+      $SourceSnapshot.source_authority.captured_inputs_match_head -ne $true) {
+    throw 'Prebuilt publication requires clean inputs from the exact cached HEAD-tracked native inventory.'
+  }
   if ($BuildManifestVerification.verified -ne $true -or
       [string]$BuildManifestVerification.claim_scope -cne 'release_build_integrity_bundle' -or
       [string]$BuildManifestVerification.build_target -cne 'Rebuild' -or
       [string]$BuildManifestVerification.configuration -cne 'Release' -or
       [string]$BuildManifestVerification.platform -cne 'x64') {
     throw 'Prebuilt publication requires a finalized Release|x64 Rebuild integrity manifest.'
+  }
+  foreach ($leaf in $Leaves) {
+    if ($null -eq $ArtifactContents -or -not $ArtifactContents.Contains($leaf)) {
+      throw "Prebuilt publication requires captured artifact bytes for $leaf."
+    }
   }
   if (-not (Test-NativeBuildSnapshotEqual -Before $SourceSnapshot -After (Get-NativeBuildSnapshot))) {
     throw 'Native source or build recipe changed after build-manifest verification.'
@@ -565,9 +1279,20 @@ function Publish-NativePrebuiltSet {
   try {
     $stagedRecords = @()
     foreach ($leaf in $Leaves) {
-      $sourcePath = Join-Path $BinDir $leaf
       $stagedPath = Join-Path $stagingRoot $leaf
-      [System.IO.File]::Copy($sourcePath, $stagedPath, $false)
+      [byte[]]$capturedArtifactBytes = $ArtifactContents[$leaf]
+      $stagedStream = [System.IO.File]::Open(
+        $stagedPath,
+        [System.IO.FileMode]::CreateNew,
+        [System.IO.FileAccess]::Write,
+        [System.IO.FileShare]::None
+      )
+      try {
+        $stagedStream.Write($capturedArtifactBytes, 0, $capturedArtifactBytes.Length)
+        $stagedStream.Flush($true)
+      } finally {
+        $stagedStream.Dispose()
+      }
       $staged = New-NativeArtifactRecord -BinDir $stagingRoot -Leaf $leaf -Current $true
       $matches = @($BuildManifestVerification.artifacts | Where-Object { [string]$_.leaf -ceq $leaf })
       if ($matches.Count -ne 1 -or $staged.pe_verification.verified -ne $true -or
@@ -590,7 +1315,31 @@ function Publish-NativePrebuiltSet {
         path = [string]$SourceSnapshot.build_recipe.path
         sha256 = [string]$SourceSnapshot.build_recipe.sha256
       }
+      source_tree = [ordered]@{
+        algorithm = 'sha256'
+        canonicalization = 'crlf_to_lf_unless_nul'
+        digest = [string]$SourceSnapshot.source_tree.digest
+        inputs = @($SourceSnapshot.source_tree.inputs)
+      }
       source_tree_digest = [string]$BuildManifestVerification.source_tree_digest
+      source_authority = $SourceSnapshot.source_authority
+      compilation_tree = [ordered]@{
+        algorithm = 'sha256'
+        byte_representation = 'raw_mirror_bytes'
+        digest = [string]$SourceSnapshot.compilation_tree.digest
+        inputs = @($SourceSnapshot.compilation_tree.inputs)
+      }
+      compilation_tree_digest = [string]$BuildManifestVerification.compilation_tree_digest
+      source_provenance = [ordered]@{
+        compilation_input = 'immutable_starting_snapshot_mirror'
+        mirror_ephemeral = $true
+        limitations = @(
+          [ordered]@{
+            code = 'EXTERNAL_TOOLCHAIN_INPUTS_UNSEALED'
+            scope = 'ObjectARX SDK headers/properties, Visual Studio targets, compiler, linker, and system libraries are external toolchain inputs and are not part of source_tree.'
+          }
+        )
+      }
       artifacts = $stagedRecords
     }
     Write-AtomicJson -Object $deploymentManifest -Path $stagedMarkerPath
@@ -635,6 +1384,9 @@ function Publish-NativePrebuiltSet {
     $deploymentVerification = Confirm-NativeDeploymentManifest -ManifestPath $markerPath `
       -RequiredLeaves $Leaves `
       -ExpectedSourceTreeDigest ([string]$SourceSnapshot.source_tree.digest) `
+      -ExpectedSourceInputs @($SourceSnapshot.source_tree.inputs) `
+      -ExpectedCompilationTreeDigest ([string]$SourceSnapshot.compilation_tree.digest) `
+      -ExpectedCompilationInputs @($SourceSnapshot.compilation_tree.inputs) `
       -ExpectedBuildRecipeSha256 ([string]$SourceSnapshot.build_recipe.sha256)
     return [ordered]@{
       committed = $true
@@ -687,40 +1439,60 @@ function Publish-NativePrebuiltSet {
 # Capture every provenance input before MSBuild has a chance to compile from a
 # moving source tree.  A post-build-only hash could otherwise certify binaries
 # compiled before a source edit as though they came from the newer checkout.
-$nativeBuildSnapshotBefore = Get-NativeBuildSnapshot
+$nativeBuildInputLease = $null
+$nativeArtifactLease = $null
+try {
+$nativeBuildInputLease = Open-NativeBuildInputLease
+$nativeBuildSnapshotBefore = $nativeBuildInputLease.snapshot
 $nativeBuildSnapshotBeforeDigest = Get-NativeBuildSnapshotDigest $nativeBuildSnapshotBefore
 if ($nativeBuildSnapshotBefore.git.available -ne $true) {
   throw 'Git checkout identity is unavailable; refusing native build before MSBuild.'
 }
+if ($nativeBuildSnapshotBefore.git.checks.start_end_consistent -ne $true) {
+  throw 'Git checkout changed during the starting observation; refusing native build before MSBuild.'
+}
+if ($nativeBuildSnapshotBefore.git.checks.index_visibility_unmodified -ne $true) {
+  throw 'Git index visibility is weakened for native sources; refusing native build before MSBuild.'
+}
+Assert-NativeBuildMirrorStable -Lease $nativeBuildInputLease | Out-Null
 $msbuild = Resolve-MSBuild
-$dbxProj = Join-Path $RouterHome 'src\Ariadne.AcadNativeDbx\Ariadne.AcadNativeDbx.dbx.vcxproj'
-$crxProj = Join-Path $RouterHome 'src\Ariadne.AcadNative\Ariadne.AcadNative.crx.vcxproj'
-$arxProj = Join-Path $RouterHome 'src\Ariadne.AcadNative\Ariadne.AcadNative.arx.vcxproj'
+$dbxProj = Join-Path $nativeBuildInputLease.mirror_root 'src\Ariadne.AcadNativeDbx\Ariadne.AcadNativeDbx.dbx.vcxproj'
+$crxProj = Join-Path $nativeBuildInputLease.mirror_root 'src\Ariadne.AcadNative\Ariadne.AcadNative.crx.vcxproj'
+$arxProj = Join-Path $nativeBuildInputLease.mirror_root 'src\Ariadne.AcadNative\Ariadne.AcadNative.arx.vcxproj'
 
 $isolatedBuild = -not [string]::IsNullOrWhiteSpace($OutputRoot)
 if ($isolatedBuild) {
   $OutputRoot = (New-Item -ItemType Directory -Force -Path $OutputRoot).FullName
 }
+$nativeBuildOutputDir = if ($isolatedBuild) {
+  Join-Path $OutputRoot "bin\$Platform\$Configuration"
+} else {
+  Join-Path $RouterHome "src\Ariadne.AcadNative\bin\$Platform\$Configuration"
+}
+$nativeBuildObjectRoot = Join-Path $nativeBuildInputLease.mirror_root '.build-obj'
 
 function Build-Project {
   param([string]$Project, [string]$ObjectSubdir, [string]$TargetBase, [string[]]$ExtraProps = @())
   if (-not (Test-Path -LiteralPath $Project)) { throw "Native project missing: $Project" }
-  $props = @("/p:Configuration=$Configuration", "/p:Platform=$Platform")
-  if ($script:isolatedBuild) {
-    $outDir = (Join-Path $script:OutputRoot "bin\$Platform\$Configuration") + '\'
-    $intDir = (Join-Path $script:OutputRoot "obj\$ObjectSubdir\$Platform\$Configuration") + '\'
-    New-Item -ItemType Directory -Force -Path $outDir | Out-Null
-    New-Item -ItemType Directory -Force -Path $intDir | Out-Null
-    $props += "/p:OutDir=$outDir"
-    $props += "/p:IntDir=$intDir"
-    if (-not [string]::IsNullOrWhiteSpace($TargetSuffix)) {
-      $props += "/p:TargetName=$TargetBase$TargetSuffix"
-      if ($ObjectSubdir -eq 'dbx') {
-        # The .crx/.arx projects link against Ariadne.AcadNativeDbx.lib by name.
-        # Keep that import-library leaf canonical inside the isolated OutDir while
-        # the loadable .dbx itself may be version/suffix named.
-        $props += "/p:ImportLibrary=$outDir\Ariadne.AcadNativeDbx.lib"
-      }
+  $props = @(
+    "/p:Configuration=$Configuration",
+    "/p:Platform=$Platform",
+    '/p:ImportDirectoryBuildProps=false',
+    '/p:ImportDirectoryBuildTargets=false'
+  )
+  $outDir = $script:nativeBuildOutputDir + '\'
+  $intDir = (Join-Path $script:nativeBuildObjectRoot "$ObjectSubdir\$Platform\$Configuration") + '\'
+  New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+  New-Item -ItemType Directory -Force -Path $intDir | Out-Null
+  $props += "/p:OutDir=$outDir"
+  $props += "/p:IntDir=$intDir"
+  if (-not [string]::IsNullOrWhiteSpace($TargetSuffix)) {
+    $props += "/p:TargetName=$TargetBase$TargetSuffix"
+    if ($ObjectSubdir -eq 'dbx') {
+      # The .crx/.arx projects link against Ariadne.AcadNativeDbx.lib by name.
+      # Keep that import-library leaf canonical inside the isolated OutDir while
+      # the loadable .dbx itself may be version/suffix named.
+      $props += "/p:ImportLibrary=$outDir\Ariadne.AcadNativeDbx.lib"
     }
   }
   $argList = @($Project) + $props + $ExtraProps + @($script:msbuildTargetArgument, '/m', '/v:minimal')
@@ -755,34 +1527,44 @@ if ($arxCanonicalCode -ne 0) {
   $arxMode = 'versioned_lock_bypass'
 }
 
+Assert-NativeBuildMirrorStable -Lease $nativeBuildInputLease | Out-Null
 $nativeBuildSnapshotAfterMsbuild = Get-NativeBuildSnapshot
 $nativeBuildSnapshotAfterMsbuildDigest = Get-NativeBuildSnapshotDigest $nativeBuildSnapshotAfterMsbuild
 if (-not (Test-NativeBuildSnapshotEqual -Before $nativeBuildSnapshotBefore -After $nativeBuildSnapshotAfterMsbuild)) {
   throw 'Native source, native-source Git state, or build recipe changed while MSBuild ran; refusing to emit a provenance manifest.'
 }
 
-$bin = if ($isolatedBuild) { Join-Path $OutputRoot "bin\$Platform\$Configuration" } else { Join-Path $RouterHome "src\Ariadne.AcadNative\bin\$Platform\$Configuration" }
+$bin = $nativeBuildOutputDir
 if (-not (Test-Path -LiteralPath $bin -PathType Container)) {
   throw "Native build output directory missing: $bin"
 }
 $bin = (Resolve-Path -LiteralPath $bin).Path
 $nativeBase = if ([string]::IsNullOrWhiteSpace($TargetSuffix)) { 'Ariadne.AcadNative' } else { "Ariadne.AcadNative$TargetSuffix" }
 $dbxBase = if ([string]::IsNullOrWhiteSpace($TargetSuffix)) { 'Ariadne.AcadNativeDbx' } else { "Ariadne.AcadNativeDbx$TargetSuffix" }
-$artifactRecords = @(
-  (New-NativeArtifactRecord -BinDir $bin -Leaf "$dbxBase.dbx" -Current $true),
-  (New-NativeArtifactRecord -BinDir $bin -Leaf "$nativeBase.crx" -Current $true),
-  (New-NativeArtifactRecord -BinDir $bin -Leaf "$nativeBase.arx" -Current ($arxMode -eq 'canonical'))
-)
-if ($arxVersionedName) {
-  $artifactRecords += (New-NativeArtifactRecord -BinDir $bin -Leaf "$arxVersionedName.arx" -Current $true)
-}
-$artifactLeaves = @($artifactRecords | ForEach-Object { $_.leaf })
 $requiredBuiltLeaves = @("$dbxBase.dbx", "$nativeBase.crx")
 if ($arxVersionedName) {
   $requiredBuiltLeaves += "$arxVersionedName.arx"
 } else {
   $requiredBuiltLeaves += "$nativeBase.arx"
 }
+$artifactSpecs = @(
+  [pscustomobject][ordered]@{ leaf = "$dbxBase.dbx"; current = $true; required = $true },
+  [pscustomobject][ordered]@{ leaf = "$nativeBase.crx"; current = $true; required = $true },
+  [pscustomobject][ordered]@{
+    leaf = "$nativeBase.arx"
+    current = ($arxMode -eq 'canonical')
+    required = ($arxMode -eq 'canonical')
+  }
+)
+if ($arxVersionedName) {
+  $artifactSpecs += [pscustomobject][ordered]@{
+    leaf = "$arxVersionedName.arx"
+    current = $true
+    required = $true
+  }
+}
+$nativeArtifactLease = Open-NativeArtifactLease -BinDir $bin -Specs $artifactSpecs
+$artifactRecords = @($nativeArtifactLease.records)
 $missingBuiltArtifacts = @($artifactRecords | Where-Object {
   ($requiredBuiltLeaves -contains $_.leaf) -and ((-not $_.exists) -or $_.bytes -le 0)
 })
@@ -805,7 +1587,10 @@ if (-not (Test-NativeBuildSnapshotEqual -Before $nativeBuildSnapshotBefore -Afte
 }
 $sourceInputs = @($nativeBuildSnapshotBefore.source_tree.inputs)
 $sourceDigest = $nativeBuildSnapshotBefore.source_tree.digest
+$compilationInputs = @($nativeBuildSnapshotBefore.compilation_tree.inputs)
+$compilationDigest = $nativeBuildSnapshotBefore.compilation_tree.digest
 $gitState = $nativeBuildSnapshotBefore.git
+$sourceAuthority = $nativeBuildSnapshotBefore.source_authority
 $buildRecipeState = $nativeBuildSnapshotBefore.build_recipe
 $snapshotStable = $true
 $canonicalDbxRecord = @($artifactRecords | Where-Object { $_.leaf -ceq 'Ariadne.AcadNativeDbx.dbx' })[0]
@@ -832,6 +1617,9 @@ $displayMembershipReady = (
   $Platform -eq 'x64' -and
   $buildTarget -eq 'Rebuild' -and
   $gitState.available -eq $true -and
+  $gitState.native_source_dirty -eq $false -and
+  $sourceAuthority.source_inventory_authoritative -eq $true -and
+  $sourceAuthority.captured_inputs_match_head -eq $true -and
   $canonicalDbxCurrent -and
   $canonicalCrxCurrent -and
   $canonicalArxCurrent -and
@@ -849,14 +1637,33 @@ $manifest = [ordered]@{
   checkout = [ordered]@{
     root = $RouterHome
     git = $gitState
+    source_authority = $sourceAuthority
   }
   build_recipe = $buildRecipeState
   source_tree = [ordered]@{
     algorithm = 'sha256'
+    canonicalization = 'crlf_to_lf_unless_nul'
     digest = $sourceDigest
     inputs = $sourceInputs
   }
+  compilation_tree = [ordered]@{
+    algorithm = 'sha256'
+    byte_representation = 'raw_mirror_bytes'
+    digest = $compilationDigest
+    inputs = $compilationInputs
+  }
+  source_provenance = [ordered]@{
+    compilation_input = 'immutable_starting_snapshot_mirror'
+    mirror_ephemeral = $true
+    limitations = @(
+      [ordered]@{
+        code = 'EXTERNAL_TOOLCHAIN_INPUTS_UNSEALED'
+        scope = 'ObjectARX SDK headers/properties, Visual Studio targets, compiler, linker, and system libraries are external toolchain inputs and are not part of source_tree.'
+      }
+    )
+  }
   build_snapshot = [ordered]@{
+    input_mode = 'immutable_starting_snapshot_mirror'
     before_msbuild_sha256 = $nativeBuildSnapshotBeforeDigest
     after_msbuild_sha256 = $nativeBuildSnapshotAfterMsbuildDigest
     before_manifest_sha256 = $nativeBuildSnapshotBeforeManifestDigest
@@ -884,13 +1691,16 @@ $manifestVerification = Confirm-NativeBuildManifest -ManifestPath $manifestPath 
   -ExpectedBuildTarget $buildTarget `
   -ExpectedConfiguration $Configuration `
   -ExpectedPlatform $Platform `
-  -ExpectedSourceTreeDigest $sourceDigest
+  -ExpectedSourceTreeDigest $sourceDigest `
+  -ExpectedCompilationTreeDigest $compilationDigest
 $manifestVerification['schema'] = $manifest.schema
 $manifestVerification['source_input_count'] = $sourceInputs.Count
 $manifestVerification['git'] = $gitState
+$manifestVerification['source_authority'] = $sourceAuthority
 $manifestVerification['build_recipe'] = $buildRecipeState
 $manifestVerification['snapshot_stable'] = $snapshotStable
 $manifestVerification['source_snapshot'] = $manifest.build_snapshot
+$manifestVerification['source_provenance'] = $manifest.source_provenance
 $manifestVerification['display_membership_ready'] = [bool]$displayMembershipReady
 $manifestVerification['canonical_arx_current'] = [bool]$canonicalArxCurrent
 $manifestSha256 = $manifestVerification.manifest_sha256
@@ -911,6 +1721,9 @@ $prebuiltEligible = (
   $Platform -eq 'x64' -and
   $buildTarget -eq 'Rebuild' -and
   $gitState.available -eq $true -and
+  $gitState.native_source_dirty -eq $false -and
+  $sourceAuthority.source_inventory_authoritative -eq $true -and
+  $sourceAuthority.captured_inputs_match_head -eq $true -and
   $canonicalDbxCurrent -and
   $canonicalCrxCurrent -and
   $canonicalArxCurrent -and
@@ -929,10 +1742,19 @@ if (-not $isolatedBuild -and [string]::IsNullOrWhiteSpace($TargetSuffix)) {
       $prebuiltDeployment = Publish-NativePrebuiltSet -BinDir $bin -DeployDir $deployDir.FullName `
         -Leaves $canonicalDeployLeaves `
         -BuildManifestVerification $manifestVerification `
-        -SourceSnapshot $nativeBuildSnapshotBefore
+        -SourceSnapshot $nativeBuildSnapshotBefore `
+        -ArtifactContents $nativeArtifactLease.contents
       $prebuiltDeployed = @($canonicalDeployLeaves | ForEach-Object { Join-Path $deployDir.FullName $_ })
     } else {
-      $prebuiltDeployment.reason = 'Canonical DBX/CRX/ARX Release|x64 Rebuild set is not current and verified; prebuilt was left unchanged.'
+      $prebuiltDeployment.reason = if (
+        $gitState.native_source_dirty -ne $false -or
+        $sourceAuthority.source_inventory_authoritative -ne $true -or
+        $sourceAuthority.captured_inputs_match_head -ne $true
+      ) {
+        'Canonical prebuilt publication requires clean inputs from the exact cached HEAD-tracked native inventory; prebuilt was left unchanged.'
+      } else {
+        'Canonical DBX/CRX/ARX Release|x64 Rebuild set is not current and verified; prebuilt was left unchanged.'
+      }
     }
   } else {
     $prebuiltDeployment.reason = 'No prebuilt root exists; no deployment was attempted.'
@@ -966,3 +1788,7 @@ if (-not $isolatedBuild -and [string]::IsNullOrWhiteSpace($TargetSuffix)) {
   build_manifest_sha256 = $manifestSha256
   build_manifest_verification = $manifestVerification
 } | ConvertTo-Json -Depth 12
+} finally {
+  Close-NativeArtifactLease -Lease $nativeArtifactLease
+  Close-NativeBuildInputLease -Lease $nativeBuildInputLease
+}

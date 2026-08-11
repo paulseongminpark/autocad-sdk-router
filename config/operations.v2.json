@@ -54,16 +54,16 @@
     }
   },
   "totals": {
-    "operations": 551,
+    "operations": 552,
     "by_status": {
       "blocked": 62,
-      "implemented": 489
+      "implemented": 490
     },
     "by_family": {
       "objectdbx_database": 21,
       "symbol_tables_dictionaries": 31,
       "geometry_kernel": 25,
-      "inspect": 18,
+      "inspect": 19,
       "write": 4,
       "live": 7,
       "extend": 2,
@@ -92,11 +92,11 @@
     },
     "by_engine_tier": {
       "managed_also": 48,
-      "objectdbx_capable": 306,
+      "objectdbx_capable": 307,
       "accoreconsole_lisp_also": 20,
       "native_arx_only": 177
     },
-    "total": 551
+    "total": 552
   },
   "coverage": {
     "wired_ops": 29,
@@ -130,8 +130,8 @@
       "symbol_tables_dictionaries": 16,
       "ui_customization": 39
     },
-    "operation_records": 551,
-    "implemented": 489,
+    "operation_records": 552,
+    "implemented": 490,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
@@ -1254,6 +1254,77 @@
         "tests/test_native_arx_dbx_contract.py::runtimeCapabilitiesJson"
       ],
       "notes": "Router capability contract reports current host support instead of invoking one catalog primitive.",
+      "owner_ticket": "M08C-T01",
+      "implementation_strategy": "implemented_v1",
+      "evidence_required": "existing_tests_and_evidence_refs"
+    },
+    {
+      "id": "inspect.probe.property_count",
+      "family": "inspect",
+      "status": "implemented",
+      "engine_tier": "objectdbx_capable",
+      "host_eligibility": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "execution_context": "in_process_host",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "ARIADNE_NATIVE_JOB",
+        "dispatcher_symbol": "ariadneProbePropertyCount",
+        "execution_host_class": "dbx",
+        "composed_of": [
+          "inspect.entity.properties",
+          "inspect.property.by_name"
+        ]
+      },
+      "mapping_type": "synthetic",
+      "catalog_op_id": null,
+      "input_schema": "schemas/cad_job.v2.schema.json#/allOf",
+      "output_schema": "schemas/cad_result.v2.schema.json",
+      "summary": "Reports the registered AcRxProperty count for a transient AriadneProbe without mutating a drawing.",
+      "evidence_refs": [
+        "docs/LIVE_JOB_ARGUMENT_CONTRACT.md#job_outjson-the-result",
+        "reports/opm_property_latest.json#headless_proof",
+        "reports/native_smoke_latest.json#headless_channel_smoke",
+        "tests/unit/test_operation_registry_verifier.py::test_probe_property_count_native_source_and_result_shape"
+      ],
+      "phase_batch": "P2 Batch 3 Host-Bound Capability Contracts",
+      "target_family_first_class": false,
+      "wired_v1": false,
+      "operation": "inspect.probe.property_count",
+      "hosts": [
+        "dbx",
+        "coreconsole",
+        "arx_adapter",
+        "full_autocad"
+      ],
+      "engines": [
+        "objectdbx_capable"
+      ],
+      "schema_refs": {
+        "input": "schemas/cad_job.v2.schema.json#/allOf",
+        "output": "schemas/cad_result.v2.schema.json"
+      },
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "read",
+        "no_original_write_default": true
+      },
+      "tests": [
+        "tests/unit/test_operation_registry_verifier.py::test_probe_property_count_native_source_and_result_shape"
+      ],
+      "notes": "Headless proof reports property_count=1 for the Size property; the OPM panel itself remains attended-only.",
       "owner_ticket": "M08C-T01",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"

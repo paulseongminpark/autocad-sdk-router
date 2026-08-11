@@ -2,7 +2,7 @@
 """cadctl_cli.py -- argparse CLI for the CAD OS Layer control surface (Lane B1).
 
 Subcommands:
-  status                                  -- read the published router status (read-only)
+  status                                  -- v1 compatibility; opt in to v2 current state
   inspect --dwg <p> --out <dir>           -- stage a copy, extract via router, build IR
   query   --ir <ir.json> --sql "<sql>"    -- read-only SQL over the IR sqlite store
   validate --ir <ir.json>                 -- deterministic validation gates
@@ -51,9 +51,26 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sub = p.add_subparsers(dest="command", required=True)
 
-    status_p = sub.add_parser("status", help="read the published router status (read-only)")
+    status_p = sub.add_parser(
+        "status",
+        help=(
+            "read-only projection of checkout anchor, capability, proof, "
+            "runtime-observation state, and historical snapshots"
+        ),
+    )
     status_p.add_argument("--json", action="store_true",
                           help="kept for operator compatibility; cadctl always emits JSON")
+    status_p.add_argument(
+        "--schema-version",
+        type=int,
+        choices=(1, 2),
+        default=1,
+        help="1 = historical compatibility (default); 2 = typed current-status projection",
+    )
+    status_p.add_argument(
+        "--expected-revision",
+        help="independent exact Git commit SHA used only by schema version 2",
+    )
 
     insp = sub.add_parser("inspect", help="stage a copy, extract via router, build IR")
     insp.add_argument("--dwg", required=True, help="path to the input DWG (read-only original)")
@@ -147,7 +164,10 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         if args.command == "status":
-            return _emit(cad.status())
+            return _emit(cad.status(
+                schema_version=args.schema_version,
+                expected_revision=args.expected_revision,
+            ))
         if args.command == "inspect":
             include_rich = bool(getattr(args, "include_rich", False)) or args.mode == "rich"
             return _emit(cad.inspect(args.dwg, args.out, args.mode, include_rich=include_rich))

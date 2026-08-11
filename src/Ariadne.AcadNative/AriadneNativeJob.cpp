@@ -6388,19 +6388,18 @@ private:
 //============================================================================
 // M08B-T01: Native OperationSpec dispatch table + standard result/error envelope.
 //
-// kAriadneNativeOperationTable is the AUTHORITATIVE registry of the operations
-// ARIADNE_NATIVE_JOB implements today. The dispatcher gates on it: an op_id absent
-// from the table is not implemented in the native module and returns a structured
-// OPERATION_NOT_IMPLEMENTED (the honest contract for the catalogued ops the M08
-// family tickets will build). The implemented handler bodies are bridged unchanged
-// in the dispatch chain below; the table drives the membership/dispatch decision.
-// INVARIANT: the table op_ids and the `op == "..."` handler branches below are the
-// same set (asserted source-side by tests/unit/test_m08b_dispatcher_table.py).
+// kAriadneNativeOperationTable is the public, registry-required operation table.
+// kAriadneInternalOperationTable contains native diagnostics and experiment opcodes
+// that internal proof harnesses may execute without promoting them into the public
+// operation registry. The dispatcher admits both tables plus the M08 family gates.
+// INVARIANT: public and internal tables are disjoint, and their union has exact
+// parity with the `op == "..."` handler branches below (asserted source-side by
+// tests/unit/test_m08b_dispatcher_table.py).
 //============================================================================
 struct AriadneOperationSpec
 {
     const char* op_id;
-    const char* family;   // mirrors operations.v2.json; native-only diagnostics carry a native family
+    const char* family;
 };
 
 static const AriadneOperationSpec kAriadneNativeOperationTable[] = {
@@ -6433,27 +6432,32 @@ static const AriadneOperationSpec kAriadneNativeOperationTable[] = {
     { "live.reactor.enable", "live" },
     { "inspect.reactor.registry", "inspect" },
     { "live.reactor.disable", "live" },
-    { "live.selection.monitor.enable", "live" },
-    { "live.selection.monitor.disable", "live" },
-    { "inspect.selection.monitor.registry", "live" },
     { "inspect.probe.property_count", "inspect" },
     { "inspect.overrule.registry", "inspect" },
     { "live.overrule.enable", "live" },
     { "live.overrule.disable", "live" },
     { "inspect.jig.host_support", "inspect" },
     { "live.jig.point_probe", "live" },
-    { "extend.deep_native.firing_selftest", "extend" },
-    { "inspect.deep_native.firing_report", "inspect" },
     { "extend.customclass.create", "extend" },
     { "inspect.customclass.count", "inspect" },
     { "extend.customobject.create", "extend" },
     { "inspect.customobject.count", "inspect" },
     { "inspect.protocol.queryx", "inspect" },
+};
+
+static const AriadneOperationSpec kAriadneInternalOperationTable[] = {
+    { "live.selection.monitor.enable", "live" },
+    { "live.selection.monitor.disable", "live" },
+    { "inspect.selection.monitor.registry", "live" },
+    { "extend.deep_native.firing_selftest", "extend" },
+    { "inspect.deep_native.firing_report", "inspect" },
     { "e2.inspect.xclip_membership", "experiment_oracle" },
 };
 
 static const size_t kAriadneNativeOperationCount =
     sizeof(kAriadneNativeOperationTable) / sizeof(kAriadneNativeOperationTable[0]);
+static const size_t kAriadneInternalOperationCount =
+    sizeof(kAriadneInternalOperationTable) / sizeof(kAriadneInternalOperationTable[0]);
 
 static const AriadneOperationSpec* findAriadneNativeOp(const std::string& op)
 {
@@ -6463,6 +6467,22 @@ static const AriadneOperationSpec* findAriadneNativeOp(const std::string& op)
     }
     return nullptr;
 }
+
+static const AriadneOperationSpec* findAriadneInternalOp(const std::string& op)
+{
+    for (size_t i = 0; i < kAriadneInternalOperationCount; ++i) {
+        if (op == kAriadneInternalOperationTable[i].op_id)
+            return &kAriadneInternalOperationTable[i];
+    }
+    return nullptr;
+}
+
+enum class AriadneOperationAdmissionScope
+{
+    PublicOnly,
+    PublicOrDiagnosticInternal,
+    E2ReadOnlyOnly,
+};
 
 // Standard structured error: the result `r` already carries the
 // {schema, engine, operation,} prefix; this appends a machine-stable error_code
@@ -6529,6 +6549,32 @@ static bool familyHasOp(const std::string& op)
         || annoscaleReadHasOp(op);  // w7-annoscale
 }
 
+static bool isAriadneNativeOperationKnown(const std::string& op)
+{
+    return findAriadneNativeOp(op) != nullptr
+        || findAriadneInternalOp(op) != nullptr
+        || familyHasOp(op);
+}
+
+static bool isAriadneNativeOperationAdmitted(
+    const std::string& op,
+    AriadneOperationAdmissionScope scope)
+{
+    const bool publicOperation = findAriadneNativeOp(op) != nullptr
+        || familyHasOp(op);
+    const bool internalOperation = findAriadneInternalOp(op) != nullptr;
+    switch (scope) {
+    case AriadneOperationAdmissionScope::PublicOnly:
+        return publicOperation;
+    case AriadneOperationAdmissionScope::PublicOrDiagnosticInternal:
+        return publicOperation
+            || (internalOperation && op != "e2.inspect.xclip_membership");
+    case AriadneOperationAdmissionScope::E2ReadOnlyOnly:
+        return internalOperation && op == "e2.inspect.xclip_membership";
+    }
+    return false;
+}
+
 // route op to its owning family module; true if handled (result appended to r)
 static bool tryFamilyDispatch(const std::string& op, const AriadneJobCtx& ctx, std::ostringstream& r)
 {
@@ -6548,7 +6594,8 @@ static bool tryFamilyDispatch(const std::string& op, const AriadneJobCtx& ctx, s
 static std::string ariadneNativeJobResult(
     const std::string& job,
     std::string jobHostMode,
-    AcDbDatabase* pDb)
+    AcDbDatabase* pDb,
+    AriadneOperationAdmissionScope admissionScope)
 {
     if (jobHostMode.empty())
         jobHostMode = "coreconsole";
@@ -6561,14 +6608,16 @@ static std::string ariadneNativeJobResult(
       << "\"engine\":\"native_objectarx\","
       << "\"operation\":\"" << op << "\",";
 
-    // M08B-T01: table-gated dispatch. An op_id absent from the native operation
-    // table is not implemented in this module -> structured OPERATION_NOT_IMPLEMENTED
-    // (reported even without a working database, since it is a contract fact, not a
-    // DB error). This replaces the former generic unsupported-operation else and is
-    // the honest contract the M08 family tickets convert into real handlers.
-    if (findAriadneNativeOp(op) == nullptr && !familyHasOp(op)) {
+    if (!isAriadneNativeOperationKnown(op)) {
         emitNativeError(r, "OPERATION_NOT_IMPLEMENTED",
                         "operation '" + op + "' is not implemented in the native module");
+        return r.str();
+    }
+    if (!isAriadneNativeOperationAdmitted(op, admissionScope)) {
+        emitNativeError(
+            r,
+            "OPERATION_NOT_ADMITTED_FOR_CONTEXT",
+            "operation '" + op + "' is not admitted for this command context");
         return r.str();
     }
 
@@ -7552,7 +7601,7 @@ static std::string ariadneNativeJobResult(
     return r.str();
 }
 
-static void ariadneNativeJob()
+static void ariadneNativeJobWithScope(AriadneOperationAdmissionScope admissionScope)
 {
     const std::wstring inPath = readJobPathSetting(L"ARIADNE_CAD_JOB_IN");
     const std::wstring outPath = readJobPathSetting(L"ARIADNE_CAD_JOB_OUT");
@@ -7563,8 +7612,14 @@ static void ariadneNativeJob()
         : std::string();
     AriadneDocumentWriteLock documentLock;
     AcDbDatabase* pDb = acdbHostApplicationServices()->workingDatabase();
-    const std::string result = ariadneNativeJobResult(job, jobHostMode, pDb);
+    const std::string result = ariadneNativeJobResult(
+        job, jobHostMode, pDb, admissionScope);
     writeResult(outPath.empty() ? nullptr : outPath.c_str(), result);
+}
+
+static void ariadneNativeJob()
+{
+    ariadneNativeJobWithScope(AriadneOperationAdmissionScope::PublicOnly);
 }
 
 static bool readCommandArg(const ACHAR* prompt, std::wstring& value)
@@ -7626,7 +7681,8 @@ static void ariadneNativeJobArgs()
             gJobOutOverride = utf8ToWide(out);
             gJobHostModeOverride = utf8ToWide(host);
             acutPrintf(_T("\nARIADNE_NATIVE_JOB_ARGS: args file %ls\n"), argsPath.c_str());
-            ariadneNativeJob();
+            ariadneNativeJobWithScope(
+                AriadneOperationAdmissionScope::PublicOrDiagnosticInternal);
             clearJobPathOverrides();
             return;
         }
@@ -7646,7 +7702,8 @@ static void ariadneNativeJobArgs()
     gJobInOverride = inPath;
     gJobOutOverride = outPath;
     gJobHostModeOverride = hostMode;
-    ariadneNativeJob();
+    ariadneNativeJobWithScope(
+        AriadneOperationAdmissionScope::PublicOrDiagnosticInternal);
     clearJobPathOverrides();
 }
 
@@ -7815,9 +7872,13 @@ static void ariadneNativeJobArgsReadOnly()
         operationResult = ariadneReadOnlyBootstrapError(
             operation, "read-only args file is missing required paths or mode");
     }
-    else if (operation != "e2.inspect.xclip_membership") {
-        operationResult = ariadneReadOnlyBootstrapError(
-            operation, "read-only bootstrap only admits e2.inspect.xclip_membership");
+    else if (!isAriadneNativeOperationAdmitted(
+        operation, AriadneOperationAdmissionScope::E2ReadOnlyOnly)) {
+        operationResult = ariadneNativeJobResult(
+            immutableJob,
+            host,
+            nullptr,
+            AriadneOperationAdmissionScope::E2ReadOnlyOnly);
     }
     else if (!hostIsFullAutoCad() || !applicationContext || previousDocument == nullptr) {
         operationResult = ariadneReadOnlyBootstrapError(
@@ -7856,7 +7917,8 @@ static void ariadneNativeJobArgsReadOnly()
             if (pathVerifiedBefore && readOnlyVerifiedBefore
                 && workingDatabaseMatchesBefore) {
                 operationResult = ariadneNativeJobResult(
-                    immutableJob, host, openedDocument->database());
+                    immutableJob, host, openedDocument->database(),
+                    AriadneOperationAdmissionScope::E2ReadOnlyOnly);
                 operationExecuted = !operationResult.empty();
                 if (!operationExecuted) {
                     operationResult = ariadneReadOnlyBootstrapError(
@@ -7901,7 +7963,8 @@ static void ariadneNativeJobArgsReadOnly()
 static void ariadneNativeJobMailbox()
 {
     gUseMailboxOverride = true;
-    ariadneNativeJob();
+    ariadneNativeJobWithScope(
+        AriadneOperationAdmissionScope::PublicOrDiagnosticInternal);
     gUseMailboxOverride = false;
 }
 

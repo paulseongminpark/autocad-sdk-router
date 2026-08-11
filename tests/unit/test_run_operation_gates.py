@@ -73,3 +73,77 @@ def test_bad_write_mode_refused(tmp_path):
     assert r["status"] == "blocked"
     assert r["executed"] is False
     assert "allowed_write_modes" in r["reason"]
+
+
+def test_args_operation_cannot_bypass_the_registry_allow_list(monkeypatch, tmp_path):
+    source = tmp_path / "source.dwg"
+    source.write_bytes(b"synthetic read-only gate probe")
+    runner_calls = []
+
+    def unexpected_runner_call(*args, **kwargs):
+        runner_calls.append((args, kwargs))
+        raise AssertionError("reserved operation override reached the native runner")
+
+    monkeypatch.setattr(cadctl.run_job, "run_router_cad_job", unexpected_runner_call)
+    cad = cadctl.Cad()
+    cad.staging_golden = tmp_path / "staging"
+
+    result = cad.run_operation(
+        "inspect.database.graph",
+        args={"operation": "extend.deep_native.firing_selftest"},
+        dwg_path=str(source),
+        out_dir=str(tmp_path / "out"),
+    )
+
+    assert result["status"] == "blocked"
+    assert result["executed"] is False
+    assert result["operation"] == "inspect.database.graph"
+    assert "reserved" in result["reason"].lower()
+    assert runner_calls == []
+
+
+def test_normal_args_keep_the_allow_list_operation_and_reach_the_runner(
+    monkeypatch, tmp_path
+):
+    source = tmp_path / "source.dwg"
+    source.write_bytes(b"synthetic read-only normal-args probe")
+    captured = []
+
+    def fake_runner(staged_dwg, run_dir, operation, *, job_path=None, **kwargs):
+        staged_result = tmp_path / "router-result.dwg"
+        staged_result.write_bytes(Path(staged_dwg).read_bytes())
+        captured.append(
+            {
+                "operation": operation,
+                "job": json.loads(Path(job_path).read_text(encoding="utf-8")),
+            }
+        )
+        return {
+            "exit_code": 0,
+            "staged_used": str(staged_result),
+            "result_json": None,
+            "stdout_path": None,
+            "stderr_path": None,
+            "result": {"status": "ok"},
+            "error": None,
+        }
+
+    monkeypatch.setattr(cadctl.run_job, "run_router_cad_job", fake_runner)
+    cad = cadctl.Cad()
+    cad.staging_golden = tmp_path / "staging"
+
+    result = cad.run_operation(
+        "inspect.database.graph",
+        args={"limit": 5},
+        dwg_path=str(source),
+        out_dir=str(tmp_path / "out"),
+    )
+
+    assert result["status"] == "ok"
+    assert result["executed"] is True
+    assert captured == [
+        {
+            "operation": "inspect.database.graph",
+            "job": {"limit": 5, "operation": "inspect.database.graph"},
+        }
+    ]

@@ -12,15 +12,15 @@
     "acceptance_test_id": "registry tests[0] (current best-evidence test ref; F3's future per-op W+D roundtrip gate is not built in this tree yet)"
   },
   "totals": {
-    "catalogue_count": 551,
-    "node_count": 551,
-    "edge_count": 1408,
+    "catalogue_count": 552,
+    "node_count": 552,
+    "edge_count": 1410,
     "by_persistence_class": {
       "D": 61,
       "L": 35,
       "NON_GOAL": 62,
       "P": 59,
-      "R": 334
+      "R": 335
     }
   },
   "audit": {
@@ -4707,6 +4707,22 @@
         "tests/unit/test_operation_registry_v2.py"
       ],
       "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
+      "persistence_class": "R"
+    },
+    {
+      "op_id": "inspect.probe.property_count",
+      "predecessors": [
+        "inspect.entity.properties",
+        "inspect.property.by_name"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "docs/LIVE_JOB_ARGUMENT_CONTRACT.md",
+        "reports/native_smoke_latest.json",
+        "reports/opm_property_latest.json",
+        "tests/unit/test_operation_registry_verifier.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_operation_registry_verifier.py::test_probe_property_count_native_source_and_result_shape",
       "persistence_class": "R"
     },
     {
