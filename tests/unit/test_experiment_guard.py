@@ -20,6 +20,14 @@ import experiment_guard as guard
 import run_guarded_experiment as guarded_runner
 
 
+OBSERVATION_COMMAND = [
+    sys.executable,
+    str(Path(_TOOLS_E2) / "experiment_guard.py"),
+    "--require",
+    "vendor_custom_wall_semantics",
+]
+
+
 def _minimal_dwg_bytes(payload: bytes = b"test fixture") -> bytes:
     """A header-only DWG fixture; the guard intentionally does not parse DWGs."""
 
@@ -459,7 +467,8 @@ def test_guarded_runner_does_not_start_without_the_pr66_authoritative_receipt(
             "native_display_membership",
             "model_input_membership",
         ],
-        command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_output=_target_worldir_probe(),
         target_population_oracle=oracle,
         model_input_output=_model_input("P-W1", "P-W2"),
@@ -559,7 +568,8 @@ def test_target_population_gate_blocks_when_visible_w1_is_missing_from_model_inp
             "native_display_membership",
             "model_input_membership",
         ],
-        command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_output=_target_worldir_probe(),
         target_population_oracle=_target_oracle(tmp_path),
         model_input_output=_model_input("P-W2"),
@@ -759,7 +769,8 @@ def test_guarded_runner_hash_binds_real_source_and_exact_probe_file(tmp_path: Pa
 
     matching = guarded_runner.run_guarded(
         required_observables=requirements,
-        command=["python", "extract.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_path=matching_path,
         source_drawing=staged,
         receipt_path=receipt_path,
@@ -795,7 +806,7 @@ def test_guarded_runner_hash_binds_real_source_and_exact_probe_file(tmp_path: Pa
     assert saved["terminal_authorized"] is True
     assert saved["execution_outcome"] == "COMMAND_SUCCEEDED"
     assert saved == matching
-    assert calls == [["python", "extract.py"]]
+    assert calls == [OBSERVATION_COMMAND]
 
     wrong_identity_path = tmp_path / "wrong-identity-probe.json"
     wrong_identity_probe = _worldir_probe()
@@ -803,7 +814,8 @@ def test_guarded_runner_hash_binds_real_source_and_exact_probe_file(tmp_path: Pa
     wrong_identity_path.write_text(json.dumps(wrong_identity_probe), encoding="utf-8")
     wrong_identity = guarded_runner.run_guarded(
         required_observables=requirements,
-        command=["python", "extract.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_path=wrong_identity_path,
         source_drawing=staged,
         runner=fake_runner,
@@ -813,7 +825,8 @@ def test_guarded_runner_hash_binds_real_source_and_exact_probe_file(tmp_path: Pa
     wrong_source.write_bytes(_minimal_dwg_bytes(b"different staged DWG"))
     wrong_source_result = guarded_runner.run_guarded(
         required_observables=requirements,
-        command=["python", "extract.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_path=matching_path,
         source_drawing=wrong_source,
         runner=fake_runner,
@@ -826,7 +839,8 @@ def test_guarded_runner_hash_binds_real_source_and_exact_probe_file(tmp_path: Pa
     mutated_path.write_text(json.dumps(mutated_probe), encoding="utf-8")
     mutated = guarded_runner.run_guarded(
         required_observables=requirements,
-        command=["python", "extract.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_output=stale_in_memory_probe,
         probe_path=mutated_path,
         source_drawing=staged,
@@ -835,7 +849,8 @@ def test_guarded_runner_hash_binds_real_source_and_exact_probe_file(tmp_path: Pa
 
     omitted_source = guarded_runner.run_guarded(
         required_observables=requirements,
-        command=["python", "extract.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_path=matching_path,
         runner=fake_runner,
     )
@@ -849,7 +864,7 @@ def test_guarded_runner_hash_binds_real_source_and_exact_probe_file(tmp_path: Pa
     assert mutated["evidence_binding"]["probe_sha256"] == hashlib.sha256(mutated_path.read_bytes()).hexdigest()
     assert omitted_source["guard"]["status"] != guard.READY
     assert omitted_source["guard"]["reason_code"] == "SOURCE_DOCUMENT_BINDING_REQUIRED"
-    assert calls == [["python", "extract.py"]]
+    assert calls == [OBSERVATION_COMMAND]
 
 
 def _matching_source_bound_inputs(tmp_path: Path, *, receipt_name: str):
@@ -869,29 +884,24 @@ def _matching_source_bound_inputs(tmp_path: Path, *, receipt_name: str):
     return requirements, source, probe_path, tmp_path / receipt_name
 
 
-def test_guarded_runner_invalidates_terminal_receipt_when_subprocess_mutates_probe(tmp_path: Path):
+def test_guarded_runner_invalidates_terminal_receipt_when_runner_mutates_probe(tmp_path: Path):
     requirements, source, probe_path, receipt_path = _matching_source_bound_inputs(
         tmp_path, receipt_name="probe-mutated-receipt.json"
     )
     mutated_probe = _worldir_probe()
     mutated_probe["drawing_id"] = "b" * 64
-    mutate_command = [
-        sys.executable,
-        "-c",
-        (
-            "from pathlib import Path; import sys; "
-            "Path(sys.argv[1]).write_text(sys.argv[2], encoding='utf-8')"
-        ),
-        str(probe_path),
-        json.dumps(mutated_probe),
-    ]
+    def mutating_runner(command, check=False):
+        probe_path.write_text(json.dumps(mutated_probe), encoding="utf-8")
+        return _Completed(0)
 
     result = guarded_runner.run_guarded(
         required_observables=requirements,
-        command=mutate_command,
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_path=probe_path,
         source_drawing=source,
         receipt_path=receipt_path,
+        runner=mutating_runner,
     )
 
     final = _assert_authoritative_receipt(result, receipt_path)
@@ -927,7 +937,8 @@ def test_guarded_runner_invalidates_terminal_receipt_when_runner_mutates_source(
 
     result = guarded_runner.run_guarded(
         required_observables=requirements,
-        command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_path=probe_path,
         source_drawing=source,
         receipt_path=receipt_path,
@@ -970,7 +981,8 @@ def test_guarded_runner_blocks_pre_spawn_probe_mutation_and_does_not_execute(tmp
 
     result = guarded_runner.run_guarded(
         required_observables=requirements,
-        command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_path=probe_path,
         source_drawing=source,
         receipt_path=receipt_path,
@@ -1002,7 +1014,8 @@ def test_guarded_runner_terminalizes_runner_exception_receipt(tmp_path: Path):
 
     result = guarded_runner.run_guarded(
         required_observables=requirements,
-        command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_path=probe_path,
         source_drawing=source,
         receipt_path=receipt_path,
@@ -1157,10 +1170,73 @@ def test_guarded_runner_does_not_execute_without_probe():
 
     result = guarded_runner.run_guarded(
         required_observables=["modelspace_geometry"],
-        command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         runner=fake_runner,
     )
     assert result["guard"]["status"] == guard.NEEDS_PROBE
+    assert result["executed"] is False
+    assert calls == []
+
+
+def test_guarded_runner_requires_an_explicit_execution_purpose():
+    calls = []
+
+    def should_not_run(command, check=False):
+        calls.append(command)
+        raise AssertionError("an omitted execution purpose must fail before spawn")
+
+    with pytest.raises(TypeError):
+        guarded_runner.run_guarded(
+            required_observables=["modelspace_geometry"],
+            command=OBSERVATION_COMMAND,
+            probe_output=_rich_ir(),
+            runner=should_not_run,
+        )
+
+    assert calls == []
+
+
+def test_downstream_execution_without_a_receipt_is_blocked_before_spawn():
+    calls = []
+
+    def should_not_run(command, check=False):
+        calls.append(command)
+        raise AssertionError("downstream execution must not run without a receipt")
+
+    result = guarded_runner.run_guarded(
+        execution_purpose="downstream_learning_or_scoring",
+        experiment_id="missing-receipt",
+        required_observables=["modelspace_geometry"],
+        command=["python", "model.py"],
+        probe_output=_rich_ir(),
+        runner=should_not_run,
+    )
+
+    assert result["guard"]["status"] == guard.BLOCKED
+    assert result["guard"]["reason_code"] == "QUALIFICATION_RECEIPT_REQUIRED"
+    assert result["executed"] is False
+    assert result["terminal_authorized"] is False
+    assert calls == []
+
+
+def test_observation_mode_rejects_an_arbitrary_subprocess_before_spawn():
+    calls = []
+
+    def should_not_run(command, check=False):
+        calls.append(command)
+        raise AssertionError("observation mode must use the closed repository allowlist")
+
+    result = guarded_runner.run_guarded(
+        execution_purpose="observation_only",
+        required_observables=["modelspace_geometry"],
+        command=["python", "model.py"],
+        probe_output=_rich_ir(),
+        runner=should_not_run,
+    )
+
+    assert result["guard"]["status"] == guard.BLOCKED
+    assert result["guard"]["reason_code"] == "OBSERVATION_COMMAND_NOT_ALLOWED"
     assert result["executed"] is False
     assert calls == []
 
@@ -1177,7 +1253,8 @@ def test_guarded_runner_executes_only_after_ready_probe():
 
     result = guarded_runner.run_guarded(
         required_observables=["modelspace_geometry", "block_definitions"],
-        command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_output=_rich_ir(),
         runner=fake_runner,
     )
@@ -1187,7 +1264,7 @@ def test_guarded_runner_executes_only_after_ready_probe():
     assert result["execution_outcome"] == "COMMAND_FAILED"
     assert result["command_succeeded"] is False
     assert result["terminal_authorized"] is False
-    assert calls == [["python", "model.py"]]
+    assert calls == [OBSERVATION_COMMAND]
 
 
 def test_guarded_runner_writes_preflight_and_final_receipt(tmp_path: Path):
@@ -1203,7 +1280,8 @@ def test_guarded_runner_writes_preflight_and_final_receipt(tmp_path: Path):
 
     result = guarded_runner.run_guarded(
         required_observables=["modelspace_geometry", "block_definitions"],
-        command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_output=_rich_ir(),
         receipt_path=receipt_path,
         runner=fake_runner,
@@ -1232,7 +1310,8 @@ def test_guarded_runner_never_executes_known_build_gap():
 
     result = guarded_runner.run_guarded(
         required_observables=["nested_insert_world_geometry"],
-        command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_output=_rich_ir(),
         runner=fake_runner,
     )
@@ -1327,7 +1406,8 @@ def test_guarded_runner_invalidates_byte_identical_directory_alias_retarget(
     try:
         result = guarded_runner.run_guarded(
             required_observables=requirements,
-            command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
             probe_path=probe_path,
             source_drawing=source,
             receipt_path=receipt_path,
@@ -1372,7 +1452,8 @@ def test_guarded_runner_invalidates_byte_identical_replacement_when_observable(
 
     result = guarded_runner.run_guarded(
         required_observables=requirements,
-        command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_path=probe_path,
         source_drawing=source,
         receipt_path=receipt_path,
@@ -1407,7 +1488,8 @@ def test_guarded_runner_invalidates_source_or_probe_deletion(tmp_path: Path, bou
 
     result = guarded_runner.run_guarded(
         required_observables=requirements,
-        command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_path=probe_path,
         source_drawing=source,
         receipt_path=receipt_path,
@@ -1440,7 +1522,8 @@ def test_guarded_runner_blocks_malformed_probe_with_a_terminal_receipt(tmp_path:
 
     result = guarded_runner.run_guarded(
         required_observables=requirements,
-        command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_path=probe_path,
         source_drawing=source,
         receipt_path=receipt_path,
@@ -1475,7 +1558,8 @@ def test_guarded_runner_rejects_non_dwg_source_even_when_probe_hash_matches(tmp_
 
     result = guarded_runner.run_guarded(
         required_observables=requirements,
-        command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_path=probe_path,
         source_drawing=source,
         receipt_path=receipt_path,
@@ -1515,7 +1599,8 @@ def test_guarded_runner_terminalizes_malformed_runner_results(
 
     result = guarded_runner.run_guarded(
         required_observables=requirements,
-        command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_path=probe_path,
         source_drawing=source,
         receipt_path=receipt_path,
@@ -1541,7 +1626,8 @@ def test_guarded_runner_records_nonzero_command_as_nonterminal_failure(tmp_path:
 
     result = guarded_runner.run_guarded(
         required_observables=requirements,
-        command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_path=probe_path,
         source_drawing=source,
         receipt_path=receipt_path,
@@ -1565,6 +1651,8 @@ def test_guarded_runner_cli_returns_nonzero_command_exit(tmp_path: Path):
         tmp_path, receipt_name="cli-nonzero-receipt.json"
     )
     argv = [
+        "--execution-purpose",
+        "observation_only",
         *(item for required in requirements for item in ("--require", required)),
         "--probe-ir",
         str(probe_path),
@@ -1573,16 +1661,14 @@ def test_guarded_runner_cli_returns_nonzero_command_exit(tmp_path: Path):
         "--receipt-output",
         str(receipt_path),
         "--",
-        sys.executable,
-        "-c",
-        "import sys; sys.exit(7)",
+        *OBSERVATION_COMMAND,
     ]
 
-    assert guarded_runner.main(argv) == 7
+    assert guarded_runner.main(argv) == 21
     final = json.loads(receipt_path.read_text(encoding="utf-8"))
     assert final["guard"]["status"] == guard.READY
     assert final["execution_outcome"] == "COMMAND_FAILED"
-    assert final["command_exit_code"] == 7
+    assert final["command_exit_code"] == 21
     assert final["terminal_authorized"] is False
 
 
@@ -1605,7 +1691,8 @@ def test_guarded_runner_returns_blocked_when_final_receipt_write_fails(
     monkeypatch.setattr(guarded_runner, "_write_receipt", fail_final_write)
     result = guarded_runner.run_guarded(
         required_observables=requirements,
-        command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_path=probe_path,
         source_drawing=source,
         receipt_path=receipt_path,
@@ -1643,7 +1730,8 @@ def test_guarded_runner_does_not_execute_when_initial_receipt_write_fails(
     monkeypatch.setattr(guarded_runner, "_write_receipt", fail_initial_write)
     result = guarded_runner.run_guarded(
         required_observables=requirements,
-        command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_path=probe_path,
         source_drawing=source,
         receipt_path=receipt_path,
@@ -1677,7 +1765,8 @@ def test_guarded_runner_propagates_base_exceptions_after_safe_preflight(
     with pytest.raises(interrupt):
         guarded_runner.run_guarded(
             required_observables=requirements,
-            command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
             probe_path=probe_path,
             source_drawing=source,
             receipt_path=receipt_path,
@@ -1705,7 +1794,8 @@ def test_guarded_runner_rejects_receipt_path_aliasing_evidence_without_overwrite
 
     result = guarded_runner.run_guarded(
         required_observables=requirements,
-        command=["python", "model.py"],
+        execution_purpose="observation_only",
+        command=OBSERVATION_COMMAND,
         probe_path=probe_path,
         source_drawing=source,
         receipt_path=receipt_path,

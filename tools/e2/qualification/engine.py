@@ -12,10 +12,15 @@ import hashlib
 import importlib.util
 import json
 import math
+import os
+import stat
+import tempfile
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping
+
+from jsonschema import Draft202012Validator
 
 
 STATUS_PASS = "PASS"
@@ -43,6 +48,10 @@ WALL_MODEL_REQUIRED_OBSERVABLES = frozenset(
         "model_input_membership",
     }
 )
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+_QUALIFICATION_RECEIPT_SCHEMA_PATH = (
+    _REPO_ROOT / "schemas" / "e2_qualification_receipt.v1.schema.json"
+)
 
 
 def _utc_now() -> str:
@@ -57,28 +66,166 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _file_record(path: Path) -> dict[str, Any]:
+def _file_record(path: Path, *, relative_to: Path | None = None) -> dict[str, Any]:
+    recorded_path = path.relative_to(relative_to).as_posix() if relative_to else str(path)
+    raw = path.read_bytes()
     return {
-        "path": str(path),
-        "sha256": _sha256(path),
-        "bytes": path.stat().st_size,
+        "path": recorded_path,
+        "sha256": hashlib.sha256(raw).hexdigest(),
+        "bytes": len(raw),
     }
 
 
 def _read_json(path: Path) -> dict[str, Any]:
-    value = json.loads(path.read_text(encoding="utf-8-sig"))
+    value = json.loads(
+        path.read_text(encoding="utf-8-sig"),
+        parse_constant=lambda token: (_ for _ in ()).throw(
+            ValueError(f"non-finite JSON number {token!r}")
+        ),
+    )
     if not isinstance(value, dict):
         raise ValueError(f"{path}: expected a JSON object")
     return value
 
 
-def _write_json(path: Path, value: Any) -> None:
+def _write_bytes_atomic(path: Path, payload: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-        newline="\n",
+    descriptor: int | None = None
+    temporary: str | None = None
+    try:
+        descriptor, temporary = tempfile.mkstemp(
+            prefix=f".{path.name}.", suffix=".tmp", dir=os.fspath(path.parent)
+        )
+        with os.fdopen(descriptor, "wb") as stream:
+            descriptor = None
+            stream.write(payload)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+        temporary = None
+        try:
+            directory = os.open(os.fspath(path.parent), os.O_RDONLY)
+        except OSError:
+            directory = None
+        if directory is not None:
+            try:
+                try:
+                    os.fsync(directory)
+                except OSError:
+                    pass
+            finally:
+                os.close(directory)
+    except BaseException:
+        if descriptor is not None:
+            os.close(descriptor)
+        if temporary is not None:
+            try:
+                os.unlink(temporary)
+            except OSError:
+                pass
+        raise
+
+
+def _write_json(path: Path, value: Any) -> None:
+    _write_bytes_atomic(path, _canonical_json_bytes(value))
+
+
+def _canonical_json_bytes(value: Any) -> bytes:
+    return (
+        json.dumps(
+            value,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        )
+        + "\n"
+    ).encode("utf-8")
+
+
+def _read_json_snapshot(path: Path) -> tuple[dict[str, Any], bytes, str]:
+    raw = path.read_bytes()
+    value = json.loads(
+        raw.decode("utf-8-sig"),
+        parse_constant=lambda token: (_ for _ in ()).throw(
+            ValueError(f"non-finite JSON number {token!r}")
+        ),
     )
+    if not isinstance(value, dict):
+        raise ValueError(f"{path}: expected a JSON object")
+    return value, raw, hashlib.sha256(raw).hexdigest()
+
+
+def _is_reparse_point(path: Path) -> bool:
+    try:
+        info = path.lstat()
+    except OSError:
+        return False
+    attributes = int(getattr(info, "st_file_attributes", 0) or 0)
+    reparse_flag = int(getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0) or 0)
+    is_junction = getattr(path, "is_junction", lambda: False)
+    return path.is_symlink() or bool(reparse_flag and attributes & reparse_flag) or is_junction()
+
+
+def _regular_non_reparse_file(path: Path) -> bool:
+    try:
+        info = path.lstat()
+    except OSError:
+        return False
+    return stat.S_ISREG(info.st_mode) and not _is_reparse_point(path)
+
+
+def _run_local_record_path(run_root: Path, recorded_path: object) -> Path:
+    if not isinstance(recorded_path, str) or not recorded_path:
+        raise ValueError("recorded path must be a non-empty relative string")
+    relative = Path(recorded_path)
+    if (
+        relative.is_absolute()
+        or ".." in relative.parts
+        or relative.as_posix() != recorded_path.replace("\\", "/")
+    ):
+        raise ValueError("recorded path must stay relative to the receipt run root")
+    target = run_root / relative
+    resolved_root = run_root.resolve(strict=True)
+    resolved_target = target.resolve(strict=True)
+    if resolved_target != resolved_root and resolved_root not in resolved_target.parents:
+        raise ValueError("recorded path escaped the receipt run root")
+    if _is_reparse_point(run_root) or any(
+        _is_reparse_point(parent)
+        for parent in (target, *target.parents)
+        if parent == run_root or run_root in parent.parents
+    ):
+        raise ValueError("recorded path traverses a symlink, junction, or reparse point")
+    if not _regular_non_reparse_file(target):
+        raise ValueError("recorded path is not a regular non-reparse file")
+    return target
+
+
+def _validated_file_record(
+    run_root: Path,
+    record: Mapping[str, Any],
+) -> tuple[dict[str, Any], str]:
+    target = _run_local_record_path(run_root, record.get("path"))
+    payload, raw, observed_sha256 = _read_json_snapshot(target)
+    expected_sha256 = record.get("sha256")
+    expected_bytes = record.get("bytes")
+    if expected_sha256 != observed_sha256:
+        raise ValueError("recorded SHA-256 does not match the exact parsed bytes")
+    if not isinstance(expected_bytes, int) or isinstance(expected_bytes, bool):
+        raise ValueError("recorded byte count is not an integer")
+    if expected_bytes != len(raw):
+        raise ValueError("recorded byte count does not match the exact parsed bytes")
+    return payload, observed_sha256
+
+
+def _schema_errors(instance: Mapping[str, Any]) -> list[str]:
+    schema = json.loads(_QUALIFICATION_RECEIPT_SCHEMA_PATH.read_text(encoding="utf-8"))
+    Draft202012Validator.check_schema(schema)
+    validator = Draft202012Validator(schema)
+    return [
+        error.message
+        for error in sorted(validator.iter_errors(instance), key=lambda item: list(item.path))
+    ]
 
 
 def _all_native_entities(native: Mapping[str, Any]) -> Iterable[tuple[str, Mapping[str, Any]]]:
@@ -304,6 +451,10 @@ def qualify(
             "The completeness check is internally independent at the counting-contract level, not independent at the CAD-engine level.",
             "Arc geometry is represented by a chord and is not a lossless curve model.",
         ],
+        "authorization_scope": {
+            "execution_purpose": "downstream_learning_or_scoring",
+            "required_observables": sorted(WALL_MODEL_REQUIRED_OBSERVABLES),
+        },
     }
 
 
@@ -592,6 +743,168 @@ def _model_diagnostics(
     }
 
 
+def _finite_number(value: object) -> float | None:
+    if (
+        not isinstance(value, (int, float))
+        or isinstance(value, bool)
+        or not math.isfinite(float(value))
+    ):
+        return None
+    return float(value)
+
+
+def _nonnegative_integer(value: object) -> int | None:
+    if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+        return None
+    return value
+
+
+def _valid_point2(value: object) -> bool:
+    return (
+        isinstance(value, list)
+        and len(value) == 2
+        and all(_finite_number(coordinate) is not None for coordinate in value)
+    )
+
+
+def _candidate_details(candidates: Mapping[str, Any]) -> tuple[int | None, list[str]]:
+    records = candidates.get("candidates")
+    if not isinstance(records, list):
+        return None, ["CANDIDATE_DETAIL_INVALID"]
+    failures: list[str] = []
+    threshold = _finite_number(candidates.get("threshold"))
+    identities: list[str] = []
+    for record in records:
+        if not isinstance(record, Mapping):
+            failures.append("CANDIDATE_DETAIL_INVALID")
+            continue
+        identity = record.get("placed_uid")
+        score = _finite_number(record.get("score"))
+        if (
+            not isinstance(identity, str)
+            or not identity
+            or score is None
+            or threshold is None
+            or score < threshold
+        ):
+            failures.append("CANDIDATE_DETAIL_INVALID")
+            continue
+        identities.append(identity)
+    if len(identities) != len(set(identities)):
+        failures.append("CANDIDATE_DETAIL_INVALID")
+    declared = candidates.get("candidate_count")
+    if (
+        not isinstance(declared, int)
+        or isinstance(declared, bool)
+        or declared != len(records)
+    ):
+        failures.append("CANDIDATE_DETAIL_INVALID")
+    return len(records), list(dict.fromkeys(failures))
+
+
+def _wall_pair_details(candidates: Mapping[str, Any]) -> tuple[int, list[str]]:
+    records = candidates.get("wall_pair_records")
+    if not isinstance(records, list):
+        return 0, ["WALL_PAIR_DETAIL_INVALID"]
+    identities: list[tuple[str, str]] = []
+    failures: list[str] = []
+    for record in records:
+        if not isinstance(record, Mapping):
+            failures.append("WALL_PAIR_DETAIL_INVALID")
+            continue
+        handles = record.get("handles")
+        axis = record.get("axis")
+        thickness = _finite_number(record.get("thickness"))
+        if not (
+            isinstance(handles, list)
+            and len(handles) == 2
+            and all(isinstance(handle, str) and handle for handle in handles)
+            and handles[0] != handles[1]
+            and isinstance(axis, list)
+            and len(axis) == 2
+            and all(_valid_point2(point) for point in axis)
+            and axis[0] != axis[1]
+            and thickness is not None
+            and thickness > 0.0
+        ):
+            failures.append("WALL_PAIR_DETAIL_INVALID")
+            continue
+        identities.append(tuple(sorted((handles[0], handles[1]))))
+    if len(identities) != len(set(identities)):
+        failures.append("WALL_PAIR_DETAIL_INVALID")
+    return len(records), list(dict.fromkeys(failures))
+
+
+def _rules_f1_from_confusion(models: Mapping[str, Any]) -> tuple[float | None, list[str]]:
+    rules = models.get("rules")
+    rules = rules if isinstance(rules, Mapping) else {}
+    metrics = rules.get("accuracy_metrics")
+    if metrics is None:
+        return None, []
+    if not isinstance(metrics, Mapping):
+        return None, ["RULES_F1_CONFUSION_MISMATCH"]
+    true_positive = _nonnegative_integer(metrics.get("true_positive"))
+    false_positive = _nonnegative_integer(metrics.get("false_positive"))
+    false_negative = _nonnegative_integer(metrics.get("false_negative"))
+    declared_f1 = _finite_number(metrics.get("f1"))
+    if None in (true_positive, false_positive, false_negative, declared_f1):
+        return None, ["RULES_F1_CONFUSION_MISMATCH"]
+    denominator = 2 * true_positive + false_positive + false_negative
+    if denominator <= 0:
+        return None, ["RULES_F1_CONFUSION_MISMATCH"]
+    recomputed = 2.0 * true_positive / denominator
+    if not math.isclose(declared_f1, recomputed, rel_tol=0.0, abs_tol=1e-12):
+        return None, ["RULES_F1_CONFUSION_MISMATCH"]
+    return recomputed, []
+
+
+def _expected_invariant_details(
+    interventions: Mapping[str, Any],
+) -> tuple[dict[str, Any], list[str]]:
+    records = interventions.get("interventions")
+    if not isinstance(records, list):
+        return {}, ["EXPECTED_INVARIANCE_DETAIL_INVALID"]
+    named_expected_records = [
+        record
+        for record in records
+        if isinstance(record, Mapping)
+        and record.get("intervention") in EXPECTED_INVARIANT_INTERVENTIONS
+    ]
+    expected_records = [
+        record for record in named_expected_records if record.get("expected_invariant") is True
+    ]
+    names = [record.get("intervention") for record in expected_records]
+    failures: list[str] = []
+    if (
+        len(named_expected_records) != len(EXPECTED_INVARIANT_INTERVENTIONS)
+        or len(expected_records) != len(EXPECTED_INVARIANT_INTERVENTIONS)
+        or set(names) != EXPECTED_INVARIANT_INTERVENTIONS
+        or len(names) != len(set(names))
+    ):
+        failures.append("EXPECTED_INVARIANCE_DETAIL_INVALID")
+    statuses: dict[str, Any] = {}
+    for record in expected_records:
+        name = record.get("intervention")
+        if isinstance(name, str):
+            statuses[name] = record.get("status")
+        delta = _finite_number(record.get("max_per_handle_score_delta"))
+        if not (
+            isinstance(name, str)
+            and name in EXPECTED_INVARIANT_INTERVENTIONS
+            and record.get("status") == STATUS_PASS
+            and _nonnegative_integer(record.get("segments")) is not None
+            and _nonnegative_integer(record.get("positive_handles")) is not None
+            and record.get("positive_membership_changed_handles") == []
+            and record.get("score_changed_handle_count") == 0
+            and _finite_number(record.get("positive_handle_jaccard_vs_baseline")) == 1.0
+            and _finite_number(record.get("parallel_pair_handle_jaccard_vs_baseline")) == 1.0
+            and delta is not None
+            and delta <= 1e-6
+        ):
+            failures.append("EXPECTED_INVARIANCE_DETAIL_INVALID")
+    return statuses, list(dict.fromkeys(failures))
+
+
 def _downstream_experiment_gate(
     receipt: Mapping[str, Any],
     candidates: Mapping[str, Any],
@@ -600,61 +913,70 @@ def _downstream_experiment_gate(
 ) -> dict[str, Any]:
     """Keep report generation separate from authorization to learn or score."""
 
-    candidate_count = candidates.get("candidate_count")
-    wall_pair_records = candidates.get("wall_pair_records")
-    wall_pair_record_count = len(wall_pair_records) if isinstance(wall_pair_records, list) else 0
-    rules = models.get("rules") if isinstance(models.get("rules"), Mapping) else {}
-    metrics = rules.get("accuracy_metrics") if isinstance(rules, Mapping) else None
-    rules_f1 = metrics.get("f1") if isinstance(metrics, Mapping) else None
-    valid_f1 = (
-        isinstance(rules_f1, (int, float))
-        and not isinstance(rules_f1, bool)
-        and math.isfinite(float(rules_f1))
-        and float(rules_f1) > 0.0
-    )
-
-    invariant_statuses = {
-        str(row.get("intervention")): row.get("status")
-        for row in interventions.get("interventions", []) or []
-        if isinstance(row, Mapping) and row.get("expected_invariant") is True
-    }
+    candidate_count, candidate_failures = _candidate_details(candidates)
+    wall_pair_record_count, pair_failures = _wall_pair_details(candidates)
+    rules_f1, f1_failures = _rules_f1_from_confusion(models)
+    invariant_statuses, invariant_failures = _expected_invariant_details(interventions)
     blocked_expected_invariants = sorted(
         name
         for name in EXPECTED_INVARIANT_INTERVENTIONS
         if invariant_statuses.get(name) != STATUS_PASS
     )
-    failures = []
+    failures = [
+        *candidate_failures,
+        *pair_failures,
+        *f1_failures,
+        *invariant_failures,
+    ]
+    rules = models.get("rules")
+    rules = rules if isinstance(rules, Mapping) else {}
+    if rules.get("candidate_count") != candidate_count:
+        failures.append("CANDIDATE_DETAIL_INVALID")
+    baseline = interventions.get("baseline")
+    baseline = baseline if isinstance(baseline, Mapping) else {}
+    if baseline.get("wall_pair_records") != wall_pair_record_count:
+        failures.append("WALL_PAIR_DETAIL_INVALID")
     if receipt.get("schema") != "e2.qualification_receipt.v1":
         failures.append("QUALIFICATION_RECEIPT_SCHEMA_INVALID")
     if receipt.get("status") != STATUS_PASS:
         failures.append("QUALIFICATION_STATUS_NOT_PASS")
-    if not isinstance(candidate_count, int) or isinstance(candidate_count, bool) or candidate_count <= 0:
+    if candidate_count is None or candidate_count <= 0:
         failures.append("NO_WALL_CANDIDATES")
     if wall_pair_record_count <= 0:
         failures.append("NO_WALL_PAIR_RECORDS")
-    if not valid_f1:
+    if rules_f1 is None or rules_f1 <= 0.0:
         failures.append("RULES_F1_NOT_POSITIVE")
     if blocked_expected_invariants:
         failures.append("EXPECTED_INVARIANCE_BLOCKED")
 
     return {
         "status": STATUS_BLOCKED if failures else STATUS_PASS,
-        "reason_codes": failures,
+        "reason_codes": list(dict.fromkeys(failures)),
         "qualification_status": receipt.get("status"),
         "candidate_count": candidate_count,
         "wall_pair_record_count": wall_pair_record_count,
-        "rules_f1": float(rules_f1) if valid_f1 else None,
+        "rules_f1": rules_f1,
         "expected_invariant_statuses": dict(sorted(invariant_statuses.items())),
         "blocked_expected_invariants": blocked_expected_invariants,
     }
 
 
-def validate_downstream_qualification_receipt(path: Path) -> dict[str, Any]:
-    """Validate the persisted receipt before a downstream run is authorized."""
+def validate_downstream_qualification_receipt(
+    path: Path,
+    *,
+    authorization_context: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Validate one run-local receipt against the current downstream execution."""
 
     path = Path(path)
     try:
-        receipt = _read_json(path)
+        if path.name != "qualification_receipt.json":
+            raise ValueError("receipt filename must be qualification_receipt.json")
+        if _is_reparse_point(path.parent):
+            raise ValueError("receipt run root is a symlink, junction, or reparse point")
+        if not _regular_non_reparse_file(path):
+            raise ValueError("receipt is not a regular non-reparse file")
+        receipt, receipt_raw, receipt_sha256 = _read_json_snapshot(path)
     except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as exc:
         return {
             "status": STATUS_BLOCKED,
@@ -672,65 +994,155 @@ def validate_downstream_qualification_receipt(path: Path) -> dict[str, Any]:
     statuses = statuses if isinstance(statuses, Mapping) else {}
     failures: list[str] = []
     output_errors: list[str] = []
+    evidence_errors: list[str] = []
     output_payloads: dict[str, dict[str, Any]] = {}
     output_hashes: dict[str, str] = {}
-    outputs = receipt.get("outputs")
-    outputs = outputs if isinstance(outputs, list) else []
+    evidence_hashes: dict[str, str] = {}
+    schema_errors = _schema_errors(receipt)
+    if schema_errors:
+        failures.append("QUALIFICATION_RECEIPT_SCHEMA_INVALID")
+
+    run_root = path.parent
     required_outputs = {
         "wall_candidates_rules": "wall_candidates_rules.json",
         "model_diagnostics": "model_diagnostics.json",
         "intervention_results": "intervention_results.json",
     }
-    for role, expected_name in required_outputs.items():
-        records = [
-            record
-            for record in outputs
-            if isinstance(record, Mapping) and record.get("role") == role
-        ]
-        if len(records) != 1:
-            output_errors.append(f"{role}: expected exactly one receipt output")
+    outputs = receipt.get("outputs")
+    outputs = outputs if isinstance(outputs, list) else []
+    output_roles = [
+        record.get("role") for record in outputs if isinstance(record, Mapping)
+    ]
+    if len(output_roles) != len(set(output_roles)):
+        output_errors.append("output roles must be unique")
+    for record in outputs:
+        if not isinstance(record, Mapping):
+            output_errors.append("every output record must be an object")
             continue
-        record = records[0]
-        recorded_path = Path(str(record.get("path") or ""))
-        output_path = recorded_path if recorded_path.is_absolute() else path.parent / expected_name
-        expected_sha256 = str(record.get("sha256") or "").lower()
-        expected_bytes = record.get("bytes")
+        role = record.get("role")
+        if not isinstance(role, str) or not role:
+            output_errors.append("every output record must have a non-empty role")
+            continue
         try:
-            if recorded_path.name != expected_name:
-                raise ValueError(f"unexpected output filename {recorded_path.name!r}")
-            if len(expected_sha256) != 64 or any(
-                character not in "0123456789abcdef" for character in expected_sha256
-            ):
-                raise ValueError("invalid recorded SHA-256")
+            expected_name = required_outputs.get(role)
             if (
-                not isinstance(expected_bytes, int)
-                or isinstance(expected_bytes, bool)
-                or expected_bytes < 0
+                expected_name is not None
+                and Path(str(record.get("path") or "")).as_posix() != expected_name
             ):
-                raise ValueError("invalid recorded byte count")
-            if not output_path.is_file():
-                raise ValueError("recorded output is missing")
-            observed_sha256 = _sha256(output_path)
-            if observed_sha256 != expected_sha256:
-                raise ValueError("recorded output SHA-256 drifted")
-            if output_path.stat().st_size != expected_bytes:
-                raise ValueError("recorded output byte count drifted")
-            output_payloads[role] = _read_json(output_path)
+                raise ValueError(f"output path must be exactly {expected_name!r}")
+            payload, observed_sha256 = _validated_file_record(run_root, record)
             output_hashes[role] = observed_sha256
+            if role in required_outputs:
+                output_payloads[role] = payload
         except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as exc:
             output_errors.append(f"{role}: {type(exc).__name__}: {exc}")
+    for role in required_outputs:
+        if output_roles.count(role) != 1:
+            output_errors.append(f"{role}: expected exactly one receipt output")
+
+    evidence = receipt.get("evidence")
+    evidence = evidence if isinstance(evidence, list) else []
+    required_evidence = {"native_ir", "adapter_ir", "world_ir"}
+    evidence_roles = [
+        record.get("role") for record in evidence if isinstance(record, Mapping)
+    ]
+    if set(evidence_roles) != required_evidence or len(evidence_roles) != len(
+        required_evidence
+    ):
+        evidence_errors.append("evidence roles must be exactly native_ir, adapter_ir, world_ir")
+    else:
+        for record in evidence:
+            assert isinstance(record, Mapping)
+            role = str(record["role"])
+            try:
+                _, observed_sha256 = _validated_file_record(run_root, record)
+                evidence_hashes[role] = observed_sha256
+            except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as exc:
+                evidence_errors.append(f"{role}: {type(exc).__name__}: {exc}")
 
     if output_errors:
         failures.append("QUALIFICATION_OUTPUT_INVALID")
-    else:
+    elif required_outputs.keys() <= output_payloads.keys():
         recomputed_gate = _downstream_experiment_gate(
             receipt,
             output_payloads["wall_candidates_rules"],
             output_payloads["model_diagnostics"],
             output_payloads["intervention_results"],
         )
+        failures.extend(recomputed_gate["reason_codes"])
         if dict(gate) != recomputed_gate:
             failures.append("DOWNSTREAM_GATE_EVIDENCE_MISMATCH")
+    if evidence_errors:
+        failures.append("QUALIFICATION_EVIDENCE_INVALID")
+
+    context = dict(authorization_context or {})
+    source = receipt.get("source")
+    source = source if isinstance(source, Mapping) else {}
+    scope = receipt.get("authorization_scope")
+    scope = scope if isinstance(scope, Mapping) else {}
+    if not authorization_context:
+        failures.append("QUALIFICATION_AUTHORIZATION_CONTEXT_REQUIRED")
+    else:
+        if context.get("execution_purpose") != "downstream_learning_or_scoring":
+            failures.append("QUALIFICATION_EXECUTION_PURPOSE_MISMATCH")
+        if context.get("experiment_id") != receipt.get("experiment_id"):
+            failures.append("QUALIFICATION_EXPERIMENT_ID_MISMATCH")
+        current_observables = context.get("required_observables")
+        current_observables = (
+            sorted(set(current_observables))
+            if isinstance(current_observables, list)
+            and all(isinstance(item, str) and item for item in current_observables)
+            else None
+        )
+        authorized_observables = scope.get("required_observables")
+        authorized_observables = (
+            sorted(set(authorized_observables))
+            if isinstance(authorized_observables, list)
+            and all(isinstance(item, str) and item for item in authorized_observables)
+            else None
+        )
+        if current_observables is None or current_observables != authorized_observables:
+            failures.append("QUALIFICATION_OBSERVABLE_SCOPE_MISMATCH")
+        try:
+            requested_source = Path(
+                str(context.get("source_requested_path") or context.get("source_path") or "")
+            )
+            receipt_source_requested = Path(str(source.get("path") or ""))
+            if (
+                _is_reparse_point(requested_source)
+                or _is_reparse_point(requested_source.parent)
+                or _is_reparse_point(receipt_source_requested)
+                or _is_reparse_point(receipt_source_requested.parent)
+            ):
+                raise ValueError("source binding traverses a symlink, junction, or reparse point")
+            current_source = Path(str(context.get("source_path") or "")).resolve(strict=True)
+            receipt_source = receipt_source_requested.resolve(strict=True)
+            current_source_sha256 = context.get("source_sha256")
+            if not _regular_non_reparse_file(current_source):
+                raise ValueError("current source is not a regular non-reparse file")
+            source_raw = current_source.read_bytes()
+            observed_source_sha256 = hashlib.sha256(source_raw).hexdigest()
+            if not (
+                os.path.normcase(str(current_source))
+                == os.path.normcase(str(receipt_source))
+                and current_source_sha256 == observed_source_sha256
+                and source.get("sha256") == observed_source_sha256
+                and source.get("native_payload_sha256") == observed_source_sha256
+                and source.get("read_only") is True
+            ):
+                failures.append("QUALIFICATION_SOURCE_BINDING_MISMATCH")
+        except (OSError, ValueError):
+            failures.append("QUALIFICATION_SOURCE_BINDING_MISMATCH")
+        command = context.get("command")
+        command_config = context.get("command_config")
+        if not (
+            isinstance(command, list)
+            and bool(command)
+            and all(isinstance(item, str) and item for item in command)
+            and isinstance(command_config, Mapping)
+        ):
+            failures.append("QUALIFICATION_COMMAND_CONTEXT_INVALID")
+
     if receipt.get("schema") != "e2.qualification_receipt.v1":
         failures.append("QUALIFICATION_RECEIPT_SCHEMA_INVALID")
     if receipt.get("status") != STATUS_PASS:
@@ -750,13 +1162,34 @@ def validate_downstream_qualification_receipt(path: Path) -> dict[str, Any]:
         failures.append("RULES_F1_NOT_POSITIVE")
     if any(statuses.get(name) != STATUS_PASS for name in EXPECTED_INVARIANT_INTERVENTIONS):
         failures.append("EXPECTED_INVARIANCE_BLOCKED")
+
+    try:
+        snapshot_material = {
+            "receipt_sha256": receipt_sha256,
+            "evidence_sha256": dict(sorted(evidence_hashes.items())),
+            "output_sha256": dict(sorted(output_hashes.items())),
+            "authorization_context": context,
+        }
+        authorization_snapshot_digest = hashlib.sha256(
+            _canonical_json_bytes(snapshot_material)
+        ).hexdigest()
+    except (TypeError, ValueError):
+        authorization_snapshot_digest = None
+        failures.append("QUALIFICATION_COMMAND_CONTEXT_INVALID")
+
+    reason_codes = list(dict.fromkeys(failures))
     return {
-        "status": STATUS_BLOCKED if failures else STATUS_PASS,
-        "reason_codes": failures,
+        "status": STATUS_BLOCKED if reason_codes else STATUS_PASS,
+        "reason_codes": reason_codes,
         "path": str(path.resolve()),
-        "sha256": _sha256(path),
+        "sha256": receipt_sha256,
+        "bytes": len(receipt_raw),
+        "authorization_snapshot_digest": authorization_snapshot_digest,
         "validated_output_sha256": output_hashes,
+        "validated_evidence_sha256": evidence_hashes,
+        "schema_errors": schema_errors,
         "output_errors": output_errors,
+        "evidence_errors": evidence_errors,
     }
 
 
@@ -885,18 +1318,36 @@ def build_first_report(spec: Mapping[str, Any], run_dir: Path) -> dict[str, Any]
 
     run_dir = Path(run_dir)
     run_dir.mkdir(parents=True, exist_ok=True)
+    if _is_reparse_point(run_dir):
+        raise ValueError("run_dir must not be a symlink, junction, or reparse point")
     source_path = Path(spec["source"]["path"])
+    if not _regular_non_reparse_file(source_path):
+        raise ValueError("source must be a regular non-reparse file")
     actual_source_hash = _sha256(source_path)
     if actual_source_hash.lower() != str(spec["source"]["sha256"]).lower():
         raise ValueError(
             f"source hash mismatch: expected {spec['source']['sha256']}, got {actual_source_hash}"
         )
     evidence_paths = {name: Path(path) for name, path in spec["evidence"].items()}
-    native = _read_json(evidence_paths["native_ir"])
-    adapter = _read_json(evidence_paths["adapter_ir"])
-    world = _read_json(evidence_paths["world_ir"])
+    evidence_payloads: dict[str, dict[str, Any]] = {}
+    evidence_snapshot_paths: dict[str, Path] = {}
+    for name, path in sorted(evidence_paths.items()):
+        if not _regular_non_reparse_file(path):
+            raise ValueError(f"{name}: evidence must be a regular non-reparse file")
+        payload, _, _ = _read_json_snapshot(path)
+        snapshot_path = run_dir / "evidence" / f"{name}.json"
+        _write_json(snapshot_path, payload)
+        evidence_payloads[name] = payload
+        evidence_snapshot_paths[name] = snapshot_path
+    native = evidence_payloads["native_ir"]
+    adapter = evidence_payloads["adapter_ir"]
+    world = evidence_payloads["world_ir"]
     evidence_records = [
-        {"role": name, **_file_record(path)} for name, path in sorted(evidence_paths.items())
+        {
+            "role": name,
+            **_file_record(path, relative_to=run_dir),
+        }
+        for name, path in sorted(evidence_snapshot_paths.items())
     ]
     census = _entity_census(native)
     compact_world = _compact_conservation(world)
@@ -1000,14 +1451,22 @@ def build_first_report(spec: Mapping[str, Any], run_dir: Path) -> dict[str, Any]
     for name, value in output_values.items():
         _write_json(run_dir / name, value)
     receipt["outputs"] = [
-        {"role": name.removesuffix(".json"), **_file_record(run_dir / name)}
+        {
+            "role": name.removesuffix(".json"),
+            **_file_record(run_dir / name, relative_to=run_dir),
+        }
         for name in output_values
     ]
     if guard_path.is_file():
-        receipt["outputs"].append({"role": "guard_decision", **_file_record(guard_path)})
+        receipt["outputs"].append(
+            {
+                "role": "guard_decision",
+                **_file_record(guard_path, relative_to=run_dir),
+            }
+        )
     _write_json(run_dir / "qualification_receipt.json", receipt)
     report = _render_report(spec, receipt, census, loss, candidates, models, interventions)
-    (run_dir / "REPORT.md").write_text(report, encoding="utf-8", newline="\n")
+    _write_bytes_atomic(run_dir / "REPORT.md", report.encode("utf-8"))
     return {
         "status": receipt["status"],
         "run_dir": str(run_dir),
