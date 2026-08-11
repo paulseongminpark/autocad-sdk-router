@@ -66,26 +66,6 @@ _NATIVE_BUILD_RECIPE_PATH = Path("tools") / "build_native_acad.ps1"
 _NATIVE_SOURCE_GIT_PATHS = (
     "src/Ariadne.AcadNative",
     "src/Ariadne.AcadNativeDbx",
-    ":(exclude)src/Ariadne.AcadNative/bin/**",
-    ":(exclude)src/Ariadne.AcadNative/obj/**",
-    ":(exclude)src/Ariadne.AcadNative/.vs/**",
-    ":(exclude)src/Ariadne.AcadNative/build/**",
-    ":(exclude)src/Ariadne.AcadNative/**/bin/**",
-    ":(exclude)src/Ariadne.AcadNative/**/obj/**",
-    ":(exclude)src/Ariadne.AcadNative/**/.vs/**",
-    ":(exclude)src/Ariadne.AcadNative/**/build/**",
-    ":(exclude)src/Ariadne.AcadNative/**/obj-*/**",
-    ":(exclude)src/Ariadne.AcadNative/**/obj_*/**",
-    ":(exclude)src/Ariadne.AcadNativeDbx/bin/**",
-    ":(exclude)src/Ariadne.AcadNativeDbx/obj/**",
-    ":(exclude)src/Ariadne.AcadNativeDbx/.vs/**",
-    ":(exclude)src/Ariadne.AcadNativeDbx/build/**",
-    ":(exclude)src/Ariadne.AcadNativeDbx/**/bin/**",
-    ":(exclude)src/Ariadne.AcadNativeDbx/**/obj/**",
-    ":(exclude)src/Ariadne.AcadNativeDbx/**/.vs/**",
-    ":(exclude)src/Ariadne.AcadNativeDbx/**/build/**",
-    ":(exclude)src/Ariadne.AcadNativeDbx/**/obj-*/**",
-    ":(exclude)src/Ariadne.AcadNativeDbx/**/obj_*/**",
 )
 
 # Ensure sibling tools/*.py are importable when cadctl is imported by path.
@@ -252,6 +232,13 @@ def _is_reparse_point(path: Path) -> bool:
     return stat.S_ISLNK(metadata.st_mode) or bool(attributes & reparse_flag)
 
 
+def _canonical_native_source_bytes(raw: bytes) -> bytes:
+    """Ignore checkout-only CRLF expansion while preserving binary inputs."""
+    if b"\0" in raw:
+        return raw
+    return raw.replace(b"\r\n", b"\n")
+
+
 def _native_source_inputs(router_home: Path) -> list[dict]:
     """Enumerate the native source tree without build output or reparse inputs."""
     inputs: list[dict] = []
@@ -277,7 +264,7 @@ def _native_source_inputs(router_home: Path) -> list[dict]:
                 path = current / name
                 if _is_reparse_point(path):
                     raise OSError(f"native source input is a reparse point: {path}")
-                raw = path.read_bytes()
+                raw = _canonical_native_source_bytes(path.read_bytes())
                 inputs.append(
                     {
                         "path": path.relative_to(router_home).as_posix(),
@@ -291,6 +278,19 @@ def _native_source_inputs(router_home: Path) -> list[dict]:
     return inputs
 
 
+def _native_status_line_tracks_source(line: str) -> bool:
+    """Keep source changes but discard generated build-output status rows."""
+    payload = line[3:] if len(line) >= 3 else line
+    for candidate in payload.split(" -> "):
+        normalized = candidate.strip().strip('"').replace("\\", "/")
+        if not any(
+            _is_native_build_output_component(part)
+            for part in Path(normalized).parts
+        ):
+            return True
+    return False
+
+
 def _native_source_git_state(router_home: Path) -> dict:
     """Read Git state only for native source inputs, never the whole worktree."""
     unknown = {
@@ -300,8 +300,17 @@ def _native_source_git_state(router_home: Path) -> dict:
         "native_source_status_sha256": "UNKNOWN",
     }
     try:
+        safe_directory = f"safe.directory={router_home.resolve()}"
         head_result = subprocess.run(
-            ["git", "-C", str(router_home), "rev-parse", "HEAD"],
+            [
+                "git",
+                "-c",
+                safe_directory,
+                "-C",
+                str(router_home),
+                "rev-parse",
+                "HEAD",
+            ],
             check=False,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -315,6 +324,8 @@ def _native_source_git_state(router_home: Path) -> dict:
         status_result = subprocess.run(
             [
                 "git",
+                "-c",
+                safe_directory,
                 "-C",
                 str(router_home),
                 "status",
@@ -330,8 +341,11 @@ def _native_source_git_state(router_home: Path) -> dict:
         )
         if status_result.returncode != 0:
             return unknown
+        status_lines = status_result.stdout.decode(
+            "utf-8", errors="strict"
+        ).splitlines()
         status_text = "\n".join(
-            status_result.stdout.decode("utf-8", errors="strict").splitlines()
+            line for line in status_lines if _native_status_line_tracks_source(line)
         )
     except (OSError, UnicodeError, subprocess.TimeoutExpired):
         return unknown
@@ -351,7 +365,9 @@ def _build_recipe_state(router_home: Path) -> dict:
     try:
         if not recipe.is_file() or _is_reparse_point(recipe):
             raise FileNotFoundError(recipe)
-        sha256 = _sha256_file(recipe)
+        sha256 = hashlib.sha256(
+            _canonical_native_source_bytes(recipe.read_bytes())
+        ).hexdigest()
     except OSError:
         return {
             "path": _NATIVE_BUILD_RECIPE_PATH.as_posix(),

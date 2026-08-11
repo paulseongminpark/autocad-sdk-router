@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -13,6 +14,10 @@ if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
 import cadctl  # noqa: E402
+
+
+def _canonical_text_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 
 
 def _git(router: Path, *args: str) -> str:
@@ -257,7 +262,7 @@ try {{
     assert result["success_marker"]["source_tree_digest"]
     assert result["success_marker"]["build_recipe"] == {
         "path": "tools/build_native_acad.ps1",
-        "sha256": hashlib.sha256(recipe.read_bytes()).hexdigest(),
+        "sha256": _canonical_text_sha256(recipe),
     }
     assert "build_manifest" not in result["success_marker"]
     assert "committed_utc" not in result["success_marker"]
@@ -378,6 +383,7 @@ $after = Get-NativeBuildSnapshot
         stderr=subprocess.PIPE,
         text=True,
         encoding="utf-8",
+        env={**os.environ, "GIT_TEST_ASSUME_DIFFERENT_OWNER": "1"},
     )
     assert completed.returncode == 0, completed.stderr
     snapshot = json.loads(completed.stdout)
@@ -387,11 +393,114 @@ $after = Get-NativeBuildSnapshot
     assert snapshot["after"]["git"]["native_source_dirty"] is True
     assert snapshot["before"]["build_recipe"] == {
         "path": "tools/build_native_acad.ps1",
-        "sha256": hashlib.sha256(recipe.read_bytes()).hexdigest(),
+        "sha256": _canonical_text_sha256(recipe),
     }
     assert snapshot["exact_equal"] is False
     assert snapshot["before"]["source_tree"]["digest"] != snapshot["after"]["source_tree"]["digest"]
     assert all("/bin/" not in item["path"] for item in snapshot["before"]["source_tree"]["inputs"])
+
+
+def test_build_snapshot_source_identity_ignores_checkout_line_endings(tmp_path: Path):
+    router = tmp_path / "router"
+    native = router / "src" / "Ariadne.AcadNative"
+    dbx = router / "src" / "Ariadne.AcadNativeDbx"
+    recipe = router / "tools" / "build_native_acad.ps1"
+    native.mkdir(parents=True)
+    dbx.mkdir(parents=True)
+    recipe.parent.mkdir(parents=True)
+    native_file = native / "AriadneNativeJob.cpp"
+    dbx_file = dbx / "AriadneDbxEntry.cpp"
+    native_file.write_bytes(b"// native\n")
+    dbx_file.write_bytes(b"// dbx\n")
+    recipe.write_text("# fixture recipe\n", encoding="utf-8")
+
+    script_path = REPO / "tools" / "build_native_acad.ps1"
+    ps_literal = str(script_path).replace("'", "''")
+    root_literal = str(router).replace("'", "''")
+    native_literal = str(native_file).replace("'", "''")
+    dbx_literal = str(dbx_file).replace("'", "''")
+    command = f"""
+$ErrorActionPreference = 'Stop'
+$scriptText = Get-Content -Raw -LiteralPath '{ps_literal}'
+$functionStart = $scriptText.IndexOf('function Resolve-MSBuild')
+$functionEnd = $scriptText.IndexOf('# Capture every provenance input before MSBuild')
+$RouterHome = '{root_literal}'
+. ([scriptblock]::Create($scriptText.Substring($functionStart, $functionEnd - $functionStart)))
+$before = Get-NativeBuildSnapshot
+[System.IO.File]::WriteAllBytes('{native_literal}', [System.Text.Encoding]::UTF8.GetBytes("// native`r`n"))
+[System.IO.File]::WriteAllBytes('{dbx_literal}', [System.Text.Encoding]::UTF8.GetBytes("// dbx`r`n"))
+$after = Get-NativeBuildSnapshot
+[ordered]@{{
+  before = $before.source_tree.digest
+  after = $after.source_tree.digest
+}} | ConvertTo-Json -Compress
+"""
+    completed = subprocess.run(
+        ["powershell", "-NoProfile", "-NonInteractive", "-Command", command],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+    )
+    assert completed.returncode == 0, completed.stderr
+    result = json.loads(completed.stdout)
+    assert result["before"] == result["after"]
+
+
+def test_build_recipe_identity_ignores_checkout_line_endings(tmp_path: Path):
+    router = tmp_path / "router"
+    native = router / "src" / "Ariadne.AcadNative"
+    dbx = router / "src" / "Ariadne.AcadNativeDbx"
+    recipe = router / "tools" / "build_native_acad.ps1"
+    native.mkdir(parents=True)
+    dbx.mkdir(parents=True)
+    recipe.parent.mkdir(parents=True)
+    (native / "AriadneNativeJob.cpp").write_bytes(b"// native\n")
+    (dbx / "AriadneDbxEntry.cpp").write_bytes(b"// dbx\n")
+    recipe.write_bytes(b"# fixture recipe\n")
+
+    script_path = REPO / "tools" / "build_native_acad.ps1"
+    ps_literal = str(script_path).replace("'", "''")
+    root_literal = str(router).replace("'", "''")
+    recipe_literal = str(recipe).replace("'", "''")
+    command = f"""
+$ErrorActionPreference = 'Stop'
+$scriptText = Get-Content -Raw -LiteralPath '{ps_literal}'
+$functionStart = $scriptText.IndexOf('function Resolve-MSBuild')
+$functionEnd = $scriptText.IndexOf('# Capture every provenance input before MSBuild')
+$RouterHome = '{root_literal}'
+. ([scriptblock]::Create($scriptText.Substring($functionStart, $functionEnd - $functionStart)))
+$before = Get-NativeBuildSnapshot
+[System.IO.File]::WriteAllBytes('{recipe_literal}', [System.Text.Encoding]::UTF8.GetBytes("# fixture recipe`r`n"))
+$after = Get-NativeBuildSnapshot
+[ordered]@{{
+  before = $before.build_recipe.sha256
+  after = $after.build_recipe.sha256
+}} | ConvertTo-Json -Compress
+"""
+    completed = subprocess.run(
+        ["powershell", "-NoProfile", "-NonInteractive", "-Command", command],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+    )
+    assert completed.returncode == 0, completed.stderr
+    result = json.loads(completed.stdout)
+    assert result["before"] == result["after"]
+
+
+def test_native_git_snapshot_uses_portable_positive_pathspecs() -> None:
+    text = (REPO / "tools" / "build_native_acad.ps1").read_text(encoding="utf-8")
+    start = text.index("function Get-NativeSourceGitState")
+    end = text.index("function Get-BuildRecipeState", start)
+    helper = text[start:end]
+
+    assert ":(exclude)" not in helper
+    assert "Test-NativeSourceStatusLine" in helper
+    assert "safe.directory=" in helper
 
 
 def test_build_manifest_writer_atomically_replaces_a_complete_json_file(tmp_path: Path):

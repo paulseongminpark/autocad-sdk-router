@@ -76,3 +76,36 @@ def test_committed_native_deployment_matches_this_checkout() -> None:
             "optional_header_bytes",
         ):
             assert recorded[key] == observed[key]
+
+
+def test_native_source_identity_ignores_checkout_line_endings(tmp_path: Path) -> None:
+    native = tmp_path / "src" / "Ariadne.AcadNative"
+    dbx = tmp_path / "src" / "Ariadne.AcadNativeDbx"
+    native.mkdir(parents=True)
+    dbx.mkdir(parents=True)
+    native_file = native / "native.cpp"
+    dbx_file = dbx / "dbx.cpp"
+    native_file.write_bytes(b"// native\n")
+    dbx_file.write_bytes(b"// dbx\n")
+
+    lf_inputs = cadctl._native_source_inputs(tmp_path)
+    native_file.write_bytes(b"// native\r\n")
+    dbx_file.write_bytes(b"// dbx\r\n")
+    crlf_inputs = cadctl._native_source_inputs(tmp_path)
+
+    assert lf_inputs == crlf_inputs
+    assert cadctl._source_tree_digest(lf_inputs) == cadctl._source_tree_digest(
+        crlf_inputs
+    )
+
+
+def test_build_recipe_identity_ignores_checkout_line_endings(tmp_path: Path) -> None:
+    recipe = tmp_path / "tools" / "build_native_acad.ps1"
+    recipe.parent.mkdir(parents=True)
+    recipe.write_bytes(b"# recipe\n")
+    lf_state = cadctl._build_recipe_state(tmp_path)
+
+    recipe.write_bytes(b"# recipe\r\n")
+    crlf_state = cadctl._build_recipe_state(tmp_path)
+
+    assert lf_state == crlf_state
