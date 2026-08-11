@@ -56,9 +56,11 @@ def test_native_entity_xdata_emits_rows_not_legacy_items() -> None:
     assert r'\"items\"' not in block
 
 
-def test_native_entity_xdata_is_pointer_gated_and_1005_stays_string() -> None:
+def test_native_entity_xdata_routes_1004_to_binary_and_keeps_1005_string() -> None:
     source = _native_source()
     assert "resbuf* xdata = pEnt->xData(nullptr);" in source
     assert "if (xdata != nullptr)" in source
     assert "arr << \",\\\"xdata\\\":\" << blocksJson;" in source
-    assert "(code >= 1000 && code <= 1005)" in source
+    assert "(code >= 1000 && code <= 1003) || code == 1005" in source
+    assert "(code >= 1000 && code <= 1005)" not in source
+    assert "else if (code == 310 || code == 1004)" in source

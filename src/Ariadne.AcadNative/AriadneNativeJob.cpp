@@ -923,7 +923,7 @@ static bool resbufCodeIsString(short code)
            code == 6 || code == 7 || code == 8 || code == 9 ||
            code == 100 || code == 102 ||
            (code >= 300 && code <= 309) ||
-           (code >= 1000 && code <= 1005);
+           (code >= 1000 && code <= 1003) || code == 1005;
 }
 
 static bool resbufCodeIsPoint(short code)

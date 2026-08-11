@@ -1,68 +1,68 @@
 {
-  "schema": "ariadne.cad_os.native_deployment_manifest.v1",
-  "schema_version": 1,
-  "claim_scope": "release_build_integrity_bundle",
-  "deployment_state": "committed",
-  "committed": true,
-  "build_target": "Rebuild",
-  "configuration": "Release",
-  "platform": "x64",
-  "build_recipe": {
-    "path": "tools/build_native_acad.ps1",
-    "sha256": "529a5ddea172bee35a2ff171ce2cfac31a4a0c669d4bb1487ca20cde5ee4c54d"
-  },
-  "source_tree_digest": "6b5888bacbe23f9d19f7c4fa1859b13b34c99b591d8686813f2280344664e51c",
-  "artifacts": [
-    {
-      "leaf": "Ariadne.AcadNativeDbx.dbx",
-      "sha256": "2f03a69777b52908d8f5997c0036744e8fb4216d4fa09fa6aed239ec69619410",
-      "bytes": 54272,
-      "current": true,
-      "exists": true,
-      "pe_verification": {
-        "verified": true,
-        "format": "PE32+",
-        "machine": "0x8664",
-        "minimum_bytes": 512,
-        "pe_header_offset": 288,
-        "section_count": 6,
-        "optional_header_bytes": 240,
-        "reason": "MZ, PE, x64 machine, section table, and PE32+ optional header checks passed."
-      }
-    },
-    {
-      "leaf": "Ariadne.AcadNative.crx",
-      "sha256": "1890e0632a2bae1e317df4cd0fcef4fbdd2a243c42977f26eeb7be29772f78c2",
-      "bytes": 1175552,
-      "current": true,
-      "exists": true,
-      "pe_verification": {
-        "verified": true,
-        "format": "PE32+",
-        "machine": "0x8664",
-        "minimum_bytes": 512,
-        "pe_header_offset": 296,
-        "section_count": 6,
-        "optional_header_bytes": 240,
-        "reason": "MZ, PE, x64 machine, section table, and PE32+ optional header checks passed."
-      }
-    },
-    {
-      "leaf": "Ariadne.AcadNative.arx",
-      "sha256": "e1b23f775afa51395f1a517990947fa41158acf186e64845cda94880f7bbcf5f",
-      "bytes": 1184256,
-      "current": true,
-      "exists": true,
-      "pe_verification": {
-        "verified": true,
-        "format": "PE32+",
-        "machine": "0x8664",
-        "minimum_bytes": 512,
-        "pe_header_offset": 288,
-        "section_count": 6,
-        "optional_header_bytes": 240,
-        "reason": "MZ, PE, x64 machine, section table, and PE32+ optional header checks passed."
-      }
-    }
-  ]
+    "schema":  "ariadne.cad_os.native_deployment_manifest.v1",
+    "schema_version":  1,
+    "claim_scope":  "release_build_integrity_bundle",
+    "deployment_state":  "committed",
+    "committed":  true,
+    "build_target":  "Rebuild",
+    "configuration":  "Release",
+    "platform":  "x64",
+    "build_recipe":  {
+                         "path":  "tools/build_native_acad.ps1",
+                         "sha256":  "529a5ddea172bee35a2ff171ce2cfac31a4a0c669d4bb1487ca20cde5ee4c54d"
+                     },
+    "source_tree_digest":  "cded710a84a56b5a85551165cd21d6b086a250520c9604d972bc8daebb76a8c0",
+    "artifacts":  [
+                      {
+                          "leaf":  "Ariadne.AcadNativeDbx.dbx",
+                          "sha256":  "841ef904c8ca20b0bb25b22c63fdb9f846a824e760fe920d26ac0cabe1d54240",
+                          "bytes":  54272,
+                          "current":  true,
+                          "exists":  true,
+                          "pe_verification":  {
+                                                  "verified":  true,
+                                                  "format":  "PE32+",
+                                                  "machine":  "0x8664",
+                                                  "minimum_bytes":  512,
+                                                  "pe_header_offset":  288,
+                                                  "section_count":  6,
+                                                  "optional_header_bytes":  240,
+                                                  "reason":  "MZ, PE, x64 machine, section table, and PE32+ optional header checks passed."
+                                              }
+                      },
+                      {
+                          "leaf":  "Ariadne.AcadNative.crx",
+                          "sha256":  "1e3a49087c12acd73549ff87a934b9b895154540f6e4f18013fc199983e3e103",
+                          "bytes":  1175552,
+                          "current":  true,
+                          "exists":  true,
+                          "pe_verification":  {
+                                                  "verified":  true,
+                                                  "format":  "PE32+",
+                                                  "machine":  "0x8664",
+                                                  "minimum_bytes":  512,
+                                                  "pe_header_offset":  296,
+                                                  "section_count":  6,
+                                                  "optional_header_bytes":  240,
+                                                  "reason":  "MZ, PE, x64 machine, section table, and PE32+ optional header checks passed."
+                                              }
+                      },
+                      {
+                          "leaf":  "Ariadne.AcadNative.arx",
+                          "sha256":  "eda2af173d6a524366bbccf44505230bb58f3c55e289469a0100635d9d8a2fbd",
+                          "bytes":  1184256,
+                          "current":  true,
+                          "exists":  true,
+                          "pe_verification":  {
+                                                  "verified":  true,
+                                                  "format":  "PE32+",
+                                                  "machine":  "0x8664",
+                                                  "minimum_bytes":  512,
+                                                  "pe_header_offset":  288,
+                                                  "section_count":  6,
+                                                  "optional_header_bytes":  240,
+                                                  "reason":  "MZ, PE, x64 machine, section table, and PE32+ optional header checks passed."
+                                              }
+                      }
+                  ]
 }
