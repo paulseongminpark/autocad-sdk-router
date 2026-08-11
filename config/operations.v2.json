@@ -35133,7 +35133,7 @@
       },
       "handler": {
         "router_lane": "ARIADNE_NATIVE_JOB",
-        "dispatcher_symbol": "m08eDispatch",
+        "dispatcher_symbol": "m08cDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbObject::createExtensionDictionary()",
         "composed_of": []
@@ -35158,7 +35158,6 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_m08e_handlers.py",
         "tests/unit/test_m08c_handlers.py"
       ],
       "summary": "Create the per-object extension dictionary (where app-specific data/xrecords hang off ANY object). eAlreadyInDb if",
@@ -35166,13 +35165,10 @@
       "citation": "ref AcDbObject__createExtensionDictionary.html",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#write.object.create_ext_dict",
-        "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
-        "reports/merge/MERGE-M08-READ.json",
-        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
-        "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch"
+        "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
+        "tests/unit/test_m08c_handlers.py::TestM08CHandlers"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "IMPLEMENTED (M08C-T02). Sole native owner = m08cDispatch, which creates the extension dictionary in the router-staged working database so write_copy can persist it without writing the original. Static source-contract coverage is tests/unit/test_m08c_handlers.py; handler execution in live AutoCAD is not proven by that test.",
       "owner_ticket": "M08C-T02",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"
@@ -35209,7 +35205,7 @@
       },
       "handler": {
         "router_lane": "ARIADNE_NATIVE_JOB",
-        "dispatcher_symbol": "m08eDispatch",
+        "dispatcher_symbol": "m08cDispatch",
         "execution_host_class": "dbx",
         "native_api": "AcDbRegAppTable::add(...) / acdbRegApp(...)",
         "composed_of": []
@@ -35234,7 +35230,6 @@
       "tests": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_m08e_handlers.py",
         "tests/unit/test_m08c_handlers.py"
       ],
       "summary": "Register an application name in the RegApp/APPID table (prerequisite for xdata under that name).",
@@ -35242,13 +35237,11 @@
       "citation": "ref !!OVERLOADED_add_AcDbRegAppTable.html (RegApp table add); setXData doc cross-ref to acdbRegApp() — **(exact acdbRegApp global signature page not opened — unverified arglist)**",
       "evidence_refs": [
         "config/autocad_native_arx_operation_catalog.json#write.regapp.register",
-        "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
-        "reports/merge/MERGE-M08-READ.json",
-        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
-        "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch"
+        "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
+        "tools/patch_ops/xdata.py:build_xdata_ops",
+        "tests/unit/test_m08c_handlers.py::TestM08CHandlers"
       ],
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "IMPLEMENTED (M08C-T03). Sole native owner = m08cDispatch, which registers the application in the router-staged working database so write_copy can persist it without writing the original. Input uses canonical app, then legacy regapp, and defaults to ARIADNE only when both are empty. Static source-contract coverage is tests/unit/test_m08c_handlers.py; handler execution in live AutoCAD is not proven by that test.",
       "owner_ticket": "M08C-T03",
       "implementation_strategy": "implemented_v1",
       "evidence_required": "existing_tests_and_evidence_refs"

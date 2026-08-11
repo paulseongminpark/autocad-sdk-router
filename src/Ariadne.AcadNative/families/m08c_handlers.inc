@@ -1,5 +1,5 @@
-// families/m08c_handlers.inc — M08C READ family: database metadata / object
-// lifecycle / symbol-table reads.
+// families/m08c_handlers.inc — M08C database metadata / object lifecycle /
+// symbol-table handlers.
 //
 // Owned by the M08C teammate (PR-scoped). #included into AriadneNativeJob.cpp, so it
 // sees every in-TU helper. Contract (docs/M08_FAMILY_HANDLER_CONTRACT.md):
@@ -8,8 +8,9 @@
 //     (or emitNativeError-style error) to r and return true; else return false.
 // Uses the in-TU primitives: njsonStr / serializeObjectCommon / serializeEntityCommon,
 // AriadneReadTransaction, resolveHandle, jsonFind*, handleOf / handleOfId, the
-// resbuf serializers, symbolTableRecordsJson / layersRichJson. NO original DWG writes
-// (READ family is read-only): no save / saveAs / _QSAVE / writeDwgFile anywhere here.
+// resbuf serializers, symbolTableRecordsJson / layersRichJson. Write operations are
+// restricted to the router-staged working database or an explicitly guarded output;
+// raw commands and original-DWG writes remain forbidden.
 //
 // summinfo.h is NOT pulled transitively by dbmain.h; the contract forbids editing
 // AriadneNativeJob.cpp, but a family .inc is part of the same translation unit, so the
@@ -30,6 +31,135 @@
 static std::string m08cAcStringJson(const AcString& s)
 {
     return njsonStr(s.kwszPtr());
+}
+
+static size_t m08cJsonClosingQuote(const std::string& json, size_t start)
+{
+    bool escaped = false;
+    for (size_t i = start; i < json.size(); ++i) {
+        const char c = json[i];
+        if (escaped) {
+            escaped = false;
+        }
+        else if (c == '\\') {
+            escaped = true;
+        }
+        else if (c == '"') {
+            return i;
+        }
+    }
+    return std::string::npos;
+}
+
+static size_t m08cSkipJsonSpace(const std::string& json, size_t pos)
+{
+    while (pos < json.size()) {
+        const char c = json[pos];
+        if (c != ' ' && c != '\t' && c != '\r' && c != '\n')
+            break;
+        ++pos;
+    }
+    return pos;
+}
+
+// Locate a member directly on one JSON object. Shared legacy jsonFind* helpers
+// search through nested values, which lets metadata.args shadow top-level args.
+static bool m08cFindDirectJsonMemberValue(const std::string& objectJson,
+                                           const char* key,
+                                           size_t& valueStart)
+{
+    int containerDepth = 0;
+
+    for (size_t i = 0; i < objectJson.size();) {
+        const char c = objectJson[i];
+        if (c == '{' || c == '[') {
+            ++containerDepth;
+            ++i;
+            continue;
+        }
+        if (c == '}' || c == ']') {
+            --containerDepth;
+            ++i;
+            continue;
+        }
+        if (c != '"') {
+            ++i;
+            continue;
+        }
+
+        const size_t tokenEnd = m08cJsonClosingQuote(objectJson, i + 1);
+        if (tokenEnd == std::string::npos)
+            return false;
+        const std::string token = objectJson.substr(i + 1, tokenEnd - i - 1);
+        const size_t separator = m08cSkipJsonSpace(objectJson, tokenEnd + 1);
+        if (containerDepth == 1 && token == key &&
+            separator < objectJson.size() && objectJson[separator] == ':') {
+            valueStart = m08cSkipJsonSpace(objectJson, separator + 1);
+            return valueStart < objectJson.size();
+        }
+        i = tokenEnd + 1;
+    }
+    return false;
+}
+
+// Find a string-valued direct member. A non-string canonical member such as
+// {"app":null,"regapp":"LEGACY"} returns false so the caller can use regapp.
+static bool m08cFindDirectJsonString(const std::string& objectJson,
+                                     const char* key,
+                                     std::string& out)
+{
+    out.clear();
+    size_t valueStart = 0;
+    if (!m08cFindDirectJsonMemberValue(objectJson, key, valueStart) ||
+        objectJson[valueStart] != '"') {
+        return false;
+    }
+    const size_t valueEnd = m08cJsonClosingQuote(objectJson, valueStart + 1);
+    if (valueEnd == std::string::npos)
+        return false;
+    out = objectJson.substr(valueStart + 1, valueEnd - valueStart - 1);
+    return true;
+}
+
+static bool m08cFindDirectJsonObject(const std::string& objectJson,
+                                     const char* key,
+                                     std::string& out)
+{
+    out.clear();
+    size_t valueStart = 0;
+    if (!m08cFindDirectJsonMemberValue(objectJson, key, valueStart) ||
+        objectJson[valueStart] != '{') {
+        return false;
+    }
+    int objectDepth = 0;
+    bool inString = false;
+    bool escaped = false;
+    for (size_t i = valueStart; i < objectJson.size(); ++i) {
+        const char c = objectJson[i];
+        if (inString) {
+            if (escaped) {
+                escaped = false;
+            }
+            else if (c == '\\') {
+                escaped = true;
+            }
+            else if (c == '"') {
+                inString = false;
+            }
+            continue;
+        }
+        if (c == '"') {
+            inString = true;
+        }
+        else if (c == '{') {
+            ++objectDepth;
+        }
+        else if (c == '}' && --objectDepth == 0) {
+            out = objectJson.substr(valueStart, i - valueStart + 1);
+            return true;
+        }
+    }
+    return false;
 }
 
 // Read the single object-handle argument ("handle" | "object_handle"), returns true
@@ -316,7 +446,15 @@ static bool m08cDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
 
     if (op == "write.regapp.register") {
         std::string app;
-        jsonFindString(job, "regapp", app);
+        std::string argsJson;
+        if (m08cFindDirectJsonObject(job, "args", argsJson)) {
+            if (!m08cFindDirectJsonString(argsJson, "app", app) || app.empty())
+                m08cFindDirectJsonString(argsJson, "regapp", app);
+        }
+        else {
+            if (!m08cFindDirectJsonString(job, "app", app) || app.empty())
+                m08cFindDirectJsonString(job, "regapp", app);
+        }
         if (app.empty()) app = "ARIADNE";
         Acad::ErrorStatus es = pDb->registerApp(utf8ToWide(app).c_str());
         const bool registered = pDb->isAppRegistered(utf8ToWide(app).c_str());

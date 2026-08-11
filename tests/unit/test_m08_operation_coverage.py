@@ -20,7 +20,9 @@ from __future__ import annotations
 import json
 import os
 import sys
+import tempfile
 import unittest
+from copy import deepcopy
 
 _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
@@ -146,6 +148,51 @@ class TestM08Promotions(unittest.TestCase):
         import cadctl
         rc = cadctl.registry_coverage()
         self.assertEqual(self.matrix["totals"]["by_status"], rc["computed_by_status"])
+
+    def test_latest_coverage_consistency_is_derived_from_current_registry(self):
+        summary = ocm.build_latest_coverage(self.matrix)
+        self.assertEqual(summary["registry_source_ref"], "config/operations.v2.json")
+        self.assertNotIn("registry_coverage_ref", summary)
+        self.assertTrue(summary["consistency_checks"])
+        self.assertTrue(all(summary["consistency_checks"].values()))
+        self.assertEqual(
+            summary["consistent"],
+            all(summary["consistency_checks"].values()),
+        )
+
+    def test_latest_coverage_rejects_corrupted_totals_instead_of_using_an_identity(self):
+        corrupted = deepcopy(self.matrix)
+        corrupted["totals"]["unknown"] = corrupted["totals"]["total"] + 1
+        summary = ocm.build_latest_coverage(corrupted)
+        self.assertFalse(
+            summary["consistency_checks"][
+                "catalogue_partition_matches_operation_count"
+            ]
+        )
+        self.assertFalse(summary["consistent"])
+
+    def test_committed_coverage_reports_match_one_fresh_registry_projection(self):
+        report_names = (
+            "operation_coverage_full_matrix.json",
+            "operation_coverage_full_matrix.md",
+            "operation_coverage_latest.json",
+            "operation_coverage_latest.md",
+            "v1_operation_gate_latest.json",
+        )
+        with tempfile.TemporaryDirectory(prefix="operation-coverage-") as tmp:
+            original_reports = ocm.REPORTS
+            try:
+                ocm.REPORTS = tmp
+                ocm.write_reports()
+            finally:
+                ocm.REPORTS = original_reports
+            for name in report_names:
+                with self.subTest(name=name):
+                    with open(os.path.join(tmp, name), "rb") as actual:
+                        actual_bytes = actual.read()
+                    with open(os.path.join(_REPO, "reports", name), "rb") as committed:
+                        committed_bytes = committed.read()
+                    self.assertEqual(committed_bytes, actual_bytes)
 
 
 class TestM08NativeSource(unittest.TestCase):

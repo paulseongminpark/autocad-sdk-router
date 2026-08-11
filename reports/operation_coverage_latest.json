@@ -1,29 +1,36 @@
 {
   "schema": "ariadne.cad_os.operation_coverage.v1",
   "packet": "CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE",
-  "operation_count": 551,
+  "operation_count": 552,
   "by_status": {
-    "implemented": 489,
+    "implemented": 490,
     "blocked": 62
   },
-  "implemented": 489,
+  "implemented": 490,
   "wired": 0,
   "stub": 0,
   "catalogued": 0,
   "blocked": 62,
   "deprecated": 0,
   "unknown": 0,
-  "v1_target_total": 551,
-  "v1_target_implemented": 489,
+  "v1_target_total": 552,
+  "v1_target_implemented": 490,
   "v1_target_blocked": 62,
   "v1_target_deferred": 0,
-  "catalog_total_ops": 551,
-  "catalog_classified_ops": 551,
+  "catalog_total_ops": 552,
+  "catalog_classified_ops": 552,
   "catalog_unclassified_ops": 0,
   "existing_29_ops_mapped": true,
   "inspect_database_graph_status": "implemented",
+  "consistency_checks": {
+    "operation_count_matches_status_total": true,
+    "status_histogram_matches_operations": true,
+    "catalogue_partition_matches_operation_count": true,
+    "v1_partition_matches_v1_target_total": true,
+    "coverage_gate_passes": true
+  },
   "consistent": true,
+  "registry_source_ref": "config/operations.v2.json",
   "full_matrix_ref": "reports/operation_coverage_full_matrix.json",
-  "v1_gate_ref": "reports/v1_operation_gate_latest.json",
-  "registry_coverage_ref": "reports/registry_coverage_latest.json"
+  "v1_gate_ref": "reports/v1_operation_gate_latest.json"
 }

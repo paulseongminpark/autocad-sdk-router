@@ -12,17 +12,14 @@ Intent (WHY):
        If HasOp claims an op the dispatcher doesn't route, the runtime surfaces
        OPERATION_DISPATCH_MISMATCH -- this test fails first, at source level.
 
-    2. M08E is nominally a READ family, but claims 7 write-shaped ops as smoke PROBES
-       (write.block.append_entity / write.dictionary.set / write.entity.set_xdata /
-       transform.database.deep_clone / transform.database.insert_block /
-       acdb.database.create / infra.hostapp.provide_services) -- each wraps its mutation in
-       AriadneStagedWriteTransaction and never commits, so nothing survives the call. This
-       is the honest opposite of a fabricated read result: the op runs for real and then
-       is undone, on purpose.
-       p2-blockapp wave: write.block.append_entity was graduated OUT of that probe shape
-       into a REAL, persisting primitive (drops the transaction wrapper; appends into a
-       named block-table record, matching the no-wrapper shape every other real write
-       handler in the codebase uses). The other 6 stay probe-only, unaffected.
+    2. M08E is nominally a READ family, but claims 8 write-shaped or diagnostic ops.
+       Four mutation probes (write.dictionary.set / write.entity.set_xdata /
+       transform.database.deep_clone / transform.database.insert_block) use an
+       AriadneStagedWriteTransaction that is never committed. acdb.database.create uses
+       an isolated scratch database that it deletes, while infra.hostapp.provide_services
+       is read-only. write.block.append_entity and write.block.relink_hatch_assoc are
+       REAL, persisting staged-copy primitives. write.object.create_ext_dict and
+       write.regapp.register belong exclusively to M08C and must not appear here.
 
     3. Read-only proof: the .inc must contain none of the original-DWG-write / host-bootstrap
        tokens (save/saveAs/_QSAVE, acedCommand/acedCmd, appendAcDbEntity, setXData(,
@@ -47,11 +44,10 @@ _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
 _INC = os.path.join(_REPO, "src", "Ariadne.AcadNative", "families", "m08e_handlers.inc")
 
-# Ops M08E implements as real handlers. Read ops are pure; 6 of the 7 write-shaped ops run
-# only inside staged transactions that roll back and never persist the original DWG --
-# write.block.append_entity is the exception (p2-blockapp wave): a REAL, persisting write
-# to the staged-copy DWG (never the original either way -- see test_write_opens_are_inside_
-# staged_transactions, which still holds for the other 6).
+# Ops M08E implements as real handlers. Read ops are pure; four mutation probes use
+# rollback transactions, db-create uses a deleted scratch DB, and host-services only
+# observes state. append_entity and relink_hatch_assoc persist to the staged-copy DWG.
+# None writes the original DWG.
 _IMPLEMENTED = {
     "inspect.entity.get_xdata",
     "inspect.dictionary.named_objects",
@@ -59,8 +55,6 @@ _IMPLEMENTED = {
     "inspect.block.iterate",
     "infra.hostapp.provide_services",
     "acdb.database.create",
-    "write.object.create_ext_dict",
-    "write.regapp.register",
     "write.dictionary.set",
     "write.entity.set_xdata",
     "write.block.append_entity",
@@ -70,6 +64,11 @@ _IMPLEMENTED = {
     "write.block.relink_hatch_assoc",
     "transform.database.deep_clone",
     "transform.database.insert_block",
+}
+
+_M08C_OWNED = {
+    "write.object.create_ext_dict",
+    "write.regapp.register",
 }
 
 # Remaining write/create ops not implemented by this ticket.
@@ -140,8 +139,12 @@ class TestM08EHandlers(unittest.TestCase):
 
     def test_hasop_claims_exactly_implemented(self):
         self.assertEqual(self.claimed, _IMPLEMENTED,
-                         "m08eHasOp must claim exactly the 4 implemented read ops; got %s"
+                         "m08eHasOp must claim exactly the implemented op ids; got %s"
                          % sorted(self.claimed))
+
+    def test_does_not_claim_m08c_owned_write_ops(self):
+        self.assertEqual(set(self.consts.values()) & _M08C_OWNED, set())
+        self.assertEqual(self.claimed & _M08C_OWNED, set())
 
     def test_hasop_does_not_claim_deferred_write_ops(self):
         # The remaining deferred op stays NOT_IMPLEMENTED.

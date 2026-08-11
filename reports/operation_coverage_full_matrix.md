@@ -2,9 +2,9 @@
 
 - packet: `CADOS_M08_FULL_OPERATION_COVERAGE_CLOSURE`
 - generated_from: `config/operations.v2.json`
-- total operations: **551** · implemented 489 · stub 0 · blocked 62 · catalogued 0 · deprecated 0 · **unknown 0**
-- v1-target: **551** (implemented 489 · blocked 62 · **deferred 0**)
-- agent-exposed ops: 489
+- total operations: **552** · implemented 490 · stub 0 · blocked 62 · catalogued 0 · deprecated 0 · **unknown 0**
+- v1-target: **552** (implemented 490 · blocked 62 · **deferred 0**)
+- agent-exposed ops: 490
 
 ## Gate
 
@@ -26,7 +26,7 @@
 
 | group | implemented | stub | blocked | catalogued | v1_target |
 |---|---|---|---|---|---|
-| read | 70 | 0 | 0 | 0 | 70 |
+| read | 71 | 0 | 0 | 0 | 71 |
 | query | 1 | 0 | 0 | 0 | 1 |
 | write_patch | 20 | 0 | 4 | 0 | 24 |
 | validate_diff | 3 | 0 | 0 | 0 | 3 |
@@ -38,7 +38,7 @@
 
 | risk_class | count |
 |---|---|
-| read_safe | 366 |
+| read_safe | 367 |
 | staged_write | 129 |
 | live_edit | 50 |
 | raw_command | 6 |
@@ -454,6 +454,7 @@
 | inspect.layers | inspect | implemented | read_safe | read | True | listLayerRecords |  |
 | inspect.layout.list | inspect | implemented | read_safe | read | True | listLayouts |  |
 | inspect.overrule.registry | inspect | implemented | read_safe | read | True | overruleRegistryJson |  |
+| inspect.probe.property_count | inspect | implemented | read_safe | read | True | ariadneProbePropertyCount |  |
 | inspect.protocol.queryx | inspect | implemented | read_safe | read | True | protocolQueryX |  |
 | inspect.reactor.registry | inspect | implemented | read_safe | read | True | reactorRegistryJson |  |
 | inspect.runtime.capabilities | inspect | implemented | read_safe | read | True | runtimeCapabilitiesJson |  |
@@ -547,8 +548,8 @@
 | write.layerstate.restore | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | w6LayerStateDispatch |  |
 | write.layerstate.save | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | w6LayerStateDispatch |  |
 | write.linetype.create | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | upsertLinetypeRecord |  |
-| write.object.create_ext_dict | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | m08eDispatch |  |
-| write.regapp.register | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | m08eDispatch |  |
+| write.object.create_ext_dict | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | m08cDispatch |  |
+| write.regapp.register | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | m08cDispatch |  |
 | write.textstyle.create | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | upsertTextStyleRecord |  |
 | write.ucs.create | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | upsertUcsRecord |  |
 | write.view.create | symbol_tables_dictionaries | implemented | staged_write | write_copy | True | upsertViewRecord |  |
@@ -599,4 +600,4 @@
 | write.layout.create | write | implemented | staged_write | write_copy | True | createLayout |  |
 | write.xdata.set | write | implemented | staged_write | write_copy | True | setDatabaseXdata |  |
 
-> Full 551-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 551 v1-target ops. The 0 catalogued ops are classified future-version native capability (v1_target=false), not omitted.
+> Full 552-operation detail (all 13 fields per op) is in `reports/operation_coverage_full_matrix.json` — this table lists only the 552 v1-target ops. The 0 catalogued ops are classified future-version native capability (v1_target=false), not omitted.

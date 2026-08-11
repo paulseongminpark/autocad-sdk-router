@@ -1,4 +1,4 @@
-// families/m08e_handlers.inc — M08E READ family: blocks / dictionaries / xdata-xrecords reads.
+// families/m08e_handlers.inc — M08E blocks / dictionaries / xdata-xrecords handlers.
 //
 // Owned by the M08E teammate (PR-scoped). #included into AriadneNativeJob.cpp (before the
 // ariadneNativeJob() dispatcher), so it sees every in-TU helper. Contract
@@ -7,30 +7,18 @@
 //   - m08eDispatch(op, ctx, r): if op is yours, append  "result":{...},"status":"ok"  (or an
 //     emitNativeError-style error) to r and return true; else return false.
 //
-// READ family = read-only. Implemented (real handlers, all objectdbx_capable / non-persisting):
-//     inspect.entity.get_xdata       -- reuse AcDbObject::xData + xdataBlocksJson
-//     inspect.dictionary.named_objects -- NOD root via getNamedObjectsDictionary + dictionaryEntriesJson
-//     inspect.dictionary.get         -- AcDbDictionary::getAt (one entry; sub-dict listing)
-//     inspect.block.iterate          -- BTR entity enumeration (model space / by handle / by name)
-// The WRITE/create/clone ops in the M08E brief (write.block.append_entity, write.dictionary.set,
-// write.entity.set_xdata, transform.database.deep_clone, transform.database.insert_block,
-// acdb.database.create, infra.hostapp.provide_services) MUTATE or CREATE state -> they are NOT
-// part of a read-only family, but ARE claimed by m08eHasOp/m08eDispatch below (this header
-// comment + reports/tickets/M08E.md predate that and are stale on this point -- the ops were
-// wired as always-rollback smoke PROBES, not left OPERATION_NOT_IMPLEMENTED). Each wraps its
-// mutation in AriadneStagedWriteTransaction and never calls .commit(), so nothing survives the
-// call -- except write.block.append_entity (p2-blockapp wave), which was graduated to a REAL,
-// persisting primitive: it drops the transaction wrapper (matching every other real write
-// handler in the codebase -- write.entity.line/circle/arc/text/... in m08g/m08h/
-// AriadneNativeJob.cpp) so its appendAcDbEntity() survives to the staged-copy DWG the router job
-// already operates on. It still never touches the ORIGINAL file; that invariant is enforced by
-// the router/registry write_mode policy layer, same as every other write op. The remaining 6 ops
-// stay probe-only (rolled back, no fabricated results).
+// The four inspect handlers are read-only. Of the additional diagnostic/write-shaped handlers:
+//   - dictionary.set, entity.set_xdata, deep_clone, and insert_block use an uncommitted
+//     AriadneStagedWriteTransaction, so their probe mutations are rolled back;
+//   - acdb.database.create creates and deletes an isolated scratch database;
+//   - infra.hostapp.provide_services only observes host state; and
+//   - block.append_entity and block.relink_hatch_assoc persist to the router-staged DWG.
+// None writes the original drawing; the router/registry write-mode policy enforces that boundary.
 //
 // Reuses in-TU primitives only: njsonStr / jsonEscape, handleOf / handleOfId, resolveHandle,
 // serializeObjectCommon / serializeEntityCommon, dictionaryEntriesJson / xrecordJson,
 // xdataBlocksJson, jsonFindString / jsonFindNumber, AriadneReadTransaction, RichGraphCounters.
-// NO original DWG writes (no save/saveAs/_QSAVE, no acedCommand/acedCmd, no append/set/clone).
+// NO original DWG writes (no save/saveAs/_QSAVE or raw acedCommand/acedCmd path).
 #include "dbidmap.h"      // AcDbIdMapping / AcDbIdPair for staged deep-clone proof
 #include "dbpl.h"         // AcDbPolyline (LWPOLYLINE append kind)
 #include "dbspline.h"     // AcDbSpline
@@ -51,8 +39,6 @@ static const char* const kM08eOpDictGet        = "inspect.dictionary.get";
 static const char* const kM08eOpBlockIterate   = "inspect.block.iterate";
 static const char* const kM08eOpHostServices   = "infra.hostapp.provide_services";
 static const char* const kM08eOpDbCreate       = "acdb.database.create";
-static const char* const kM08eOpCreateExtDict  = "write.object.create_ext_dict";
-static const char* const kM08eOpRegappRegister = "write.regapp.register";
 static const char* const kM08eOpDictionarySet  = "write.dictionary.set";
 static const char* const kM08eOpEntitySetXdata = "write.entity.set_xdata";
 static const char* const kM08eOpBlockAppend    = "write.block.append_entity";
@@ -68,8 +54,6 @@ static bool m08eHasOp(const std::string& op)
         || op == kM08eOpBlockIterate
         || op == kM08eOpHostServices
         || op == kM08eOpDbCreate
-        || op == kM08eOpCreateExtDict
-        || op == kM08eOpRegappRegister
         || op == kM08eOpDictionarySet
         || op == kM08eOpEntitySetXdata
         || op == kM08eOpBlockAppend
@@ -396,68 +380,6 @@ static bool m08eHandleDbCreate(const AriadneJobCtx&, std::ostringstream& r)
       << ",\"block_count\":" << blocks
       << ",\"linetype_count\":" << ltypes
       << ",\"deleted_after_probe\":true},\"status\":\"ok\"}";
-    return true;
-}
-
-static AcDbObjectId m08eDefaultWritableObjectId(AcDbDatabase* pDb)
-{
-    if (pDb == nullptr)
-        return AcDbObjectId::kNull;
-    AcDbObjectId id = pDb->currentSpaceId();
-    if (!id.isNull())
-        return id;
-    return pDb->blockTableId();
-}
-
-static bool m08eResolveOptionalObject(const AriadneJobCtx& ctx, AcDbObjectId& id, std::string& handle)
-{
-    if (jsonFindString(ctx.job, "handle", handle) && !handle.empty())
-        return resolveHandle(ctx.pDb, handle, id);
-    id = m08eDefaultWritableObjectId(ctx.pDb);
-    handle = handleOfId(id);
-    return !id.isNull();
-}
-
-static bool m08eHandleCreateExtDict(const AriadneJobCtx& ctx, std::ostringstream& r)
-{
-    AcDbObjectId id;
-    std::string handle;
-    if (!m08eResolveOptionalObject(ctx, id, handle)) {
-        emitNativeError(r, "OBJECT_NOT_FOUND", "write.object.create_ext_dict could not resolve object");
-        return true;
-    }
-    AriadneStagedWriteTransaction wt(ctx.pDb);
-    AcDbObject* pObj = nullptr;
-    Acad::ErrorStatus es = acdbOpenObject(pObj, id, AcDb::kForWrite);
-    bool created = false;
-    std::string dictHandle;
-    if (es == Acad::eOk && pObj != nullptr) {
-        if (pObj->extensionDictionary().isNull()) {
-            es = pObj->createExtensionDictionary();
-            created = (es == Acad::eOk);
-        }
-        AcDbObjectId did = pObj->extensionDictionary();
-        if (!did.isNull()) dictHandle = handleOfId(did);
-        pObj->close();
-    }
-    r << "\"result\":{\"handle\":" << njsonStr(handle)
-      << ",\"created\":" << (created ? "true" : "false")
-      << ",\"extension_dictionary_handle\":" << (dictHandle.empty() ? std::string("null") : njsonStr(dictHandle))
-      << ",\"staged_rolled_back\":true,\"errorstatus\":" << static_cast<int>(es)
-      << "},\"status\":\"ok\"}";
-    return true;
-}
-
-static bool m08eHandleRegappRegister(const AriadneJobCtx& ctx, std::ostringstream& r)
-{
-    std::string app;
-    if (!jsonFindString(ctx.job, "app", app) || app.empty()) app = "ARIADNE_M08CDEF";
-    AriadneStagedWriteTransaction wt(ctx.pDb);
-    const Acad::ErrorStatus es = ensureRegApp(ctx.pDb, app);
-    r << "\"result\":{\"app\":" << njsonStr(app)
-      << ",\"registered\":" << (es == Acad::eOk ? "true" : "false")
-      << ",\"staged_rolled_back\":true,\"errorstatus\":" << static_cast<int>(es)
-      << "},\"status\":\"" << (es == Acad::eOk ? "ok" : "error") << "\"}";
     return true;
 }
 
@@ -2488,10 +2410,6 @@ static bool m08eDispatch(const std::string& op, const AriadneJobCtx& ctx, std::o
         return m08eHandleHostServices(ctx, r);
     if (op == kM08eOpDbCreate)
         return m08eHandleDbCreate(ctx, r);
-    if (op == kM08eOpCreateExtDict)
-        return m08eHandleCreateExtDict(ctx, r);
-    if (op == kM08eOpRegappRegister)
-        return m08eHandleRegappRegister(ctx, r);
     if (op == kM08eOpDictionarySet)
         return m08eHandleDictionarySet(ctx, r);
     if (op == kM08eOpEntitySetXdata)

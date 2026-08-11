@@ -143,13 +143,16 @@ def test_vport_active_carveout_is_byte_identical_in_both_modes():
     assert a_true[0] == a_false[0]           # identical op: args + step_id + operation
 
 
-def test_app_id_is_excluded_not_applied():
+def test_app_id_is_excluded_until_replay_mapping_is_wired():
     patch, meta = build_records_patch(_census(), TARGET, "P")
-    # app_id surfaces as an explicit DEFERRAL with the rollback-only reason...
+    # The native write can persist, but this builder has no app_id -> regapp mapping.
     assert "app_id" in meta["excluded_table_kinds"]
     assert "app_id" in EXCLUDED_TABLE_KINDS
-    assert "regapp" in meta["excluded_table_kinds"]["app_id"].lower()
-    assert "rollback" in meta["excluded_table_kinds"]["app_id"].lower()
+    reason = meta["excluded_table_kinds"]["app_id"].lower()
+    assert "regapp" in reason
+    assert "not wired" in reason
+    assert "mapping" in reason
+    assert "rollback" not in reason
     # ...and is never counted applied (no op targets it, no regapp op emitted)
     assert all(op["operation"] != "create_app_id" for op in patch["operations"])
     assert all("regapp" not in op["operation"] for op in patch["operations"])

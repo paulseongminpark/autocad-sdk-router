@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""CAD OS Layer M08C TEST -- native db / object / symbol-table READ handlers.
+"""CAD OS Layer M08C TEST -- native db / object / symbol-table handlers.
 
 Intent (WHY):
-  M08C fills families/m08c_handlers.inc with the READ-only subset of the
+  M08C fills families/m08c_handlers.inc with the implemented subset of the
   objectdbx_database + symbol_tables_dictionaries op families. Three invariants
   carry business meaning and must fail CI if violated:
 
   1. GATE PARITY -- m08cHasOp must return true for EXACTLY the implemented ops and
-     false for every deferred (write-lane) op. If a write op (save_as, dxf_out,
-     wblock_clone, write.object.close/upgrade/downgrade, create_ext_dict,
-     register, set_working_db, the side-db file readers, flush_input) leaks into
-     HasOp without a real read-only handler, the dispatcher would admit it and
-     either misroute or (worse) a write op would be reported runnable -- breaking
-     the "READ family is read-only / no original DWG write" hard constraint.
+     false for every deferred op. Implemented write_copy operations mutate only
+     the router-staged working database or an explicitly guarded output path;
+     they must never write the original drawing.
 
   2. HASOP<->DISPATCH PARITY -- every op HasOp claims must have an `op == "<id>"`
      branch in m08cDispatch. Drift = OPERATION_DISPATCH_MISMATCH at runtime.
@@ -38,7 +35,7 @@ _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
 _INC = os.path.join(_REPO, "src", "Ariadne.AcadNative", "families", "m08c_handlers.inc")
 
-# Ops M08C implements as real non-persisting handlers.
+# Ops M08C implements as real handlers. write_copy operations may persist the staged copy.
 _IMPLEMENTED = [
     "infra.hostapp.get_services",
     "inspect.database.summaryinfo",
@@ -137,6 +134,80 @@ class TestM08CHandlers(unittest.TestCase):
         # dispatch must not branch on an op HasOp does not admit (would be dead/misrouted)
         extra = sorted(self.dispatch - self.hasop)
         self.assertEqual(extra, [], "dispatch branches not admitted by HasOp: %s" % extra)
+
+    def test_regapp_prefers_nested_args_and_only_then_flat_legacy_payload(self):
+        match = re.search(
+            r'if \(op == "write\.regapp\.register"\) \{(.*?)\n\s*\}\n\n\s*if \(op ==',
+            self.src,
+            re.S,
+        )
+        self.assertIsNotNone(match, "write.regapp.register dispatch branch not found")
+        branch = match.group(1)
+        args_object = 'm08cFindDirectJsonObject(job, "args", argsJson)'
+        canonical = 'm08cFindDirectJsonString(argsJson, "app", app)'
+        legacy = 'm08cFindDirectJsonString(argsJson, "regapp", app)'
+        flat_canonical = 'm08cFindDirectJsonString(job, "app", app)'
+        flat_legacy = 'm08cFindDirectJsonString(job, "regapp", app)'
+        default = 'if (app.empty()) app = "ARIADNE";'
+        for token in (
+            args_object,
+            canonical,
+            legacy,
+            flat_canonical,
+            flat_legacy,
+            default,
+        ):
+            self.assertIn(token, branch)
+        self.assertLess(branch.index(args_object), branch.index(canonical))
+        self.assertLess(branch.index(canonical), branch.index(legacy))
+        self.assertLess(branch.index(legacy), branch.index(flat_canonical))
+        self.assertLess(branch.index(flat_canonical), branch.index(flat_legacy))
+        self.assertLess(branch.index(flat_legacy), branch.index(default))
+        self.assertRegex(
+            branch,
+            r'if \(m08cFindDirectJsonObject\(job, "args", argsJson\)\) \{\s*'
+            r'if \(!m08cFindDirectJsonString\(argsJson, "app", app\) \|\| app\.empty\(\)\)\s*'
+            r'm08cFindDirectJsonString\(argsJson, "regapp", app\);\s*'
+            r'\}\s*else \{\s*'
+            r'if \(!m08cFindDirectJsonString\(job, "app", app\) \|\| app\.empty\(\)\)\s*'
+            r'm08cFindDirectJsonString\(job, "regapp", app\);\s*'
+            r'\}\s*'
+            r'if \(app\.empty\(\)\) app = "ARIADNE";',
+        )
+
+    def test_regapp_parser_requires_a_direct_string_member(self):
+        member_match = re.search(
+            r"static bool m08cFindDirectJsonMemberValue\(.*?\n\}(?=\n\nstatic)",
+            self.src,
+            re.S,
+        )
+        self.assertIsNotNone(member_match, "direct JSON member parser not found")
+        self.assertIn("containerDepth == 1", member_match.group(0))
+
+        string_match = re.search(
+            r"static bool m08cFindDirectJsonString\(.*?\n\}(?=\n\nstatic)",
+            self.src,
+            re.S,
+        )
+        self.assertIsNotNone(string_match, "direct JSON string parser not found")
+        helper = string_match.group(0)
+        self.assertIn(
+            "objectJson[valueStart] != '\"'",
+            helper,
+            "app:null/number/object must not be mistaken for a later string key",
+        )
+
+    def test_regapp_args_object_must_be_a_direct_top_level_member(self):
+        self.assertNotIn('jsonFindObject(job, "args", argsJson)', self.src)
+        match = re.search(
+            r"static bool m08cFindDirectJsonObject\(.*?\n\}(?=\n\nstatic)",
+            self.src,
+            re.S,
+        )
+        self.assertIsNotNone(match, "direct JSON object parser not found")
+        helper = match.group(0)
+        self.assertIn("m08cFindDirectJsonMemberValue", helper)
+        self.assertIn("objectJson[valueStart] != '{'", helper)
 
     def test_no_raw_command_or_original_write_tokens(self):
         # M08C now includes staged export/object ops. saveAs/dxfOut are allowed only
