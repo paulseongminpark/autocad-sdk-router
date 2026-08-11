@@ -46,6 +46,8 @@ for _p in (_REPO, os.path.join(_REPO, "tools")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+from operation_provenance import build_execution_receipt  # noqa: E402
+
 _JSON_ENCODING = "utf-8-sig"
 _OPERATIONS_V2 = os.path.join(_REPO, "config", "operations.v2.json")
 
@@ -79,6 +81,86 @@ def _native_result(handles):
     }
 
 
+def _canonical_receipt(operation, baseline, result):
+    return build_execution_receipt(
+        authorized_operation=operation,
+        authorized_write_mode="write_copy",
+        executed=True,
+        reported_status="ok",
+        executed_operation=operation,
+        executed_write_mode="write_copy",
+        router_input_path=str(baseline),
+        original_path=str(baseline),
+        original_sha256_before="a" * 64,
+        original_sha256_after="a" * 64,
+        baseline_path=str(baseline),
+        baseline_sha256="a" * 64,
+        baseline_sha256_after="a" * 64,
+        result_path=str(result),
+        result_sha256="b" * 64,
+        result_kind="router_working_copy",
+        process_exit_code=0,
+        engine_exit_code=0,
+        engine_output_exit_code=0,
+        native_status="ok",
+        native_schema="ariadne.autocad_native_job_result.v1",
+        native_engine="native_objectarx",
+        native_operation=operation,
+        native_result_source="file",
+        native_result_is_object=True,
+        native_error_code=None,
+        native_result_path=str(result) + ".native-result.json",
+        native_result_sha256="c" * 64,
+        router_status="PASS",
+        router_schema="ariadne.autocad_router_run.v2",
+        executed_route="dwg_truth_autocad",
+        timed_out=False,
+        input_kind="staged_copy",
+        save_command_issued=True,
+        router_working_sha256_before="a" * 64,
+        router_working_sha256_after="b" * 64,
+    )
+
+
+class _CanonicalFoundryCad:
+    """Cad seam fake with canonical provenance and no flat path aliases."""
+
+    def __init__(self):
+        self.run_inputs = []
+        self.result_paths = []
+        self.inspect_inputs = []
+
+    def run_operation(self, op_id, args=None, write_mode=None, dwg_path=None, out_dir=None):
+        baseline = Path(dwg_path).resolve()
+        result_path = (Path(out_dir) / "bound_result.dwg").resolve()
+        result_path.parent.mkdir(parents=True, exist_ok=True)
+        result_path.write_bytes((op_id + "-result").encode("ascii"))
+        self.run_inputs.append(str(baseline))
+        self.result_paths.append(str(result_path))
+        native = (
+            {"created": True, "errorstatus": 0, "handle": "CIR1"}
+            if op_id == "write.entity.circle"
+            else {"created": True, "handles": ["REG1"]}
+        )
+        return {
+            "schema": "ariadne.cadctl.run_operation.v1",
+            "status": "ok",
+            "executed": True,
+            "result": native,
+            "execution_receipt": _canonical_receipt(op_id, baseline, result_path),
+        }
+
+    def inspect(self, dwg_path, out_dir, mode="rich", include_rich=True):
+        self.inspect_inputs.append(str(Path(dwg_path).resolve()))
+        ir_path = Path(out_dir) / "dwg_graph_ir.json"
+        ir_path.parent.mkdir(parents=True, exist_ok=True)
+        ir_path.write_text("{}", encoding="utf-8")
+        return {"status": "ok", "dwg_graph_ir": str(ir_path)}
+
+    def get_entity(self, ir_path, handle):
+        return {"status": "ok", "row_count": 1, "rows": [{"handle": handle}]}
+
+
 class _FakeRunJob:
     """Stand-in for the run_job sibling: returns canned results per operation
     so cadctl.Cad.run_operation / .inspect run their REAL control flow
@@ -105,14 +187,83 @@ class _FakeRunJob:
             fh.write("{}")
         with open(stderr, "w", encoding="utf-8") as fh:
             fh.write("")
-        out = {"command": ["fake"], "exit_code": 0, "stdout_path": stdout,
-               "stderr_path": stderr, "envelope": {"status": "ok"},
-               "result_json": None, "staged_used": None,
-               "timed_out": False, "error": None}
+        baseline = Path(staged_dwg).resolve()
+        staged_result = baseline.parent / ("router_result_%s.dwg" % len(self.calls))
+        result_bytes = baseline.read_bytes()
+        if write_mode == "write_copy":
+            result_bytes += ("\n" + operation).encode("ascii")
+        staged_result.write_bytes(result_bytes)
         if operation == "inspect.database.graph":
-            out["result"] = self.inspect_result
+            native_result = dict(self.inspect_result)
         else:
-            out["result"] = self.create_results.get(operation)
+            configured = self.create_results.get(operation)
+            native_result = dict(configured) if isinstance(configured, dict) else None
+        if native_result is not None and "status" not in native_result:
+            native_result["status"] = "ok"
+        native_status = (
+            native_result.get("status") if isinstance(native_result, dict) else "partial"
+        )
+        native_result_path = baseline.parent / (
+            "native_result_%s.json" % len(self.calls)
+        )
+        native_result_path.write_text(json.dumps({
+            "schema": "ariadne.autocad_native_job_result.v1",
+            "engine": "native_objectarx",
+            "operation": operation,
+            "status": native_status,
+            "result": native_result if isinstance(native_result, dict) else {},
+        }), encoding="utf-8")
+        out = {
+            "command": ["fake"],
+            "exit_code": 0,
+            "stdout_path": stdout,
+            "stderr_path": stderr,
+            "envelope": {"status": "ok"},
+            "execution": {
+                "router_status": "PASS",
+                "router_schema": "ariadne.autocad_router_run.v2",
+                "executed_route": "dwg_truth_autocad",
+                "process_exit_code": 0,
+                "timed_out": False,
+                "launch_error": None,
+                "engine_exit_code": 0,
+                "engine_output_exit_code": 0,
+                "executed": True,
+                "status": native_status,
+                "native_status": native_status,
+                "native_schema": "ariadne.autocad_native_job_result.v1",
+                "native_engine": "native_objectarx",
+                "native_operation": operation,
+                "native_result_source": "file",
+                "native_result_is_object": isinstance(native_result, dict),
+                "native_error_code": (
+                    native_result.get("error_code")
+                    if isinstance(native_result, dict)
+                    else None
+                ),
+                "native_result_path": str(native_result_path.resolve()),
+                "native_result_sha256": _sha256(native_result_path),
+                "result_kind": "router_working_copy",
+                "result_path": str(staged_result),
+                "mode": "cad_job",
+                "operation": operation,
+                "write_mode": write_mode,
+                "input_kind": "staged_copy",
+                "request_input": str(baseline),
+                "original_input": str(baseline),
+                "input": str(staged_result),
+                "working_sha256_before": _sha256(baseline),
+                "working_sha256_after": _sha256(staged_result),
+                "save_command_issued": write_mode == "write_copy",
+                "limitation_code": None,
+                "limitation_codes": [],
+            },
+            "result_json": str(native_result_path),
+            "result": native_result,
+            "staged_used": str(staged_result),
+            "timed_out": False,
+            "error": None,
+        }
         return out
 
 
@@ -355,6 +506,48 @@ class TestMintFixtureMocked(unittest.TestCase):
             with open(job_path, "r", encoding="utf-8") as fh:
                 sent = json.load(fh)
             self.assertEqual(sent.get("curves"), ["CIR1"])
+
+    def test_region_chains_and_reopens_only_canonical_bound_results(self):
+        with tempfile.TemporaryDirectory(prefix="f10_bound_result_") as tmp:
+            seed = _make_seed(tmp)
+            fixtures_dir = Path(tmp) / "fixtures"
+            cad = _CanonicalFoundryCad()
+
+            rec = self.ff.mint_fixture(
+                "region",
+                seed_dwg=seed,
+                fixtures_dir=fixtures_dir,
+                run_root=Path(tmp) / "run",
+                cad=cad,
+            )
+
+            self.assertEqual(rec["status"], "VERIFIED", rec)
+            self.assertEqual(cad.run_inputs[1], cad.result_paths[0])
+            self.assertEqual(cad.inspect_inputs, [cad.result_paths[1]])
+            self.assertEqual(
+                (fixtures_dir / "region.dwg").read_bytes(),
+                Path(cad.result_paths[1]).read_bytes(),
+            )
+
+    def test_executed_create_without_canonical_receipt_is_unverified(self):
+        class MissingReceiptCad:
+            def run_operation(self, *args, **kwargs):
+                return {
+                    "status": "ok",
+                    "executed": True,
+                    "result": {"created": True, "errorstatus": 0, "handle": "A1"},
+                }
+
+        out = self.ff._lane_a_create(
+            MissingReceiptCad(),
+            "write.entity.point",
+            {"position": {"x": 0, "y": 0, "z": 0}},
+            "fixture.dwg",
+            Path(tempfile.gettempdir()) / "f10_missing_receipt",
+        )
+
+        self.assertFalse(out["ok"])
+        self.assertIn("receipt", out["reason"].lower())
 
     def test_region_prereq_failure_blocks_main_create(self):
         with tempfile.TemporaryDirectory(prefix="f10_region_fail_") as tmp:

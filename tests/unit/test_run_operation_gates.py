@@ -3,6 +3,7 @@
 These exercise the allow-list + write-mode governance that must refuse BEFORE
 any native job runs. The "actually executes an implemented op headless" proof is
 a separate CADOS_LIVE smoke (needs accoreconsole)."""
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -112,6 +113,17 @@ def test_normal_args_keep_the_allow_list_operation_and_reach_the_runner(
     def fake_runner(staged_dwg, run_dir, operation, *, job_path=None, **kwargs):
         staged_result = tmp_path / "router-result.dwg"
         staged_result.write_bytes(Path(staged_dwg).read_bytes())
+        baseline_sha = hashlib.sha256(Path(staged_dwg).read_bytes()).hexdigest()
+        result_sha = hashlib.sha256(staged_result.read_bytes()).hexdigest()
+        native_result_path = tmp_path / "native-result.json"
+        native_result_path.write_text(json.dumps({
+            "schema": "ariadne.autocad_native_job_result.v1",
+            "engine": "native_objectarx",
+            "operation": operation,
+            "status": "ok",
+            "result": {},
+        }), encoding="utf-8")
+        write_mode = kwargs.get("write_mode", "read")
         captured.append(
             {
                 "operation": operation,
@@ -121,10 +133,45 @@ def test_normal_args_keep_the_allow_list_operation_and_reach_the_runner(
         return {
             "exit_code": 0,
             "staged_used": str(staged_result),
-            "result_json": None,
+            "result_json": str(native_result_path),
             "stdout_path": None,
             "stderr_path": None,
             "result": {"status": "ok"},
+            "execution": {
+                "router_schema": "ariadne.autocad_router_run.v2",
+                "router_status": "PASS",
+                "executed_route": "dwg_truth_autocad",
+                "process_exit_code": 0,
+                "engine_exit_code": 0,
+                "engine_output_exit_code": 0,
+                "timed_out": False,
+                "launch_error": None,
+                "executed": True,
+                "status": "ok",
+                "native_status": "ok",
+                "native_schema": "ariadne.autocad_native_job_result.v1",
+                "native_engine": "native_objectarx",
+                "native_operation": operation,
+                "native_result_source": "file",
+                "native_result_is_object": True,
+                "native_error_code": None,
+                "native_result_path": str(native_result_path.resolve()),
+                "native_result_sha256": hashlib.sha256(
+                    native_result_path.read_bytes()
+                ).hexdigest(),
+                "result_kind": "router_working_copy",
+                "result_path": str(staged_result.resolve()),
+                "operation": operation,
+                "write_mode": write_mode,
+                "input_kind": "staged_copy",
+                "request_input": str(Path(staged_dwg).resolve()),
+                "original_input": str(Path(staged_dwg).resolve()),
+                "input": str(staged_result.resolve()),
+                "working_sha256_before": baseline_sha,
+                "working_sha256_after": result_sha,
+                "save_command_issued": write_mode == "write_copy",
+                "limitation_codes": [],
+            },
             "error": None,
         }
 
@@ -144,6 +191,10 @@ def test_normal_args_keep_the_allow_list_operation_and_reach_the_runner(
     assert captured == [
         {
             "operation": "inspect.database.graph",
-            "job": {"limit": 5, "operation": "inspect.database.graph"},
+            "job": {
+                "limit": 5,
+                "operation": "inspect.database.graph",
+                "input_path": str(source.resolve()),
+            },
         }
     ]

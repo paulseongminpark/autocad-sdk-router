@@ -30,6 +30,7 @@ class CapturedFile:
     byte_count: int
     final_path: str
     identity: str
+    link_count: int
 
 
 @dataclass(frozen=True)
@@ -53,6 +54,54 @@ class ImmutableFileSnapshot:
 class FileRequest:
     root: Path
     relative_path: str
+    require_single_link: bool = False
+
+
+@dataclass
+class FileSnapshotLease:
+    """A captured generation whose read-only OS handles remain open."""
+
+    snapshot: ImmutableFileSnapshot
+    _handles: list[object]
+    _closed: bool = False
+
+    @property
+    def files(self) -> Mapping[str, CapturedFile]:
+        return self.snapshot.files
+
+    @property
+    def aggregate_sha256(self) -> str:
+        return self.snapshot.aggregate_sha256
+
+    def same_generation_as(self, other: object) -> bool:
+        if isinstance(other, FileSnapshotLease):
+            other = other.snapshot
+        return self.snapshot.same_generation_as(other)
+
+    def close(self) -> None:
+        if self._closed:
+            return
+        self._closed = True
+        for handle in reversed(self._handles):
+            if os.name == "nt":
+                _CloseHandle(handle)
+            else:
+                os.close(handle)
+        self._handles.clear()
+
+    def __enter__(self) -> "FileSnapshotLease":
+        return self
+
+    def __exit__(self, exc_type, exc, traceback) -> None:
+        self.close()
+
+    def __del__(self) -> None:
+        try:
+            self.close()
+        except Exception:
+            # Destructors run during interpreter teardown as a last-resort
+            # safeguard; explicit callers still receive close errors.
+            pass
 
 
 def _lexical_request(root: Path, relative_path: str | Path) -> tuple[str, str]:
@@ -172,7 +221,7 @@ def _win_error(action: str, path: str) -> SnapshotCaptureError:
     return SnapshotCaptureError(f"{action} failed for {path}: [{error}] {detail}")
 
 
-def _windows_open(expected: str) -> tuple[object, str, str]:
+def _windows_open(expected: str) -> tuple[object, str, str, int]:
     handle = _CreateFileW(
         expected,
         _GENERIC_READ,
@@ -224,7 +273,7 @@ def _windows_open(expected: str) -> tuple[object, str, str]:
             f"{information.ftLastWriteTime.dwLowDateTime:08x}:"
             f"{information.nFileSizeHigh:08x}{information.nFileSizeLow:08x}"
         )
-        return handle, final_path, identity
+        return handle, final_path, identity, int(information.nNumberOfLinks)
     except BaseException:
         _CloseHandle(handle)
         raise
@@ -263,7 +312,7 @@ def _posix_final_path(fd: int, expected: str) -> str:
     )
 
 
-def _posix_open(expected: str) -> tuple[int, str, str]:
+def _posix_open(expected: str) -> tuple[int, str, str, int]:
     flags = os.O_RDONLY
     flags |= getattr(os, "O_CLOEXEC", 0)
     flags |= getattr(os, "O_NOFOLLOW", 0)
@@ -291,7 +340,7 @@ def _posix_open(expected: str) -> tuple[int, str, str]:
             f"{metadata.st_ctime_ns:x}:{metadata.st_mtime_ns:x}:"
             f"{metadata.st_size:x}"
         )
-        return fd, final_path, identity
+        return fd, final_path, identity, int(metadata.st_nlink)
     except BaseException:
         os.close(fd)
         raise
@@ -331,29 +380,41 @@ def _posix_read(fd: int, path: str) -> bytes:
         chunks.append(chunk)
 
 
-def capture_file_set(
+def acquire_file_set(
     requests: Mapping[str, FileRequest | tuple[Path, str]],
-) -> ImmutableFileSnapshot:
-    """Open, validate, and read one immutable multi-root file generation."""
+) -> FileSnapshotLease:
+    """Capture files and retain read-only handles until ``close`` is called."""
 
-    prepared: list[tuple[str, str]] = []
+    prepared: list[tuple[str, str, bool]] = []
     for label in sorted(requests):
         request = requests[label]
         if isinstance(request, FileRequest):
-            root, relative_path = request.root, request.relative_path
+            root = request.root
+            relative_path = request.relative_path
+            require_single_link = request.require_single_link
         else:
             root, relative_path = request
+            require_single_link = False
         _, expected = _lexical_request(Path(root), relative_path)
-        prepared.append((label, expected))
+        prepared.append((label, expected, require_single_link))
 
-    opened: list[tuple[str, str, object, str, str]] = []
+    opened: list[tuple[str, str, object, str, str, int]] = []
     identity_labels: dict[str, str] = {}
     try:
-        for label, expected in prepared:
+        for label, expected, require_single_link in prepared:
             if os.name == "nt":
-                handle, final_path, identity = _windows_open(expected)
+                handle, final_path, identity, link_count = _windows_open(expected)
             else:
-                handle, final_path, identity = _posix_open(expected)
+                handle, final_path, identity, link_count = _posix_open(expected)
+            if require_single_link and link_count != 1:
+                if os.name == "nt":
+                    _CloseHandle(handle)
+                else:
+                    os.close(handle)
+                raise SnapshotCaptureError(
+                    "protected snapshot input has more than one filesystem link; "
+                    f"possible hardlink alias: {label!r}, link_count={link_count}"
+                )
             previous_label = identity_labels.get(identity)
             if previous_label is not None:
                 if os.name == "nt":
@@ -365,10 +426,12 @@ def capture_file_set(
                     f"possible hardlink alias: {previous_label!r}, {label!r}"
                 )
             identity_labels[identity] = label
-            opened.append((label, expected, handle, final_path, identity))
+            opened.append(
+                (label, expected, handle, final_path, identity, link_count)
+            )
 
         captured: dict[str, CapturedFile] = {}
-        for label, expected, handle, final_path, identity in opened:
+        for label, expected, handle, final_path, identity, link_count in opened:
             if os.name == "nt":
                 content = _windows_read(handle, expected)
             else:
@@ -379,13 +442,15 @@ def capture_file_set(
                 byte_count=len(content),
                 final_path=final_path,
                 identity=identity,
+                link_count=link_count,
             )
-    finally:
-        for _, _, handle, _, _ in reversed(opened):
+    except BaseException:
+        for _, _, handle, _, _, _ in reversed(opened):
             if os.name == "nt":
                 _CloseHandle(handle)
             else:
                 os.close(handle)
+        raise
 
     aggregate = hashlib.sha256()
     for label in sorted(captured):
@@ -393,10 +458,26 @@ def capture_file_set(
         aggregate.update(
             f"{label}\0{item.sha256}\0{item.byte_count}\n".encode("utf-8")
         )
-    return ImmutableFileSnapshot(
+    snapshot = ImmutableFileSnapshot(
         files=MappingProxyType(dict(sorted(captured.items()))),
         aggregate_sha256=aggregate.hexdigest(),
     )
+    return FileSnapshotLease(
+        snapshot=snapshot,
+        _handles=[item[2] for item in opened],
+    )
+
+
+def capture_file_set(
+    requests: Mapping[str, FileRequest | tuple[Path, str]],
+) -> ImmutableFileSnapshot:
+    """Open, validate, and read one immutable multi-root file generation."""
+
+    lease = acquire_file_set(requests)
+    try:
+        return lease.snapshot
+    finally:
+        lease.close()
 
 
 def capture_files(

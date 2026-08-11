@@ -66,6 +66,7 @@ class _FakeRouterRunJob:
                            write_mode="read", job_path=None, timeout=600,
                            intent="dwg"):
         self.calls.append({"staged_dwg": staged_dwg, "write_mode": write_mode})
+        working_sha_before = _sha256(staged_dwg)
         os.makedirs(run_dir, exist_ok=True)
         stdout = os.path.join(run_dir, "stdout.txt")
         stderr = os.path.join(run_dir, "stderr.txt")
@@ -81,7 +82,13 @@ class _FakeRouterRunJob:
                 fh.write(b"MUTATED-BY-SIMULATED-QSAVE")
 
         result_json = os.path.join(run_dir, "result.json")
-        Path(result_json).write_text(json.dumps({"status": "ok"}), encoding="utf-8")
+        Path(result_json).write_text(json.dumps({
+            "schema": "ariadne.autocad_native_job_result.v1",
+            "engine": "native_objectarx",
+            "operation": operation,
+            "status": "ok",
+            "result": {},
+        }), encoding="utf-8")
 
         return {
             "command": ["fake"], "exit_code": 0,
@@ -90,6 +97,39 @@ class _FakeRouterRunJob:
             "result_json": result_json,
             "result": {"status": "ok"},
             "staged_used": router_copy,
+            "execution": {
+                "router_schema": "ariadne.autocad_router_run.v2",
+                "router_status": "PASS",
+                "executed_route": "dwg_truth_autocad",
+                "process_exit_code": 0,
+                "engine_exit_code": 0,
+                "engine_output_exit_code": 0,
+                "timed_out": False,
+                "launch_error": None,
+                "executed": True,
+                "status": "ok",
+                "native_status": "ok",
+                "native_schema": "ariadne.autocad_native_job_result.v1",
+                "native_engine": "native_objectarx",
+                "native_operation": operation,
+                "native_result_source": "file",
+                "native_result_is_object": True,
+                "native_error_code": None,
+                "native_result_path": str(Path(result_json).resolve()),
+                "native_result_sha256": _sha256(result_json),
+                "result_kind": "router_working_copy",
+                "result_path": str(Path(router_copy).resolve()),
+                "operation": operation,
+                "write_mode": write_mode,
+                "input_kind": "staged_copy",
+                "request_input": str(Path(staged_dwg).resolve()),
+                "original_input": str(Path(staged_dwg).resolve()),
+                "input": str(Path(router_copy).resolve()),
+                "working_sha256_before": working_sha_before,
+                "working_sha256_after": _sha256(router_copy),
+                "save_command_issued": write_mode == "write_copy",
+                "limitation_codes": [],
+            },
             "timed_out": False, "error": None,
         }
 
@@ -130,6 +170,7 @@ def test_write_mode_pre_sha_reflects_staged_copy_before_mutation(monkeypatch, tm
     monkeypatch.setattr(cadctl, "run_job", fake)
 
     cad = cadctl.Cad()
+    cad.staging_golden = tmp_path / "staging"
     env = cad.run_operation(op_id, write_mode="write_copy",
                             dwg_path=str(fixture_dwg), out_dir=str(tmp_path / "out"))
 
@@ -168,6 +209,7 @@ def test_read_mode_pre_and_post_sha_are_equal(monkeypatch, tmp_path, fixture_dwg
     monkeypatch.setattr(cadctl, "run_job", fake)
 
     cad = cadctl.Cad()
+    cad.staging_golden = tmp_path / "staging"
     env = cad.run_operation(op_id, write_mode="read",
                             dwg_path=str(fixture_dwg), out_dir=str(tmp_path / "out"))
 
@@ -185,6 +227,7 @@ def test_missing_staged_used_reports_none_not_a_fabricated_hash(monkeypatch, tmp
     monkeypatch.setattr(cadctl, "run_job", _NoStagedUsedRunJob())
 
     cad = cadctl.Cad()
+    cad.staging_golden = tmp_path / "staging"
     env = cad.run_operation(op_id, write_mode="read",
                             dwg_path=str(fixture_dwg), out_dir=str(tmp_path / "out"))
 

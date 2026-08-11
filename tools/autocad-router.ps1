@@ -432,41 +432,77 @@ function Read-JsonFile {
 }
 
 function Read-CadJobResultSafe {
-  # Reads a native CAD-job result JSON for envelope assembly WITHOUT letting a
+  # Reads a CAD-job result JSON for envelope assembly WITHOUT letting a
   # huge result blow up ConvertTo-Json. For large files we skip the full parse
-  # and inline entirely (the Python side reads result_json from disk as the
-  # authoritative copy) and only cheaply validate the trailing status marker.
+  # and inline entirely; the Python side reads result_json from disk as the
+  # authoritative copy. A tail marker cannot prove the whole result contract.
   # Returns @{ Ok = <bool>; Inline = <obj|$null>; SizeBytes = <long> }.
-  param([string]$ResultPath, [int]$InlineMaxMB = 24)
+  param(
+    [string]$ResultPath,
+    [Parameter(Mandatory = $true)][string]$ExpectedOperation,
+    [Parameter(Mandatory = $true)][string]$ExpectedSchema,
+    [Parameter(Mandatory = $true)][string]$ExpectedEngine,
+    [int]$InlineMaxMB = 24
+  )
   $out = [ordered]@{ Ok = $false; Inline = $null; SizeBytes = [int64]0 }
   if (-not (Test-Path -LiteralPath $ResultPath)) { return $out }
   $size = (Get-Item -LiteralPath $ResultPath).Length
   $out.SizeBytes = $size
   if ($size -le ([int64]$InlineMaxMB * 1MB)) {
     try {
-      $parsed = Get-Content -LiteralPath $ResultPath -Raw -Encoding UTF8 | ConvertFrom-Json
-      if ($parsed -and "$($parsed.status)" -ne 'error') { $out.Ok = $true }
+      $raw = Get-Content -LiteralPath $ResultPath -Raw -Encoding UTF8
+      # ConvertFrom-Json accepts duplicate keys and non-finite numbers. Validate
+      # with the router's existing Python dependency before creating Inline.
+      $strictPython = if (-not [string]::IsNullOrWhiteSpace([string]$PythonExe)) {
+        [string]$PythonExe
+      } else {
+        (Get-Command -Name python -ErrorAction Stop).Source
+      }
+      $strictScript = @(
+        'import json, sys'
+        'def object_no_duplicates(pairs):'
+        '    result = {}'
+        '    for key, value in pairs:'
+        '        if key in result: raise ValueError("duplicate key")'
+        '        result[key] = value'
+        '    return result'
+        'def reject_constant(value): raise ValueError("non-finite number")'
+        'raw = sys.stdin.buffer.read().decode("utf-8-sig")'
+        'document = json.loads(raw, object_pairs_hook=object_no_duplicates, parse_constant=reject_constant)'
+        'if not isinstance(document, dict): raise ValueError("top-level JSON must be an object")'
+        'if document.get("schema") != sys.argv[3]: raise ValueError("wrong schema")'
+        'if document.get("operation") != sys.argv[2]: raise ValueError("wrong operation")'
+        'if document.get("engine") != sys.argv[4]: raise ValueError("wrong engine")'
+        'if document.get("status") != "ok": raise ValueError("wrong status")'
+        'if document.get("error_code") not in (None, ""): raise ValueError("nonempty error_code")'
+        'if not isinstance(document.get("result"), dict): raise ValueError("result must be an object")'
+      ) -join "`n"
+      $strictScriptBase64 = [Convert]::ToBase64String(
+        [System.Text.Encoding]::UTF8.GetBytes($strictScript)
+      )
+      $strictLauncher = 'import base64,sys;exec(base64.b64decode(sys.argv[1]))'
+      $raw | & $strictPython -c $strictLauncher $strictScriptBase64 $ExpectedOperation $ExpectedSchema $ExpectedEngine *> $null
+      $strictJson = $LASTEXITCODE -eq 0
+      if (-not $strictJson) { return $out }
+
+      $parsed = $raw | ConvertFrom-Json
+      if ($parsed -is [PSCustomObject] -and
+          $parsed.schema -is [string] -and $parsed.schema -ceq $ExpectedSchema -and
+          $parsed.operation -is [string] -and $parsed.operation -ceq $ExpectedOperation -and
+          $parsed.engine -is [string] -and $parsed.engine -ceq $ExpectedEngine -and
+          $parsed.status -is [string] -and $parsed.status -ceq 'ok' -and
+          $parsed.result -is [PSCustomObject] -and
+          ($null -eq $parsed.error_code -or
+           ($parsed.error_code -is [string] -and $parsed.error_code.Length -eq 0))) {
+        $out.Ok = $true
+      }
       $out.Inline = $parsed
     }
     catch { $out.Ok = $false }
     return $out
   }
-  # Huge result: do NOT parse or inline (ConvertTo-Json would OOM). Cheaply
-  # validate completeness by scanning the file tail for the status marker.
-  try {
-    $fs = [System.IO.File]::Open($ResultPath, 'Open', 'Read', 'ReadWrite')
-    try {
-      $tailLen = [int][Math]::Min([int64]8192, $fs.Length)
-      $null = $fs.Seek(-$tailLen, 'End')
-      $buf = New-Object byte[] $tailLen
-      $null = $fs.Read($buf, 0, $tailLen)
-      $tail = [System.Text.Encoding]::UTF8.GetString($buf)
-    }
-    finally { $fs.Dispose() }
-    if ($tail -match '"status"\s*:\s*"ok"') { $out.Ok = $true }
-    elseif ($tail -notmatch '"status"\s*:\s*"error"') { $out.Ok = $true }
-  }
-  catch { $out.Ok = $false }
+  # Huge result: do NOT parse or inline (ConvertTo-Json would OOM), and fail
+  # closed because no bounded tail inspection can prove the full contract.
   return $out
 }
 
@@ -1122,6 +1158,82 @@ function Get-EffectiveDwgWriteMode {
   return 'read'
 }
 
+function New-CadJobEngineOutput {
+  param(
+    [string]$Status,
+    [int]$EngineExitCode,
+    [bool]$Executed,
+    [AllowNull()][object]$OperationName = $null,
+    [AllowNull()][object]$EffectiveWriteMode = $null,
+    [AllowNull()][object]$InputKind = $null,
+    [AllowNull()][object]$RequestInput = $null,
+    [AllowNull()][object]$WorkingInput = $null,
+    [AllowNull()][object]$WorkingSha256Before = $null,
+    [AllowNull()][object]$WorkingSha256After = $null,
+    [AllowNull()][object]$SaveCommandIssued = $null,
+    [AllowNull()][System.Collections.IDictionary]$Additional = $null
+  )
+  $normalizedOperation = if ([string]::IsNullOrWhiteSpace([string]$OperationName)) { $null } else { [string]$OperationName }
+  $normalizedWriteMode = if ([string]::IsNullOrWhiteSpace([string]$EffectiveWriteMode)) { $null } else { [string]$EffectiveWriteMode }
+  $normalizedInputKind = if ([string]::IsNullOrWhiteSpace([string]$InputKind)) { $null } else { [string]$InputKind }
+  $normalizedRequestInput = if ([string]::IsNullOrWhiteSpace([string]$RequestInput)) { $null } else { [string]$RequestInput }
+  $normalizedWorkingInput = if ([string]::IsNullOrWhiteSpace([string]$WorkingInput)) { $null } else { [string]$WorkingInput }
+  $output = [ordered]@{
+    status = $Status
+    engine_exit_code = $EngineExitCode
+    executed = $Executed
+    operation = $normalizedOperation
+    write_mode = $normalizedWriteMode
+    input_kind = $normalizedInputKind
+    request_input = $normalizedRequestInput
+    original_input = $normalizedRequestInput
+    input = $normalizedWorkingInput
+    working_sha256_before = $WorkingSha256Before
+    working_sha256_after = $WorkingSha256After
+    save_command_issued = $SaveCommandIssued
+  }
+  if ($null -ne $Additional) {
+    foreach ($key in $Additional.Keys) {
+      $output[$key] = $Additional[$key]
+    }
+  }
+  return $output
+}
+
+function New-FullAutoCadCadJobEngineOutput {
+  param(
+    [string]$Status,
+    [int]$EngineExitCode,
+    [bool]$Executed,
+    [AllowNull()][object]$OperationName = $null,
+    [AllowNull()][object]$EffectiveWriteMode = $null,
+    [AllowNull()][object]$RequestInput = $null,
+    [AllowNull()][object]$SaveCommandIssued = $null,
+    [AllowNull()][System.Collections.IDictionary]$Additional = $null
+  )
+  $details = [ordered]@{
+    limitation_code = 'FULL_AUTOCAD_DOCUMENT_IDENTITY_UNBOUND'
+  }
+  if ($null -ne $Additional) {
+    foreach ($key in $Additional.Keys) {
+      $details[$key] = $Additional[$key]
+    }
+  }
+  return New-CadJobEngineOutput `
+    -Status $Status `
+    -EngineExitCode $EngineExitCode `
+    -Executed $Executed `
+    -OperationName $OperationName `
+    -EffectiveWriteMode $EffectiveWriteMode `
+    -InputKind 'active_document' `
+    -RequestInput $RequestInput `
+    -WorkingInput $null `
+    -WorkingSha256Before $null `
+    -WorkingSha256After $null `
+    -SaveCommandIssued $SaveCommandIssued `
+    -Additional $details
+}
+
 function Invoke-FullAutoCadScript {
   param([string]$RunOut)
   if ([string]::IsNullOrWhiteSpace($Script) -or -not (Test-Path -LiteralPath $Script)) {
@@ -1261,6 +1373,15 @@ function Wait-PathExists {
 function Invoke-FullAutoCadCadJob {
   param([string]$RunOut)
 
+  $effectiveWriteMode = Get-EffectiveDwgWriteMode
+  $requestedOperation = if (-not [string]::IsNullOrWhiteSpace($Operation)) {
+    $Operation
+  } elseif (-not [string]::IsNullOrWhiteSpace($JobPath) -and (Test-Path -LiteralPath $JobPath)) {
+    Get-CadJobOperation -Path $JobPath
+  } else {
+    $null
+  }
+
   $app = $null
   foreach ($progId in @('AutoCAD.Application', 'AutoCAD.Application.26')) {
     try {
@@ -1270,21 +1391,36 @@ function Invoke-FullAutoCadCadJob {
     catch {}
   }
   if (-not $app) {
+    $engineExitCode = -11
     return [ordered]@{
-      engine_exit_code = -11
-      engine_output    = [ordered]@{
-        status = 'NO_ACTIVE_AUTOCAD'
-        detail = 'No running AutoCAD COM application was found for full_autocad native job mode.'
-      }
+      engine_exit_code = $engineExitCode
+      engine_output = New-FullAutoCadCadJobEngineOutput `
+        -Status 'NO_ACTIVE_AUTOCAD' `
+        -EngineExitCode $engineExitCode `
+        -Executed $false `
+        -OperationName $requestedOperation `
+        -EffectiveWriteMode $effectiveWriteMode `
+        -RequestInput $InputPath `
+        -SaveCommandIssued $false `
+        -Additional ([ordered]@{ detail = 'No running AutoCAD COM application was found for full_autocad native job mode.' })
     }
   }
 
   $doc = $null
   try { $doc = $app.ActiveDocument } catch { $doc = $null }
   if (-not $doc) {
+    $engineExitCode = -12
     return [ordered]@{
-      engine_exit_code = -12
-      engine_output    = [ordered]@{ status = 'NO_ACTIVE_DOCUMENT'; detail = 'AutoCAD is running but has no active document.' }
+      engine_exit_code = $engineExitCode
+      engine_output = New-FullAutoCadCadJobEngineOutput `
+        -Status 'NO_ACTIVE_DOCUMENT' `
+        -EngineExitCode $engineExitCode `
+        -Executed $false `
+        -OperationName $requestedOperation `
+        -EffectiveWriteMode $effectiveWriteMode `
+        -RequestInput $InputPath `
+        -SaveCommandIssued $false `
+        -Additional ([ordered]@{ detail = 'AutoCAD is running but has no active document.' })
     }
   }
 
@@ -1294,14 +1430,22 @@ function Invoke-FullAutoCadCadJob {
     $want = [System.IO.Path]::GetFullPath($InputPath)
     $have = [System.IO.Path]::GetFullPath($activePath)
     if ($want.ToLowerInvariant() -ne $have.ToLowerInvariant()) {
+      $engineExitCode = -13
       return [ordered]@{
-        engine_exit_code = -13
-        engine_output    = [ordered]@{
-          status = 'ACTIVE_DOCUMENT_MISMATCH'
+        engine_exit_code = $engineExitCode
+        engine_output = New-FullAutoCadCadJobEngineOutput `
+          -Status 'ACTIVE_DOCUMENT_MISMATCH' `
+          -EngineExitCode $engineExitCode `
+          -Executed $false `
+          -OperationName $requestedOperation `
+          -EffectiveWriteMode $effectiveWriteMode `
+          -RequestInput $InputPath `
+          -SaveCommandIssued $false `
+          -Additional ([ordered]@{
           requested_input = $want
           active_document = $have
           detail = 'Refusing to run a full AutoCAD native job against a different active drawing.'
-        }
+          })
       }
     }
   }
@@ -1312,11 +1456,22 @@ function Invoke-FullAutoCadCadJob {
     Write-Verbose '[full-autocad] AutoCAD not idle before SendCommand; attempting command submit anyway and relying on result marker for completion.'
   }
 
-  $effectiveWriteMode = Get-EffectiveDwgWriteMode
   $jobIn = Join-Path $RunOut 'cad_job_request.json'
   if (-not [string]::IsNullOrWhiteSpace($JobPath)) {
     if (-not (Test-Path -LiteralPath $JobPath)) {
-      return [ordered]@{ engine_exit_code = -1; engine_output = "CAD job file not found: $JobPath" }
+      $engineExitCode = -1
+      return [ordered]@{
+        engine_exit_code = $engineExitCode
+        engine_output = New-FullAutoCadCadJobEngineOutput `
+          -Status 'JOB_NOT_FOUND' `
+          -EngineExitCode $engineExitCode `
+          -Executed $false `
+          -OperationName $requestedOperation `
+          -EffectiveWriteMode $effectiveWriteMode `
+          -RequestInput $InputPath `
+          -SaveCommandIssued $false `
+          -Additional ([ordered]@{ detail = "CAD job file not found: $JobPath" })
+      }
     }
     Copy-Item -LiteralPath $JobPath -Destination $jobIn -Force
   }
@@ -1328,9 +1483,17 @@ function Invoke-FullAutoCadCadJob {
     }) -Path $jobIn | Out-Null
   }
   else {
+    $engineExitCode = -10
     return [ordered]@{
-      engine_exit_code = -10
-      engine_output = [ordered]@{ status = 'JOB_REQUIRED'; detail = 'Full AutoCAD native job requires -JobPath <job.json> or -Operation <operation>.' }
+      engine_exit_code = $engineExitCode
+      engine_output = New-FullAutoCadCadJobEngineOutput `
+        -Status 'JOB_REQUIRED' `
+        -EngineExitCode $engineExitCode `
+        -Executed $false `
+        -EffectiveWriteMode $effectiveWriteMode `
+        -RequestInput $InputPath `
+        -SaveCommandIssued $false `
+        -Additional ([ordered]@{ detail = 'Full AutoCAD native job requires -JobPath <job.json> or -Operation <operation>.' })
     }
   }
   $jobOperation = Get-CadJobOperation -Path $jobIn
@@ -1338,13 +1501,21 @@ function Invoke-FullAutoCadCadJob {
   if ($jobOperation -eq 'live.jig.point_probe') {
     $jigPointLine = Get-CadJobJigPointLine -Path $jobIn
     if ([string]::IsNullOrWhiteSpace($jigPointLine)) {
+      $engineExitCode = -16
       return [ordered]@{
-        engine_exit_code = -16
-        engine_output    = [ordered]@{
-          status = 'JIG_POINT_REQUIRED'
+        engine_exit_code = $engineExitCode
+        engine_output = New-FullAutoCadCadJobEngineOutput `
+          -Status 'JIG_POINT_REQUIRED' `
+          -EngineExitCode $engineExitCode `
+          -Executed $false `
+          -OperationName $jobOperation `
+          -EffectiveWriteMode $effectiveWriteMode `
+          -RequestInput $InputPath `
+          -SaveCommandIssued $false `
+          -Additional ([ordered]@{
           detail = 'live.jig.point_probe requires args.point {x,y,z} so SendCommand can satisfy the AcEdJig prompt.'
           job = $jobIn
-        }
+          })
       }
     }
   }
@@ -1383,7 +1554,8 @@ function Invoke-FullAutoCadCadJob {
   if (-not [string]::IsNullOrWhiteSpace($jigPointLine)) {
     $scrLines += $jigPointLine
   }
-  if (@('write_copy', 'write_original', 'live_edit') -contains $effectiveWriteMode) {
+  $saveCommandIssued = @('write_copy', 'write_original', 'live_edit') -contains $effectiveWriteMode
+  if ($saveCommandIssued) {
     $scrLines += '_QSAVE'
   }
   $scrLines += '(ariadne-write-done)'
@@ -1405,14 +1577,22 @@ function Invoke-FullAutoCadCadJob {
         Start-Sleep -Seconds 1
         continue
       }
+      $engineExitCode = -14
       return [ordered]@{
-        engine_exit_code = -14
-        engine_output    = [ordered]@{
-          status = 'SENDCOMMAND_FAILED'
+        engine_exit_code = $engineExitCode
+        engine_output = New-FullAutoCadCadJobEngineOutput `
+          -Status 'SENDCOMMAND_FAILED' `
+          -EngineExitCode $engineExitCode `
+          -Executed $false `
+          -OperationName $jobOperation `
+          -EffectiveWriteMode $effectiveWriteMode `
+          -RequestInput $InputPath `
+          -SaveCommandIssued $false `
+          -Additional ([ordered]@{
           detail = "$($_.Exception.Message)"
           active_document = $activePath
           send_attempts = $sendAttempts
-        }
+          })
       }
     }
   }
@@ -1436,27 +1616,33 @@ function Invoke-FullAutoCadCadJob {
       $ok = $true
     }
   }
+  $engineExitCode = if ($ok) { 0 } else { 1 }
   return [ordered]@{
-    engine_exit_code = if ($ok) { 0 } else { 1 }
-    engine_output = [ordered]@{
-      status = if ($ok) { 'ok' } else { 'native_cad_job_pending_or_failed' }
-      mode = 'full_autocad_native_job'
-      host = 'full_autocad_com_active_document'
-      operation = $jobOperation
-      write_mode = $effectiveWriteMode
-      active_document = $activePath
-      job = $jobIn
-      result_json = $resultOut
-      result = $result
-      done_marker = $doneOut
-      done_after = $doneAfter
-      mailbox = $mailboxOut
-      idle_after = $idleAfter
-      dbx_module = $dbx
-      arx_module = $arx
-      script = $scrPath
-      detail = 'Commands were sent to AutoCAD ActiveDocument and the router polled for ARIADNE_NATIVE_JOB result JSON.'
-    }
+    engine_exit_code = $engineExitCode
+    engine_output = New-FullAutoCadCadJobEngineOutput `
+      -Status $(if ($ok) { 'ok' } else { 'native_cad_job_pending_or_failed' }) `
+      -EngineExitCode $engineExitCode `
+      -Executed $true `
+      -OperationName $jobOperation `
+      -EffectiveWriteMode $effectiveWriteMode `
+      -RequestInput $InputPath `
+      -SaveCommandIssued $saveCommandIssued `
+      -Additional ([ordered]@{
+        mode = 'full_autocad_native_job'
+        host = 'full_autocad_com_active_document'
+        active_document = $activePath
+        job = $jobIn
+        result_json = $resultOut
+        result = $result
+        done_marker = $doneOut
+        done_after = $doneAfter
+        mailbox = $mailboxOut
+        idle_after = $idleAfter
+        dbx_module = $dbx
+        arx_module = $arx
+        script = $scrPath
+        detail = 'Commands were sent to AutoCAD ActiveDocument and the router polled for ARIADNE_NATIVE_JOB result JSON.'
+      })
   }
 }
 
@@ -1505,15 +1691,46 @@ function Invoke-DwgWriteOriginalScript {
 function Invoke-CadJobRoute {
   param([object]$Capabilities)
   $cap = @($Capabilities.routes | Where-Object { $_.id -eq 'dwg_truth_autocad' }) | Select-Object -First 1
+  $effectiveWriteMode = Get-EffectiveDwgWriteMode
+  $requestedOperation = if (-not [string]::IsNullOrWhiteSpace($Operation)) {
+    $Operation
+  } elseif (-not [string]::IsNullOrWhiteSpace($JobPath) -and (Test-Path -LiteralPath $JobPath)) {
+    Get-CadJobOperation -Path $JobPath
+  } else {
+    $null
+  }
   $engine = Resolve-AcadEnginePath -Default $cap.engine_path
   if (-not (Test-Path -LiteralPath $engine)) {
-    return [ordered]@{ engine_exit_code = -1; engine_output = "accoreconsole not found at $engine" }
+    $engineExitCode = -1
+    return [ordered]@{
+      engine_exit_code = $engineExitCode
+      engine_output = New-CadJobEngineOutput `
+        -Status 'ENGINE_UNAVAILABLE' `
+        -EngineExitCode $engineExitCode `
+        -Executed $false `
+        -OperationName $requestedOperation `
+        -EffectiveWriteMode $effectiveWriteMode `
+        -RequestInput $InputPath `
+        -SaveCommandIssued $false `
+        -Additional ([ordered]@{ detail = "accoreconsole not found at $engine" })
+    }
   }
   if ([string]::IsNullOrWhiteSpace($InputPath) -or -not (Test-Path -LiteralPath $InputPath)) {
-    return [ordered]@{ engine_exit_code = -1; engine_output = 'CAD job requires -InputPath <existing.dwg> for Core Console execution.' }
+    $engineExitCode = -1
+    return [ordered]@{
+      engine_exit_code = $engineExitCode
+      engine_output = New-CadJobEngineOutput `
+        -Status 'INPUT_REQUIRED' `
+        -EngineExitCode $engineExitCode `
+        -Executed $false `
+        -OperationName $requestedOperation `
+        -EffectiveWriteMode $effectiveWriteMode `
+        -RequestInput $InputPath `
+        -SaveCommandIssued $false `
+        -Additional ([ordered]@{ detail = 'CAD job requires -InputPath <existing.dwg> for Core Console execution.' })
+    }
   }
 
-  $effectiveWriteMode = Get-EffectiveDwgWriteMode
   $stamp = (Get-Date -Format 'yyyyMMdd_HHmmssfff') + '_p' + $PID + '_' + (Get-Random -Maximum 9999).ToString('D4')  # collision-proof: second-granularity stamps let CONCURRENT pipelines claim the SAME staging dir (measured: R4j b149 ran on a foreign 37KB drawing staged by another process in the same second)
   $runOut = Join-Path $RunsDir "dwg_truth_autocad_cad_job_$stamp"
   New-Item -ItemType Directory -Force -Path $runOut | Out-Null
@@ -1521,7 +1738,19 @@ function Invoke-CadJobRoute {
   $jobIn = Join-Path $runOut 'cad_job_request.json'
   if (-not [string]::IsNullOrWhiteSpace($JobPath)) {
     if (-not (Test-Path -LiteralPath $JobPath)) {
-      return [ordered]@{ engine_exit_code = -1; engine_output = "CAD job file not found: $JobPath" }
+      $engineExitCode = -1
+      return [ordered]@{
+        engine_exit_code = $engineExitCode
+        engine_output = New-CadJobEngineOutput `
+          -Status 'JOB_NOT_FOUND' `
+          -EngineExitCode $engineExitCode `
+          -Executed $false `
+          -OperationName $requestedOperation `
+          -EffectiveWriteMode $effectiveWriteMode `
+          -RequestInput $InputPath `
+          -SaveCommandIssued $false `
+          -Additional ([ordered]@{ detail = "CAD job file not found: $JobPath" })
+      }
     }
     Copy-Item -LiteralPath $JobPath -Destination $jobIn -Force
   }
@@ -1533,12 +1762,41 @@ function Invoke-CadJobRoute {
     }) -Path $jobIn | Out-Null
   }
   else {
+    $engineExitCode = -10
     return [ordered]@{
-      engine_exit_code = -10
-      engine_output = [ordered]@{ status = 'JOB_REQUIRED'; detail = 'CAD job execution requires -JobPath <job.json> or -Operation <operation>.' }
+      engine_exit_code = $engineExitCode
+      engine_output = New-CadJobEngineOutput `
+        -Status 'JOB_REQUIRED' `
+        -EngineExitCode $engineExitCode `
+        -Executed $false `
+        -EffectiveWriteMode $effectiveWriteMode `
+        -RequestInput $InputPath `
+        -SaveCommandIssued $false `
+        -Additional ([ordered]@{ detail = 'CAD job execution requires -JobPath <job.json> or -Operation <operation>.' })
     }
   }
   $jobOperation = Get-CadJobOperation -Path $jobIn
+
+  if (@('write_copy', 'live_edit') -contains $effectiveWriteMode -and
+      -not (Test-NativeP1CadJobOperation -OperationName $jobOperation)) {
+    $engineExitCode = -17
+    return [ordered]@{
+      engine_exit_code = $engineExitCode
+      engine_output = New-CadJobEngineOutput `
+        -Status 'MANAGED_WRITE_MODE_UNSUPPORTED' `
+        -EngineExitCode $engineExitCode `
+        -Executed $false `
+        -OperationName $jobOperation `
+        -EffectiveWriteMode $effectiveWriteMode `
+        -InputKind 'staged_copy' `
+        -RequestInput $InputPath `
+        -SaveCommandIssued $false `
+        -Additional ([ordered]@{
+          limitation_code = 'MANAGED_WRITE_MODE_NOT_PROVEN_SAFE'
+          detail = 'Managed CAD jobs do not have a verified write_copy/live_edit result path. Refusing before AutoCAD launch.'
+        })
+    }
+  }
 
   $inputDwg = $InputPath
   $dwgDir = Split-Path -Parent $inputDwg
@@ -1550,6 +1808,8 @@ function Invoke-CadJobRoute {
     Set-ItemProperty -LiteralPath $inputDwg -Name IsReadOnly -Value $false
     $dwgDir = Split-Path -Parent $inputDwg
   }
+  $inputKind = if ($effectiveWriteMode -eq 'write_original') { 'original_input' } else { 'staged_copy' }
+  $workingSha256Before = Get-Sha256File -Path $inputDwg
 
   if (Test-NativeP1CadJobOperation -OperationName $jobOperation) {
     $resultOut = Join-Path $runOut 'native_cad_job_result.json'
@@ -1587,27 +1847,40 @@ function Invoke-CadJobRoute {
     }
     $r = Invoke-AccoreScr -Engine $engine -StagedDwg $inputDwg -ScrPath $scrPath -DwgDir $dwgDir -RunOut $runOut -EnvVars $envVars -Tag 'native_cad_job'
 
-    $rr = Read-CadJobResultSafe -ResultPath $resultOut
+    $rr = Read-CadJobResultSafe `
+      -ResultPath $resultOut `
+      -ExpectedOperation $jobOperation `
+      -ExpectedSchema 'ariadne.autocad_native_job_result.v1' `
+      -ExpectedEngine 'native_objectarx'
     $result = $rr.Inline
     $ok = $rr.Ok
+    $workingSha256After = if (Test-Path -LiteralPath $inputDwg) { Get-Sha256File -Path $inputDwg } else { $null }
+    $engineExitCode = if ($r.ExitCode -eq 0 -and $ok) { 0 } else { if ($r.ExitCode -ne 0) { $r.ExitCode } else { -3 } }
 
     return [ordered]@{
-      engine_exit_code = if ($r.ExitCode -eq 0 -and $ok) { 0 } else { if ($r.ExitCode -ne 0) { $r.ExitCode } else { -3 } }
-      engine_output = [ordered]@{
-        status = if ($ok) { 'ok' } else { 'native_cad_job_failed' }
-        mode = 'native_cad_job'
-        operation = $jobOperation
-        write_mode = $effectiveWriteMode
-        input = $inputDwg
-        original_input = $InputPath
-        job = $jobIn
-        result_json = $resultOut
-        result = $result
-        dbx_module = $dbx
-        crx_module = $crx
-        stdout_tail = $r.StdoutTail
-        process_hygiene = $r.Hygiene
-      }
+      engine_exit_code = $engineExitCode
+      engine_output = New-CadJobEngineOutput `
+        -Status $(if ($ok) { 'ok' } else { 'native_cad_job_failed' }) `
+        -EngineExitCode $engineExitCode `
+        -Executed $true `
+        -OperationName $jobOperation `
+        -EffectiveWriteMode $effectiveWriteMode `
+        -InputKind $inputKind `
+        -RequestInput $InputPath `
+        -WorkingInput $inputDwg `
+        -WorkingSha256Before $workingSha256Before `
+        -WorkingSha256After $workingSha256After `
+        -SaveCommandIssued (@('write_copy', 'write_original', 'live_edit') -contains $effectiveWriteMode) `
+        -Additional ([ordered]@{
+          mode = 'native_cad_job'
+          job = $jobIn
+          result_json = $resultOut
+          result = $result
+          dbx_module = $dbx
+          crx_module = $crx
+          stdout_tail = $r.StdoutTail
+          process_hygiene = $r.Hygiene
+        })
     }
   }
 
@@ -1629,24 +1902,38 @@ function Invoke-CadJobRoute {
   }
   $r = Invoke-AccoreScr -Engine $engine -StagedDwg $inputDwg -ScrPath $scrPath -DwgDir $dwgDir -RunOut $runOut -EnvVars $envVars -Tag 'cad_job'
 
-  $rr = Read-CadJobResultSafe -ResultPath $resultOut
+  $rr = Read-CadJobResultSafe `
+    -ResultPath $resultOut `
+    -ExpectedOperation $jobOperation `
+    -ExpectedSchema 'ariadne.autocad_sdk_job_result.v1' `
+    -ExpectedEngine 'managed_objectarx_active_document'
   $result = $rr.Inline
   $ok = $rr.Ok
+  $workingSha256After = if (Test-Path -LiteralPath $inputDwg) { Get-Sha256File -Path $inputDwg } else { $null }
+  $engineExitCode = if ($r.ExitCode -eq 0 -and $ok) { 0 } else { if ($r.ExitCode -ne 0) { $r.ExitCode } else { -3 } }
 
   [ordered]@{
-    engine_exit_code = if ($r.ExitCode -eq 0 -and $ok) { 0 } else { if ($r.ExitCode -ne 0) { $r.ExitCode } else { -3 } }
-    engine_output = [ordered]@{
-      status = if ($ok) { 'ok' } else { 'cad_job_failed' }
-      mode = 'cad_job'
-      write_mode = $effectiveWriteMode
-      input = $inputDwg
-      original_input = $InputPath
-      job = $jobIn
-      result_json = $resultOut
-      result = $result
-      stdout_tail = $r.StdoutTail
-      process_hygiene = $r.Hygiene
-    }
+    engine_exit_code = $engineExitCode
+    engine_output = New-CadJobEngineOutput `
+      -Status $(if ($ok) { 'ok' } else { 'cad_job_failed' }) `
+      -EngineExitCode $engineExitCode `
+      -Executed $true `
+      -OperationName $jobOperation `
+      -EffectiveWriteMode $effectiveWriteMode `
+      -InputKind $inputKind `
+      -RequestInput $InputPath `
+      -WorkingInput $inputDwg `
+      -WorkingSha256Before $workingSha256Before `
+      -WorkingSha256After $workingSha256After `
+      -SaveCommandIssued ($effectiveWriteMode -eq 'write_original') `
+      -Additional ([ordered]@{
+        mode = 'cad_job'
+        job = $jobIn
+        result_json = $resultOut
+        result = $result
+        stdout_tail = $r.StdoutTail
+        process_hygiene = $r.Hygiene
+      })
   }
 }
 

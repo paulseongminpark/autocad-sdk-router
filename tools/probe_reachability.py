@@ -107,6 +107,10 @@ if str(_THIS_DIR) not in sys.path:
 import cadctl  # noqa: E402  (sibling tool, Lane A -- cad_run_operation)
 import probe_routes  # noqa: E402  (sibling tool -- shared accoreconsole resolver)
 from operation_coverage_matrix import is_raw_command  # noqa: E402  (shared policy classifier)
+from operation_provenance import (  # noqa: E402
+    ExecutionReceiptError,
+    parse_execution_receipt,
+)
 
 OPERATIONS_V2 = ROUTER_HOME / "config" / "operations.v2.json"
 DEFAULT_DWG = ROUTER_HOME / "tests" / "fixtures" / "native_sample.dwg"
@@ -612,6 +616,15 @@ def classify_probe_response(env: dict, *, is_empty_arg: bool) -> str:
     executed = env.get("executed", True)
     status = env.get("status")
 
+    if status == "unavailable":
+        reason = (env.get("reason") or "").lower()
+        if "timed out" in reason:
+            return ATTENDED_ONLY
+        # The router/powershell/accoreconsole itself never ran -- an
+        # INFRASTRUCTURE gap, not a per-op fact. Never silently mis-file the
+        # rest of the sweep on the back of this.
+        raise RuntimeAvailabilityError(env.get("reason") or "router unavailable")
+
     if not executed:
         # cadctl's own allow-list / write-mode gate refused the call BEFORE
         # any native dispatch (cadctl.py Cad._run_op_refusal). "not_found"
@@ -623,25 +636,40 @@ def classify_probe_response(env: dict, *, is_empty_arg: bool) -> str:
             return OPERATION_NOT_IMPLEMENTED
         return BLOCKED_BY_POLICY
 
-    if status == "unavailable":
-        reason = (env.get("reason") or "").lower()
-        if "timed out" in reason:
-            return ATTENDED_ONLY
-        # The router/powershell/accoreconsole itself never ran -- an
-        # INFRASTRUCTURE gap, not a per-op fact. Never silently mis-file the
-        # rest of the sweep on the back of this.
-        raise RuntimeAvailabilityError(env.get("reason") or "router unavailable")
-
     if status == "partial":
         # Native job produced no parseable result JSON -- the engine most
         # likely died mid-run without an OS-level crash exit code reaching us.
         return CRASH
 
+    try:
+        receipt = parse_execution_receipt(env)
+        if receipt is None:  # pragma: no cover -- executed envelopes cannot parse to None
+            raise ExecutionReceiptError(
+                "MISSING_EXECUTION_RECEIPT",
+                "executed operation has no execution receipt",
+            )
+        if not receipt.provenance_verified:
+            return CRASH
+    except ExecutionReceiptError:
+        # An executed response without one fully-bound canonical result has no
+        # trustworthy native observation to classify.
+        return CRASH
+
     result = env.get("result")
     result = result if isinstance(result, dict) else {}
 
+    if status in ("blocked", "not_implemented"):
+        # A provenance-bound native-layer self-report of non-runnability
+        # (distinct from cadctl's pre-dispatch policy refusal handled above).
+        return OPERATION_NOT_IMPLEMENTED
+
     if status == "error":
         code = str(result.get("error_code") or "").upper()
+        if not code:
+            # A provenance-bound execution is not by itself a structured
+            # native response. Without an error code, the reachability signal
+            # is unknown and must not be promoted to REACHABLE.
+            return CRASH
         if code in ("OPERATION_NOT_IMPLEMENTED", "OPERATION_DISPATCH_MISMATCH"):
             return OPERATION_NOT_IMPLEMENTED
         if code == "ORIGINAL_WRITE_FORBIDDEN":
@@ -651,11 +679,6 @@ def classify_probe_response(env: dict, *, is_empty_arg: bool) -> str:
         # honest, reachable dispatcher response (PLAN.md PART 3 F1 change (a):
         # "structured native arg-error = REACHABLE").
         return REACHABLE
-
-    if status in ("blocked", "not_implemented"):
-        # A native-layer self-report of non-runnability post-dispatch
-        # (distinct from cadctl's pre-dispatch policy refusal handled above).
-        return OPERATION_NOT_IMPLEMENTED
 
     # status == "ok" (or any other unmodeled, non-error native status): a
     # genuine dispatcher response with no error.
@@ -751,7 +774,14 @@ def classify_op_result(payload: dict) -> dict:
 # Live probing: in-process (probe_one) + the isolated-subprocess wrapper.
 # --------------------------------------------------------------------------- #
 def _check_original_unchanged(op_id: str, probe_label: str, env: dict) -> None:
-    if env.get("executed") and env.get("original_unchanged") is False:
+    try:
+        receipt = parse_execution_receipt(env)
+    except ExecutionReceiptError:
+        # The classifier will fail the malformed/unbound response closed as
+        # CRASH. This helper only promotes the distinct original-mutation
+        # safety violation to the sweep-aborting exception.
+        return
+    if receipt is not None and "ORIGINAL_CHANGED" in receipt.failure_codes:
         raise OriginalMutatedError(
             f"{op_id} ({probe_label} probe): original DWG sha changed mid-run -- {env.get('reason')!r}"
         )

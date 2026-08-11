@@ -24,7 +24,9 @@ from verification.native_integrity import (  # noqa: E402
 from verification import native_integrity  # noqa: E402
 from verification import file_snapshot  # noqa: E402
 from verification.file_snapshot import (  # noqa: E402
+    FileRequest,
     SnapshotCaptureError,
+    acquire_file_set,
     capture_files,
 )
 
@@ -118,6 +120,29 @@ def test_file_snapshot_rejects_distinct_names_for_one_hardlinked_identity(
         capture_files(root, ("first.bin", "second.bin"))
 
 
+def test_file_snapshot_can_require_one_link_for_protected_artifacts(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path / "root"
+    root.mkdir()
+    protected = root / "protected.bin"
+    alias = tmp_path / "outside-alias.bin"
+    protected.write_bytes(b"one physical generation")
+    try:
+        os.link(protected, alias)
+    except OSError as exc:
+        pytest.skip(f"hard links are unavailable: {exc}")
+
+    with pytest.raises(SnapshotCaptureError, match="link|alias|hardlink"):
+        acquire_file_set({
+            "protected": FileRequest(
+                root,
+                "protected.bin",
+                require_single_link=True,
+            )
+        })
+
+
 @pytest.mark.skipif(os.name != "nt", reason="Windows share-mode contract")
 def test_file_snapshot_denies_write_while_all_capture_handles_are_open(
     tmp_path: Path,
@@ -150,6 +175,33 @@ def test_file_snapshot_denies_write_while_all_capture_handles_are_open(
 
     assert len(blocked_write_errors) == 1
     assert snapshot.files["second.bin"].content == b"second"
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows share-mode contract")
+def test_file_snapshot_lease_denies_write_until_explicit_close(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path / "root"
+    root.mkdir()
+    protected = root / "protected.bin"
+    protected.write_bytes(b"leased generation")
+
+    lease = acquire_file_set({
+        "protected": FileRequest(
+            root,
+            "protected.bin",
+            require_single_link=True,
+        )
+    })
+    try:
+        with pytest.raises(OSError):
+            protected.write_bytes(b"must not replace leased bytes")
+        assert lease.files["protected"].content == b"leased generation"
+    finally:
+        lease.close()
+
+    protected.write_bytes(b"write succeeds after close")
+    assert protected.read_bytes() == b"write succeeds after close"
 
 
 def _deployment_manifest(deploy_dir: Path) -> tuple[Path, dict]:

@@ -17,6 +17,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
+from operation_provenance import ExecutionReceiptError, parse_execution_receipt
+
 os.environ.setdefault("PYTHONUTF8", "1")
 os.environ.setdefault("PYTHONIOENCODING", "utf-8")
 
@@ -309,8 +311,26 @@ def _result_envelope(
 def _operation_record(op: dict[str, Any], result: dict[str, Any], elapsed_sec: float) -> dict[str, Any]:
     op_status = str(result.get("status") or "error")
     reason = result.get("reason")
+    result_artifact = None
+    provenance_verified = None
+    try:
+        receipt = parse_execution_receipt(result)
+        if receipt is not None:
+            provenance_verified = receipt.provenance_verified
+            if not receipt.provenance_verified:
+                op_status = "error"
+                reason = "unbound execution provenance: %s" % (
+                    ", ".join(receipt.provenance_failure_codes) or "unknown failure",
+                )
+            elif receipt.outcome_successful:
+                result_artifact = receipt.require_successful_result()
+            else:
+                result_artifact = receipt.result
+    except ExecutionReceiptError as exc:
+        op_status = "error"
+        reason = "invalid or unbound execution receipt: %s" % (exc,)
     op_error_class = None if op_status == "ok" else classify_error(
-        source_path=str(result.get("staged_copy") or result.get("staged_result") or "input.dwg"),
+        source_path=str(result_artifact.path if result_artifact else "input.dwg"),
         status="timeout" if op_status == "timeout" else "failed",
         reason=str(reason or (result.get("result") or {}).get("error") or ""),
     )
@@ -321,6 +341,9 @@ def _operation_record(op: dict[str, Any], result: dict[str, Any], elapsed_sec: f
         "error_class": op_error_class,
         "reason": reason,
         "elapsed_sec": round(elapsed_sec, 3),
+        "result_path": result_artifact.path if result_artifact else None,
+        "result_sha256": result_artifact.sha256 if result_artifact else None,
+        "provenance_verified": provenance_verified,
         "result_ref": result.get("result_ref"),
         "stdout": result.get("stdout"),
         "stderr": result.get("stderr"),
@@ -460,6 +483,7 @@ def _worker_impl(request_path: Path) -> int:
                 str(op["id"]),
                 args=dict(op.get("args") or {}),
                 dwg_path=str(staged_path),
+                write_mode="read",
                 out_dir=str(op_dir),
             )
             op_elapsed = time.monotonic() - op_started
