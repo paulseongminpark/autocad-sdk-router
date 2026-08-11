@@ -411,6 +411,8 @@ def _native_proof_projection(router_home: Path) -> dict[str, object]:
     return {
         "status": "PASS" if verified else "BLOCKED",
         "verification": "VERIFIED" if verified else "BLOCKED",
+        "verification_scope": receipt.get("verification_scope"),
+        "limitation_codes": list(receipt.get("limitation_codes") or []),
         "source": {
             "path": str(_safe_resolve(manifest)),
             "sha256": receipt.get("sha256"),

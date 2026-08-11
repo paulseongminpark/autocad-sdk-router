@@ -49,6 +49,13 @@ def _native_receipt(*, valid: bool = True) -> dict[str, object]:
         "path": "prebuilt/2027/native_deployment_manifest.json",
         "sha256": "d" * 64,
         "valid": valid,
+        "verification_scope": (
+            "committed_artifact_identity_and_canonical_compilation_input_binding"
+        ),
+        "limitation_codes": [
+            "external_toolchain_inputs_unsealed",
+            "binary_rebuild_equivalence_not_proven",
+        ],
         "checks": {"artifacts": valid},
         "errors": [] if valid else ["manifest source-tree digest"],
         "artifact_paths": ["one", "two", "three"] if valid else [],
@@ -546,6 +553,13 @@ def test_native_proof_does_not_imply_revision_bound_ci_proof(tmp_path: Path) -> 
     result = _build(tmp_path, native=_native_receipt(valid=True))
 
     assert result["proof"]["committed_native"]["status"] == "PASS"
+    assert result["proof"]["committed_native"]["verification_scope"] == (
+        "committed_artifact_identity_and_canonical_compilation_input_binding"
+    )
+    assert result["proof"]["committed_native"]["limitation_codes"] == [
+        "external_toolchain_inputs_unsealed",
+        "binary_rebuild_equivalence_not_proven",
+    ]
     assert result["proof"]["ci"]["status"] == "BLOCKED"
     assert result["proof"]["ci"]["verification"] == "UNKNOWN"
     assert result["proof"]["ci"]["reason_code"] == "CI_PROOF_NOT_BOUND"

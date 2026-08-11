@@ -186,8 +186,8 @@ function Get-NativeSourceState {
     }
     $compilationInputs += [ordered]@{
       path = $record.path
-      sha256 = Get-Sha256Bytes -Bytes $raw
-      bytes = [int64]$raw.Length
+      sha256 = Get-Sha256Bytes -Bytes $canonical
+      bytes = [int64]$canonical.Length
     }
     $authorityInputs += [pscustomobject][ordered]@{
       kind = 'source'
@@ -565,7 +565,7 @@ function Open-NativeBuildInputLease {
       $mirrorPath = Join-Path $mirrorRoot ($capture.path -replace '/', '\\')
       $mirrorParent = [System.IO.Path]::GetDirectoryName($mirrorPath)
       [System.IO.Directory]::CreateDirectory($mirrorParent) | Out-Null
-      [System.IO.File]::WriteAllBytes($mirrorPath, $raw)
+      [System.IO.File]::WriteAllBytes($mirrorPath, $canonical)
       $mirrorStream = [System.IO.File]::Open(
         $mirrorPath,
         [System.IO.FileMode]::Open,
@@ -577,8 +577,8 @@ function Open-NativeBuildInputLease {
         kind = $capture.kind
         path = $capture.path
         stream = $mirrorStream
-        expected_sha256 = Get-Sha256Bytes -Bytes $raw
-        expected_bytes = [int64]$raw.Length
+        expected_sha256 = Get-Sha256Bytes -Bytes $canonical
+        expected_bytes = [int64]$canonical.Length
       }
       [System.IO.File]::SetAttributes($mirrorPath, [System.IO.FileAttributes]::ReadOnly)
       if ($capture.kind -ceq 'source') {
@@ -589,8 +589,8 @@ function Open-NativeBuildInputLease {
         }
         $compilationInputs += [ordered]@{
           path = $capture.path
-          sha256 = Get-Sha256Bytes -Bytes $raw
-          bytes = [int64]$raw.Length
+          sha256 = Get-Sha256Bytes -Bytes $canonical
+          bytes = [int64]$canonical.Length
         }
       } else {
         $recipeState = [ordered]@{
@@ -612,7 +612,7 @@ function Open-NativeBuildInputLease {
       }
       compilation_tree = [ordered]@{
         algorithm = 'sha256'
-        byte_representation = 'raw_mirror_bytes'
+        byte_representation = 'canonical_lf_unless_nul_mirror_bytes'
         digest = Get-NativeSourceDigest $compilationInputs
         inputs = $compilationInputs
       }
@@ -674,7 +674,7 @@ function Assert-NativeBuildMirrorStable {
   $actualDigest = Get-NativeSourceDigest $actualCompilationInputs
   if ($actualInputsJson -cne $expectedInputsJson -or
       $actualDigest -cne [string]$Lease.snapshot.compilation_tree.digest) {
-    throw 'Native build mirror raw compilation inputs do not match the starting snapshot.'
+    throw 'Native build mirror canonical compilation inputs do not match the starting snapshot.'
   }
   return $true
 }
@@ -729,7 +729,7 @@ function Get-NativeBuildSnapshot {
     }
     compilation_tree = [ordered]@{
       algorithm = 'sha256'
-      byte_representation = 'raw_mirror_bytes'
+      byte_representation = 'canonical_lf_unless_nul_mirror_bytes'
       digest = Get-NativeSourceDigest $compilationInputs
       inputs = $compilationInputs
     }
@@ -1101,9 +1101,9 @@ function Confirm-NativeBuildManifest {
     throw 'Native build manifest source-tree digest does not match the post-build snapshot.'
   }
   if ([string]$document.compilation_tree.algorithm -cne 'sha256' -or
-      [string]$document.compilation_tree.byte_representation -cne 'raw_mirror_bytes' -or
+      [string]$document.compilation_tree.byte_representation -cne 'canonical_lf_unless_nul_mirror_bytes' -or
       [string]$document.compilation_tree.digest -cne $ExpectedCompilationTreeDigest) {
-    throw 'Native build manifest does not identify the raw bytes compiled from the immutable mirror.'
+    throw 'Native build manifest does not identify the canonical bytes compiled from the immutable mirror.'
   }
   if ($document.build_snapshot.exact_match -ne $true) {
     throw 'Native build manifest does not record an exact pre/post source snapshot match.'
@@ -1194,7 +1194,7 @@ function Confirm-NativeDeploymentManifest {
       $observedSourceInputsJson -cne $expectedSourceInputsJson -or
       [string]$document.source_tree_digest -cne $ExpectedSourceTreeDigest -or
       [string]$document.compilation_tree.algorithm -cne 'sha256' -or
-      [string]$document.compilation_tree.byte_representation -cne 'raw_mirror_bytes' -or
+      [string]$document.compilation_tree.byte_representation -cne 'canonical_lf_unless_nul_mirror_bytes' -or
       [string]$document.compilation_tree.digest -cne $ExpectedCompilationTreeDigest -or
       $observedCompilationInputsJson -cne $expectedCompilationInputsJson -or
       [string]$document.compilation_tree_digest -cne $ExpectedCompilationTreeDigest -or
@@ -1325,7 +1325,7 @@ function Publish-NativePrebuiltSet {
       source_authority = $SourceSnapshot.source_authority
       compilation_tree = [ordered]@{
         algorithm = 'sha256'
-        byte_representation = 'raw_mirror_bytes'
+        byte_representation = 'canonical_lf_unless_nul_mirror_bytes'
         digest = [string]$SourceSnapshot.compilation_tree.digest
         inputs = @($SourceSnapshot.compilation_tree.inputs)
       }
@@ -1648,7 +1648,7 @@ $manifest = [ordered]@{
   }
   compilation_tree = [ordered]@{
     algorithm = 'sha256'
-    byte_representation = 'raw_mirror_bytes'
+    byte_representation = 'canonical_lf_unless_nul_mirror_bytes'
     digest = $compilationDigest
     inputs = $compilationInputs
   }

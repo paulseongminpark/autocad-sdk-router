@@ -48,6 +48,7 @@ def _copy_committed_fixture(tmp_path: Path) -> tuple[Path, Path]:
     _git(router, "init", "--quiet")
     _git(router, "config", "user.name", "Native Integrity Test")
     _git(router, "config", "user.email", "native-integrity@example.invalid")
+    _git(router, "config", "core.autocrlf", "true")
     _git(router, "add", "src", "tools/build_native_acad.ps1")
     _git(router, "commit", "--quiet", "-m", "native source anchor")
     _bind_deployment_manifest_to_fixture(router, deploy_dir)
@@ -171,7 +172,7 @@ def _bind_deployment_manifest_to_fixture(router: Path, deploy_dir: Path) -> None
     compilation_digest = native_integrity._source_tree_digest(compilation_inputs)
     manifest["compilation_tree"] = {
         "algorithm": "sha256",
-        "byte_representation": "raw_mirror_bytes",
+        "byte_representation": "canonical_lf_unless_nul_mirror_bytes",
         "digest": compilation_digest,
         "inputs": compilation_inputs,
     }
@@ -237,7 +238,7 @@ def _copy_build_fixture(tmp_path: Path) -> tuple[Path, Path, dict]:
         },
         "compilation_tree": {
             "algorithm": "sha256",
-            "byte_representation": "raw_mirror_bytes",
+            "byte_representation": "canonical_lf_unless_nul_mirror_bytes",
             "inputs": compilation_inputs,
             "digest": native_integrity._source_tree_digest(compilation_inputs),
         },
@@ -559,16 +560,143 @@ def test_committed_deployment_rejects_a_rebound_recipe_absent_from_head(
     assert any("exact HEAD blobs" in error for error in receipt["errors"])
 
 
-def test_build_manifest_rejects_canonical_hashes_as_raw_compiler_byte_identity(
+def test_committed_deployment_rejects_rehashed_noncanonical_compilation_bytes(
+    tmp_path: Path,
+) -> None:
+    router, deploy_dir = _copy_committed_fixture(tmp_path)
+    manifest_path, manifest = _deployment_manifest(deploy_dir)
+    source_path = (
+        router / "src" / "Ariadne.AcadNative" / "AriadneNativeJob.cpp"
+    )
+    source_raw = source_path.read_bytes()
+    normalized = source_raw.replace(b"\r\n", b"\n")
+    producer_raw = normalized.replace(b"\n", b"\r\n")
+    if producer_raw == source_raw:
+        producer_raw = normalized
+    assert producer_raw != source_raw
+
+    relative_path = "src/Ariadne.AcadNative/AriadneNativeJob.cpp"
+    compilation_inputs = manifest["compilation_tree"]["inputs"]
+    record = next(
+        item for item in compilation_inputs if item["path"] == relative_path
+    )
+    record["sha256"] = hashlib.sha256(producer_raw).hexdigest()
+    record["bytes"] = len(producer_raw)
+    compilation_digest = native_integrity._source_tree_digest(compilation_inputs)
+    manifest["compilation_tree"]["digest"] = compilation_digest
+    manifest["compilation_tree_digest"] = compilation_digest
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    receipt = verify_committed_deployment(router, deploy_dir)
+
+    assert receipt["checks"]["source_inputs_at_head"] is True
+    assert receipt["checks"]["source_tree"] is True
+    assert receipt["checks"]["compilation_tree"] is False
+    assert receipt["valid"] is False
+    assert receipt["verification_scope"] == (
+        "committed_artifact_identity_and_canonical_compilation_input_binding"
+    )
+    assert receipt["limitation_codes"] == [
+        "external_toolchain_inputs_unsealed",
+        "binary_rebuild_equivalence_not_proven",
+    ]
+
+
+def test_committed_deployment_verifies_lf_crlf_and_mixed_worktrees(
+    tmp_path: Path,
+) -> None:
+    variants = {
+        "lf": b"// portable first\n// portable second\n",
+        "crlf": b"// portable first\r\n// portable second\r\n",
+        "mixed": b"// portable first\r\n// portable second\n",
+    }
+    compilation_digests: list[str] = []
+
+    for name, content in variants.items():
+        router, deploy_dir = _copy_committed_fixture(tmp_path / name)
+        source = router / "src" / "Ariadne.AcadNative" / "AriadneNativeJob.cpp"
+        source.write_bytes(content)
+        _git(router, "add", "src/Ariadne.AcadNative/AriadneNativeJob.cpp")
+        _git(router, "commit", "--quiet", "-m", f"{name} worktree fixture")
+        _bind_deployment_manifest_to_fixture(router, deploy_dir)
+
+        receipt = verify_committed_deployment(router, deploy_dir)
+        _, manifest = _deployment_manifest(deploy_dir)
+
+        assert source.read_bytes() == content
+        assert receipt["valid"] is True, receipt["errors"]
+        assert receipt["checks"]["source_inputs_at_head"] is True
+        assert receipt["checks"]["canonical_compilation_inputs_at_head"] is True
+        assert manifest["compilation_tree"]["byte_representation"] == (
+            "canonical_lf_unless_nul_mirror_bytes"
+        )
+        assert manifest["compilation_tree"]["inputs"] == (
+            manifest["source_tree"]["inputs"]
+        )
+        compilation_digests.append(manifest["compilation_tree"]["digest"])
+
+    assert len(set(compilation_digests)) == 1
+
+
+@pytest.mark.parametrize("entrypoint", ("committed", "build"))
+@pytest.mark.parametrize("mutation", ("omit", "extra", "reorder"))
+def test_native_verifiers_reject_compilation_inventory_path_mutation(
+    tmp_path: Path,
+    entrypoint: str,
+    mutation: str,
+) -> None:
+    if entrypoint == "committed":
+        router, artifact_dir = _copy_committed_fixture(tmp_path)
+        manifest_path, manifest = _deployment_manifest(artifact_dir)
+        verify = verify_committed_deployment
+    else:
+        router, artifact_dir, manifest = _copy_build_fixture(tmp_path)
+        manifest_path = artifact_dir / "native_build_manifest.json"
+        verify = verify_build_manifest
+    compilation_inputs = manifest["compilation_tree"]["inputs"]
+
+    if mutation == "omit":
+        compilation_inputs.pop()
+    elif mutation == "extra":
+        phantom = b"// absent from the canonical source inventory\n"
+        compilation_inputs.append(
+            {
+                "path": "src/Ariadne.AcadNative/zz_phantom.cpp",
+                "sha256": hashlib.sha256(phantom).hexdigest(),
+                "bytes": len(phantom),
+            }
+        )
+        compilation_inputs.sort(
+            key=lambda item: (item["path"].casefold(), item["path"])
+        )
+    else:
+        compilation_inputs[0], compilation_inputs[1] = (
+            compilation_inputs[1],
+            compilation_inputs[0],
+        )
+    compilation_digest = native_integrity._source_tree_digest(compilation_inputs)
+    manifest["compilation_tree"]["digest"] = compilation_digest
+    if entrypoint == "committed":
+        manifest["compilation_tree_digest"] = compilation_digest
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    receipt = verify(router, artifact_dir)
+
+    assert receipt["checks"]["canonical_compilation_inputs_at_head"] is False
+    assert receipt["checks"]["compilation_tree"] is False
+    assert receipt["valid"] is False
+
+
+def test_build_manifest_accepts_canonical_compiler_byte_identity(
     tmp_path: Path,
 ) -> None:
     router, native_bin, manifest = _copy_build_fixture(tmp_path)
     canonical_inputs = native_integrity._native_source_inputs(router)
-    raw_inputs = native_integrity._native_compilation_inputs(router)
-    assert canonical_inputs != raw_inputs, "fixture must contain CRLF/LF-distinct bytes"
+    compilation_inputs = native_integrity._native_compilation_inputs(router)
+    assert compilation_inputs == canonical_inputs
     manifest["compilation_tree"] = {
         "algorithm": "sha256",
-        "byte_representation": "raw_mirror_bytes",
+        "byte_representation": "canonical_lf_unless_nul_mirror_bytes",
         "inputs": canonical_inputs,
         "digest": native_integrity._source_tree_digest(canonical_inputs),
     }
@@ -579,6 +707,37 @@ def test_build_manifest_rejects_canonical_hashes_as_raw_compiler_byte_identity(
     receipt = verify_build_manifest(router, native_bin)
 
     assert receipt["checks"]["source_tree"] is True
+    assert receipt["checks"]["canonical_compilation_inputs_at_head"] is True
+    assert receipt["checks"]["compilation_tree"] is True
+    assert receipt["valid"] is True
+
+
+def test_build_manifest_rejects_rehashed_noncanonical_compilation_bytes(
+    tmp_path: Path,
+) -> None:
+    router, native_bin, manifest = _copy_build_fixture(tmp_path)
+    source = router / "src" / "Ariadne.AcadNative" / "AriadneNativeJob.cpp"
+    canonical = source.read_bytes().replace(b"\r\n", b"\n")
+    noncanonical = canonical.replace(b"\n", b"\r\n")
+    assert noncanonical != canonical
+    relative_path = "src/Ariadne.AcadNative/AriadneNativeJob.cpp"
+    record = next(
+        item
+        for item in manifest["compilation_tree"]["inputs"]
+        if item["path"] == relative_path
+    )
+    record["sha256"] = hashlib.sha256(noncanonical).hexdigest()
+    record["bytes"] = len(noncanonical)
+    manifest["compilation_tree"]["digest"] = native_integrity._source_tree_digest(
+        manifest["compilation_tree"]["inputs"]
+    )
+    (native_bin / "native_build_manifest.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
+
+    receipt = verify_build_manifest(router, native_bin)
+
+    assert receipt["checks"]["canonical_compilation_inputs_at_head"] is False
     assert receipt["checks"]["compilation_tree"] is False
     assert receipt["valid"] is False
 

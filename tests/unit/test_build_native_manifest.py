@@ -147,6 +147,11 @@ status = {
     "project": str(project),
     "project_is_mirror": router not in project.parents,
 }
+mirror_root = project.parents[2]
+mirror_source = mirror_root / source.relative_to(router)
+mirror_recipe = mirror_root / recipe.relative_to(router)
+status["mirror_source_hex"] = mirror_source.read_bytes().hex()
+status["mirror_recipe_hex"] = mirror_recipe.read_bytes().hex()
 
 if mode == "existing":
     for label, path in (("source", source), ("recipe", recipe)):
@@ -163,9 +168,6 @@ if mode == "existing":
         raise SystemExit(73)
 
 if mode == "mirror-existing":
-    mirror_root = project.parents[2]
-    mirror_source = mirror_root / source.relative_to(router)
-    mirror_recipe = mirror_root / recipe.relative_to(router)
     for label, path in (("source", mirror_source), ("recipe", mirror_recipe)):
         original = path.read_bytes()
         try:
@@ -191,6 +193,7 @@ if mode == "new-file":
         injected.unlink()
     status_path.write_text(json.dumps(status), encoding="utf-8")
 
+status_path.write_text(json.dumps(status), encoding="utf-8")
 out_dir.mkdir(parents=True, exist_ok=True)
 (out_dir / f"{target_name}{extension}").write_bytes(minimal_pe(marker))
 ''',
@@ -631,18 +634,24 @@ Close-NativeArtifactLease -Lease $artifactLease
     }
     assert result["success_marker"]["compilation_tree"] == {
         "algorithm": "sha256",
-        "byte_representation": "raw_mirror_bytes",
+        "byte_representation": "canonical_lf_unless_nul_mirror_bytes",
         "digest": result["success_marker"]["compilation_tree_digest"],
         "inputs": [
             {
                 "path": "src/Ariadne.AcadNative/native.cpp",
-                "sha256": hashlib.sha256((native / "native.cpp").read_bytes()).hexdigest(),
-                "bytes": len((native / "native.cpp").read_bytes()),
+                "sha256": _canonical_text_sha256(native / "native.cpp"),
+                "bytes": len(
+                    (native / "native.cpp").read_bytes().replace(b"\r\n", b"\n")
+                ),
             },
             {
                 "path": "src/Ariadne.AcadNativeDbx/dbx.cpp",
-                "sha256": hashlib.sha256((dbx_source / "dbx.cpp").read_bytes()).hexdigest(),
-                "bytes": len((dbx_source / "dbx.cpp").read_bytes()),
+                "sha256": _canonical_text_sha256(dbx_source / "dbx.cpp"),
+                "bytes": len(
+                    (dbx_source / "dbx.cpp")
+                    .read_bytes()
+                    .replace(b"\r\n", b"\n")
+                ),
             },
         ],
     }
@@ -1053,6 +1062,81 @@ def test_native_build_compiles_only_the_starting_immutable_source_mirror(
     assert not (source.parent / "temporary_compiler_input.hpp").exists()
 
 
+def test_native_build_materializes_canonical_bytes_in_compiler_mirror(
+    tmp_path: Path,
+) -> None:
+    """The compiler-facing mirror contains the canonical leased generation."""
+
+    router = tmp_path / "router"
+    source, recipe = _create_native_build_fixture(router)
+    source_raw = b"// first\r\n// second\rthird\n"
+    recipe_raw = b"# binary-like\r\n\0# preserve\r\n"
+    source.write_bytes(source_raw)
+    recipe.write_bytes(recipe_raw)
+    _git(router, "add", ".")
+    _git(
+        router,
+        "-c",
+        "user.name=Build Manifest Test",
+        "-c",
+        "user.email=build-manifest@example.invalid",
+        "commit",
+        "-qm",
+        "mixed line ending fixture",
+    )
+    fake_msbuild = _write_fake_msbuild(tmp_path)
+    status_path = tmp_path / "canonical-mirror-status.json"
+    env = _git_safe_directory_env(router)
+    env.update(
+        {
+            "NATIVE_ABA_MODE": "none",
+            "NATIVE_ABA_STATUS": str(status_path),
+            "NATIVE_ABA_ROUTER": str(router),
+            "NATIVE_ABA_SOURCE": str(source),
+            "NATIVE_ABA_RECIPE": str(recipe),
+        }
+    )
+
+    completed = subprocess.run(
+        [
+            "powershell",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            str(REPO / "tools" / "build_native_acad.ps1"),
+            "-RouterHome",
+            str(router),
+            "-OutputRoot",
+            str(tmp_path / "build-output"),
+            "-MSBuildExe",
+            str(fake_msbuild),
+        ],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+        env=env,
+    )
+
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    status = json.loads(status_path.read_text(encoding="utf-8"))
+    result = json.loads(completed.stdout)
+    assert bytes.fromhex(status["mirror_source_hex"]) == source_raw.replace(
+        b"\r\n", b"\n"
+    )
+    assert bytes.fromhex(status["mirror_recipe_hex"]) == recipe_raw
+    build_manifest = json.loads(
+        Path(result["build_manifest_path"]).read_text(encoding="utf-8-sig")
+    )
+    assert build_manifest["compilation_tree"]["byte_representation"] == (
+        "canonical_lf_unless_nul_mirror_bytes"
+    )
+    assert build_manifest["compilation_tree"]["inputs"] == (
+        build_manifest["source_tree"]["inputs"]
+    )
+
+
 def test_native_build_scrubs_inherited_git_repo_redirection_before_msbuild(
     tmp_path: Path,
 ) -> None:
@@ -1383,7 +1467,9 @@ $after = Get-NativeBuildSnapshot
     assert all("/bin/" not in item["path"] for item in snapshot["before"]["source_tree"]["inputs"])
 
 
-def test_build_snapshot_separates_canonical_identity_from_raw_compiler_bytes(tmp_path: Path):
+def test_build_snapshot_makes_lf_crlf_and_mixed_compiler_inputs_equivalent(
+    tmp_path: Path,
+) -> None:
     router = tmp_path / "router"
     native = router / "src" / "Ariadne.AcadNative"
     dbx = router / "src" / "Ariadne.AcadNativeDbx"
@@ -1393,8 +1479,8 @@ def test_build_snapshot_separates_canonical_identity_from_raw_compiler_bytes(tmp
     recipe.parent.mkdir(parents=True)
     native_file = native / "AriadneNativeJob.cpp"
     dbx_file = dbx / "AriadneDbxEntry.cpp"
-    native_file.write_bytes(b"// native\n")
-    dbx_file.write_bytes(b"// dbx\n")
+    native_file.write_bytes(b"// native\n// second\n")
+    dbx_file.write_bytes(b"// dbx\n// second\n")
     recipe.write_text("# fixture recipe\n", encoding="utf-8")
 
     script_path = REPO / "tools" / "build_native_acad.ps1"
@@ -1409,15 +1495,22 @@ $functionStart = $scriptText.IndexOf('function Resolve-MSBuild')
 $functionEnd = $scriptText.IndexOf('# Capture every provenance input before MSBuild')
 $RouterHome = '{root_literal}'
 . ([scriptblock]::Create($scriptText.Substring($functionStart, $functionEnd - $functionStart)))
-$before = Get-NativeBuildSnapshot
-[System.IO.File]::WriteAllBytes('{native_literal}', [System.Text.Encoding]::UTF8.GetBytes("// native`r`n"))
-[System.IO.File]::WriteAllBytes('{dbx_literal}', [System.Text.Encoding]::UTF8.GetBytes("// dbx`r`n"))
-$after = Get-NativeBuildSnapshot
+$lf = Get-NativeBuildSnapshot
+[System.IO.File]::WriteAllBytes('{native_literal}', [System.Text.Encoding]::UTF8.GetBytes("// native`r`n// second`r`n"))
+[System.IO.File]::WriteAllBytes('{dbx_literal}', [System.Text.Encoding]::UTF8.GetBytes("// dbx`r`n// second`r`n"))
+$crlf = Get-NativeBuildSnapshot
+[System.IO.File]::WriteAllBytes('{native_literal}', [System.Text.Encoding]::UTF8.GetBytes("// native`r`n// second`n"))
+[System.IO.File]::WriteAllBytes('{dbx_literal}', [System.Text.Encoding]::UTF8.GetBytes("// dbx`n// second`r`n"))
+$mixed = Get-NativeBuildSnapshot
 [ordered]@{{
-  canonical_before = $before.source_tree.digest
-  canonical_after = $after.source_tree.digest
-  compilation_before = $before.compilation_tree.digest
-  compilation_after = $after.compilation_tree.digest
+  source = @($lf.source_tree.digest, $crlf.source_tree.digest, $mixed.source_tree.digest)
+  compilation = @($lf.compilation_tree.digest, $crlf.compilation_tree.digest, $mixed.compilation_tree.digest)
+  representations = @($lf.compilation_tree.byte_representation, $crlf.compilation_tree.byte_representation, $mixed.compilation_tree.byte_representation)
+  trees_equal = @(
+    (($lf.source_tree.inputs | ConvertTo-Json -Compress) -ceq ($lf.compilation_tree.inputs | ConvertTo-Json -Compress)),
+    (($crlf.source_tree.inputs | ConvertTo-Json -Compress) -ceq ($crlf.compilation_tree.inputs | ConvertTo-Json -Compress)),
+    (($mixed.source_tree.inputs | ConvertTo-Json -Compress) -ceq ($mixed.compilation_tree.inputs | ConvertTo-Json -Compress))
+  )
 }} | ConvertTo-Json -Compress
 """
     completed = subprocess.run(
@@ -1430,8 +1523,13 @@ $after = Get-NativeBuildSnapshot
     )
     assert completed.returncode == 0, completed.stderr
     result = json.loads(completed.stdout)
-    assert result["canonical_before"] == result["canonical_after"]
-    assert result["compilation_before"] != result["compilation_after"]
+    assert len(set(result["source"])) == 1
+    assert len(set(result["compilation"])) == 1
+    assert result["compilation"] == result["source"]
+    assert result["representations"] == [
+        "canonical_lf_unless_nul_mirror_bytes",
+    ] * 3
+    assert result["trees_equal"] == [True, True, True]
 
 
 def test_build_recipe_identity_ignores_checkout_line_endings(tmp_path: Path):

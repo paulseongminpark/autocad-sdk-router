@@ -39,8 +39,15 @@ _NATIVE_SOURCE_PREFIXES = tuple(
 _NATIVE_BUILD_OUTPUT_DIRS = frozenset({"bin", "obj", ".vs", "build"})
 _NATIVE_BUILD_RECIPE_PATH = Path("tools") / "build_native_acad.ps1"
 _SOURCE_CANONICALIZATION = "crlf_to_lf_unless_nul"
-_COMPILATION_BYTE_REPRESENTATION = "raw_mirror_bytes"
+_COMPILATION_BYTE_REPRESENTATION = "canonical_lf_unless_nul_mirror_bytes"
 _COMPILATION_INPUT_MODE = "immutable_starting_snapshot_mirror"
+_COMMITTED_VERIFICATION_SCOPE = (
+    "committed_artifact_identity_and_canonical_compilation_input_binding"
+)
+_COMMITTED_LIMITATION_CODES = (
+    "external_toolchain_inputs_unsealed",
+    "binary_rebuild_equivalence_not_proven",
+)
 
 
 def _reject_json_constant(value: str) -> None:
@@ -193,16 +200,17 @@ def _native_compilation_inputs_from_capture(
     captured: _file_snapshot.ImmutableFileSnapshot,
     relative_paths: list[str] | tuple[str, ...],
 ) -> list[dict]:
-    return [
-        {
+    inputs: list[dict] = []
+    for relative_path in sorted(relative_paths, key=str.casefold):
+        canonical = _canonical_native_source_bytes(
+            captured.files[relative_path].content
+        )
+        inputs.append({
             "path": relative_path,
-            "sha256": hashlib.sha256(
-                captured.files[relative_path].content
-            ).hexdigest(),
-            "bytes": len(captured.files[relative_path].content),
-        }
-        for relative_path in sorted(relative_paths, key=str.casefold)
-    ]
+            "sha256": hashlib.sha256(canonical).hexdigest(),
+            "bytes": len(canonical),
+        })
+    return inputs
 
 
 def _native_source_git_state(router_home: Path) -> dict:
@@ -429,18 +437,17 @@ class _NativeVerificationSnapshot:
         return inputs
 
     def compilation_inputs(self) -> list[dict]:
-        return [
-            {
+        inputs: list[dict] = []
+        for relative_path in self.source_paths:
+            canonical = _canonical_native_source_bytes(
+                self.captured.files[f"source:{relative_path}"].content
+            )
+            inputs.append({
                 "path": relative_path,
-                "sha256": hashlib.sha256(
-                    self.captured.files[f"source:{relative_path}"].content
-                ).hexdigest(),
-                "bytes": len(
-                    self.captured.files[f"source:{relative_path}"].content
-                ),
-            }
-            for relative_path in self.source_paths
-        ]
+                "sha256": hashlib.sha256(canonical).hexdigest(),
+                "bytes": len(canonical),
+            })
+        return inputs
 
     def same_generation_as(self, other: object) -> bool:
         return (
@@ -624,11 +631,19 @@ def _recipe_state_from_snapshot(snapshot: _NativeVerificationSnapshot) -> dict:
 
 
 def verify_committed_deployment(router_home: Path, deploy_dir: Path) -> dict:
-    """Verify a committed native bundle against the current checkout."""
+    """Verify artifact identity and canonical compiler inputs against HEAD.
+
+    The producer compiles the canonical leased mirror generation.  This
+    consumer reconstructs that deterministic byte generation from the current
+    handle-held checkout and binds it to exact HEAD blobs before comparing the
+    manifest, independent of checkout line-ending materialization.
+    """
     router_home = Path(router_home)
     deploy_dir = Path(deploy_dir)
     manifest_path = deploy_dir / NATIVE_DEPLOYMENT_MANIFEST_NAME
     receipt = _new_receipt(manifest_path)
+    receipt["verification_scope"] = _COMMITTED_VERIFICATION_SCOPE
+    receipt["limitation_codes"] = list(_COMMITTED_LIMITATION_CODES)
     checks = receipt["checks"]
     try:
         _, _, declared_source_inputs = (
@@ -676,6 +691,11 @@ def verify_committed_deployment(router_home: Path, deploy_dir: Path) -> dict:
             checks["source_inputs_at_head"]
             and [item["path"] for item in starting_snapshot.compilation_inputs()]
             == [item["path"] for item in starting_snapshot.source_inputs()]
+        )
+        checks["canonical_compilation_inputs_at_head"] = (
+            checks["source_inputs_at_head"]
+            and starting_snapshot.compilation_inputs()
+            == starting_snapshot.source_inputs()
         )
         receipt["head_binding"] = head_binding
         if not checks["source_inputs_at_head"]:
@@ -767,8 +787,6 @@ def verify_committed_deployment(router_home: Path, deploy_dir: Path) -> dict:
         if not checks["source_tree"]:
             receipt["errors"].append("native source-tree digest")
 
-        compilation_inputs = starting_snapshot.compilation_inputs()
-        compilation_digest = _source_tree_digest(compilation_inputs)
         try:
             manifest_compilation_inputs = (
                 _normalized_manifest_compilation_inputs(manifest)
@@ -776,17 +794,38 @@ def verify_committed_deployment(router_home: Path, deploy_dir: Path) -> dict:
         except ValueError:
             manifest_compilation_inputs = None
         compilation_tree = manifest.get("compilation_tree")
+        expected_compilation_inputs = starting_snapshot.compilation_inputs()
+        expected_compilation_digest = _source_tree_digest(
+            expected_compilation_inputs
+        )
+        manifest_compilation_paths = (
+            [item["path"] for item in manifest_compilation_inputs]
+            if manifest_compilation_inputs is not None
+            else None
+        )
+        source_input_paths = [item["path"] for item in source_inputs]
+        checks["compilation_inputs_bound_to_head_paths"] = (
+            checks["compilation_inputs_bound_to_head_paths"]
+            and manifest_compilation_paths == source_input_paths
+        )
+        checks["canonical_compilation_inputs_at_head"] = (
+            checks["canonical_compilation_inputs_at_head"]
+            and manifest_compilation_inputs
+            == expected_compilation_inputs
+            == source_inputs
+        )
         checks["compilation_tree"] = (
-            manifest_compilation_inputs == compilation_inputs
-            and isinstance(compilation_tree, dict)
+            isinstance(compilation_tree, dict)
             and compilation_tree.get("algorithm") == "sha256"
             and compilation_tree.get("byte_representation")
             == _COMPILATION_BYTE_REPRESENTATION
-            and compilation_tree.get("digest") == compilation_digest
-            and manifest.get("compilation_tree_digest") == compilation_digest
+            and checks["canonical_compilation_inputs_at_head"]
+            and compilation_tree.get("digest") == expected_compilation_digest
+            and manifest.get("compilation_tree_digest")
+            == expected_compilation_digest
         )
         if not checks["compilation_tree"]:
-            receipt["errors"].append("raw compilation input-tree digest")
+            receipt["errors"].append("canonical compilation input-tree binding")
 
         by_leaf = _artifact_records(manifest, receipt)
         artifacts_ok = set(by_leaf) == set(REQUIRED_NATIVE_ARTIFACTS)
@@ -906,6 +945,11 @@ def verify_build_manifest(router_home: Path, native_bin: Path) -> dict:
         checks["source_inputs_at_head"]
         and [item["path"] for item in starting_snapshot.compilation_inputs()]
         == [item["path"] for item in starting_snapshot.source_inputs()]
+    )
+    checks["canonical_compilation_inputs_at_head"] = (
+        checks["source_inputs_at_head"]
+        and starting_snapshot.compilation_inputs()
+        == starting_snapshot.source_inputs()
     )
     receipt["head_binding"] = head_binding
     if not checks["source_inputs_at_head"]:
@@ -1065,18 +1109,24 @@ def verify_build_manifest(router_home: Path, native_bin: Path) -> dict:
         except ValueError:
             normalized_compilation_inputs = None
         actual_compilation_inputs = starting_snapshot.compilation_inputs()
+        checks["canonical_compilation_inputs_at_head"] = (
+            checks["canonical_compilation_inputs_at_head"]
+            and normalized_compilation_inputs
+            == actual_compilation_inputs
+            == actual_inputs
+        )
         checks["compilation_tree"] = (
             isinstance(compilation_tree, dict)
             and compilation_tree.get("algorithm") == "sha256"
             and compilation_tree.get("byte_representation")
             == _COMPILATION_BYTE_REPRESENTATION
-            and normalized_compilation_inputs == actual_compilation_inputs
+            and checks["canonical_compilation_inputs_at_head"]
             and compilation_tree.get("digest")
             == _source_tree_digest(actual_compilation_inputs)
         )
         if not checks["compilation_tree"]:
             receipt["errors"].append(
-                "raw compilation input-tree digest or inventory"
+                "canonical compilation input-tree digest or inventory"
             )
 
         by_leaf = _artifact_records(manifest, receipt)
