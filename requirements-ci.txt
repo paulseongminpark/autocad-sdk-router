@@ -1,0 +1,12 @@
+# Reproducible dependencies for the complete non-live GitHub test suite.
+# Production protocol dependencies remain in requirements.txt. The complete
+# suite additionally exercises ezdxf and the OpenCV/scikit-image visual gate;
+# unrelated optional geometry engines stay install-on-demand.
+
+-r requirements.txt
+
+pytest==9.1.1
+PyYAML==6.0.3
+ezdxf==1.4.4
+opencv-python-headless==4.13.0.92
+scikit-image==0.26.0

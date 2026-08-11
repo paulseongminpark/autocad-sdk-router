@@ -93,6 +93,40 @@ function Get-Sha256Text {
   }
 }
 
+function Get-Sha256Bytes {
+  param([byte[]]$Bytes)
+  $sha = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    -join ($sha.ComputeHash($Bytes) | ForEach-Object { $_.ToString('x2') })
+  } finally {
+    $sha.Dispose()
+  }
+}
+
+function Get-CanonicalNativeSourceBytes {
+  param([string]$Path)
+  [byte[]]$raw = [System.IO.File]::ReadAllBytes($Path)
+  if ([Array]::IndexOf($raw, [byte]0) -ge 0) {
+    Write-Output -NoEnumerate $raw
+    return
+  }
+  $buffer = New-Object System.IO.MemoryStream
+  try {
+    for ($index = 0; $index -lt $raw.Length; $index++) {
+      if ($raw[$index] -eq 13 -and ($index + 1) -lt $raw.Length -and $raw[$index + 1] -eq 10) {
+        $buffer.WriteByte(10)
+        $index++
+      } else {
+        $buffer.WriteByte($raw[$index])
+      }
+    }
+    [byte[]]$canonical = $buffer.ToArray()
+  } finally {
+    $buffer.Dispose()
+  }
+  Write-Output -NoEnumerate $canonical
+}
+
 function Test-NativeBuildOutputPart {
   param([string]$Part)
   $normalized = $Part.ToLowerInvariant()
@@ -132,10 +166,11 @@ function Get-NativeSourceInputs {
           continue
         }
         $relative = $entry.FullName.Substring($RouterHome.Length).TrimStart('\', '/') -replace '\\', '/'
+        [byte[]]$sourceBytes = Get-CanonicalNativeSourceBytes -Path $entry.FullName
         $inputs += [ordered]@{
           path = $relative
-          sha256 = Get-Sha256File -Path $entry.FullName
-          bytes = [int64]$entry.Length
+          sha256 = Get-Sha256Bytes -Bytes $sourceBytes
+          bytes = [int64]$sourceBytes.Length
         }
       }
     }
@@ -287,8 +322,9 @@ function Open-NativeDeploymentLease {
       throw 'Native manifest is not a Release|x64 Rebuild integrity bundle.'
     }
     $recipePath = Join-Path $RouterHome 'tools\build_native_acad.ps1'
+    [byte[]]$recipeBytes = Get-CanonicalNativeSourceBytes -Path $recipePath
     if ([string]$document.build_recipe.path -cne 'tools/build_native_acad.ps1' -or
-        [string]$document.build_recipe.sha256 -cne (Get-Sha256File $recipePath)) {
+        [string]$document.build_recipe.sha256 -cne (Get-Sha256Bytes $recipeBytes)) {
       throw 'Native manifest does not bind to the current build recipe.'
     }
     $sourceInputs = @(Get-NativeSourceInputs)

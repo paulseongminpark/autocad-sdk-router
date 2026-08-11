@@ -59,6 +59,40 @@ function Get-Sha256Text {
   }
 }
 
+function Get-Sha256Bytes {
+  param([byte[]]$Bytes)
+  $sha = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    -join ($sha.ComputeHash($Bytes) | ForEach-Object { $_.ToString('x2') })
+  } finally {
+    $sha.Dispose()
+  }
+}
+
+function Get-CanonicalNativeSourceBytes {
+  param([string]$Path)
+  [byte[]]$raw = [System.IO.File]::ReadAllBytes($Path)
+  if ([Array]::IndexOf($raw, [byte]0) -ge 0) {
+    Write-Output -NoEnumerate $raw
+    return
+  }
+  $buffer = New-Object System.IO.MemoryStream
+  try {
+    for ($index = 0; $index -lt $raw.Length; $index++) {
+      if ($raw[$index] -eq 13 -and ($index + 1) -lt $raw.Length -and $raw[$index + 1] -eq 10) {
+        $buffer.WriteByte(10)
+        $index++
+      } else {
+        $buffer.WriteByte($raw[$index])
+      }
+    }
+    [byte[]]$canonical = $buffer.ToArray()
+  } finally {
+    $buffer.Dispose()
+  }
+  Write-Output -NoEnumerate $canonical
+}
+
 function Test-NativeBuildOutputPart {
   param([string]$Part)
   $normalized = $Part.ToLowerInvariant()
@@ -98,10 +132,11 @@ function Get-NativeSourceInputs {
           continue
         }
         $relative = $entry.FullName.Substring($RouterHome.Length).TrimStart('\', '/') -replace '\\', '/'
+        [byte[]]$sourceBytes = Get-CanonicalNativeSourceBytes -Path $entry.FullName
         $inputs += [ordered]@{
           path = $relative
-          sha256 = Get-Sha256File -Path $entry.FullName
-          bytes = [int64]$entry.Length
+          sha256 = Get-Sha256Bytes -Bytes $sourceBytes
+          bytes = [int64]$sourceBytes.Length
         }
       }
     }
@@ -125,6 +160,24 @@ function Get-NativeSourceDigest {
   Get-Sha256Text $builder.ToString()
 }
 
+function Test-NativeSourceStatusLine {
+  param([string]$Line)
+  if ([string]::IsNullOrWhiteSpace($Line)) { return $false }
+  $payload = if ($Line.Length -ge 3) { $Line.Substring(3) } else { $Line }
+  foreach ($candidate in @($payload -split ' -> ')) {
+    $normalized = $candidate.Trim().Trim('"').Replace('\', '/')
+    $hasBuildPart = $false
+    foreach ($part in @($normalized -split '/')) {
+      if (Test-NativeBuildOutputPart $part) {
+        $hasBuildPart = $true
+        break
+      }
+    }
+    if (-not $hasBuildPart) { return $true }
+  }
+  return $false
+}
+
 function Get-NativeSourceGitState {
   $unknown = [ordered]@{
     available = $false
@@ -132,7 +185,8 @@ function Get-NativeSourceGitState {
     native_source_dirty = 'UNKNOWN'
     native_source_status_sha256 = 'UNKNOWN'
   }
-  $git = Get-Command git -CommandType Application -ErrorAction SilentlyContinue
+  $git = Get-Command git -CommandType Application -ErrorAction SilentlyContinue |
+    Select-Object -First 1
   if (-not $git) { return $unknown }
   try {
     $headLines = & $git.Source -C $RouterHome rev-parse HEAD 2>$null
@@ -147,29 +201,10 @@ function Get-NativeSourceGitState {
       '-C', $RouterHome,
       'status', '--porcelain=v1', '--untracked-files=all', '--',
       'src/Ariadne.AcadNative',
-      'src/Ariadne.AcadNativeDbx',
-      ':(exclude)src/Ariadne.AcadNative/bin/**',
-      ':(exclude)src/Ariadne.AcadNative/obj/**',
-      ':(exclude)src/Ariadne.AcadNative/.vs/**',
-      ':(exclude)src/Ariadne.AcadNative/build/**',
-      ':(exclude)src/Ariadne.AcadNative/**/bin/**',
-      ':(exclude)src/Ariadne.AcadNative/**/obj/**',
-      ':(exclude)src/Ariadne.AcadNative/**/.vs/**',
-      ':(exclude)src/Ariadne.AcadNative/**/build/**',
-      ':(exclude)src/Ariadne.AcadNative/**/obj-*/**',
-      ':(exclude)src/Ariadne.AcadNative/**/obj_*/**',
-      ':(exclude)src/Ariadne.AcadNativeDbx/bin/**',
-      ':(exclude)src/Ariadne.AcadNativeDbx/obj/**',
-      ':(exclude)src/Ariadne.AcadNativeDbx/.vs/**',
-      ':(exclude)src/Ariadne.AcadNativeDbx/build/**',
-      ':(exclude)src/Ariadne.AcadNativeDbx/**/bin/**',
-      ':(exclude)src/Ariadne.AcadNativeDbx/**/obj/**',
-      ':(exclude)src/Ariadne.AcadNativeDbx/**/.vs/**',
-      ':(exclude)src/Ariadne.AcadNativeDbx/**/build/**',
-      ':(exclude)src/Ariadne.AcadNativeDbx/**/obj-*/**',
-      ':(exclude)src/Ariadne.AcadNativeDbx/**/obj_*/**'
+      'src/Ariadne.AcadNativeDbx'
     )
-    $statusLines = & $git.Source @statusArgs 2>$null
+    $statusLines = @(& $git.Source @statusArgs 2>$null) |
+      Where-Object { Test-NativeSourceStatusLine ([string]$_) }
     if ($LASTEXITCODE -ne 0) { return $unknown }
     $statusText = @($statusLines) -join "`n"
     return [ordered]@{
@@ -189,9 +224,10 @@ function Get-BuildRecipeState {
   if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
     throw "Native build recipe missing: $path"
   }
+  [byte[]]$recipeBytes = Get-CanonicalNativeSourceBytes -Path $path
   return [ordered]@{
     path = $relative
-    sha256 = Get-Sha256File -Path $path
+    sha256 = Get-Sha256Bytes -Bytes $recipeBytes
   }
 }
 
@@ -498,6 +534,9 @@ function Publish-NativePrebuiltSet {
   if (@(Compare-Object -ReferenceObject $canonicalLeaves -DifferenceObject @($Leaves)).Count -ne 0) {
     throw 'Prebuilt publication requires exactly the canonical DBX, CRX, and ARX leaves.'
   }
+  if ($SourceSnapshot.git.available -ne $true) {
+    throw 'Git checkout identity is unavailable; refusing prebuilt publication.'
+  }
   if ($BuildManifestVerification.verified -ne $true -or
       [string]$BuildManifestVerification.claim_scope -cne 'release_build_integrity_bundle' -or
       [string]$BuildManifestVerification.build_target -cne 'Rebuild' -or
@@ -650,6 +689,9 @@ function Publish-NativePrebuiltSet {
 # compiled before a source edit as though they came from the newer checkout.
 $nativeBuildSnapshotBefore = Get-NativeBuildSnapshot
 $nativeBuildSnapshotBeforeDigest = Get-NativeBuildSnapshotDigest $nativeBuildSnapshotBefore
+if ($nativeBuildSnapshotBefore.git.available -ne $true) {
+  throw 'Git checkout identity is unavailable; refusing native build before MSBuild.'
+}
 $msbuild = Resolve-MSBuild
 $dbxProj = Join-Path $RouterHome 'src\Ariadne.AcadNativeDbx\Ariadne.AcadNativeDbx.dbx.vcxproj'
 $crxProj = Join-Path $RouterHome 'src\Ariadne.AcadNative\Ariadne.AcadNative.crx.vcxproj'
@@ -789,10 +831,10 @@ $displayMembershipReady = (
   $Configuration -eq 'Release' -and
   $Platform -eq 'x64' -and
   $buildTarget -eq 'Rebuild' -and
+  $gitState.available -eq $true -and
   $canonicalDbxCurrent -and
   $canonicalCrxCurrent -and
   $canonicalArxCurrent -and
-  $gitState.available -and
   $snapshotStable
 )
 $manifestPath = Join-Path $bin 'native_build_manifest.json'
@@ -868,6 +910,7 @@ $prebuiltEligible = (
   $Configuration -eq 'Release' -and
   $Platform -eq 'x64' -and
   $buildTarget -eq 'Rebuild' -and
+  $gitState.available -eq $true -and
   $canonicalDbxCurrent -and
   $canonicalCrxCurrent -and
   $canonicalArxCurrent -and

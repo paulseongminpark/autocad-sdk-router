@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -15,6 +16,10 @@ if str(TOOLS) not in sys.path:
 import cadctl  # noqa: E402
 
 
+def _canonical_text_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+
+
 def _git(router: Path, *args: str) -> str:
     completed = subprocess.run(
         ["git", "-C", str(router), *args],
@@ -25,6 +30,38 @@ def _git(router: Path, *args: str) -> str:
         encoding="utf-8",
     )
     return completed.stdout
+
+
+def _isolated_git_config_env() -> dict[str, str]:
+    """Remove inherited command-scoped Git config from security-boundary tests."""
+    return {
+        key: value
+        for key, value in os.environ.items()
+        if key != "GIT_CONFIG_COUNT"
+        and key != "GIT_CONFIG_PARAMETERS"
+        and not key.startswith("GIT_CONFIG_KEY_")
+        and not key.startswith("GIT_CONFIG_VALUE_")
+    }
+
+
+def _git_safe_directory_env(router: Path) -> dict[str, str]:
+    """Trust one generated fixture repo without changing machine Git config."""
+    env = _isolated_git_config_env()
+    env["GIT_CONFIG_COUNT"] = "1"
+    env["GIT_CONFIG_KEY_0"] = "safe.directory"
+    env["GIT_CONFIG_VALUE_0"] = str(router)
+    return env
+
+
+def _replace_process_git_env(monkeypatch, env: dict[str, str]) -> None:
+    """Apply the same isolated Git environment used by a child process."""
+    git_keys = {key for key in os.environ if key.startswith("GIT_")}
+    git_keys.update(key for key in env if key.startswith("GIT_"))
+    for key in git_keys:
+        monkeypatch.delenv(key, raising=False)
+    for key, value in env.items():
+        if key.startswith("GIT_"):
+            monkeypatch.setenv(key, value)
 
 
 def _minimal_pe(*, machine: int = 0x8664, optional_magic: int = 0x20B) -> bytes:
@@ -141,6 +178,18 @@ def test_prebuilt_publish_commits_all_three_or_restores_the_previous_set(tmp_pat
     (native / "native.cpp").write_text("// native\n", encoding="utf-8")
     (dbx_source / "dbx.cpp").write_text("// dbx\n", encoding="utf-8")
     recipe.write_text("# fixture recipe\n", encoding="utf-8")
+    _git(router, "init", "-q")
+    _git(router, "add", ".")
+    _git(
+        router,
+        "-c",
+        "user.name=Build Manifest Test",
+        "-c",
+        "user.email=build-manifest@example.invalid",
+        "commit",
+        "-qm",
+        "fixture checkout",
+    )
 
     leaves = (
         "Ariadne.AcadNativeDbx.dbx",
@@ -246,6 +295,7 @@ try {{
         stderr=subprocess.PIPE,
         text=True,
         encoding="utf-8",
+        env=_git_safe_directory_env(router),
     )
     assert completed.returncode == 0, completed.stderr
     result = json.loads(completed.stdout)
@@ -257,7 +307,7 @@ try {{
     assert result["success_marker"]["source_tree_digest"]
     assert result["success_marker"]["build_recipe"] == {
         "path": "tools/build_native_acad.ps1",
-        "sha256": hashlib.sha256(recipe.read_bytes()).hexdigest(),
+        "sha256": _canonical_text_sha256(recipe),
     }
     assert "build_manifest" not in result["success_marker"]
     assert "committed_utc" not in result["success_marker"]
@@ -274,13 +324,139 @@ def test_main_publishes_prebuilt_only_after_snapshot_and_final_manifest_verifica
     text = (REPO / "tools" / "build_native_acad.ps1").read_text(encoding="utf-8")
     main = text.split("# Capture every provenance input before MSBuild", 1)[1]
 
+    git_guard = main.index("if ($nativeBuildSnapshotBefore.git.available -ne $true)")
+    msbuild_resolve = main.index("$msbuild = Resolve-MSBuild")
     post_snapshot = main.index("$nativeBuildSnapshotBeforeManifest = Get-NativeBuildSnapshot")
     manifest_write = main.index("Write-AtomicJson -Object $manifest -Path $manifestPath")
     manifest_verify = main.index("$manifestVerification = Confirm-NativeBuildManifest")
     prebuilt_publish = main.index("$prebuiltDeployment = Publish-NativePrebuiltSet")
+    prebuilt_gate_start = main.index("$prebuiltEligible = (")
+    prebuilt_gate_end = main.index(
+        "if (-not $isolatedBuild -and [string]::IsNullOrWhiteSpace($TargetSuffix))",
+        prebuilt_gate_start,
+    )
+    prebuilt_gate = main[prebuilt_gate_start:prebuilt_gate_end]
+    assert git_guard < msbuild_resolve
     assert post_snapshot < manifest_write < manifest_verify < prebuilt_publish
     assert "@('Ariadne.AcadNativeDbx.dbx', 'Ariadne.AcadNative.crx', 'Ariadne.AcadNative.arx')" in main
+    assert "$gitState.available -eq $true" in prebuilt_gate
     assert "Copy-Item -LiteralPath $src -Destination" not in main
+
+
+def test_prebuilt_publisher_rejects_unknown_git_provenance_before_staging(
+    tmp_path: Path,
+):
+    build_bin = tmp_path / "build-bin"
+    deploy_dir = tmp_path / "prebuilt" / "2027"
+    build_bin.mkdir()
+    deploy_dir.mkdir(parents=True)
+    script_path = REPO / "tools" / "build_native_acad.ps1"
+    script_literal = str(script_path).replace("'", "''")
+    bin_literal = str(build_bin).replace("'", "''")
+    deploy_literal = str(deploy_dir).replace("'", "''")
+    command = f"""
+$ErrorActionPreference = 'Stop'
+$scriptText = Get-Content -Raw -LiteralPath '{script_literal}'
+$functionStart = $scriptText.IndexOf('function Resolve-MSBuild')
+$functionEnd = $scriptText.IndexOf('# Capture every provenance input before MSBuild')
+if ($functionStart -lt 0 -or $functionEnd -lt 0) {{ throw 'build helper boundaries not found' }}
+. ([scriptblock]::Create($scriptText.Substring($functionStart, $functionEnd - $functionStart)))
+$snapshot = [pscustomobject]@{{
+  git = [pscustomobject]@{{ available = $false }}
+}}
+$verification = [pscustomobject]@{{
+  verified = $true
+  claim_scope = 'release_build_integrity_bundle'
+  build_target = 'Rebuild'
+  configuration = 'Release'
+  platform = 'x64'
+}}
+$errorText = ''
+try {{
+  Publish-NativePrebuiltSet `
+    -BinDir '{bin_literal}' `
+    -DeployDir '{deploy_literal}' `
+    -Leaves @('Ariadne.AcadNativeDbx.dbx', 'Ariadne.AcadNative.crx', 'Ariadne.AcadNative.arx') `
+    -BuildManifestVerification $verification `
+    -SourceSnapshot $snapshot | Out-Null
+}} catch {{
+  $errorText = $_.Exception.Message
+}}
+$errorText
+"""
+    completed = subprocess.run(
+        ["powershell", "-NoProfile", "-NonInteractive", "-Command", command],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert "Git checkout identity is unavailable; refusing prebuilt publication." in completed.stdout
+    assert list(tmp_path.rglob(".native-deploy-*")) == []
+
+
+def test_native_build_rejects_unknown_git_provenance_before_msbuild(
+    tmp_path: Path,
+) -> None:
+    router = tmp_path / "router"
+    native = router / "src" / "Ariadne.AcadNative"
+    dbx = router / "src" / "Ariadne.AcadNativeDbx"
+    recipe = router / "tools" / "build_native_acad.ps1"
+    native.mkdir(parents=True)
+    dbx.mkdir(parents=True)
+    recipe.parent.mkdir(parents=True)
+    (native / "AriadneNativeJob.cpp").write_bytes(b"// native\n")
+    (dbx / "AriadneDbxEntry.cpp").write_bytes(b"// dbx\n")
+    recipe.write_bytes((REPO / "tools" / "build_native_acad.ps1").read_bytes())
+    _git(router, "init", "-q")
+    _git(router, "add", ".")
+    _git(
+        router,
+        "-c",
+        "user.name=Build Manifest Test",
+        "-c",
+        "user.email=build-manifest@example.invalid",
+        "commit",
+        "-qm",
+        "fixture checkout",
+    )
+    empty_global_config = tmp_path / "empty.gitconfig"
+    empty_global_config.write_bytes(b"")
+    ownership_env = {
+        **_isolated_git_config_env(),
+        "GIT_TEST_ASSUME_DIFFERENT_OWNER": "1",
+        "GIT_CONFIG_GLOBAL": str(empty_global_config),
+        "GIT_CONFIG_NOSYSTEM": "1",
+    }
+    output_root = tmp_path / "build-output"
+
+    completed = subprocess.run(
+        [
+            "powershell",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            str(REPO / "tools" / "build_native_acad.ps1"),
+            "-RouterHome",
+            str(router),
+            "-OutputRoot",
+            str(output_root),
+        ],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+        env=ownership_env,
+    )
+    assert completed.returncode != 0
+    assert (
+        "Git checkout identity is unavailable; refusing native build before MSBuild."
+        in completed.stdout + completed.stderr
+    )
+    assert not output_root.exists()
 
 
 def test_build_manifest_source_digest_matches_display_membership_verifier():
@@ -349,7 +525,6 @@ def test_build_snapshot_scopes_git_status_to_native_sources_and_detects_source_d
     generated = native / "bin" / "x64" / "Release" / "generated.obj"
     generated.parent.mkdir(parents=True)
     generated.write_bytes(b"build output must not become source dirt")
-
     script_path = REPO / "tools" / "build_native_acad.ps1"
     ps_literal = str(script_path).replace("'", "''")
     root_literal = str(router).replace("'", "''")
@@ -378,6 +553,7 @@ $after = Get-NativeBuildSnapshot
         stderr=subprocess.PIPE,
         text=True,
         encoding="utf-8",
+        env=_git_safe_directory_env(router),
     )
     assert completed.returncode == 0, completed.stderr
     snapshot = json.loads(completed.stdout)
@@ -387,11 +563,349 @@ $after = Get-NativeBuildSnapshot
     assert snapshot["after"]["git"]["native_source_dirty"] is True
     assert snapshot["before"]["build_recipe"] == {
         "path": "tools/build_native_acad.ps1",
-        "sha256": hashlib.sha256(recipe.read_bytes()).hexdigest(),
+        "sha256": _canonical_text_sha256(recipe),
     }
     assert snapshot["exact_equal"] is False
     assert snapshot["before"]["source_tree"]["digest"] != snapshot["after"]["source_tree"]["digest"]
     assert all("/bin/" not in item["path"] for item in snapshot["before"]["source_tree"]["inputs"])
+
+
+def test_build_snapshot_source_identity_ignores_checkout_line_endings(tmp_path: Path):
+    router = tmp_path / "router"
+    native = router / "src" / "Ariadne.AcadNative"
+    dbx = router / "src" / "Ariadne.AcadNativeDbx"
+    recipe = router / "tools" / "build_native_acad.ps1"
+    native.mkdir(parents=True)
+    dbx.mkdir(parents=True)
+    recipe.parent.mkdir(parents=True)
+    native_file = native / "AriadneNativeJob.cpp"
+    dbx_file = dbx / "AriadneDbxEntry.cpp"
+    native_file.write_bytes(b"// native\n")
+    dbx_file.write_bytes(b"// dbx\n")
+    recipe.write_text("# fixture recipe\n", encoding="utf-8")
+
+    script_path = REPO / "tools" / "build_native_acad.ps1"
+    ps_literal = str(script_path).replace("'", "''")
+    root_literal = str(router).replace("'", "''")
+    native_literal = str(native_file).replace("'", "''")
+    dbx_literal = str(dbx_file).replace("'", "''")
+    command = f"""
+$ErrorActionPreference = 'Stop'
+$scriptText = Get-Content -Raw -LiteralPath '{ps_literal}'
+$functionStart = $scriptText.IndexOf('function Resolve-MSBuild')
+$functionEnd = $scriptText.IndexOf('# Capture every provenance input before MSBuild')
+$RouterHome = '{root_literal}'
+. ([scriptblock]::Create($scriptText.Substring($functionStart, $functionEnd - $functionStart)))
+$before = Get-NativeBuildSnapshot
+[System.IO.File]::WriteAllBytes('{native_literal}', [System.Text.Encoding]::UTF8.GetBytes("// native`r`n"))
+[System.IO.File]::WriteAllBytes('{dbx_literal}', [System.Text.Encoding]::UTF8.GetBytes("// dbx`r`n"))
+$after = Get-NativeBuildSnapshot
+[ordered]@{{
+  before = $before.source_tree.digest
+  after = $after.source_tree.digest
+}} | ConvertTo-Json -Compress
+"""
+    completed = subprocess.run(
+        ["powershell", "-NoProfile", "-NonInteractive", "-Command", command],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+    )
+    assert completed.returncode == 0, completed.stderr
+    result = json.loads(completed.stdout)
+    assert result["before"] == result["after"]
+
+
+def test_build_recipe_identity_ignores_checkout_line_endings(tmp_path: Path):
+    router = tmp_path / "router"
+    native = router / "src" / "Ariadne.AcadNative"
+    dbx = router / "src" / "Ariadne.AcadNativeDbx"
+    recipe = router / "tools" / "build_native_acad.ps1"
+    native.mkdir(parents=True)
+    dbx.mkdir(parents=True)
+    recipe.parent.mkdir(parents=True)
+    (native / "AriadneNativeJob.cpp").write_bytes(b"// native\n")
+    (dbx / "AriadneDbxEntry.cpp").write_bytes(b"// dbx\n")
+    recipe.write_bytes(b"# fixture recipe\n")
+
+    script_path = REPO / "tools" / "build_native_acad.ps1"
+    ps_literal = str(script_path).replace("'", "''")
+    root_literal = str(router).replace("'", "''")
+    recipe_literal = str(recipe).replace("'", "''")
+    command = f"""
+$ErrorActionPreference = 'Stop'
+$scriptText = Get-Content -Raw -LiteralPath '{ps_literal}'
+$functionStart = $scriptText.IndexOf('function Resolve-MSBuild')
+$functionEnd = $scriptText.IndexOf('# Capture every provenance input before MSBuild')
+$RouterHome = '{root_literal}'
+. ([scriptblock]::Create($scriptText.Substring($functionStart, $functionEnd - $functionStart)))
+$before = Get-NativeBuildSnapshot
+[System.IO.File]::WriteAllBytes('{recipe_literal}', [System.Text.Encoding]::UTF8.GetBytes("# fixture recipe`r`n"))
+$after = Get-NativeBuildSnapshot
+[ordered]@{{
+  before = $before.build_recipe.sha256
+  after = $after.build_recipe.sha256
+}} | ConvertTo-Json -Compress
+"""
+    completed = subprocess.run(
+        ["powershell", "-NoProfile", "-NonInteractive", "-Command", command],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+    )
+    assert completed.returncode == 0, completed.stderr
+    result = json.loads(completed.stdout)
+    assert result["before"] == result["after"]
+
+
+def test_native_git_snapshot_uses_portable_positive_pathspecs() -> None:
+    text = (REPO / "tools" / "build_native_acad.ps1").read_text(encoding="utf-8")
+    start = text.index("function Get-NativeSourceGitState")
+    end = text.index("function Get-BuildRecipeState", start)
+    helper = text[start:end]
+
+    assert ":(exclude)" not in helper
+    assert "Test-NativeSourceStatusLine" in helper
+    assert "safe.directory" not in helper
+    assert "git config --global" not in helper
+
+
+def test_native_git_snapshot_uses_one_git_when_path_has_multiple_applications(
+    tmp_path: Path,
+) -> None:
+    router = tmp_path / "router"
+    native = router / "src" / "Ariadne.AcadNative"
+    dbx = router / "src" / "Ariadne.AcadNativeDbx"
+    recipe = router / "tools" / "build_native_acad.ps1"
+    native.mkdir(parents=True)
+    dbx.mkdir(parents=True)
+    recipe.parent.mkdir(parents=True)
+    (native / "AriadneNativeJob.cpp").write_bytes(b"// native\n")
+    (dbx / "AriadneDbxEntry.cpp").write_bytes(b"// dbx\n")
+    recipe.write_bytes(b"# fixture recipe\n")
+    _git(router, "init", "-q")
+    _git(router, "add", ".")
+    _git(
+        router,
+        "-c",
+        "user.name=Build Manifest Test",
+        "-c",
+        "user.email=build-manifest@example.invalid",
+        "commit",
+        "-qm",
+        "fixture checkout",
+    )
+
+    extra_bin = tmp_path / "extra-bin"
+    extra_bin.mkdir()
+    (extra_bin / "git.cmd").write_text("@exit /b 99\n", encoding="ascii")
+    env = _git_safe_directory_env(router)
+    env["PATH"] = f'{env["PATH"]}{os.pathsep}{extra_bin}'
+
+    script_path = REPO / "tools" / "build_native_acad.ps1"
+    ps_literal = str(script_path).replace("'", "''")
+    root_literal = str(router).replace("'", "''")
+    command = f"""
+$ErrorActionPreference = 'Stop'
+$scriptText = Get-Content -Raw -LiteralPath '{ps_literal}'
+$functionStart = $scriptText.IndexOf('function Resolve-MSBuild')
+$functionEnd = $scriptText.IndexOf('# Capture every provenance input before MSBuild')
+$RouterHome = '{root_literal}'
+. ([scriptblock]::Create($scriptText.Substring($functionStart, $functionEnd - $functionStart)))
+[ordered]@{{
+  application_count = @(Get-Command git -CommandType Application).Count
+  git = (Get-NativeBuildSnapshot).git
+}} | ConvertTo-Json -Depth 4 -Compress
+"""
+    completed = subprocess.run(
+        ["powershell", "-NoProfile", "-NonInteractive", "-Command", command],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+        env=env,
+    )
+    assert completed.returncode == 0, completed.stderr
+    result = json.loads(completed.stdout)
+    assert result["application_count"] >= 2
+    assert result["git"]["available"] is True
+
+
+def test_native_git_snapshot_fails_closed_for_dubious_ownership(
+    tmp_path: Path, monkeypatch
+) -> None:
+    router = tmp_path / "router"
+    native = router / "src" / "Ariadne.AcadNative"
+    dbx = router / "src" / "Ariadne.AcadNativeDbx"
+    recipe = router / "tools" / "build_native_acad.ps1"
+    native.mkdir(parents=True)
+    dbx.mkdir(parents=True)
+    recipe.parent.mkdir(parents=True)
+    (native / "AriadneNativeJob.cpp").write_bytes(b"// native\n")
+    (dbx / "AriadneDbxEntry.cpp").write_bytes(b"// dbx\n")
+    recipe.write_bytes(b"# fixture recipe\n")
+    _git(router, "init", "-q")
+    _git(router, "add", ".")
+    _git(
+        router,
+        "-c",
+        "user.name=Build Manifest Test",
+        "-c",
+        "user.email=build-manifest@example.invalid",
+        "commit",
+        "-qm",
+        "fixture checkout",
+    )
+    empty_global_config = tmp_path / "empty.gitconfig"
+    empty_global_config.write_bytes(b"")
+    ownership_env = {
+        **_isolated_git_config_env(),
+        "GIT_TEST_ASSUME_DIFFERENT_OWNER": "1",
+        "GIT_CONFIG_GLOBAL": str(empty_global_config),
+        "GIT_CONFIG_NOSYSTEM": "1",
+    }
+
+    script_path = REPO / "tools" / "build_native_acad.ps1"
+    ps_literal = str(script_path).replace("'", "''")
+    root_literal = str(router).replace("'", "''")
+    command = f"""
+$ErrorActionPreference = 'Stop'
+$scriptText = Get-Content -Raw -LiteralPath '{ps_literal}'
+$functionStart = $scriptText.IndexOf('function Resolve-MSBuild')
+$functionEnd = $scriptText.IndexOf('# Capture every provenance input before MSBuild')
+$RouterHome = '{root_literal}'
+. ([scriptblock]::Create($scriptText.Substring($functionStart, $functionEnd - $functionStart)))
+(Get-NativeBuildSnapshot).git | ConvertTo-Json -Compress
+"""
+    completed = subprocess.run(
+        ["powershell", "-NoProfile", "-NonInteractive", "-Command", command],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+        env=ownership_env,
+    )
+    assert completed.returncode == 0, completed.stderr
+    powershell_state = json.loads(completed.stdout)
+    assert powershell_state == {
+        "available": False,
+        "head": "UNKNOWN",
+        "native_source_dirty": "UNKNOWN",
+        "native_source_status_sha256": "UNKNOWN",
+    }
+
+    _replace_process_git_env(monkeypatch, ownership_env)
+    python_state = cadctl._native_source_git_state(router)
+    assert python_state == {
+        "available": False,
+        "head": "UNKNOWN",
+        "native_source_dirty": "UNKNOWN",
+        "native_source_status_sha256": "UNKNOWN",
+    }
+
+
+def test_native_git_snapshot_accepts_exact_safe_directory_for_dubious_ownership(
+    tmp_path: Path, monkeypatch
+) -> None:
+    router = tmp_path / "router"
+    native = router / "src" / "Ariadne.AcadNative"
+    dbx = router / "src" / "Ariadne.AcadNativeDbx"
+    recipe = router / "tools" / "build_native_acad.ps1"
+    native.mkdir(parents=True)
+    dbx.mkdir(parents=True)
+    recipe.parent.mkdir(parents=True)
+    (native / "AriadneNativeJob.cpp").write_bytes(b"// native\n")
+    (dbx / "AriadneDbxEntry.cpp").write_bytes(b"// dbx\n")
+    recipe.write_bytes(b"# fixture recipe\n")
+    _git(router, "init", "-q")
+    _git(router, "add", ".")
+    _git(
+        router,
+        "-c",
+        "user.name=Build Manifest Test",
+        "-c",
+        "user.email=build-manifest@example.invalid",
+        "commit",
+        "-qm",
+        "fixture checkout",
+    )
+    sibling = tmp_path / "sibling"
+    sibling.mkdir()
+    (sibling / "tracked.txt").write_text("sibling\n", encoding="utf-8")
+    _git(sibling, "init", "-q")
+    _git(sibling, "add", ".")
+    _git(
+        sibling,
+        "-c",
+        "user.name=Build Manifest Test",
+        "-c",
+        "user.email=build-manifest@example.invalid",
+        "commit",
+        "-qm",
+        "sibling checkout",
+    )
+    head = _git(router, "rev-parse", "HEAD").strip()
+    empty_global_config = tmp_path / "empty.gitconfig"
+    empty_global_config.write_bytes(b"")
+    ownership_env = _git_safe_directory_env(router)
+    ownership_env.update(
+        {
+            "GIT_TEST_ASSUME_DIFFERENT_OWNER": "1",
+            "GIT_CONFIG_GLOBAL": str(empty_global_config),
+            "GIT_CONFIG_NOSYSTEM": "1",
+        }
+    )
+
+    script_path = REPO / "tools" / "build_native_acad.ps1"
+    ps_literal = str(script_path).replace("'", "''")
+    root_literal = str(router).replace("'", "''")
+    command = f"""
+$ErrorActionPreference = 'Stop'
+$scriptText = Get-Content -Raw -LiteralPath '{ps_literal}'
+$functionStart = $scriptText.IndexOf('function Resolve-MSBuild')
+$functionEnd = $scriptText.IndexOf('# Capture every provenance input before MSBuild')
+$RouterHome = '{root_literal}'
+. ([scriptblock]::Create($scriptText.Substring($functionStart, $functionEnd - $functionStart)))
+(Get-NativeBuildSnapshot).git | ConvertTo-Json -Compress
+"""
+    completed = subprocess.run(
+        ["powershell", "-NoProfile", "-NonInteractive", "-Command", command],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+        env=ownership_env,
+    )
+    assert completed.returncode == 0, completed.stderr
+    expected = {
+        "available": True,
+        "head": head,
+        "native_source_dirty": False,
+        "native_source_status_sha256": hashlib.sha256(b"").hexdigest(),
+    }
+    assert json.loads(completed.stdout) == expected
+
+    sibling_probe = subprocess.run(
+        ["git", "-C", str(sibling), "rev-parse", "HEAD"],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+        env=ownership_env,
+    )
+    assert sibling_probe.returncode != 0
+    assert "dubious ownership" in sibling_probe.stderr
+
+    _replace_process_git_env(monkeypatch, ownership_env)
+    assert cadctl._native_source_git_state(router) == expected
 
 
 def test_build_manifest_writer_atomically_replaces_a_complete_json_file(tmp_path: Path):
