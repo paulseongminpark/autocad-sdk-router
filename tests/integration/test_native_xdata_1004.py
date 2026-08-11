@@ -26,6 +26,7 @@ for candidate in (str(ROOT), str(TOOLS)):
         sys.path.insert(0, candidate)
 
 FIXTURE = ROOT / "tests" / "fixtures" / "xdata_1004_binary_24bytes.dwg"
+SIDECAR = FIXTURE.with_suffix(FIXTURE.suffix + ".sha256")
 EXPECTED_SHA256 = "529373624b0bb388f21ffbb58a3a15c0da3d09d80eb51d0ce8a9523ef900e39a"
 EXPECTED_HEX = bytes(range(24)).hex()
 ACCORECONSOLE = Path(r"C:\Program Files\Autodesk\AutoCAD 2027\accoreconsole.exe")
@@ -51,6 +52,18 @@ def _code_rows(value: object, code: int) -> list[dict]:
         for child in value:
             rows.extend(_code_rows(child, code))
     return rows
+
+
+class TestXdata1004FixtureIntegrity(unittest.TestCase):
+    def test_committed_fixture_matches_its_pinned_digest(self) -> None:
+        self.assertTrue(FIXTURE.is_file())
+        self.assertTrue(SIDECAR.is_file())
+        sidecar_fields = SIDECAR.read_text(encoding="ascii").split()
+        self.assertEqual(sidecar_fields[1:], [FIXTURE.name])
+        sidecar_digest = sidecar_fields[0].lower()
+        self.assertEqual(sidecar_digest, EXPECTED_SHA256)
+        self.assertEqual(_sha256(FIXTURE), EXPECTED_SHA256)
+        self.assertEqual(FIXTURE.stat().st_size, 16_453)
 
 
 @unittest.skipUnless(

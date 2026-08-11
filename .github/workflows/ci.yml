@@ -25,11 +25,11 @@ jobs:
           cache: pip
           cache-dependency-path: |
             requirements.txt
-            requirements-full.txt
+            requirements-ci.txt
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pytest -r requirements-full.txt
+          python -m pip install -r requirements-ci.txt
       - name: Run the complete non-live test suite
         run: python -m pytest tests -q
 
@@ -62,11 +62,15 @@ jobs:
         shell: powershell
         run: |
           $allErrors = @()
-          Get-ChildItem tools -Recurse -File -Filter *.ps1 | ForEach-Object {
+          $trackedScripts = @(git ls-files -- '*.ps1')
+          if ($LASTEXITCODE -ne 0 -or $trackedScripts.Count -eq 0) {
+            throw 'Unable to enumerate tracked PowerShell files.'
+          }
+          $trackedScripts | ForEach-Object {
             $tokens = $null
             $parseErrors = $null
             [void][System.Management.Automation.Language.Parser]::ParseFile(
-              $_.FullName,
+              (Join-Path $env:GITHUB_WORKSPACE $_),
               [ref]$tokens,
               [ref]$parseErrors
             )
@@ -98,6 +102,7 @@ jobs:
       - name: Verify native source, deployment marker, and consumers agree
         run: >-
           python -m pytest -q
+          tests/unit/test_committed_native_deployment.py
           tests/unit/test_build_native_manifest.py
           tests/test_native_arx_dbx_contract.py
           tests/unit/test_native_deployment_consumers.py
