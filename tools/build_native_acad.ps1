@@ -185,7 +185,8 @@ function Get-NativeSourceGitState {
     native_source_dirty = 'UNKNOWN'
     native_source_status_sha256 = 'UNKNOWN'
   }
-  $git = Get-Command git -CommandType Application -ErrorAction SilentlyContinue
+  $git = Get-Command git -CommandType Application -ErrorAction SilentlyContinue |
+    Select-Object -First 1
   if (-not $git) { return $unknown }
   try {
     $headLines = & $git.Source -C $RouterHome rev-parse HEAD 2>$null
@@ -533,6 +534,9 @@ function Publish-NativePrebuiltSet {
   if (@(Compare-Object -ReferenceObject $canonicalLeaves -DifferenceObject @($Leaves)).Count -ne 0) {
     throw 'Prebuilt publication requires exactly the canonical DBX, CRX, and ARX leaves.'
   }
+  if ($SourceSnapshot.git.available -ne $true) {
+    throw 'Git checkout identity is unavailable; refusing prebuilt publication.'
+  }
   if ($BuildManifestVerification.verified -ne $true -or
       [string]$BuildManifestVerification.claim_scope -cne 'release_build_integrity_bundle' -or
       [string]$BuildManifestVerification.build_target -cne 'Rebuild' -or
@@ -685,6 +689,9 @@ function Publish-NativePrebuiltSet {
 # compiled before a source edit as though they came from the newer checkout.
 $nativeBuildSnapshotBefore = Get-NativeBuildSnapshot
 $nativeBuildSnapshotBeforeDigest = Get-NativeBuildSnapshotDigest $nativeBuildSnapshotBefore
+if ($nativeBuildSnapshotBefore.git.available -ne $true) {
+  throw 'Git checkout identity is unavailable; refusing native build before MSBuild.'
+}
 $msbuild = Resolve-MSBuild
 $dbxProj = Join-Path $RouterHome 'src\Ariadne.AcadNativeDbx\Ariadne.AcadNativeDbx.dbx.vcxproj'
 $crxProj = Join-Path $RouterHome 'src\Ariadne.AcadNative\Ariadne.AcadNative.crx.vcxproj'
@@ -824,10 +831,10 @@ $displayMembershipReady = (
   $Configuration -eq 'Release' -and
   $Platform -eq 'x64' -and
   $buildTarget -eq 'Rebuild' -and
+  $gitState.available -eq $true -and
   $canonicalDbxCurrent -and
   $canonicalCrxCurrent -and
   $canonicalArxCurrent -and
-  $gitState.available -and
   $snapshotStable
 )
 $manifestPath = Join-Path $bin 'native_build_manifest.json'
@@ -903,6 +910,7 @@ $prebuiltEligible = (
   $Configuration -eq 'Release' -and
   $Platform -eq 'x64' -and
   $buildTarget -eq 'Rebuild' -and
+  $gitState.available -eq $true -and
   $canonicalDbxCurrent -and
   $canonicalCrxCurrent -and
   $canonicalArxCurrent -and
