@@ -30,6 +30,10 @@ if str(_E2_DIR) not in sys.path:
 
 from instruments import dwg_graph_to_worldir as graph_adapter  # noqa: E402
 from instruments import worldir_oracle  # noqa: E402
+from target_population_oracle import (  # noqa: E402
+    TargetPopulationContractError,
+    validate_target_population_oracle,
+)
 
 
 PASS = "PASS"
@@ -80,45 +84,21 @@ def _stable_id(segment: Mapping[str, Any]) -> str:
     return str(segment.get("placed_uid") or segment.get("lineage_id") or "")
 
 
-def _verify_evidence(evidence: Any) -> tuple[bool, list[dict[str, Any]], str | None]:
-    if not isinstance(evidence, list) or len(evidence) < 2:
-        return False, [], "oracle evidence must contain at least two hash-bound files"
-    checked: list[dict[str, Any]] = []
-    for index, record in enumerate(evidence):
-        if not isinstance(record, Mapping):
-            return False, checked, f"oracle evidence[{index}] is not an object"
-        path = Path(str(record.get("path") or ""))
-        expected = str(record.get("sha256") or "").lower()
-        if not path.is_file() or len(expected) != 64:
-            return False, checked, f"oracle evidence[{index}] is missing or has no SHA-256"
-        observed = _sha256(path)
-        checked.append({"path": str(path.resolve()), "sha256": observed})
-        if observed != expected:
-            return False, checked, f"oracle evidence[{index}] SHA-256 drifted"
-    return True, checked, None
-
-
 def _oracle_ids(
     oracle_path: Path,
     drawing_id: str,
     *,
+    source_dwg: Path | None = None,
     required_geometry_scope: str | None,
 ) -> tuple[set[str], dict[str, set[str]], dict[str, Any]]:
     oracle = _read_json(oracle_path)
-    if (
-        oracle.get("schema") != "ariadne.e2.target_population_oracle.v1"
-        or oracle.get("oracle") != "autocad.native_display_membership.v1"
-        or oracle.get("status") != PASS
-        or str(oracle.get("drawing_id") or "").lower() != drawing_id
-    ):
-        raise ValueError(f"invalid or source-mismatched native oracle: {oracle_path}")
-    if required_geometry_scope is not None and oracle.get("geometry_scope") != required_geometry_scope:
-        raise ValueError(
-            f"native oracle geometry_scope must be {required_geometry_scope!r}: {oracle_path}"
-        )
-    evidence_ok, checked_evidence, evidence_error = _verify_evidence(oracle.get("evidence"))
-    if not evidence_ok:
-        raise ValueError(f"unverified native oracle evidence: {evidence_error}")
+    contract = validate_target_population_oracle(
+        oracle,
+        oracle_path=oracle_path,
+        source_dwg=source_dwg,
+        expected_source_sha256=drawing_id,
+        expected_geometry_scope=required_geometry_scope,
+    )
 
     targets = oracle.get("targets")
     if not isinstance(targets, list):
@@ -145,12 +125,9 @@ def _oracle_ids(
     if declared_visible != len(union):
         raise ValueError("native oracle union does not conserve declared visible counts")
     return union, by_layer, {
+        **contract,
         "path": str(oracle_path.resolve()),
         "sha256": _sha256(oracle_path),
-        "geometry_scope": oracle.get("geometry_scope"),
-        "target_count": len(targets),
-        "visible_segment_count": len(union),
-        "evidence": checked_evidence,
     }
 
 
@@ -299,6 +276,7 @@ def build_population(
         native_ids, native_by_layer, full_oracle_record = _oracle_ids(
             full_linear_oracle,
             source_before,
+            source_dwg=source_dwg,
             required_geometry_scope="linear_segments_v1",
         )
         consensus_ids = world_linear_id_set & native_ids
@@ -310,6 +288,7 @@ def build_population(
         positive_ids, positive_by_layer, positive_oracle_record = _oracle_ids(
             positive_oracle,
             source_before,
+            source_dwg=source_dwg,
             required_geometry_scope=None,
         )
         expected_positive_layers = set(WALL_LAYERS)
@@ -434,6 +413,17 @@ def build_population(
             native_layers_with_visible_linear_segments=sum(bool(values) for values in native_by_layer.values()),
             layer_leakage_guard=leakage,
             artifacts=artifacts,
+        )
+    except TargetPopulationContractError as exc:  # fail closed at the authority boundary
+        return finish(
+            BLOCKED,
+            exc.reason_code,
+            str(exc),
+            source_sha256_before=source_before,
+            native_graph_sha256=_sha256(native_graph),
+            full_linear_oracle_sha256=_sha256(full_linear_oracle),
+            positive_oracle_sha256=_sha256(positive_oracle),
+            label_contract_sha256=_sha256(label_contract),
         )
     except Exception as exc:  # fail closed at the measurement boundary
         return finish(

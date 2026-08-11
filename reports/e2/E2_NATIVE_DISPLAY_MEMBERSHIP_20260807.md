@@ -2,6 +2,19 @@
 
 작성일: 2026-08-07
 
+> **역사 스냅샷 표지 (2026-08-11 갱신)**
+>
+> 이 문서는 2026-08-07 기록 시점의 실험 결과를 보존한다. 당시의 수치와
+> `PASS`/`PASS_WITH_DEFERRAL`/`RETRACTED` 판정은 역사 기록으로 유지하지만,
+> 당시 `target_population_oracle.json`의 `status=PASS` 형식은 현재 v1
+> authoritative oracle 계약(`status=OBSERVED`, source/receipt/hash 결속)을
+> 만족하지 않는 legacy 형식이다. 따라서 이 문서의 artifact를 현재 권위로
+> 자동 승격해서는 안 된다.
+>
+> 기록 기준 commit: `b4621e60d14f5bdef1859eee9c504a9ef79848a6`.
+> 현재 PR #69는 Draft이며 target-population 계약 보강이 끝날 때까지
+> `BLOCKED`로 취급한다. 현재 suite/merge 상태의 정본이 아니라 역사 증거다.
+
 ## 결론
 
 이번 단계의 결론은 **관측기와 모델 입력 모집단 자격 `PASS`**다. 독립적인 full AutoCAD/ObjectARX 관측기가 XCLIP으로 잘린 원본 선분을 판정했고, 그 결과가 WorldIR와 모델 입력에 같은 안정 ID로 전달되었다.

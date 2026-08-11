@@ -26,6 +26,10 @@ def _minimal_dwg_bytes(payload: bytes = b"test fixture") -> bytes:
     return b"AC1027" + payload
 
 
+_TARGET_SOURCE_BYTES = _minimal_dwg_bytes(b"target population fixture")
+_TARGET_SOURCE_SHA256 = hashlib.sha256(_TARGET_SOURCE_BYTES).hexdigest()
+
+
 class _Completed:
     def __init__(self, returncode: object = 0) -> None:
         self.returncode = returncode
@@ -176,8 +180,25 @@ def _worldir_probe(*, adapter_balance=True, conservation=True, inserts=1):
 
 
 def _bind_authoritative_target_oracle(tmp_path: Path, oracle: dict) -> dict:
+    source_path = tmp_path / "target_source.dwg"
+    source_path.write_bytes(_TARGET_SOURCE_BYTES)
+    drawing_id = hashlib.sha256(source_path.read_bytes()).hexdigest()
+    oracle["drawing_id"] = drawing_id
     receipt_path = tmp_path / "display_membership_receipt.json"
     oracle_path = tmp_path / "target_population_oracle.json"
+    geometry_scope = oracle.get("geometry_scope") or "strict_layer_entities_v1"
+    staged_path = tmp_path / "target_staged.dwg"
+    staged_path.write_bytes(source_path.read_bytes())
+    raw_path = tmp_path / "native_job_out.json"
+    raw_path.write_text('{"native":true}', encoding="utf-8")
+    attended_path = tmp_path / "attended_final_receipt.json"
+    attended_path.write_text('{"receipt":true}', encoding="utf-8")
+    manifest_path = tmp_path / "native_build_manifest.json"
+    manifest_path.write_text('{"manifest":true}', encoding="utf-8")
+
+    def digest(path: Path) -> str:
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+
     oracle.update(
         {
             "status": "OBSERVED",
@@ -185,24 +206,69 @@ def _bind_authoritative_target_oracle(tmp_path: Path, oracle: dict) -> dict:
             "producer_receipt_required": True,
             "producer_receipt_path": str(receipt_path.resolve()),
             "downstream_experiment_guard_required": True,
-            "geometry_scope": "strict_layer_entities_v1",
+            "geometry_scope": geometry_scope,
         }
     )
+    for target in oracle["targets"]:
+        visible = target["native_visible_source_segments"]
+        target.update(
+            {
+                "native_source_entity_templates": target.get(
+                    "native_source_entity_templates", visible
+                ),
+                "expected_source_segments": target.get("expected_source_segments", visible),
+                "clipped_away_source_segments": target.get("clipped_away_source_segments", 0),
+                "excluded_curved_source_segments": target.get("excluded_curved_source_segments", 0),
+                "excluded_degenerate_source_segments": target.get("excluded_degenerate_source_segments", 0),
+                "excluded_unsupported_entity_templates": target.get(
+                    "excluded_unsupported_entity_templates", 0
+                ),
+            }
+        )
+    binding_path = tmp_path / "display_membership_binding.json"
+    binding = {
+        "schema": "ariadne.e2.native_display_binding.v1",
+        "source_path": str(source_path.resolve()),
+        "source_sha256": drawing_id,
+        "staged_path": str(staged_path.resolve()),
+        "staged_sha256_before": digest(staged_path),
+        "geometry_scope": geometry_scope,
+        "native_job_out_path": str(raw_path.resolve()),
+        "native_job_out_sha256": digest(raw_path),
+        "attended_final_receipt": {
+            "path": str(attended_path.resolve()),
+            "sha256": digest(attended_path),
+        },
+        "native_build_manifest": {
+            "path": str(manifest_path.resolve()),
+            "sha256": digest(manifest_path),
+        },
+    }
+    binding_path.write_text(json.dumps(binding), encoding="utf-8")
+    oracle["evidence"] = [
+        {"path": str(path.resolve()), "sha256": digest(path)}
+        for path in (raw_path, attended_path, binding_path, manifest_path)
+    ]
     oracle_path.write_text(json.dumps(oracle), encoding="utf-8")
-    oracle_sha256 = hashlib.sha256(oracle_path.read_bytes()).hexdigest()
+    oracle_sha256 = digest(oracle_path)
     receipt = {
         "schema": "ariadne.cadctl.display_membership.v1",
         "status": "PASS",
         "operation": "e2.inspect.xclip_membership",
-        "geometry_scope": oracle["geometry_scope"],
+        "geometry_scope": geometry_scope,
         "claim_scope": "instrument_observation_only",
         "downstream_experiment_guard_required": True,
         "authoritative_completion_marker": str(receipt_path.resolve()),
         "target_population_oracle": str(oracle_path.resolve()),
         "target_population_oracle_sha256": oracle_sha256,
         "final_evidence_sha256": {
-            "source": oracle["drawing_id"],
+            "source": drawing_id,
+            "staged_dwg": digest(staged_path),
+            "native_job_out": digest(raw_path),
+            "attended_final_receipt": digest(attended_path),
+            "binding": digest(binding_path),
             "observation_oracle": oracle_sha256,
+            "native_build_manifest": digest(manifest_path),
         },
     }
     receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
@@ -213,18 +279,9 @@ def _target_oracle(tmp_path: Path, *, w1_visible=1, w2_visible=1):
     def visible_ids(prefix: str, count: int) -> list[str]:
         return [prefix, *(f"{prefix}-{index}" for index in range(2, count + 1))] if count else []
 
-    evidence = tmp_path / "native-display.json"
-    evidence.write_text('{"oracle":"autocad-native-display"}', encoding="utf-8")
     oracle = {
         "schema": "ariadne.e2.target_population_oracle.v1",
         "oracle": "autocad.native_display_membership.v1",
-        "drawing_id": "probe",
-        "evidence": [
-            {
-                "path": str(evidence),
-                "sha256": hashlib.sha256(evidence.read_bytes()).hexdigest(),
-            }
-        ],
         "targets": [
             {
                 "target_id": "wall-w1",
@@ -249,6 +306,7 @@ def _authoritative_target_oracle(tmp_path: Path):
 
 def _target_worldir_probe():
     probe = _worldir_probe()
+    probe["drawing_id"] = _TARGET_SOURCE_SHA256
     probe["segments"] = [
         {
             "placed_uid": "P-W1",
@@ -294,7 +352,7 @@ def _target_worldir_probe():
 def _model_input(*placed_uids: str):
     return {
         "ir": "seg.v1",
-        "drawing_id": "probe",
+        "drawing_id": _TARGET_SOURCE_SHA256,
         "segments": [
             {
                 "handle": uid,
@@ -446,6 +504,45 @@ def test_target_population_oracle_fixture_matches_published_schema(tmp_path: Pat
 
     Draft202012Validator.check_schema(schema)
     Draft202012Validator(schema).validate(_target_oracle(tmp_path))
+
+
+def test_target_population_gate_rejects_legacy_pass_status_even_with_receipt(tmp_path: Path):
+    oracle = _target_oracle(tmp_path)
+    oracle["status"] = "PASS"
+    decision = guard.qualify(
+        required_observables=["native_display_membership"], candidate="auto"
+    )
+
+    result = guard.verify_probe(
+        decision,
+        _target_worldir_probe(),
+        target_population_oracle=oracle,
+        model_input_output=_model_input("P-W1", "P-W2"),
+    )
+
+    assert result["status"] == guard.NEEDS_PROBE
+    assert result["reason_code"] == "TARGET_POPULATION_ORACLE_INVALID"
+
+
+def test_target_population_gate_rejects_final_evidence_hash_drift(tmp_path: Path):
+    oracle = _target_oracle(tmp_path)
+    receipt_path = Path(oracle["producer_receipt_path"])
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    receipt["final_evidence_sha256"]["binding"] = "0" * 64
+    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+    decision = guard.qualify(
+        required_observables=["native_display_membership"], candidate="auto"
+    )
+
+    result = guard.verify_probe(
+        decision,
+        _target_worldir_probe(),
+        target_population_oracle=oracle,
+        model_input_output=_model_input("P-W1", "P-W2"),
+    )
+
+    assert result["status"] == guard.NEEDS_PROBE
+    assert result["reason_code"] == "TARGET_POPULATION_ORACLE_INVALID"
 
 
 def test_target_population_gate_blocks_when_visible_w1_is_missing_from_model_input(tmp_path: Path):

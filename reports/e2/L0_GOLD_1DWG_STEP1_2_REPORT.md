@@ -1,6 +1,16 @@
 # E2 L0 Gold 1DWG Step 1–2 Report
 
-This report is the current synthesis and supersedes stale Terra/Luna intermediate wording.
+> **Historical snapshot (recorded 2026-08-05; refreshed 2026-08-11)**
+>
+> The wording “current synthesis” below means the state recorded at the snapshot
+> commit `9b506051ca0ddbf7f40b324e2f224241e752559c`; it is not the current PR
+> status. Counts and historical `PASS`/`PARTIAL_PASS`/`BLOCKED` judgments are
+> preserved. The legacy target-oracle `status=PASS` artifacts described here are
+> incompatible with the current v1 authoritative contract, so they must not be
+> silently treated as current evidence.
+>
+> As of 2026-08-11, PR #69 is Draft and `BLOCKED` pending target-population
+> source/receipt/hash contract hardening.
 
 ## Status and objective
 

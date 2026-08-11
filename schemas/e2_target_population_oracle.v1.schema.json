@@ -12,6 +12,7 @@
     "producer_receipt_required",
     "producer_receipt_path",
     "downstream_experiment_guard_required",
+    "geometry_scope",
     "drawing_id",
     "evidence",
     "targets"
@@ -27,7 +28,10 @@
     "geometry_scope": {
       "enum": ["strict_layer_entities_v1", "linear_segments_v1"]
     },
-    "drawing_id": {"type": "string", "minLength": 1},
+    "drawing_id": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{64}$"
+    },
     "evidence": {
       "type": "array",
       "minItems": 1,
@@ -50,14 +54,25 @@
         "required": [
           "target_id",
           "layer",
+          "native_source_entity_templates",
+          "expected_source_segments",
           "native_visible_source_segments",
+          "clipped_away_source_segments",
+          "excluded_curved_source_segments",
+          "excluded_degenerate_source_segments",
+          "excluded_unsupported_entity_templates",
           "native_visible_segment_ids"
         ],
         "properties": {
           "target_id": {"type": "string", "minLength": 1},
           "layer": {"type": "string", "minLength": 1},
           "native_source_entity_templates": {"type": "integer", "minimum": 0},
+          "expected_source_segments": {"type": "integer", "minimum": 0},
           "native_visible_source_segments": {"type": "integer", "minimum": 0},
+          "clipped_away_source_segments": {"type": "integer", "minimum": 0},
+          "excluded_curved_source_segments": {"type": "integer", "minimum": 0},
+          "excluded_degenerate_source_segments": {"type": "integer", "minimum": 0},
+          "excluded_unsupported_entity_templates": {"type": "integer", "minimum": 0},
           "native_visible_segment_ids": {
             "type": "array",
             "uniqueItems": true,

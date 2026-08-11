@@ -105,21 +105,94 @@ def _write_oracle(
     by_layer: dict[str, set[str]],
     *,
     geometry_scope: str | None,
+    legacy: bool = False,
 ) -> None:
-    evidence = []
-    for name, payload in (("native.json", b"native"), ("binding.json", b"binding")):
-        evidence_path = path.parent / f"{path.stem}_{name}"
-        evidence_path.write_bytes(payload)
-        evidence.append(
-            {
-                "path": str(evidence_path),
-                "sha256": hashlib.sha256(payload).hexdigest(),
-            }
+    def digest(candidate: Path) -> str:
+        return hashlib.sha256(candidate.read_bytes()).hexdigest()
+
+    if legacy:
+        evidence = []
+        for name, payload in (("native.json", b"native"), ("binding.json", b"binding")):
+            evidence_path = path.parent / f"{path.stem}_{name}"
+            evidence_path.write_bytes(payload)
+            evidence.append(
+                {
+                    "path": str(evidence_path),
+                    "sha256": hashlib.sha256(payload).hexdigest(),
+                }
+            )
+        oracle = {
+            "schema": "ariadne.e2.target_population_oracle.v1",
+            "oracle": "autocad.native_display_membership.v1",
+            "status": "PASS",
+            "drawing_id": drawing_id,
+            "evidence": evidence,
+            "targets": [
+                {
+                    "target_id": f"target-{index:03d}",
+                    "layer": layer,
+                    "native_visible_source_segments": len(ids),
+                    "native_visible_segment_ids": sorted(ids),
+                }
+                for index, (layer, ids) in enumerate(sorted(by_layer.items()), start=1)
+            ],
+        }
+        if geometry_scope is not None:
+            oracle["geometry_scope"] = geometry_scope
+        path.write_text(json.dumps(oracle), encoding="utf-8")
+        return
+
+    source_path = next(
+        candidate
+        for candidate in sorted(
+            path.parent.glob("*.dwg"),
+            key=lambda candidate: (candidate.name != "source.dwg", candidate.name),
         )
+        if digest(candidate) == drawing_id
+    )
+    scope = geometry_scope or "strict_layer_entities_v1"
+    staged_path = path.parent / f"{path.stem}_staged.dwg"
+    staged_path.write_bytes(source_path.read_bytes())
+    raw_path = path.parent / f"{path.stem}_native.json"
+    raw_path.write_text('{"native":true}', encoding="utf-8")
+    attended_path = path.parent / f"{path.stem}_attended.json"
+    attended_path.write_text('{"receipt":true}', encoding="utf-8")
+    manifest_path = path.parent / f"{path.stem}_manifest.json"
+    manifest_path.write_text('{"manifest":true}', encoding="utf-8")
+    binding_path = path.parent / f"{path.stem}_binding.json"
+    binding = {
+        "schema": "ariadne.e2.native_display_binding.v1",
+        "source_path": str(source_path.resolve()),
+        "source_sha256": drawing_id,
+        "staged_path": str(staged_path.resolve()),
+        "staged_sha256_before": digest(staged_path),
+        "geometry_scope": scope,
+        "native_job_out_path": str(raw_path.resolve()),
+        "native_job_out_sha256": digest(raw_path),
+        "attended_final_receipt": {
+            "path": str(attended_path.resolve()),
+            "sha256": digest(attended_path),
+        },
+        "native_build_manifest": {
+            "path": str(manifest_path.resolve()),
+            "sha256": digest(manifest_path),
+        },
+    }
+    binding_path.write_text(json.dumps(binding), encoding="utf-8")
+    evidence = [
+        {"path": str(candidate.resolve()), "sha256": digest(candidate)}
+        for candidate in (raw_path, attended_path, binding_path, manifest_path)
+    ]
+    receipt_path = path.parent / f"{path.stem}_receipt.json"
     oracle = {
         "schema": "ariadne.e2.target_population_oracle.v1",
         "oracle": "autocad.native_display_membership.v1",
-        "status": "PASS",
+        "status": "OBSERVED",
+        "claim_scope": "instrument_observation_only",
+        "producer_receipt_required": True,
+        "producer_receipt_path": str(receipt_path.resolve()),
+        "downstream_experiment_guard_required": True,
+        "geometry_scope": scope,
         "drawing_id": drawing_id,
         "evidence": evidence,
         "targets": [
@@ -127,15 +200,40 @@ def _write_oracle(
                 "target_id": f"target-{index:03d}",
                 "layer": layer,
                 "native_source_entity_templates": len(ids),
+                "expected_source_segments": len(ids),
                 "native_visible_source_segments": len(ids),
+                "clipped_away_source_segments": 0,
+                "excluded_curved_source_segments": 0,
+                "excluded_degenerate_source_segments": 0,
+                "excluded_unsupported_entity_templates": 0,
                 "native_visible_segment_ids": sorted(ids),
             }
             for index, (layer, ids) in enumerate(sorted(by_layer.items()), start=1)
         ],
     }
-    if geometry_scope is not None:
-        oracle["geometry_scope"] = geometry_scope
     path.write_text(json.dumps(oracle), encoding="utf-8")
+    oracle_hash = digest(path)
+    receipt = {
+        "schema": "ariadne.cadctl.display_membership.v1",
+        "status": "PASS",
+        "operation": "e2.inspect.xclip_membership",
+        "geometry_scope": scope,
+        "claim_scope": "instrument_observation_only",
+        "downstream_experiment_guard_required": True,
+        "authoritative_completion_marker": str(receipt_path.resolve()),
+        "target_population_oracle": str(path.resolve()),
+        "target_population_oracle_sha256": oracle_hash,
+        "final_evidence_sha256": {
+            "source": digest(source_path),
+            "staged_dwg": digest(staged_path),
+            "native_job_out": digest(raw_path),
+            "attended_final_receipt": digest(attended_path),
+            "binding": digest(binding_path),
+            "observation_oracle": oracle_hash,
+            "native_build_manifest": digest(manifest_path),
+        },
+    }
+    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
 
 
 def _world_and_ids(graph: dict) -> tuple[dict, dict[str, set[str]]]:
@@ -285,3 +383,47 @@ def test_build_population_blocks_when_owner_wall_is_outside_consensus(tmp_path: 
     assert result["reason_code"] == "POPULATION_QUALIFICATION_FAILED"
     assert "dual-oracle consensus" in result["reason"]
     assert not (tmp_path / "out" / "detector_input.seg.json").exists()
+
+
+def test_build_population_blocks_legacy_pass_oracle_bundle(tmp_path: Path):
+    """The v1 authoritative oracle must never be promoted from legacy PASS data."""
+
+    source = tmp_path / "source.dwg"
+    source.write_bytes(b"immutable-dwg")
+    drawing_id = hashlib.sha256(source.read_bytes()).hexdigest()
+    graph_value = _native_graph(drawing_id)
+    graph = tmp_path / "full_native_graph.json"
+    graph.write_text(json.dumps(graph_value), encoding="utf-8")
+    _, by_layer = _world_and_ids(graph_value)
+
+    full_oracle = tmp_path / "full_oracle.json"
+    _write_oracle(
+        full_oracle,
+        drawing_id,
+        by_layer,
+        geometry_scope="linear_segments_v1",
+        legacy=True,
+    )
+    positive_oracle = tmp_path / "positive_oracle.json"
+    _write_oracle(
+        positive_oracle,
+        drawing_id,
+        {layer: by_layer.get(layer, set()) for layer in builder.WALL_LAYERS},
+        geometry_scope="strict_layer_entities_v1",
+        legacy=True,
+    )
+    contract = tmp_path / "SPEC.md"
+    contract.write_text("complete binary owner labels", encoding="utf-8")
+
+    result = builder.build_population(
+        native_graph=graph,
+        source_dwg=source,
+        full_linear_oracle=full_oracle,
+        positive_oracle=positive_oracle,
+        label_contract=contract,
+        out_dir=tmp_path / "out",
+    )
+
+    assert result["status"] == "BLOCKED"
+    assert result["reason_code"] == "LEGACY_INCOMPATIBLE_TARGET_ORACLE"
+    assert "OBSERVED" in result["reason"]
