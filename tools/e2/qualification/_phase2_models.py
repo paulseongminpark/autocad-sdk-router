@@ -15,9 +15,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-import joblib
 import numpy as np
-import torch
 
 
 MODEL_SEEDS = (17, 29, 43)
@@ -134,6 +132,8 @@ class FrozenJury:
     """Load the sealed W4 model stack once and score arbitrary SEG-IR variants."""
 
     def __init__(self, transfer_harness: Path) -> None:
+        import joblib
+
         self.transfer_harness_path = Path(transfer_harness)
         self.a4 = _load_module(self.transfer_harness_path, "e2_phase2_frozen_a4")
         self.integrity = self.a4.verify_integrity()
@@ -170,6 +170,8 @@ class FrozenJury:
             "warning": "GBDT and GNN differ architecturally but share CubiCasa supervision, so they count as one independent evidence family for silver promotion.",
         }
     def _score_one(self, ir: Mapping[str, Any], parent_map: Mapping[str, str]) -> dict[str, Any]:
+        import torch
+
         builder = self.components["builder"]
         graph_result = builder.build_graph(
             dict(ir), self.components["graph_config"], collect_edges=True

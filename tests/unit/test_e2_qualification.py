@@ -41,6 +41,38 @@ QUALIFIED_OBSERVABLES = [
 ]
 
 
+def test_phase_one_import_does_not_require_optional_model_runtime() -> None:
+    script = r"""
+import builtins
+import sys
+
+real_import = builtins.__import__
+
+def reject_optional_runtime(name, globals=None, locals=None, fromlist=(), level=0):
+    if name.split(".", 1)[0] in {"joblib", "numpy", "torch"}:
+        raise ModuleNotFoundError(f"blocked optional model dependency: {name}")
+    return real_import(name, globals, locals, fromlist, level)
+
+builtins.__import__ = reject_optional_runtime
+from tools.e2 import qualification
+
+assert callable(qualification.qualify)
+assert callable(qualification.build_first_report)
+assert callable(qualification.build_model_assisted_report)
+assert "tools.e2.qualification.phase2" not in sys.modules
+assert "tools.e2.qualification._phase2_models" not in sys.modules
+"""
+    completed = subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=REPO,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+
+
 def _record(run_root: Path, relative_path: str, role: str) -> dict[str, object]:
     path = run_root / relative_path
     raw = path.read_bytes()
