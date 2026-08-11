@@ -1,11 +1,16 @@
 # CAD OS — CORE control plane (DWG-native via AutoCAD).
 #
 # The AutoCAD/DWG core (cad.run_operation, inspect, patch, diff, validate, query,
-# the 457 native ObjectARX ops, and the cadagent MCP server) is PURE PYTHON STDLIB.
-# The only third-party dependency is jsonschema, and even that is optional — the
-# validator/IR modules import-guard it and degrade gracefully if it is absent.
+# and native ObjectARX operations) are PURE PYTHON STDLIB.  cadagent's MCP stdio
+# host uses the official Python SDK; the CAD/validator modules remain isolated
+# from that protocol dependency.
 #
-# So: this one tiny pure-python package is all you need for full AutoCAD control.
+# So: this one tiny package is all you need for full AutoCAD control plus the
+# CADAgent stdio MCP host.
 # Python 3.10+ recommended (3.12 matches the build environment).
 
 jsonschema>=4.0
+# Keep the shared/default interpreter on the FastMCP v1 line.  The same
+# CADAgent entrypoint supports v2, but v2 must be installed only via the
+# isolated matrix target (requirements-mcp-sdk-v2.txt) until Grasshopper ports.
+mcp==1.27.1

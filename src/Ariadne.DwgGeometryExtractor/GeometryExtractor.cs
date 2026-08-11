@@ -119,14 +119,7 @@ public sealed class GeometryExtractor
                 Radius = circle.Radius,
             },
             BlockReference block => ExtractBlockReference(block, tr),
-            DBText text => new GeometryPayload
-            {
-                Kind = "text",
-                Position = ToPoint(text.Position),
-                Text = text.TextString,
-                Height = text.Height,
-                Rotation = text.Rotation,
-            },
+            DBText text => ExtractText(text),
             MText text => new GeometryPayload
             {
                 Kind = "mtext",
@@ -147,6 +140,23 @@ public sealed class GeometryExtractor
                 LoopCount = hatch.NumberOfLoops,
             },
             _ => new GeometryPayload { Kind = "unsupported" },
+        };
+    }
+
+    private static GeometryPayload ExtractText(DBText text)
+    {
+        var isDefaultAlignment = text.IsDefaultAlignment;
+        return new GeometryPayload
+        {
+            Kind = "text",
+            Position = ToPoint(text.Position),
+            AlignmentPoint = isDefaultAlignment ? null : ToPoint(text.AlignmentPoint),
+            IsDefaultAlignment = isDefaultAlignment,
+            HorizontalMode = (int)text.HorizontalMode,
+            VerticalMode = (int)text.VerticalMode,
+            Text = text.TextString,
+            Height = text.Height,
+            Rotation = text.Rotation,
         };
     }
 

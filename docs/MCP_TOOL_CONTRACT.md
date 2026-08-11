@@ -1,126 +1,167 @@
 # MCP_TOOL_CONTRACT — `tools/cadagent_mcp.py`
 
-Lane E MCP shell for the CAD OS Layer (stdio / **MOCK** transport).
+This document is the public contract for the CADAgent MCP endpoint on the PR #67
+integration branch. The endpoint is the official Python MCP SDK over persistent
+stdio; it is not the retired private JSON-RPC compatibility shim. The branch is
+still Draft, so this document does not claim that the SDK integration is merged
+into `main`.
 
-## Purpose
+## Purpose and safety boundary
 
-Expose the CAD OS Layer as a small set of agent-callable MCP tools. **Every tool
-delegates to a CAD OS Layer shell** (`cadctl` / `validator` / `patch_engine`) —
-never to a raw SDK and never to ad-hoc DWG parsing. That keeps every safety
-invariant (staged-copy, router-only extraction, no-fake-success, deterministic
-validation) in exactly one place.
+`cadagent_mcp.py` owns the CAD OS Layer tool catalogue and dispatch table. Each
+handler delegates to a CAD OS shell (`cadctl`, `validator`, `patch_engine`,
+`cad_diff`, or `visual_report`) and does not parse a DWG or call a raw SDK
+directly. The shells keep the safety rules in one place: original DWGs remain
+read-only, writes use a staged copy, unavailable routes return a truthful
+blocked/not-implemented result, and no result is fabricated as success.
 
-## Transport
+The official SDK owns protocol negotiation, stdio framing, lifecycle
+notifications, `ping`, and the `CallToolResult` model. The adapter in
+`tools/cadagent_mcp_sdk.py` bridges the existing handler envelopes to the SDK
+without changing the published tool schemas.
 
-If a real MCP server library were importable it could host these tools. In this
-packet **no MCP library is assumed**, so this module ships a minimal stdlib
-**JSON-RPC 2.0 over stdio MOCK** plus a self-describing manifest.
-`transport == "mock"` is reported everywhere so no consumer mistakes it for a
-production MCP endpoint.
+## SDK version lanes
 
-## Safety guarantees
+The shared interpreter and the isolated compatibility target are deliberately
+separate:
 
-- **Standard library only.** Sibling shells are imported by file path with
-  `importlib`, defensively — a missing/erroring shell is reported in the
-  manifest (`shells.<name>.loaded/error`), it does not crash the server.
-- **Delegation only.** No tool touches a raw SDK or parses a DWG; each calls a
-  shell function. Drawing extraction flows `cadctl → router` (staged copy).
-- **No-fake-success.** A tool whose shell is unavailable returns
-  `{"ok": false, "status": "error", "error": "…"}` — never a fake success.
-  `cad.patch_dry_run` plans only (execution `not_implemented`).
+| lane | package | installation surface | required gate |
+|---|---|---|---|
+| v1 (default) | `mcp==1.27.1` | `requirements.txt` / `install.ps1` | The matrix removes inherited `PYTHONPATH` and `CADAGENT_MCP_V2_TARGET`, verifies the exact v1 version before pytest, and verifies that `mcp.__file__` is outside the v2 target. |
+| v2 (compatibility) | `mcp==2.0.0` | `requirements-mcp-sdk-v2.txt` into a dedicated `--target` directory | The matrix imports from the exact target and rejects both a different version and a module path outside that target. |
 
-## Tools
+Run the matrix with `tools/test_cadagent_mcp_sdk_matrix.ps1`. Both lanes use the
+same real stdio integration test and no AutoCAD or DWG execution.
 
-**Every handler delegates to a CAD OS Layer shell** (`cadctl` / `validator` / `patch_engine` /
-`cad_diff` / `visual_report`) — **never to a raw SDK and never to ad-hoc DWG parsing**. Drawing
-extraction always flows `cadctl → autocad-router.ps1` against a staged copy. The dispatch table
-binds **12 tools** today; `set(_DISPATCH) == {t["name"] for t in manifest.tools}` (self-test
-invariant).
+## Server and transport
 
-### Wired tools (all in `_DISPATCH`, callable now)
+Start the endpoint with:
 
-| tool | delegates to | required args | return (inside `{"ok":true,"result":…}`) |
-|------|--------------|---------------|------------------------------------------|
-| `cad.status` | `cadctl.Cad().status()` | — | `ariadne.cadctl.status.v1` (route_count, available_count, native_available) — read-only snapshot of the published status JSON; never runs `-Action status` |
-| `cad.inspect_drawing` | `cadctl.Cad().inspect(dwg, out, mode)` | `dwg`, `out` | `ariadne.cadctl.inspect.v1` envelope (cad_job, cad_result, dwg_graph_ir refs, entity_count) |
-| `cad.query_entities` | `cadctl.Cad().query(ir, sql)` | `ir`, `sql` | `ariadne.cadctl.query.v1` (`columns`, `rows`, `row_count`) over the IR-backed SQLite store |
-| `cad.get_entity` | `cadctl.Cad().query(ir, handle-SQL)` | `ir`, `handle` | same as `query_entities`, filtered to one handle |
-| `cad.validate_ir` | `validator.validate_target(ir, run_dir)` | `ir` **and/or** `run_dir` | `ariadne.validation_report.v1` (14 gates) |
-| `cad.registry_status` | `cadctl.Cad().registry_coverage()` | — | `ariadne.cadctl.registry_coverage.v1` (operation_count, wired_count, by_status) |
-| `cad.registry_explain` | `cadctl.Cad().registry_explain(op_id)` | `op_id` | `ariadne.cadctl.registry_explain.v1` (the full v2 registry record for one op) |
-| `cad.patch_dry_run` | `patch_engine.dry_run_plan(patch)` | `patch` | `ariadne.cad_patch.dry_run.v1` (plan only; `execution: "not_implemented"`) |
-| `cad.patch_apply_staged` | `patch_engine.apply_staged(patch, dwg_path, out_dir)` | `patch`, `dwg_path`, `out_dir` | the staged-write result envelope (status `ok`/`blocked`/`not_implemented`/`partial`; refs to pre/post IR, `cad_diff.json`, `journal.json`, original-unchanged proof). See PATCH_ENGINE_SPEC §A. |
-| `cad.diff_before_after` | `cad_diff.compute_diff(pre_ir, post_ir)` | `pre_ir`, `post_ir` | `ariadne.cad_diff.v1` (handle-keyed; `summary.added/removed/modified`; `comparison_basis: "handle"`). The handler loads the two IR paths (BOM-tolerant) and calls `compute_diff`. |
-| `cad.visual_report` | `visual_report.build_visual_report(source_ref, kind)` | `source_ref` | `ariadne.visual_artifact.v1` — a render it cannot produce returns **`NOT_IMPLEMENTED`**, never a fake PASS |
-| `cad.live_status` | truthful local liveness probe (no shell) | — | a truthful liveness report; the live ARX named-pipe pump is **not attached** (design-only) and is reported as such, not faked |
-
-Each result envelope is `{"ok": true, "result": …}` on success, or
-`{"ok": false, "status": "error", "error": "…", "delegate": "…"}` when the underlying shell is
-unavailable (no-fake-success). `cad.get_entity` builds a read-only
-`SELECT * FROM entities WHERE handle = '…'` (handle single-quote-escaped); read-only enforcement
-lives in the cadctl/sqlite shell, not here. `cad.patch_apply_staged` mutates only a **staged copy**
-(the shell stages the copy; the router `_QSAVE`s its own copy) and **never** the original.
-
-## JSON-RPC methods
-
-| method | params | result |
-|--------|--------|--------|
-| `initialize` | — | `{serverInfo, transport, capabilities}` |
-| `tools/list` | — | `{tools: [...]}` (the manifest tool list) |
-| `tools/call` | `{name, arguments}` | the delegated tool result, or a JSON-RPC error |
-
-- Unknown tool → JSON-RPC error `-32601` with `data.available`.
-- Tool raising → JSON-RPC error `-32000` with `data` = repr of the exception.
-- Notifications (requests without `id`) produce no response.
-- Parse errors → `-32700`.
-
-Each tool result envelope is `{"ok": bool, "result": ...}` on success or
-`{"ok": false, "status": "error", "error": "...", "delegate": "..."}` when the
-underlying shell is unavailable.
-
-## Exact commands
-
-```bash
-# Print the self-describing tools manifest (default), verdict on last line.
-python tools/cadagent_mcp.py        # exit 0 = SELFTEST_OK
-
-# Speak JSON-RPC 2.0 over stdio (newline-delimited requests on stdin):
+```powershell
 python tools/cadagent_mcp.py --serve
-# e.g. echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | python tools/cadagent_mcp.py --serve
 ```
 
-Verdict line example:
-`SELFTEST_OK | tools=12 transport=mock | validator_loaded=True cadctl_loaded=True`
+The server name is `cadagent-mcp`; the module version constant is `0.1.0`.
+`tools_manifest()` reports `transport: "mcp-sdk"` and
+`protocol: "official-mcp-sdk-over-stdio"`. The client performs the normal SDK
+`initialize` exchange, sends `notifications/initialized`, and may send `ping`.
 
-## Manifest shape
+The public endpoint has exactly 19 registered tools. `tools/list` exposes the
+closed schemas from `_TOOLS`; every schema has `additionalProperties: false`.
+The exact names are:
 
-```jsonc
-{
-  "server": "cadagent-mcp", "version": "0.1.0",
-  "transport": "mock", "protocol": "jsonrpc-2.0-over-stdio (mock)",
-  "shells": { "validator": {"loaded": true, "error": null}, "patch_engine": {...}, "cadctl": {...} },
-  "tools": [ { "name": "cad.status", "delegates_to": "cadctl.Cad.status", "inputSchema": {...} }, ... ],
-  "notes": [ "Every tool delegates to a shell …", "transport is 'mock' …", "cad.patch_dry_run never executes …" ]
-}
+1. `cad.status`
+2. `cad.inspect_drawing`
+3. `cad.query_entities`
+4. `cad.get_entity`
+5. `cad.validate_ir`
+6. `cad.registry_status`
+7. `cad.registry_explain`
+8. `cad.patch_dry_run`
+9. `cad.patch_apply_staged`
+10. `cad.anchor_set`
+11. `cad.anchor_get`
+12. `cad.anchor_list`
+13. `cad.anchor_clear`
+14. `cad.diff_before_after`
+15. `cad.visual_report`
+16. `cad.live_status`
+17. `cad.run_operation`
+18. `cad.inspect_display_membership`
+19. `cad.run_command_template`
+
+The public schema is the source of truth for required fields, defaults, enum
+values, and descriptions. The implementation and the integration test must
+keep the 19-name set and each `inputSchema` equal.
+
+## Tool surface and mutation rules
+
+| tool family | public behavior |
+|---|---|
+| `cad.status`, `cad.registry_status`, `cad.registry_explain` | Read router status or registry records through `cadctl`. |
+| `cad.inspect_drawing`, `cad.query_entities`, `cad.get_entity`, `cad.validate_ir` | Read/extract/query/validate through the CAD shells; drawing input is staged and the original is not modified. |
+| `cad.patch_dry_run`, `cad.patch_apply_staged` | Plan or apply a patch only on a staged copy; a missing peer implementation is reported as `not_implemented`. |
+| `cad.anchor_set`, `cad.anchor_clear` | Write semantic-anchor data to a staged copy; `anchor_get` and `anchor_list` read an extracted IR. |
+| `cad.diff_before_after`, `cad.visual_report` | Produce a structured IR diff or visual artifact, with unavailable producers reported truthfully. |
+| `cad.live_status` | Reports that the persistent live ObjectARX pump is not attached; it never fakes live success. |
+| `cad.run_operation` | Uses the registry allow-list and write-mode gate; `write_original` is always refused and the source DWG remains read-only. |
+| `cad.inspect_display_membership` | Full AutoCAD/ObjectARX display-membership observation on a staged copy; no headless fallback. |
+| `cad.run_command_template` | Runs only a governed command template with typed slots; raw command strings are not accepted. |
+
+## Hidden legacy aliases and argument binding
+
+The adapter accepts **hidden legacy aliases** for compatibility with existing
+callers, but aliases are not present in `tools/list` and must not be added to a
+published `inputSchema`. The accepted aliases are:
+
+| public tool | hidden aliases accepted by the runtime binder |
+|---|---|
+| `cad.inspect_drawing` | `dwg_path`, `out_dir` |
+| `cad.query_entities`, `cad.get_entity`, `cad.validate_ir`, `cad.anchor_get`, `cad.anchor_list` | `ir_path` |
+| `cad.registry_explain` | `operation`, `id` |
+| `cad.patch_apply_staged` | `dwg`, `out` |
+| `cad.anchor_set` | `dwg_path`, `out_dir` |
+| `cad.anchor_clear` | `dwg_path`, `out_dir` |
+| `cad.diff_before_after` | `pre_ir_path`, `pre`, `post_ir_path`, `post` |
+| `cad.visual_report` | `source`, `ir`, `dwg` |
+| `cad.run_operation` | `operation`, `id`, `dwg_path`, `out_dir` |
+| `cad.run_command_template` | `dwg_path` |
+| `cad.inspect_display_membership` | `dwg_path`, `out_dir` |
+
+The adapter uses an internal missing sentinel. Therefore an **omitted** optional
+argument is absent from the handler dictionary, while an explicit JSON `null`
+is retained as Python `None`. For example, omitted `mode` on
+`cad.inspect_drawing` reaches the handler default, while `"mode": null` is
+forwarded explicitly; omitted `geometry_scope` on
+`cad.inspect_display_membership` selects `strict_layer_entities_v1`, while an
+explicit JSON null is rejected as a structured error. This distinction is part
+of the contract and is tested through a real `ClientSession`.
+
+## Results and errors
+
+For a registered tool, the adapter returns an SDK `CallToolResult` with:
+
+- one text item in `content`, containing the JSON-serialized CAD handler
+  envelope;
+- the same handler envelope in `structuredContent`; and
+- `isError` equal to `true` exactly when the envelope has `ok: false`.
+
+Normal CAD outcomes such as a truthful `status: "blocked"` result remain a
+structured tool result. A handler exception is caught and converted to a
+**structured error** envelope with `ok: false`, `status: "error"`, an error
+message, and the tool name; the SDK result then has `isError=true` and the same
+object in `structuredContent`.
+
+An unknown tool is different: the official SDK rejects it before a CAD handler
+is called and returns a `CallToolResult` with `isError=true`,
+`structuredContent=null`, and a text item beginning `Unknown tool:`. This is the
+public behavior; the old local `_dispatch_tool` helper is test/diagnostic
+coverage only and is not a JSON-RPC endpoint.
+
+## Resources
+
+The server registers no resources or resource templates. The official SDK
+responses are therefore:
+
+- `resources/list` → `resources: []`
+- `resources/templates/list` → `resourceTemplates: []`
+
+These empty lists are a deliberate contract, not an indication that the server
+failed to initialize.
+
+## Verification commands
+
+```powershell
+# Shared/default lane: requirements.txt installs both jsonschema and mcp==1.27.1.
+python -m pip install -r requirements.txt
+
+# Real stdio contract; uses nonexistent DWG paths and temporary directories only.
+python -m pytest -q tests/integration/test_cadagent_mcp_sdk_stdio.py
+
+# v1 + isolated v2 matrix (v2 is installed only under the target directory).
+powershell -ExecutionPolicy Bypass -File .\tools\test_cadagent_mcp_sdk_matrix.ps1 -InstallV2
 ```
 
-## Not implemented yet (truthful degradation, not faked)
-
-- **Real MCP transport.** This is a stdlib JSON-RPC mock (`transport == "mock"`), not an
-  `mcp`-library-hosted server. Promoting it means binding the same `_DISPATCH`
-  table to a real MCP server (`stdio`/SSE) once that dependency is permitted.
-- **Shell availability.** Every tool is only as live as the shell it delegates to. All five shells
-  (`cadctl`, `validator`, `patch_engine`, `cad_diff`, `visual_report`) are present today; if one
-  were absent the tool returns an explicit `delegate`/`error` envelope (verified by the self-test,
-  which exercises `cad.validate_ir` against a nonexistent IR and gets a truthful result, not a fake
-  pass).
-- **`cad.patch_dry_run`** plans only — declared-op execution there is `not_implemented`. Use
-  **`cad.patch_apply_staged`** for the real staged write (see `PATCH_ENGINE_SPEC.md` §A).
-- **`cad.patch_apply_staged`** returns a truthful `not_implemented` for any patch op that has no
-  native write handler (only `create_line`/`create_circle`/`set_layer`/`create_layer` map to a live
-  native op) and for any unavailable sibling/host — never a fake `ok`.
-- **`cad.visual_report`** returns `NOT_IMPLEMENTED` for any render it cannot actually produce
-  (no fake PASS). **`cad.live_status`** reports the live ARX pump as not-attached (design-only).
-
-> Self-test invariant: `tools=12`, `transport=mock`, and `set(_DISPATCH) == {t["name"] for t in
-> manifest.tools}`. The wired tool count is **12**; keep this in sync with `_DISPATCH`/`_TOOLS`.
+The matrix performs the exact version/path checks before each lane's pytest
+run. It restores inherited `PYTHONPATH` and `CADAGENT_MCP_V2_TARGET` values in
+`finally` blocks, including when a preflight or test fails.

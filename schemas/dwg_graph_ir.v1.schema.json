@@ -732,7 +732,18 @@
         "end": { "$ref": "#/$defs/point3" },
         "center": { "$ref": "#/$defs/point3" },
         "position": { "$ref": "#/$defs/point3" },
-        "alignment_point": { "$ref": "#/$defs/point3", "description": "DXF group 11 alignment anchor for TEXT when horizontal or vertical alignment mode is nonzero." },
+        "base_point": { "$ref": "#/$defs/point3", "description": "Explicit WCS base point required for RAY and XLINE geometry." },
+        "unit_dir": {
+          "description": "Explicit non-zero WCS direction required for RAY and XLINE geometry.",
+          "allOf": [
+            { "$ref": "#/$defs/point3" },
+            { "not": { "const": [0.0, 0.0, 0.0] } }
+          ]
+        },
+        "alignment_point": { "$ref": "#/$defs/point3", "description": "DXF group 11 alignment anchor for non-default TEXT; absent when AcDbText::isDefaultAlignment() is true because alignmentPoint() then returns an origin sentinel." },
+        "is_default_alignment": { "type": "boolean", "description": "AcDbText::isDefaultAlignment(); this explicit state distinguishes a real origin alignment from the default-alignment alignmentPoint() sentinel." },
+        "horizontal_mode": { "type": "integer", "minimum": 0, "maximum": 5, "description": "AcDb::TextHorzMode ordinal (0 left, 1 center, 2 right, 3 aligned, 4 middle, 5 fit)." },
+        "vertical_mode": { "type": "integer", "minimum": 0, "maximum": 3, "description": "AcDb::TextVertMode ordinal (0 base, 1 bottom, 2 middle, 3 top)." },
         "radius": { "type": "number" },
         "major_axis": { "$ref": "#/$defs/point3" },
         "minor_ratio": { "type": "number" },
@@ -848,7 +859,16 @@
         "ole_data_sha256": { "type": ["string", "null"], "pattern": "^[0-9a-fA-F]{64}$" },
         "ole_data_bytes": { "type": ["integer", "null"], "minimum": 0 },
         "ole_data_unavailable_reason": { "type": "string" }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "kind": { "enum": ["ray", "xline"] } },
+            "required": ["kind"]
+          },
+          "then": { "required": ["base_point", "unit_dir"] }
+        }
+      ]
     },
     "entity": {
       "type": "object",

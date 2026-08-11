@@ -8,8 +8,8 @@
   What it does (no surprises):
     1. Detect AutoCAD (accoreconsole.exe) and its version.
     2. Verify the committed prebuilt native modules for that version exist.
-    3. Detect Python; pip-install the core dep (jsonschema). -Full adds the heavy
-       non-AutoCAD geometry routes.
+    3. Detect Python; pip-install the core dependencies (jsonschema + MCP SDK
+       v1). -Full adds the heavy non-AutoCAD geometry routes.
     4. Run a router status smoke.
     5. PRINT the MCP registration block to paste into your agent config.
 
@@ -29,6 +29,24 @@ $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
 function Say  ($m) { Write-Host $m -ForegroundColor Cyan }
 function Ok   ($m) { Write-Host "  + $m" -ForegroundColor Green }
 function Warn ($m) { Write-Host "  ! $m" -ForegroundColor Yellow }
+function Invoke-CheckedNative {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)][string]$Label,
+    [Parameter(Mandatory = $true)][string]$FilePath,
+    [Parameter(Mandatory = $true)][string[]]$ArgumentList
+  )
+
+  # PowerShell does not throw for a nonzero native exit by default.  Reset stale
+  # state so a failed dependency install or router smoke cannot print a false Ok.
+  $global:LASTEXITCODE = 0
+  & $FilePath @ArgumentList
+  $commandSucceeded = $?
+  $exitCode = $LASTEXITCODE
+  if (-not $commandSucceeded -or $exitCode -ne 0) {
+    throw "$Label failed with exit code $exitCode."
+  }
+}
 
 Say "CAD OS installer"
 Write-Host "  repo: $Root"
@@ -77,28 +95,35 @@ if (-not $PythonExe) {
   }
 }
 if (-not $PythonExe) { throw "Python not found. Install Python 3.10+ (3.12 recommended) and re-run." }
-$pyv = (& $PythonExe -c "import sys;print('%d.%d'%sys.version_info[:2])").Trim()
+$pyv = (Invoke-CheckedNative -Label 'Python version check' -FilePath $PythonExe `
+  -ArgumentList @('-c', "import sys;print('%d.%d'%sys.version_info[:2])")).Trim()
 Ok "Python $pyv  ($PythonExe)"
 
-Say "Installing core dependency (jsonschema)..."
-& $PythonExe -m pip install --quiet --disable-pip-version-check -r (Join-Path $Root 'requirements.txt')
+Say "Installing core dependencies (jsonschema + MCP SDK v1)..."
+Invoke-CheckedNative -Label 'core dependency install' -FilePath $PythonExe `
+  -ArgumentList @('-m', 'pip', 'install', '--quiet', '--disable-pip-version-check',
+                  '-r', (Join-Path $Root 'requirements.txt'))
 Ok "core deps installed"
 if ($Full) {
   Say "Installing OPTIONAL geometry-route deps (heavy; non-AutoCAD routes)..."
-  & $PythonExe -m pip install --disable-pip-version-check -r (Join-Path $Root 'requirements-full.txt')
+  Invoke-CheckedNative -Label 'full dependency install' -FilePath $PythonExe `
+    -ArgumentList @('-m', 'pip', 'install', '--disable-pip-version-check',
+                    '-r', (Join-Path $Root 'requirements-full.txt'))
   Ok "full deps installed"
 }
 
 # 4) router status smoke --------------------------------------------------------
 Say "Router status smoke (live tool probe)..."
-& (Join-Path $Root 'tools\autocad-router.ps1') -Action status | Out-Null
+Invoke-CheckedNative -Label 'router status smoke' `
+  -FilePath (Join-Path $Root 'tools\autocad-router.ps1') -ArgumentList @('-Action', 'status') | Out-Null
 Ok "router status ran (see reports\autocad_router_status_latest.json)"
 
 # 5) MCP registration block to paste -------------------------------------------
 # Resolve the CONCRETE interpreter (sys.executable) so the MCP command is
 # deterministic even when Python was found via the 'py' launcher.
 $pyAbs = ''
-try { $pyAbs = (& $PythonExe -c "import sys;print(sys.executable)").Trim() } catch { $pyAbs = '' }
+$pyAbs = (Invoke-CheckedNative -Label 'Python executable resolution' -FilePath $PythonExe `
+  -ArgumentList @('-c', 'import sys;print(sys.executable)')).Trim()
 if (-not $pyAbs) {
   $cmd = Get-Command $PythonExe -ErrorAction SilentlyContinue
   if ($cmd -and $cmd.Source) { $pyAbs = $cmd.Source } else { $pyAbs = $PythonExe }
