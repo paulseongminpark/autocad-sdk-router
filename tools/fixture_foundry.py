@@ -74,6 +74,10 @@ if str(_THIS_DIR) not in sys.path:
     sys.path.insert(0, str(_THIS_DIR))
 
 import cadctl  # noqa: E402
+from operation_provenance import (  # noqa: E402
+    ExecutionReceiptError,
+    parse_execution_receipt,
+)
 
 SCHEMA_MINT_RESULT = "ariadne.cad_os.f10.mint_result.v1"
 SCHEMA_MANIFEST_RUN = "ariadne.cad_os.f10.manifest_run.v1"
@@ -374,13 +378,11 @@ def _wire_handle(args: dict, prereq_spec: dict, handle: str) -> dict:
 def _lane_a_create(cad, op_id: str, args: dict, dwg_path: str, out_dir: str | Path) -> dict:
     """Run one Lane-A create on a staged copy; return an honest interpretation.
 
-    Returns {"ok", "reason", "handle", "envelope", "staged_copy"}. "ok" is True
-    ONLY when the native result explicitly reports created:true, errorstatus 0
-    (when present), and a handle. cadctl's own envelope status is NEVER
-    trusted alone -- run_operation reports status=='ok' as soon as ANY native
-    result JSON parses, including a MISSING_ARG / native error payload (see
-    cadctl.Cad.run_operation: native_status falls back to "ok" when the inner
-    result has no "status" key of its own).
+    Returns {"ok", "reason", "handle", "envelope", "staged_result"}. "ok" is True
+    ONLY when the canonical execution receipt is provenance-bound and successful,
+    and the native result explicitly reports created:true, errorstatus 0 (when
+    present), and a handle. Neither flat compatibility aliases nor the native
+    result object is trusted alone.
     """
     envelope = cad.run_operation(
         op_id, args=dict(args), write_mode="write_copy",
@@ -388,15 +390,25 @@ def _lane_a_create(cad, op_id: str, args: dict, dwg_path: str, out_dir: str | Pa
     )
     out: dict[str, Any] = {
         "ok": False, "reason": "", "handle": None, "envelope": envelope,
-        "staged_copy": envelope.get("staged_copy") if isinstance(envelope, dict) else None,
+        "staged_result": None, "staged_result_sha256": None,
     }
     if not isinstance(envelope, dict) or not envelope.get("executed"):
         reason = envelope.get("reason") if isinstance(envelope, dict) else None
         out["reason"] = reason or "operation was not executed (registry/write-mode refusal)"
         return out
-    if not envelope.get("original_unchanged", True):
-        out["reason"] = "SAFETY: source DWG changed during Lane-A create -- refusing to mint"
+    try:
+        receipt = parse_execution_receipt(envelope)
+        if receipt is None:  # pragma: no cover -- executed envelopes cannot parse to None
+            raise ExecutionReceiptError(
+                "MISSING_EXECUTION_RECEIPT",
+                "executed operation has no execution receipt",
+            )
+        result_artifact = receipt.require_successful_result()
+    except ExecutionReceiptError as exc:
+        out["reason"] = "invalid or unbound execution receipt: %s" % (exc,)
         return out
+    out["staged_result"] = result_artifact.path
+    out["staged_result_sha256"] = result_artifact.sha256
     result = envelope.get("result")
     if not isinstance(result, dict):
         out["reason"] = envelope.get("reason") or "no native result object returned"
@@ -496,9 +508,10 @@ def mint_fixture(kind: str, *, seed_dwg: str = DEFAULT_SEED_DWG,
             record["reason"] = "prereq %r failed: %s" % (prereq_spec["op_id"], prereq["reason"])
             return record
         record["prereq"]["handle"] = prereq["handle"]
-        # Chain onto the prereq's OWN staged copy so the create sees the new curve.
-        if prereq["staged_copy"]:
-            dwg_for_create = prereq["staged_copy"]
+        # Chain onto the prereq's bound post-operation result so the dependent
+        # create sees the newly persisted curve.
+        if prereq["staged_result"]:
+            dwg_for_create = prereq["staged_result"]
         args = _wire_handle(args, prereq_spec, prereq["handle"])
 
     # --- Lane-A create on a staged copy ---
@@ -512,9 +525,9 @@ def mint_fixture(kind: str, *, seed_dwg: str = DEFAULT_SEED_DWG,
         return record
     handle = create["handle"]
     record["handle"] = handle
-    staged_with_entity = create["staged_copy"]
+    staged_with_entity = create["staged_result"]
     if not staged_with_entity or not Path(staged_with_entity).is_file():
-        record["reason"] = "create reported success but no staged copy file was produced"
+        record["reason"] = "create reported success but no bound result file was produced"
         return record
 
     # --- re-inspect: a FRESH process re-opens the staged file and re-extracts.

@@ -54,11 +54,16 @@ if str(_THIS_DIR) not in sys.path:
     sys.path.insert(0, str(_THIS_DIR))
 
 import run_job  # noqa: E402  (sibling helper, Lane B1)
+from operation_provenance import (  # noqa: E402
+    ExecutionReceiptError,
+    build_execution_receipt,
+)
 import normalize_result  # noqa: E402  (sibling helper, Lane B1)
 import route_select  # noqa: E402  (sibling helper, Lane B1)
 import attended_lane  # noqa: E402  (dedicated full-AutoCAD one-shot lane)
 from verification import native_integrity as _native_integrity  # noqa: E402
 from verification import current_status as _current_status  # noqa: E402
+from verification import file_snapshot as _file_snapshot  # noqa: E402
 
 NATIVE_BUILD_MANIFEST_NAME = _native_integrity.NATIVE_BUILD_MANIFEST_NAME
 NATIVE_BUILD_MANIFEST_SCHEMA = _native_integrity.NATIVE_BUILD_MANIFEST_SCHEMA
@@ -232,6 +237,216 @@ def _path_reparse_error(path: Path) -> str | None:
         if current != absolute and not current.is_dir():
             return f"path component is not a directory: {current}"
     return None
+
+
+def _validated_operation_result_path(
+    reported_path: object,
+    *,
+    staging_root: Path,
+    expected_output_path: Path | None = None,
+) -> tuple[Path | None, tuple[str, ...]]:
+    """Resolve a router result only when it is the authorized regular file.
+
+    The router is an external process boundary.  Its reported path is evidence,
+    not authority, so callers must not hash or expose it until containment and
+    reparse checks succeed.
+    """
+    if not isinstance(reported_path, str) or not reported_path:
+        return None, ("RESULT_UNREPORTED",)
+    raw_candidate = Path(reported_path)
+    if not raw_candidate.is_absolute():
+        return None, ("RESULT_PATH_NOT_ABSOLUTE",)
+    candidate = Path(os.path.abspath(reported_path))
+    reparse_error = _path_reparse_error(candidate)
+    if reparse_error:
+        return None, ("RESULT_REPARSE_POINT",)
+    try:
+        resolved_candidate = candidate.resolve(strict=True)
+        if expected_output_path is not None:
+            if not expected_output_path.is_absolute():
+                return None, ("AUTHORIZED_OUTPUT_PATH_NOT_ABSOLUTE",)
+            expected_error = _path_reparse_error(expected_output_path)
+            if expected_error:
+                return None, ("AUTHORIZED_OUTPUT_PATH_UNSAFE",)
+            resolved_expected = expected_output_path.resolve(strict=True)
+            if os.path.normcase(str(resolved_candidate)) != os.path.normcase(
+                str(resolved_expected)
+            ):
+                return None, ("RESULT_OUTPUT_PATH_MISMATCH",)
+        else:
+            root_error = _path_reparse_error(staging_root)
+            if root_error:
+                return None, ("STAGING_ROOT_UNSAFE",)
+            resolved_root = staging_root.resolve(strict=True)
+            resolved_candidate.relative_to(resolved_root)
+    except FileNotFoundError:
+        return None, ("RESULT_NOT_FOUND",)
+    except (OSError, RuntimeError, ValueError):
+        return None, ("RESULT_OUTSIDE_STAGING",)
+    if not resolved_candidate.is_file():
+        return None, ("RESULT_NOT_REGULAR_FILE",)
+    return resolved_candidate, ()
+
+
+_NATIVE_OUTPUT_OPERATIONS = frozenset({
+    "transform.database.dxf_out",
+    "transform.database.save_as",
+    "transform.database.save_as_simple",
+})
+_NATIVE_OUTPUT_ARGUMENT_KEYS = ("out", "output_path", "output")
+
+
+def _authorized_native_output_path(
+    op_id: str, args: dict | None
+) -> Path | None:
+    if op_id not in _NATIVE_OUTPUT_OPERATIONS or not isinstance(args, dict):
+        return None
+    for key in _NATIVE_OUTPUT_ARGUMENT_KEYS:
+        value = args.get(key)
+        if isinstance(value, str) and value:
+            return Path(value)
+    return None
+
+
+def _validate_native_output_before_run(
+    output_path: Path,
+    *,
+    original: Path,
+    baseline: Path,
+    output_root: Path,
+) -> tuple[Path | None, tuple[str, ...]]:
+    """Reject an output that could overwrite a protected input before CAD runs."""
+
+    if not output_path.is_absolute():
+        return None, ("AUTHORIZED_OUTPUT_PATH_NOT_ABSOLUTE",)
+    candidate = Path(os.path.abspath(str(output_path)))
+    reparse_error = _path_reparse_error(candidate)
+    if reparse_error:
+        return None, ("AUTHORIZED_OUTPUT_PATH_UNSAFE",)
+    try:
+        root_error = _path_reparse_error(output_root)
+        if root_error:
+            return None, ("AUTHORIZED_OUTPUT_RUN_DIRECTORY_UNSAFE",)
+        resolved_root = output_root.resolve(strict=True)
+        if not resolved_root.is_dir():
+            return None, ("AUTHORIZED_OUTPUT_RUN_DIRECTORY_INVALID",)
+        parent = candidate.parent.resolve(strict=True)
+        if not parent.is_dir():
+            return None, ("AUTHORIZED_OUTPUT_PARENT_INVALID",)
+        candidate = parent / candidate.name
+        protected = (
+            ("ORIGINAL", original.resolve(strict=True)),
+            ("BASELINE", baseline.resolve(strict=True)),
+        )
+        for label, protected_path in protected:
+            if os.path.normcase(str(candidate)) == os.path.normcase(
+                str(protected_path)
+            ):
+                return None, (f"OUTPUT_PATH_COLLIDES_WITH_{label}",)
+        if os.path.lexists(candidate):
+            for label, protected_path in protected:
+                if os.path.samefile(candidate, protected_path):
+                    return None, (f"OUTPUT_PATH_COLLIDES_WITH_{label}",)
+        try:
+            candidate.relative_to(resolved_root)
+        except ValueError:
+            return None, ("AUTHORIZED_OUTPUT_OUTSIDE_RUN_DIRECTORY",)
+        if os.path.lexists(candidate):
+            return None, ("AUTHORIZED_OUTPUT_ALREADY_EXISTS",)
+    except (OSError, RuntimeError, ValueError):
+        return None, ("AUTHORIZED_OUTPUT_PATH_UNSAFE",)
+    return candidate, ()
+
+
+def _allocate_private_native_output_path(
+    requested_output: Path,
+    *,
+    output_root: Path,
+) -> tuple[Path | None, tuple[str, ...]]:
+    """Allocate a fresh run-owned path instead of letting CAD open a public name.
+
+    The requested path is an intent boundary only.  CAD receives a path beneath
+    a newly created, unpredictable directory; callers consume the actual result
+    path from the execution receipt and publish it separately after validation.
+    """
+
+    try:
+        resolved_root = output_root.resolve(strict=True)
+        private_root = Path(tempfile.mkdtemp(
+            prefix=".cadctl-native-output-",
+            dir=str(resolved_root),
+        ))
+        if _path_reparse_error(private_root):
+            return None, ("AUTHORIZED_OUTPUT_PRIVATE_DIRECTORY_UNSAFE",)
+        resolved_private = private_root.resolve(strict=True)
+        resolved_private.relative_to(resolved_root)
+        if not resolved_private.is_dir():
+            return None, ("AUTHORIZED_OUTPUT_PRIVATE_DIRECTORY_INVALID",)
+        candidate = resolved_private / requested_output.name
+        if os.path.lexists(candidate):
+            return None, ("AUTHORIZED_PRIVATE_OUTPUT_ALREADY_EXISTS",)
+    except (OSError, RuntimeError, ValueError):
+        return None, ("AUTHORIZED_OUTPUT_PRIVATE_ALLOCATION_FAILED",)
+    return candidate, ()
+
+
+def _operation_artifact_requests(
+    *, original: Path, baseline: Path, result: Path | None
+) -> dict[str, _file_snapshot.FileRequest]:
+    requests: dict[str, _file_snapshot.FileRequest] = {
+        "original": _file_snapshot.FileRequest(
+            original.parent, original.name, require_single_link=True
+        ),
+        "baseline": _file_snapshot.FileRequest(
+            baseline.parent, baseline.name, require_single_link=True
+        ),
+    }
+    if result is not None:
+        requests["result"] = _file_snapshot.FileRequest(
+            result.parent, result.name, require_single_link=True
+        )
+    return requests
+
+
+def _acquire_operation_artifacts(
+    *, original: Path, baseline: Path, result: Path | None
+) -> _file_snapshot.FileSnapshotLease:
+    return _file_snapshot.acquire_file_set(
+        _operation_artifact_requests(
+            original=original,
+            baseline=baseline,
+            result=result,
+        )
+    )
+
+
+def _project_run_operation_receipt(env: dict, receipt: dict) -> dict:
+    """Attach the canonical receipt and derive all legacy flat aliases from it."""
+    authorization = receipt["authorization"]
+    execution = receipt["execution"]
+    artifacts = receipt["artifacts"]
+    matches = receipt["matches"]
+    original = artifacts["original"]
+    baseline = artifacts["baseline"]
+    result = artifacts["result"]
+
+    env.update({
+        "execution_receipt": receipt,
+        "operation": authorization["operation"],
+        "write_mode": authorization["write_mode"],
+        "executed": execution["executed"],
+        "staged_copy": baseline["path"],
+        "staged_copy_sha256": baseline["sha256"],
+        "staged_copy_matches_original": matches["baseline_to_original"],
+        "staged_copy_unchanged": baseline["unchanged"],
+        "staged_result": result["path"],
+        "staged_result_sha256": result["sha256"],
+        "original_sha256_before": original["sha256_before"],
+        "original_sha256_after": original["sha256_after"],
+        "original_unchanged": matches["original_unchanged"],
+        "exit_code": execution["process_exit_code"],
+    })
+    return env
 
 
 _source_tree_digest = _native_integrity._source_tree_digest
@@ -1231,19 +1446,25 @@ class Cad:
         return None
 
     def _run_op_refusal(self, op_id, status_word, reason, out_dir,
-                        registry_status=None, blocked_reason=None) -> dict:
+                        registry_status=None, blocked_reason=None,
+                        write_mode=None) -> dict:
         env = {
             "schema": "ariadne.cadctl.run_operation.v1",
-            "operation": op_id,
             "status": status_word,
-            "executed": False,
             "registry_operation_status": registry_status,
             "reason": reason,
             "out_dir": str(out_dir),
         }
         if blocked_reason:
             env["registry_blocked_reason"] = blocked_reason
-        return env
+        receipt = build_execution_receipt(
+            authorized_operation=op_id,
+            authorized_write_mode=write_mode,
+            executed=False,
+            reported_status=status_word,
+            limitations=("pre-dispatch refusal; no CAD operation executed",),
+        )
+        return _project_run_operation_receipt(env, receipt)
 
     # ------------------------------------------------------------- run_operation
     def run_operation(self, op_id: str, args: dict | None = None,
@@ -1262,18 +1483,19 @@ class Cad:
             an explicit write_mode must be in allowed_write_modes; write_original is
             ALWAYS refused from this surface (the original DWG stays READ-ONLY).
           * a COPY is staged; the original DWG's sha is verified unchanged.
+          * native output operations write only to a fresh private path beneath
+            out_dir. The requested output name is never opened by CAD; callers
+            publish the receipt-bound result separately after verification.
 
-        Staged-copy snapshot (pre/post, for run-record-only verification):
+        Canonical execution receipt (pre/post, for run-record-only verification):
           the router (autocad-router.ps1 -> Invoke-CadJobRoute) stages its OWN,
           second-level copy under staging/dwg_job_<stamp>/ and _QSAVEs THAT one
           for write ops; the copy staged here (`staged_copy`) is never touched
           again, so its sha256 taken right before the router runs is a true
-          pre-write snapshot. The router's own post-run copy is reported back
-          as run_res["staged_used"]; its path + sha256 are surfaced here as
-          `staged_result` / `staged_result_sha256` so a caller can verify what a
-          write op actually produced from this record alone, without re-deriving
-          anything. read-mode ops never _QSAVE, so `staged_result_sha256` equals
-          `staged_copy_sha256` in that case.
+          pre-write snapshot. The router's own post-run copy, authorized
+          operation/write mode, input path, exit states, and hashes are compared
+          in `execution_receipt`. Legacy flat `staged_copy`/`staged_result`
+          aliases are derived from that receipt for one compatibility period.
         """
         out_dir_p = Path(out_dir) if out_dir else (self.router_home / "runs" / "run_op" / _ts())
         out_dir_p.mkdir(parents=True, exist_ok=True)
@@ -1318,14 +1540,38 @@ class Cad:
             return self._run_op_refusal(op_id, "blocked",
                 "run_operation requires a dwg_path (a copy is staged); no-input generator ops "
                 "are not yet wired through this surface",
-                out_dir_p, registry_status=op_status)
+                out_dir_p, registry_status=op_status, write_mode=wm)
         src = Path(dwg_path)
         if not src.exists():
             return self._run_op_refusal(op_id, "blocked",
-                f"input DWG not found: {dwg_path}", out_dir_p, registry_status=op_status)
+                f"input DWG not found: {dwg_path}", out_dir_p,
+                registry_status=op_status, write_mode=wm)
         original_sha256_before = _sha256_head(src, 64).lower()
-        stage_root = self.staging_golden / _ts()
-        stage_root.mkdir(parents=True, exist_ok=True)
+        try:
+            resolved_out_dir = out_dir_p.resolve(strict=True)
+            if _path_reparse_error(resolved_out_dir):
+                raise OSError("output directory contains a reparse point")
+            execution_dir = Path(tempfile.mkdtemp(
+                prefix=".cadctl-execution-",
+                dir=str(resolved_out_dir),
+            ))
+            staging_base = Path(self.staging_golden)
+            staging_base.mkdir(parents=True, exist_ok=True)
+            if _path_reparse_error(staging_base):
+                raise OSError("staging directory contains a reparse point")
+            stage_root = Path(tempfile.mkdtemp(
+                prefix=f"{_ts()}-",
+                dir=str(staging_base.resolve(strict=True)),
+            ))
+        except (OSError, RuntimeError, ValueError) as exc:
+            return self._run_op_refusal(
+                op_id,
+                "blocked",
+                f"EXECUTION_DIRECTORY_ALLOCATION_FAILED: {exc}",
+                out_dir_p,
+                registry_status=op_status,
+                write_mode=wm,
+            )
         staged = stage_root / "input.dwg"
         shutil.copy2(src, staged)
         try:
@@ -1344,93 +1590,359 @@ class Cad:
         staged_copy_sha256 = _sha256_head(staged, 64).lower()
         staged_copy_matches_original = (staged_copy_sha256 == original_sha256_before)
         if not staged_copy_matches_original:
-            return {
+            receipt = build_execution_receipt(
+                authorized_operation=op_id,
+                authorized_write_mode=wm,
+                executed=False,
+                reported_status="error",
+                original_path=str(src.resolve(strict=True)),
+                original_sha256_before=original_sha256_before,
+                original_sha256_after=original_sha256_before,
+                baseline_path=str(staged.resolve(strict=True)),
+                baseline_sha256=staged_copy_sha256,
+                baseline_sha256_after=staged_copy_sha256,
+                additional_failure_codes=("BASELINE_ORIGINAL_MISMATCH",),
+                limitations=("staging copy rejected before CAD execution",),
+            )
+            env = {
                 "schema": "ariadne.cadctl.run_operation.v1",
-                "operation": op_id,
                 "status": "error",
-                "executed": False,
                 "registry_operation_status": op_status,
-                "write_mode": wm,
                 "out_dir": str(out_dir_p),
-                "staged_copy": str(staged),
-                "staged_copy_sha256": staged_copy_sha256,
-                "original_sha256_before": original_sha256_before,
-                "staged_copy_matches_original": False,
                 "reason": "SAFETY VIOLATION: staged copy sha does not match original at staging time",
             }
+            return _project_run_operation_receipt(env, receipt)
+
+        requested_output_path = _authorized_native_output_path(op_id, args)
+        expected_output_path = None
+        if op_id in _NATIVE_OUTPUT_OPERATIONS:
+            if requested_output_path is None:
+                return self._run_op_refusal(
+                    op_id,
+                    "blocked",
+                    "AUTHORIZED_OUTPUT_PATH_MISSING: output-producing operation "
+                    "requires an explicit out/output_path/output",
+                    out_dir_p,
+                    registry_status=op_status,
+                    write_mode=wm,
+                )
+            requested_output_path, output_failures = (
+                _validate_native_output_before_run(
+                    requested_output_path,
+                    original=src,
+                    baseline=staged,
+                    output_root=out_dir_p,
+                )
+            )
+            if output_failures:
+                return self._run_op_refusal(
+                    op_id,
+                    "blocked",
+                    ", ".join(output_failures),
+                    out_dir_p,
+                    registry_status=op_status,
+                    write_mode=wm,
+                )
+            expected_output_path, allocation_failures = (
+                _allocate_private_native_output_path(
+                    requested_output_path,
+                    output_root=execution_dir,
+                )
+            )
+            if allocation_failures:
+                return self._run_op_refusal(
+                    op_id,
+                    "blocked",
+                    ", ".join(allocation_failures),
+                    out_dir_p,
+                    registry_status=op_status,
+                    write_mode=wm,
+                )
+
+        try:
+            input_lease = _acquire_operation_artifacts(
+                original=src.resolve(strict=True),
+                baseline=staged.resolve(strict=True),
+                result=None,
+            )
+        except _file_snapshot.SnapshotCaptureError as exc:
+            return self._run_op_refusal(
+                op_id,
+                "blocked",
+                f"PROTECTED_INPUT_SNAPSHOT_FAILED: {exc}",
+                out_dir_p,
+                registry_status=op_status,
+                write_mode=wm,
+            )
 
         # --- optional args -> ARIADNE_NATIVE_JOB job file (-JobPath) ---
         job_path = None
+        job_lease = None
         if args:
-            job_path = str(out_dir_p / "job_args.json")
+            job_root = (
+                expected_output_path.parent
+                if expected_output_path is not None
+                else Path(tempfile.mkdtemp(
+                    prefix=".cadctl-job-",
+                    dir=str(execution_dir),
+                ))
+            )
+            job_path = str(job_root / "job_args.json")
             payload = dict(args)
+            if expected_output_path is not None:
+                for key in _NATIVE_OUTPUT_ARGUMENT_KEYS:
+                    if key in payload:
+                        payload[key] = str(expected_output_path)
             payload["operation"] = op_id
+            payload["input_path"] = str(src.resolve(strict=True))
             Path(job_path).write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+            try:
+                job_lease = _file_snapshot.acquire_file_set({
+                    "job": _file_snapshot.FileRequest(
+                        job_root,
+                        "job_args.json",
+                        require_single_link=True,
+                    ),
+                })
+            except _file_snapshot.SnapshotCaptureError as exc:
+                input_lease.close()
+                return self._run_op_refusal(
+                    op_id,
+                    "blocked",
+                    f"JOB_ARGUMENT_SNAPSHOT_FAILED: {exc}",
+                    out_dir_p,
+                    registry_status=op_status,
+                    write_mode=wm,
+                )
 
         # --- drive the native job lane on the COPY ---
-        run_res = run_job.run_router_cad_job(str(staged), str(out_dir_p), op_id,
-                                             write_mode=wm, job_path=job_path)
-        original_sha256_after = _sha256_head(src, 64).lower()
-        original_unchanged = (original_sha256_before == original_sha256_after)
-        # Re-read cadctl's staged_copy AFTER the router: if bytes drifted, the path
-        # alone would mislead consumers ("staged_copy=pre-write" ambiguity).
-        staged_copy_sha_after = _sha256_head(staged, 64).lower()
-        staged_copy_unchanged = (staged_copy_sha_after == staged_copy_sha256)
+        try:
+            try:
+                run_res = run_job.run_router_cad_job(
+                    str(staged),
+                    str(execution_dir),
+                    op_id,
+                    write_mode=wm,
+                    job_path=job_path,
+                )
+            except Exception as exc:  # external process boundary must fail closed
+                run_res = {
+                    "exit_code": None,
+                    "stdout_path": None,
+                    "stderr_path": None,
+                    "execution": {},
+                    "result_json": None,
+                    "result": None,
+                    "staged_used": None,
+                    "timed_out": False,
+                    "error": (
+                        "router invocation raised "
+                        f"{type(exc).__name__}: {exc}"
+                    ),
+                }
+        finally:
+            if job_lease is not None:
+                job_lease.close()
+        # The result path is external testimony.  Validate it before opening it;
+        # the old ``staged_used`` alias is never an authority input here.
+        facts = run_res.get("execution")
+        fact_failures: list[str] = []
+        if not isinstance(facts, dict):
+            facts = {}
+            fact_failures.append("EXECUTION_FACTS_MISSING")
+        result_kind = facts.get("result_kind")
+        result_path, result_path_failures = _validated_operation_result_path(
+            facts.get("result_path"),
+            staging_root=Path(self.staging_golden).parent,
+            expected_output_path=(
+                expected_output_path if result_kind == "native_output" else None
+            ),
+        )
+        fact_failures.extend(result_path_failures)
+        result_is_baseline_path = (
+            result_path is not None
+            and os.path.normcase(str(result_path))
+            == os.path.normcase(str(staged.resolve(strict=True)))
+        )
+        artifact_snapshot = None
+        try:
+            artifact_snapshot = _acquire_operation_artifacts(
+                original=src.resolve(strict=True),
+                baseline=staged.resolve(strict=True),
+                result=None if result_is_baseline_path else result_path,
+            )
+        except _file_snapshot.SnapshotCaptureError as exc:
+            code = (
+                "RESULT_FILE_IDENTITY_COLLISION"
+                if "hardlink alias" in str(exc)
+                else "ARTIFACT_SNAPSHOT_FAILED"
+            )
+            fact_failures.append(code)
 
-        # Post-run snapshot: the router's own staged copy, reported back as
-        # staged_used (engine_output.input). For write ops this is the mutated
-        # (post-_QSAVE) file; for read ops it is the router's unmutated read copy.
-        staged_result = run_res.get("staged_used")
-        staged_result_sha256 = None
-        if isinstance(staged_result, str) and staged_result and Path(staged_result).is_file():
-            staged_result_sha256 = _sha256_head(Path(staged_result), 64).lower()
+        original_sha256_after = (
+            artifact_snapshot.files["original"].sha256
+            if artifact_snapshot is not None
+            else None
+        )
+        staged_copy_sha_after = (
+            artifact_snapshot.files["baseline"].sha256
+            if artifact_snapshot is not None
+            else None
+        )
+        result_sha256 = (
+            artifact_snapshot.files[
+                "baseline" if result_is_baseline_path else "result"
+            ].sha256
+            if artifact_snapshot is not None
+            and (
+                result_is_baseline_path
+                or "result" in artifact_snapshot.files
+            )
+            else None
+        )
+
+        result_obj = run_res.get("result")
+        native_status = facts.get("native_status")
+        observed_executed = facts.get("executed")
+        if type(observed_executed) is not bool:
+            fact_failures.append("EXECUTED_OBSERVATION_INVALID")
+            observed_executed = False
+
+        limitation_values: list[str] = [
+            "artifacts were handle-snapshotted twice; returned filesystem paths "
+            "are not immutable after receipt publication"
+        ]
+        limitation_code = facts.get("limitation_code")
+        if isinstance(limitation_code, str) and limitation_code:
+            limitation_values.append(limitation_code)
+        limitation_codes = facts.get("limitation_codes")
+        if isinstance(limitation_codes, list) and all(
+            isinstance(value, str) and value for value in limitation_codes
+        ):
+            limitation_values.extend(limitation_codes)
+        limitation_values = list(dict.fromkeys(limitation_values))
+
+        receipt_kwargs = {
+            "authorized_operation": op_id,
+            "authorized_write_mode": wm,
+            "executed": observed_executed,
+            "reported_status": facts.get("status"),
+            "executed_operation": facts.get("operation"),
+            "executed_write_mode": facts.get("write_mode"),
+            "router_input_path": facts.get("request_input"),
+            "original_path": str(src.resolve(strict=True)),
+            "original_sha256_before": original_sha256_before,
+            "original_sha256_after": original_sha256_after,
+            "baseline_path": str(staged.resolve(strict=True)),
+            "baseline_sha256": staged_copy_sha256,
+            "baseline_sha256_after": staged_copy_sha_after,
+            "result_path": str(result_path) if result_path else None,
+            "result_sha256": result_sha256,
+            "result_kind": facts.get("result_kind"),
+            "process_exit_code": facts.get("process_exit_code"),
+            "engine_exit_code": facts.get("engine_exit_code"),
+            "engine_output_exit_code": facts.get("engine_output_exit_code"),
+            "native_status": native_status,
+            "native_schema": facts.get("native_schema"),
+            "native_engine": facts.get("native_engine"),
+            "native_operation": facts.get("native_operation"),
+            "native_result_source": facts.get("native_result_source"),
+            "native_result_is_object": facts.get("native_result_is_object"),
+            "native_error_code": facts.get("native_error_code"),
+            "native_result_path": facts.get("native_result_path"),
+            "native_result_sha256": facts.get("native_result_sha256"),
+            "router_status": facts.get("router_status"),
+            "router_schema": facts.get("router_schema"),
+            "executed_route": facts.get("executed_route"),
+            "timed_out": facts.get("timed_out"),
+            "launch_error": facts.get("launch_error") or run_res.get("error"),
+            "input_kind": facts.get("input_kind"),
+            "save_command_issued": facts.get("save_command_issued"),
+            "router_working_sha256_before": facts.get("working_sha256_before"),
+            "router_working_sha256_after": facts.get("working_sha256_after"),
+            "additional_failure_codes": tuple(dict.fromkeys(fact_failures)),
+            "limitations": tuple(limitation_values),
+        }
+        receipt_from_full_facts = True
+        try:
+            receipt = build_execution_receipt(**receipt_kwargs)
+        except ExecutionReceiptError as exc:
+            receipt_from_full_facts = False
+            # Malformed external testimony is itself evidence of an unbound run.
+            # Rebuild with only caller-observed facts so the public API fails
+            # closed instead of raising across the agent boundary.
+            receipt = build_execution_receipt(
+                authorized_operation=op_id,
+                authorized_write_mode=wm,
+                executed=observed_executed,
+                reported_status=None,
+                original_path=str(src.resolve(strict=True)),
+                original_sha256_before=original_sha256_before,
+                original_sha256_after=original_sha256_after,
+                baseline_path=str(staged.resolve(strict=True)),
+                baseline_sha256=staged_copy_sha256,
+                baseline_sha256_after=staged_copy_sha_after,
+                result_path=str(result_path) if result_path else None,
+                result_sha256=result_sha256,
+                result_kind=facts.get("result_kind"),
+                additional_failure_codes=tuple(dict.fromkeys([
+                    *fact_failures,
+                    "EXECUTION_FACTS_INVALID",
+                ])),
+                limitations=tuple([
+                    *limitation_values,
+                    f"execution fact validation failed: {exc.code}",
+                ]),
+            )
+
+        verification = receipt["verification"]
+        outcome_successful = verification["outcome_successful"]
+        if outcome_successful:
+            outer_status = "ok"
+        elif (
+            facts.get("router_status") == "UNAVAILABLE"
+            or facts.get("status") == "ENGINE_UNAVAILABLE"
+        ):
+            outer_status = "unavailable"
+        elif run_res.get("error") or run_res.get("timed_out"):
+            outer_status = "unavailable"
+        elif native_status in {
+            "blocked", "not_implemented", "partial", "error", "unavailable"
+        }:
+            outer_status = native_status
+        else:
+            outer_status = "error"
 
         env = {
             "schema": "ariadne.cadctl.run_operation.v1",
-            "operation": op_id,
-            "executed": True,
+            "status": outer_status,
             "registry_operation_status": op_status,
-            "write_mode": wm,
             "out_dir": str(out_dir_p),
-            "staged_copy": str(staged),
-            "staged_copy_sha256": staged_copy_sha256,
-            "staged_copy_matches_original": staged_copy_matches_original,
-            "staged_copy_unchanged": staged_copy_unchanged,
-            "staged_result": staged_result,
-            "staged_result_sha256": staged_result_sha256,
-            "original_sha256_before": original_sha256_before,
-            "original_sha256_after": original_sha256_after,
-            "original_unchanged": original_unchanged,
-            "exit_code": run_res.get("exit_code"),
+            "execution_dir": str(execution_dir),
             "stdout": run_res.get("stdout_path"),
             "stderr": run_res.get("stderr_path"),
             "result_ref": run_res.get("result_json"),
+            "requested_output_path": (
+                str(requested_output_path)
+                if requested_output_path is not None
+                else None
+            ),
+            "authorized_native_output_path": (
+                str(expected_output_path)
+                if expected_output_path is not None
+                else None
+            ),
+            "reason": None if outcome_successful else ", ".join(
+                verification["failure_codes"]
+            ),
         }
-        if not original_unchanged:
-            env["status"] = "error"
-            env["reason"] = "SAFETY VIOLATION: original DWG sha changed during run_operation"
-            return env
-        if not staged_copy_unchanged:
-            env["status"] = "error"
-            env["reason"] = (
-                "SAFETY VIOLATION: cadctl staged_copy bytes changed during run; "
-                "staged_copy_sha256 is the pre-write snapshot only"
-            )
-            return env
-        if run_res.get("error"):
-            env["status"] = "unavailable"
-            env["reason"] = run_res.get("error")
-            return env
-        result_obj = run_res.get("result")
-        if result_obj is None:
-            env["status"] = "partial"
-            env["reason"] = "native job produced no parseable result JSON"
-            return env
-        native_status = (result_obj.get("status") if isinstance(result_obj, dict) else None) or "ok"
-        env["status"] = native_status if native_status in (
-            "ok", "blocked", "not_implemented", "partial", "error", "unavailable") else "ok"
-        env["result"] = result_obj
-        return env
+        if isinstance(result_obj, dict):
+            env["result"] = result_obj
+        projected = _project_run_operation_receipt(env, receipt)
+        if artifact_snapshot is not None:
+            artifact_snapshot.close()
+        input_lease.close()
+        return projected
 
     # ----------------------------------------------------- run_command_template
     def run_command_template(self, template_id: str, slots: dict,

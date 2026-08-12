@@ -21,8 +21,129 @@ import shutil
 import subprocess
 from pathlib import Path
 
+from verification import file_snapshot as _file_snapshot
+
 ROUTER_HOME = Path(__file__).resolve().parents[1]
 ROUTER_PS1 = ROUTER_HOME / "tools" / "autocad-router.ps1"
+_NATIVE_OUTPUT_OPERATIONS = frozenset({
+    "transform.database.dxf_out",
+    "transform.database.save_as",
+    "transform.database.save_as_simple",
+})
+
+
+def _reject_json_constant(value: str) -> None:
+    raise ValueError(f"non-finite JSON number is not permitted: {value}")
+
+
+def _reject_duplicate_json_object(pairs: list[tuple[str, object]]) -> dict:
+    result: dict = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON object key: {key}")
+        result[key] = value
+    return result
+
+
+def _strict_json_loads(value: str) -> object:
+    """Parse router evidence without JSON duplicate/non-finite extensions."""
+    return json.loads(
+        value,
+        object_pairs_hook=_reject_duplicate_json_object,
+        parse_constant=_reject_json_constant,
+    )
+
+
+def _capture_native_result_document(
+    reported_path: object,
+) -> tuple[dict, str, str] | None:
+    """Capture one router-owned native result file without following aliases."""
+
+    if not isinstance(reported_path, str) or not reported_path:
+        return None
+    candidate = Path(reported_path)
+    if not candidate.is_absolute():
+        return None
+    runs_root = Path(os.path.abspath(str(ROUTER_HOME / "runs")))
+    candidate = Path(os.path.abspath(str(candidate)))
+    try:
+        relative = candidate.relative_to(runs_root).as_posix()
+        snapshot = _file_snapshot.capture_file_set({
+            "native_result": _file_snapshot.FileRequest(
+                runs_root,
+                relative,
+                require_single_link=True,
+            )
+        })
+        captured = snapshot.files["native_result"]
+        document = _strict_json_loads(captured.content.decode("utf-8-sig"))
+    except (
+        ValueError,
+        OSError,
+        UnicodeError,
+        _file_snapshot.SnapshotCaptureError,
+    ):
+        return None
+    if not isinstance(document, dict):
+        return None
+    return document, str(candidate), captured.sha256
+
+
+def _execution_facts(
+    envelope: object,
+    *,
+    process_exit_code: int | None,
+    timed_out: bool,
+    launch_error: str | None,
+) -> dict:
+    """Preserve router/engine testimony without inventing missing facts.
+
+    This is intentionally a transport normalizer, not an authorization check.
+    ``cadctl`` owns the comparison between these reported facts and the
+    operation/write mode/input that it authorized.
+    """
+    outer = envelope if isinstance(envelope, dict) else {}
+    execution = outer.get("execution")
+    execution = execution if isinstance(execution, dict) else {}
+    engine_output = execution.get("engine_output")
+    engine_output = engine_output if isinstance(engine_output, dict) else {}
+
+    return {
+        "router_schema": outer.get("schema"),
+        "router_status": outer.get("status"),
+        "executed_route": outer.get("executed_route"),
+        "route": outer.get("executed_route"),
+        "process_exit_code": process_exit_code,
+        "timed_out": bool(timed_out),
+        "launch_error": launch_error,
+        "engine_exit_code": execution.get("engine_exit_code"),
+        "engine_output_exit_code": engine_output.get("engine_exit_code"),
+        "executed": engine_output.get("executed"),
+        "status": engine_output.get("status"),
+        "mode": engine_output.get("mode"),
+        "operation": engine_output.get("operation"),
+        "write_mode": engine_output.get("write_mode"),
+        "input_kind": engine_output.get("input_kind"),
+        "request_input": engine_output.get("request_input"),
+        "original_input": engine_output.get("original_input"),
+        "input": engine_output.get("input"),
+        "working_sha256_before": engine_output.get("working_sha256_before"),
+        "working_sha256_after": engine_output.get("working_sha256_after"),
+        "save_command_issued": engine_output.get("save_command_issued"),
+        "native_status": None,
+        "native_schema": None,
+        "native_engine": None,
+        "native_operation": None,
+        "native_result_source": None,
+        "native_result_is_object": None,
+        "native_error_code": None,
+        "native_result_path": None,
+        "native_result_sha256": None,
+        "result_kind": None,
+        "result_path": None,
+        "limitation_code": engine_output.get("limitation_code"),
+        "limitation_codes": engine_output.get("limitation_codes"),
+    }
 
 
 def _powershell_exe() -> str:
@@ -169,8 +290,10 @@ def run_router_cad_job(staged_dwg: str, run_dir: str, operation: str, *,
     """Invoke the router NATIVE cad-job lane; capture stdout/stderr/exit + result.
 
     Returns:
-      {command, exit_code, stdout_path, stderr_path, envelope, result_json (path|None),
-       result (dict|None), staged_used (path|None), timed_out, error}.
+      {command, exit_code, stdout_path, stderr_path, envelope,
+       execution (lossless normalized router/engine testimony),
+       result_json (path|None), result (dict|None), staged_used (compat alias),
+       timed_out, error}.
     Never raises on router failure. The native result JSON path is read from
     execution.engine_output.result_json; ``result`` is its parsed ``result`` object.
     """
@@ -184,8 +307,11 @@ def run_router_cad_job(staged_dwg: str, run_dir: str, operation: str, *,
         stderr_path.write_text(msg + "\n", encoding="utf-8")
         stdout_path.write_text("", encoding="utf-8")
         return {"command": None, "exit_code": None, "stdout_path": str(stdout_path),
-                "stderr_path": str(stderr_path), "envelope": None, "result_json": None,
-                "result": None, "staged_used": None, "timed_out": False, "error": msg}
+                "stderr_path": str(stderr_path), "envelope": None,
+                "execution": _execution_facts(
+                    None, process_exit_code=None, timed_out=False, launch_error=msg),
+                "result_json": None, "result": None, "staged_used": None,
+                "timed_out": False, "error": msg}
 
     cmd = build_cad_job_command(staged_dwg, operation, intent=intent,
                                 write_mode=write_mode, job_path=job_path)
@@ -214,26 +340,92 @@ def run_router_cad_job(staged_dwg: str, run_dir: str, operation: str, *,
     stderr_path.write_text(stderr_text, encoding="utf-8")
 
     envelope = _parse_first_json_object(stdout_text) if stdout_text.strip() else None
+    facts = _execution_facts(
+        envelope,
+        process_exit_code=code,
+        timed_out=timed_out,
+        launch_error=error,
+    )
     result_json = None
     result_obj = None
-    staged_used = None
-    if envelope:
-        eng = (envelope.get("execution") or {}).get("engine_output") or {}
+    native_doc = None
+    native_result_source = None
+    if isinstance(envelope, dict):
+        execution = envelope.get("execution")
+        execution = execution if isinstance(execution, dict) else {}
+        eng = execution.get("engine_output")
+        eng = eng if isinstance(eng, dict) else {}
         result_json = eng.get("result_json")
-        staged_used = eng.get("input")
         inline = eng.get("result")
         if isinstance(inline, dict):
-            result_obj = inline.get("result", inline)
-    # Prefer reading the on-disk result file (authoritative, full).
-    if result_json and Path(result_json).exists():
-        try:
-            doc = json.loads(Path(result_json).read_text(encoding="utf-8-sig"))
-            result_obj = doc.get("result", doc)
-        except (ValueError, OSError):
-            pass
+            native_doc = inline
+            native_result_source = "inline"
+    # A reported on-disk result is authoritative over the inline convenience
+    # copy. If that file is absent, malformed, or ambiguous, do not retain an
+    # inline value that could turn rejected evidence back into a fake success.
+    if result_json is not None:
+        result_obj = None
+        native_doc = None
+        native_result_source = None
+        captured_native = _capture_native_result_document(result_json)
+        if captured_native is not None:
+            native_doc, native_result_path, native_result_sha256 = captured_native
+            native_result_source = "file"
+            facts["native_result_path"] = native_result_path
+            facts["native_result_sha256"] = native_result_sha256
+    if isinstance(native_doc, dict):
+        facts["native_schema"] = (
+            native_doc.get("schema")
+            if isinstance(native_doc.get("schema"), str)
+            else None
+        )
+        facts["native_engine"] = (
+            native_doc.get("engine")
+            if isinstance(native_doc.get("engine"), str)
+            else None
+        )
+        facts["native_operation"] = (
+            native_doc.get("operation")
+            if isinstance(native_doc.get("operation"), str)
+            else None
+        )
+        facts["native_status"] = (
+            native_doc.get("status")
+            if isinstance(native_doc.get("status"), str)
+            else None
+        )
+        facts["native_error_code"] = (
+            native_doc.get("error_code")
+            if isinstance(native_doc.get("error_code"), str)
+            and native_doc.get("error_code")
+            else None
+        )
+        facts["native_result_source"] = native_result_source
+        facts["native_result_is_object"] = isinstance(
+            native_doc.get("result"), dict
+        )
+        if facts["native_result_is_object"]:
+            result_obj = native_doc["result"]
+        elif facts["native_status"] != "ok":
+            # Preserve an authoritative structured native error for callers
+            # that classify dispatcher reachability.  It remains an
+            # unsuccessful outcome; the canonical receipt independently
+            # verifies its schema/engine/operation/file provenance.
+            result_obj = native_doc
+    if operation in _NATIVE_OUTPUT_OPERATIONS:
+        facts["result_kind"] = "native_output"
+        if isinstance(result_obj, dict) and isinstance(
+            result_obj.get("output_path"), str
+        ):
+            facts["result_path"] = result_obj["output_path"]
+    else:
+        facts["result_kind"] = "router_working_copy"
+        facts["result_path"] = facts.get("input")
+    staged_used = facts.get("result_path")
 
     return {"command": cmd, "exit_code": code, "stdout_path": str(stdout_path),
             "stderr_path": str(stderr_path), "envelope": envelope,
+            "execution": facts,
             "result_json": result_json, "result": result_obj,
             "staged_used": staged_used, "timed_out": timed_out, "error": error}
 
@@ -341,14 +533,16 @@ def _parse_first_json_object(text: str) -> dict | None:
     """
     text = text.strip()
     try:
-        return json.loads(text)
+        value = _strict_json_loads(text)
+        return value if isinstance(value, dict) else None
     except (ValueError, TypeError):
         pass
     start = text.find("{")
     end = text.rfind("}")
     if start != -1 and end != -1 and end > start:
         try:
-            return json.loads(text[start:end + 1])
+            value = _strict_json_loads(text[start:end + 1])
+            return value if isinstance(value, dict) else None
         except (ValueError, TypeError):
             return None
     return None

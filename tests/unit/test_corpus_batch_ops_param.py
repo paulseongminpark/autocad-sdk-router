@@ -13,6 +13,58 @@ if str(_TOOLS) not in sys.path:
     sys.path.insert(0, str(_TOOLS))
 
 import corpus_batch  # noqa: E402
+import cadctl  # noqa: E402
+from operation_provenance import build_execution_receipt  # noqa: E402
+
+
+def _canonical_read_envelope(operation: str, path: Path) -> dict:
+    resolved = path.resolve()
+    result_path = resolved.with_name("router_read_result.dwg")
+    result_path.write_bytes(resolved.read_bytes())
+    return {
+        "schema": "ariadne.cadctl.run_operation.v1",
+        "status": "ok",
+        "executed": True,
+        "result": {},
+        "execution_receipt": build_execution_receipt(
+            authorized_operation=operation,
+            authorized_write_mode="read",
+            executed=True,
+            reported_status="ok",
+            executed_operation=operation,
+            executed_write_mode="read",
+            router_input_path=str(resolved),
+            original_path=str(resolved),
+            original_sha256_before="a" * 64,
+            original_sha256_after="a" * 64,
+            baseline_path=str(resolved),
+            baseline_sha256="a" * 64,
+            baseline_sha256_after="a" * 64,
+            result_path=str(result_path),
+            result_sha256="a" * 64,
+            result_kind="router_working_copy",
+            process_exit_code=0,
+            engine_exit_code=0,
+            engine_output_exit_code=0,
+            native_status="ok",
+            native_schema="ariadne.autocad_native_job_result.v1",
+            native_engine="native_objectarx",
+            native_operation=operation,
+            native_result_source="file",
+            native_result_is_object=True,
+            native_error_code=None,
+            native_result_path=str(result_path) + ".native-result.json",
+            native_result_sha256="c" * 64,
+            router_status="PASS",
+            router_schema="ariadne.autocad_router_run.v2",
+            executed_route="dwg_truth_autocad",
+            timed_out=False,
+            input_kind="staged_copy",
+            save_command_issued=False,
+            router_working_sha256_before="a" * 64,
+            router_working_sha256_after="a" * 64,
+        ),
+    }
 
 
 def test_parse_ops_default_when_no_args():
@@ -93,6 +145,62 @@ def test_result_envelope_records_ops_requested():
         elapsed_sec=1.0,
     )
     assert payload["ops_requested"] == requested
+
+
+def test_worker_forces_read_mode_and_records_canonical_result(tmp_path):
+    source = tmp_path / "sample.dwg"
+    source.write_bytes(b"DWG")
+    run_dir = tmp_path / "case"
+    run_dir.mkdir()
+    request_path = tmp_path / "request.json"
+    request_path.write_text(
+        json.dumps(
+            {
+                "entry": corpus_batch.CorpusEntry(
+                    ordinal=0,
+                    source_path=str(source),
+                    expected_sha256=None,
+                    input_kind="manifest",
+                ).to_json(),
+                "run_dir": str(run_dir),
+                "ops": [{"id": "inspect.layers", "args": {}}],
+                "resume_rerun_reason": None,
+            }
+        ),
+        encoding="utf-8",
+    )
+    calls = []
+
+    class FakeCad:
+        def __init__(self, router_home=None):
+            pass
+
+        def run_operation(self, operation, **kwargs):
+            calls.append({"operation": operation, **kwargs})
+            return _canonical_read_envelope(operation, Path(kwargs["dwg_path"]))
+
+    with patch.object(cadctl, "Cad", FakeCad):
+        assert corpus_batch._worker_impl(request_path) == 0
+
+    assert calls[0]["write_mode"] == "read"
+    payload = json.loads((run_dir / corpus_batch.RESULT_FILE).read_text(encoding="utf-8"))
+    op_record = payload["ops_run"][0]
+    assert op_record["status"] == "ok"
+    assert op_record["result_path"] == str(
+        (run_dir / "router_read_result.dwg").resolve()
+    )
+    assert op_record["result_sha256"] == "a" * 64
+
+
+def test_operation_record_fails_closed_when_executed_receipt_is_missing():
+    record = corpus_batch._operation_record(
+        {"id": "inspect.layers", "args": {}},
+        {"status": "ok", "executed": True, "result": {}},
+        0.1,
+    )
+
+    assert record["status"] != "ok"
+    assert "receipt" in (record.get("reason") or "").lower()
 
 
 def test_recorded_op_ids_backward_compat_without_ops_requested():

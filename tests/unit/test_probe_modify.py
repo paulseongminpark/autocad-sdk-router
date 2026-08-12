@@ -39,6 +39,48 @@ for _p in (_REPO, os.path.join(_REPO, "tools")):
         sys.path.insert(0, _p)
 
 import probe_modify  # noqa: E402
+from operation_provenance import build_execution_receipt  # noqa: E402
+
+
+def _canonical_receipt(operation, write_mode, baseline, result):
+    return build_execution_receipt(
+        authorized_operation=operation,
+        authorized_write_mode=write_mode,
+        executed=True,
+        reported_status="ok",
+        executed_operation=operation,
+        executed_write_mode=write_mode,
+        router_input_path=str(baseline),
+        original_path=str(baseline),
+        original_sha256_before="a" * 64,
+        original_sha256_after="a" * 64,
+        baseline_path=str(baseline),
+        baseline_sha256="a" * 64,
+        baseline_sha256_after="a" * 64,
+        result_path=str(result),
+        result_sha256="b" * 64,
+        result_kind="router_working_copy",
+        process_exit_code=0,
+        engine_exit_code=0,
+        engine_output_exit_code=0,
+        native_status="ok",
+        native_schema="ariadne.autocad_native_job_result.v1",
+        native_engine="native_objectarx",
+        native_operation=operation,
+        native_result_source="file",
+        native_result_is_object=True,
+        native_error_code=None,
+        native_result_path=str(result) + ".native-result.json",
+        native_result_sha256="c" * 64,
+        router_status="PASS",
+        router_schema="ariadne.autocad_router_run.v2",
+        executed_route="dwg_truth_autocad",
+        timed_out=False,
+        input_kind="staged_copy",
+        save_command_issued=(write_mode == "write_copy"),
+        router_working_sha256_before="a" * 64,
+        router_working_sha256_after="b" * 64,
+    )
 
 
 class _FakeCad:
@@ -73,14 +115,21 @@ class _FakeCad:
         out.mkdir(parents=True, exist_ok=True)
         result = self._run_results[self.run_calls]
         self.run_calls += 1
-        # Only the *existence* of this path matters to probe_modify's
-        # _staged_input_of(); its content is irrelevant to a FAKE run.
-        staged = out / "staged_input.dwg"
+        staged = (out / "bound_result.dwg").resolve()
         staged.write_text("fake-staged-dwg", encoding="utf-8")
-        stdout_path = out / "stdout.txt"
-        envelope = {"execution": {"engine_output": {"input": str(staged)}}}
-        stdout_path.write_text(json.dumps(envelope), encoding="utf-8")
-        return {"status": "ok", "executed": True, "stdout": str(stdout_path), "result": result}
+        effective_mode = write_mode or (
+            "read" if op_id == "modify.entity.explode" else "write_copy"
+        )
+        baseline = Path(dwg_path).resolve()
+        return {
+            "schema": "ariadne.cadctl.run_operation.v1",
+            "status": "ok",
+            "executed": True,
+            "result": result,
+            "execution_receipt": _canonical_receipt(
+                op_id, effective_mode, baseline, staged
+            ),
+        }
 
     def registry_explain(self, op_id):
         return self._registry.get(op_id) or {
@@ -299,8 +348,64 @@ class TestClassifyRunStatus(unittest.TestCase):
         for status in ("unavailable", "partial", "not_implemented"):
             self.assertEqual(probe_modify._classify_run_status({"status": status}), "needs_runtime")
 
+    def test_unavailable_without_execution_is_needs_runtime_not_failed(self):
+        self.assertEqual(
+            probe_modify._classify_run_status(
+                {"status": "unavailable", "executed": False}
+            ),
+            "needs_runtime",
+        )
+
     def test_native_error_after_execution_is_failed(self):
         self.assertEqual(probe_modify._classify_run_status({"status": "error", "executed": True}), "failed")
+
+    def test_run_preserves_canonical_unavailable_before_requiring_a_result(self):
+        class UnavailableCad:
+            def run_operation(self, op_id, **kwargs):
+                receipt = build_execution_receipt(
+                    authorized_operation=op_id,
+                    authorized_write_mode="write_copy",
+                    executed=False,
+                    reported_status="ENGINE_UNAVAILABLE",
+                    limitations=("CAD engine unavailable",),
+                )
+                return {
+                    "schema": "ariadne.cadctl.run_operation.v1",
+                    "status": "unavailable",
+                    "executed": False,
+                    "reason": "accoreconsole unavailable",
+                    "execution_receipt": receipt,
+                }
+
+        res, staged = probe_modify._run(
+            UnavailableCad(),
+            "modify.entity.common",
+            {"handle": "A1", "set_layer": "X"},
+            Path("fixture.dwg"),
+            Path("out"),
+            write_mode="write_copy",
+        )
+
+        self.assertEqual(res["status"], "unavailable")
+        self.assertEqual(probe_modify._classify_run_status(res), "needs_runtime")
+        self.assertIsNone(staged)
+
+    def test_executed_response_without_receipt_has_no_staged_result(self):
+        class MissingReceiptCad:
+            def run_operation(self, *args, **kwargs):
+                return {"status": "ok", "executed": True, "result": {"modified": True}}
+
+        res, staged = probe_modify._run(
+            MissingReceiptCad(),
+            "modify.entity.common",
+            {"handle": "A1", "set_layer": "X"},
+            Path("fixture.dwg"),
+            Path(tempfile.gettempdir()) / "missing_receipt",
+        )
+
+        self.assertIsNone(staged)
+        self.assertEqual(res["status"], "error")
+        self.assertIn("receipt", (res.get("reason") or "").lower())
 
 
 # --------------------------------------------------------------------------- #

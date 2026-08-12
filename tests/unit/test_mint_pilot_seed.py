@@ -18,6 +18,7 @@ from __future__ import annotations
 import copy
 import json
 import sys
+import threading
 from pathlib import Path
 
 import pytest
@@ -28,6 +29,7 @@ if str(_TOOLS) not in sys.path:
     sys.path.insert(0, str(_TOOLS))
 
 import mint_pilot_seed as mps  # noqa: E402
+from operation_provenance import build_execution_receipt  # noqa: E402
 
 try:
     import jsonschema
@@ -99,14 +101,82 @@ class FakeCad:
     genuinely exercised, not just trivially satisfied."""
 
     def __init__(self, *, pre_ir=None, post_ir=None, erase_executed=False,
-                save_as_status="ok", write_fixture_bytes=b"FAKE-DWG-BYTES"):
+                save_as_status="ok", erase_receipt="canonical",
+                save_receipt="canonical", write_fixture_bytes=b"FAKE-DWG-BYTES"):
         self.pre_ir = pre_ir if pre_ir is not None else _PRE_IR
         self.post_ir = post_ir if post_ir is not None else _post_ir_from(self.pre_ir)
         self.erase_executed = erase_executed
         self.save_as_status = save_as_status
+        self.erase_receipt = erase_receipt
+        self.save_receipt = save_receipt
         self.write_fixture_bytes = write_fixture_bytes
         self.calls: list[tuple[str, dict]] = []
         self._inspect_n = 0
+
+    @staticmethod
+    def _execution_envelope(op_id, write_mode, dwg_path, result_path, receipt_kind):
+        baseline_sha256 = mps._sha256_file(dwg_path)
+        result_sha256 = mps._sha256_file(result_path)
+        envelope = {
+            "schema": "ariadne.cadctl.run_operation.v1",
+            "operation": op_id,
+            "status": "ok",
+            "executed": True,
+        }
+        if receipt_kind == "flat":
+            return envelope
+        if receipt_kind == "malformed":
+            envelope["execution_receipt"] = {"schema": "malformed"}
+            return envelope
+        if receipt_kind not in {"canonical", "unbound", "unsuccessful"}:
+            raise AssertionError(f"unexpected receipt_kind: {receipt_kind}")
+
+        envelope["status"] = "ok" if receipt_kind == "canonical" else "error"
+        envelope["execution_receipt"] = build_execution_receipt(
+            authorized_operation=op_id,
+            authorized_write_mode=write_mode,
+            executed=True,
+            reported_status="ok",
+            executed_operation=(
+                "wrong.operation" if receipt_kind == "unbound" else op_id
+            ),
+            executed_write_mode=write_mode,
+            router_input_path=str(dwg_path),
+            original_path=str(dwg_path),
+            original_sha256_before=baseline_sha256,
+            original_sha256_after=baseline_sha256,
+            baseline_path=str(dwg_path),
+            baseline_sha256=baseline_sha256,
+            baseline_sha256_after=baseline_sha256,
+            result_path=str(result_path),
+            result_sha256=result_sha256,
+            result_kind=(
+                "native_output"
+                if op_id == "transform.database.save_as"
+                else "router_working_copy"
+            ),
+            process_exit_code=0,
+            engine_exit_code=0,
+            engine_output_exit_code=0,
+            native_status=("error" if receipt_kind == "unsuccessful" else "ok"),
+            native_schema="ariadne.autocad_native_job_result.v1",
+            native_engine="native_objectarx",
+            native_operation=op_id,
+            native_result_source="file",
+            native_result_is_object=True,
+            native_error_code=None,
+            native_result_path=str(result_path) + ".native-result.json",
+            native_result_sha256="c" * 64,
+            router_schema="ariadne.autocad_router_run.v2",
+            router_status="PASS",
+            executed_route="dwg_truth_autocad",
+            timed_out=False,
+            input_kind="staged_copy",
+            save_command_issued=True,
+            router_working_sha256_before=baseline_sha256,
+            router_working_sha256_after=result_sha256,
+        )
+        return envelope
 
     def inspect(self, dwg_path, out_dir, mode="graph", include_rich=False):
         self.calls.append(("inspect", {"dwg_path": dwg_path, "out_dir": out_dir,
@@ -132,16 +202,24 @@ class FakeCad:
                         "status": "not_found", "executed": False,
                         "registry_operation_status": None,
                         "reason": f"operation '{op_id}' is not in the operation registry"}
-            return {"schema": "ariadne.cadctl.run_operation.v1", "operation": op_id,
-                    "status": "ok", "executed": True}
+            result_path = Path(out_dir) / "erased.dwg"
+            result_path.parent.mkdir(parents=True, exist_ok=True)
+            result_path.write_bytes(b"ERASED-DWG-BYTES")
+            return self._execution_envelope(
+                op_id, write_mode, dwg_path, result_path, self.erase_receipt,
+            )
         if op_id == "transform.database.save_as":
             if self.save_as_status == "ok":
-                dest = Path(args["file_name"])
+                requested = Path(args["output_path"])
+                dest = requested.parent / ".cadctl-native-output-test" / requested.name
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 dest.write_bytes(self.write_fixture_bytes)
+                return self._execution_envelope(
+                    op_id, write_mode, dwg_path, dest, self.save_receipt,
+                )
             return {"schema": "ariadne.cadctl.run_operation.v1", "operation": op_id,
                     "executed": True, "status": self.save_as_status,
-                    "reason": None if self.save_as_status == "ok" else "simulated save_as failure"}
+                    "reason": "simulated save_as failure"}
         raise AssertionError(f"unexpected op_id in FakeCad.run_operation: {op_id}")
 
 
@@ -295,6 +373,18 @@ def test_mint_stops_truthfully_and_never_fabricates_when_erase_missing(tmp_path)
     assert [c[0] for c in fake.calls] == ["inspect", "run_operation"]
 
 
+def test_mint_rejects_flat_only_fake_erase_success(tmp_path):
+    src = _make_source(tmp_path)
+    fake = FakeCad(erase_executed=True, erase_receipt="flat")
+
+    res = mps.mint(str(src), out_dir=str(tmp_path / "run"), cad=fake)
+
+    assert res["status"] == "blocked"
+    assert "execution receipt" in res["reason"]
+    assert not mps.FIXTURE_PATH.exists()
+    assert [c[0] for c in fake.calls] == ["inspect", "run_operation"]
+
+
 def test_mint_full_success_path_writes_fixture_sha_and_baseline(tmp_path):
     """Once erase + save_as both genuinely work (simulated here), mint() must
     complete: write the fixture, a matching sha256 sidecar, and a baseline
@@ -328,6 +418,65 @@ def test_mint_full_success_path_writes_fixture_sha_and_baseline(tmp_path):
     assert [c[0] for c in fake.calls] == ["inspect", "run_operation", "run_operation", "inspect"]
 
 
+def test_mint_chains_erase_receipt_result_path_into_save_as(tmp_path):
+    src = _make_source(tmp_path)
+    original_bytes = src.read_bytes()
+    fake = FakeCad(erase_executed=True)
+
+    res = mps.mint(str(src), out_dir=str(tmp_path / "run"), cad=fake)
+
+    assert res["status"] == "ok", res
+    erase_result_path = res["erase"]["execution_receipt"]["artifacts"]["result"]["path"]
+    save_call = next(
+        payload for name, payload in fake.calls
+        if name == "run_operation" and payload["op_id"] == "transform.database.save_as"
+    )
+    assert save_call["dwg_path"] == erase_result_path
+    assert save_call["dwg_path"] != str(src)
+    assert save_call["args"] == {
+        "output_path": str(tmp_path / "run" / "save_as" / mps.FIXTURE_NAME)
+    }
+    assert src.read_bytes() == original_bytes
+
+
+def test_mint_rejects_flat_only_fake_save_success(tmp_path):
+    src = _make_source(tmp_path)
+    fake = FakeCad(erase_executed=True, save_receipt="flat")
+
+    res = mps.mint(str(src), out_dir=str(tmp_path / "run"), cad=fake)
+
+    assert res["status"] == "blocked"
+    assert "execution receipt" in res["reason"]
+    assert not mps.FIXTURE_PATH.exists()
+    assert not mps.SHA_PATH.exists()
+    assert not mps.BASELINE_PATH.exists()
+    assert [c[0] for c in fake.calls] == ["inspect", "run_operation", "run_operation"]
+
+
+@pytest.mark.parametrize("fault_stage", ["erase", "save_as"])
+@pytest.mark.parametrize("fault_kind", ["malformed", "unbound", "unsuccessful"])
+def test_mint_fails_closed_on_untrustworthy_execution_receipt(
+        tmp_path, fault_stage, fault_kind):
+    src = _make_source(tmp_path)
+    fake = FakeCad(
+        erase_executed=True,
+        erase_receipt=fault_kind if fault_stage == "erase" else "canonical",
+        save_receipt=fault_kind if fault_stage == "save_as" else "canonical",
+    )
+
+    res = mps.mint(str(src), out_dir=str(tmp_path / "run"), cad=fake)
+
+    assert res["status"] == "blocked"
+    assert "execution receipt" in res["reason"]
+    assert not mps.FIXTURE_PATH.exists()
+    assert not mps.SHA_PATH.exists()
+    assert not mps.BASELINE_PATH.exists()
+    expected_calls = ["inspect", "run_operation"]
+    if fault_stage == "save_as":
+        expected_calls.append("run_operation")
+    assert [c[0] for c in fake.calls] == expected_calls, res
+
+
 def test_mint_rejects_and_cleans_up_a_falsely_verified_fixture(tmp_path):
     """If save_as 'succeeds' but the written file is actually WRONG (here: the
     post-clear IR still shows leftover entities), mint() must refuse to certify
@@ -359,6 +508,70 @@ def test_mint_force_remints_over_an_existing_fixture(tmp_path, _isolated_fixture
 
     assert res["status"] == "ok"
     assert mps.FIXTURE_PATH.read_bytes() == fake.write_fixture_bytes
+
+
+def test_parallel_force_mints_serialize_and_publish_one_complete_generation(tmp_path):
+    source = _make_source(tmp_path)
+    first_entered = threading.Event()
+    second_entered = threading.Event()
+    release_first = threading.Event()
+    results = []
+    errors = []
+
+    class PausingCad(FakeCad):
+        def __init__(self, entered, fixture_bytes):
+            super().__init__(
+                erase_executed=True,
+                save_as_status="ok",
+                write_fixture_bytes=fixture_bytes,
+            )
+            self._entered = entered
+            self._paused = False
+
+        def inspect(self, *args, **kwargs):
+            if not self._paused:
+                self._paused = True
+                self._entered.set()
+                if not release_first.wait(timeout=5):
+                    raise AssertionError("timed out waiting to continue mint")
+            return super().inspect(*args, **kwargs)
+
+    def worker(name, cad):
+        try:
+            results.append(mps.mint(
+                str(source),
+                out_dir=str(tmp_path / name),
+                force=True,
+                cad=cad,
+            ))
+        except Exception as exc:  # captured for an assertion in the parent thread
+            errors.append(exc)
+
+    first = threading.Thread(
+        target=worker,
+        args=("run-a", PausingCad(first_entered, b"GENERATION-A")),
+    )
+    second = threading.Thread(
+        target=worker,
+        args=("run-b", PausingCad(second_entered, b"GENERATION-B")),
+    )
+    first.start()
+    assert first_entered.wait(timeout=5)
+    second.start()
+    second_entered_before_release = second_entered.wait(timeout=0.2)
+    release_first.set()
+    first.join(timeout=10)
+    second.join(timeout=10)
+
+    assert second_entered_before_release is False
+    assert first.is_alive() is False and second.is_alive() is False
+    assert errors == []
+    assert [result["status"] for result in results] == ["ok", "ok"]
+    final_sha = mps._sha256_file(mps.FIXTURE_PATH)
+    assert mps.SHA_PATH.read_text(encoding="utf-8").startswith(final_sha)
+    baseline = json.loads(mps.BASELINE_PATH.read_text(encoding="utf-8"))
+    assert baseline["fixture_sha256"] == final_sha
+    assert list(mps.FIXTURES_DIR.glob(".*.tmp")) == []
 
 
 # --------------------------------------------------------------------------- plan / honesty pins

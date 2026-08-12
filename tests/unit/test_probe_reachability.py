@@ -34,6 +34,7 @@ _TOOLS = _ROOT / "tools"
 if str(_TOOLS) not in sys.path:
     sys.path.insert(0, str(_TOOLS))
 import probe_reachability as pr  # noqa: E402
+from operation_provenance import build_execution_receipt  # noqa: E402
 
 _REG = _ROOT / "config" / "operations.v2.json"
 
@@ -45,6 +46,49 @@ def _registry_ops():
 # --------------------------------------------------------------------------- #
 # classify_probe_response -- the core, pure classifier
 # --------------------------------------------------------------------------- #
+def _execution_receipt(*, status="ok", bound=True, original_after=None):
+    result_path = r"C:\stage\result.dwg" if bound else None
+    result_sha = "b" * 64 if bound else None
+    return build_execution_receipt(
+        authorized_operation="x",
+        authorized_write_mode="write_copy",
+        executed=True,
+        reported_status=status,
+        executed_operation="x",
+        executed_write_mode="write_copy",
+        router_input_path=r"C:\stage\baseline.dwg",
+        original_path=r"C:\input\source.dwg",
+        original_sha256_before="a" * 64,
+        original_sha256_after=original_after or "a" * 64,
+        baseline_path=r"C:\stage\baseline.dwg",
+        baseline_sha256="a" * 64,
+        baseline_sha256_after="a" * 64,
+        result_path=result_path,
+        result_sha256=result_sha,
+        result_kind="router_working_copy" if bound else None,
+        process_exit_code=0,
+        engine_exit_code=0,
+        engine_output_exit_code=0,
+        native_status=status,
+        native_schema="ariadne.autocad_native_job_result.v1",
+        native_engine="native_objectarx",
+        native_operation="x",
+        native_result_source="file",
+        native_result_is_object=(status == "ok"),
+        native_error_code=None,
+        native_result_path=r"C:\router\runs\native-result.json",
+        native_result_sha256="c" * 64,
+        router_status="PASS",
+        router_schema="ariadne.autocad_router_run.v2",
+        executed_route="dwg_truth_autocad",
+        timed_out=False,
+        input_kind="staged_copy",
+        save_command_issued=True,
+        router_working_sha256_before="a" * 64,
+        router_working_sha256_after=result_sha,
+    )
+
+
 def _ok_env(created, **result_extra):
     """A cadctl.Cad.run_operation() SUCCESS envelope (status="ok"). Shape
     verified against cadctl.py's run_operation() + m08*EmitCreated (result has
@@ -54,7 +98,8 @@ def _ok_env(created, **result_extra):
     result.update(result_extra)
     return {"schema": "ariadne.cadctl.run_operation.v1", "operation": "x", "executed": True,
             "registry_operation_status": "implemented", "write_mode": "write_copy",
-            "original_unchanged": True, "status": "ok", "result": result}
+            "original_unchanged": True, "status": "ok", "result": result,
+            "execution_receipt": _execution_receipt()}
 
 
 def _error_env(error_code, message):
@@ -67,7 +112,8 @@ def _error_env(error_code, message):
               "operation": "x", "status": "error", "error_code": error_code, "error": message}
     return {"schema": "ariadne.cadctl.run_operation.v1", "operation": "x", "executed": True,
             "registry_operation_status": "implemented", "write_mode": "write_copy",
-            "original_unchanged": True, "status": "error", "result": result, "reason": None}
+            "original_unchanged": True, "status": "error", "result": result, "reason": None,
+            "execution_receipt": _execution_receipt(status="error")}
 
 
 def test_empty_arg_created_true_is_degenerate():
@@ -177,6 +223,96 @@ def test_partial_status_is_crash():
            "executed": True, "original_unchanged": True,
            "reason": "native job produced no parseable result JSON"}
     assert pr.classify_probe_response(env, is_empty_arg=True) == pr.CRASH
+
+
+@pytest.mark.parametrize(
+    "receipt",
+    [None, {"schema": "wrong"}, _execution_receipt(bound=False)],
+)
+def test_executed_response_without_bound_canonical_receipt_is_crash(receipt):
+    env = {
+        "schema": "ariadne.cadctl.run_operation.v1",
+        "operation": "x",
+        "executed": True,
+        "status": "ok",
+        "result": {"created": True},
+    }
+    if receipt is not None:
+        env["execution_receipt"] = receipt
+
+    assert pr.classify_probe_response(env, is_empty_arg=False) == pr.CRASH
+
+
+def test_unknown_native_error_without_receipt_is_crash_not_reachable():
+    env = {
+        "schema": "ariadne.cadctl.run_operation.v1",
+        "operation": "x",
+        "executed": True,
+        "status": "error",
+        "result": {"error_code": "UNKNOWN_NATIVE_ERROR", "error": "unknown"},
+    }
+
+    assert pr.classify_probe_response(env, is_empty_arg=True) == pr.CRASH
+
+
+def test_bound_error_without_structured_error_code_is_crash_not_reachable():
+    env = _error_env("MISSING_ARG", "missing argument")
+    env["result"] = {}
+
+    assert pr.classify_probe_response(env, is_empty_arg=True) == pr.CRASH
+
+
+@pytest.mark.parametrize("status", ["blocked", "not_implemented"])
+def test_executed_native_refusal_without_receipt_is_crash(status):
+    env = {
+        "schema": "ariadne.cadctl.run_operation.v1",
+        "operation": "x",
+        "executed": True,
+        "status": status,
+        "result": {},
+    }
+
+    assert pr.classify_probe_response(env, is_empty_arg=True) == pr.CRASH
+
+
+def test_provenance_bound_native_refusal_remains_not_implemented():
+    env = {
+        "schema": "ariadne.cadctl.run_operation.v1",
+        "operation": "x",
+        "executed": True,
+        "status": "blocked",
+        "result": {},
+        "execution_receipt": _execution_receipt(status="blocked"),
+    }
+
+    assert (
+        pr.classify_probe_response(env, is_empty_arg=True)
+        == pr.OPERATION_NOT_IMPLEMENTED
+    )
+
+
+def test_unavailable_without_execution_is_still_infrastructure_not_policy():
+    env = {
+        "schema": "ariadne.cadctl.run_operation.v1",
+        "operation": "x",
+        "status": "unavailable",
+        "executed": False,
+        "reason": "AutoCAD engine unavailable",
+    }
+    with pytest.raises(pr.RuntimeAvailabilityError):
+        pr.classify_probe_response(env, is_empty_arg=True)
+
+
+def test_original_mutation_check_uses_canonical_receipt_not_flat_alias():
+    env = _ok_env(True)
+    env["status"] = "error"
+    env["original_unchanged"] = True
+    env["execution_receipt"] = _execution_receipt(
+        status="error", original_after="c" * 64
+    )
+
+    with pytest.raises(pr.OriginalMutatedError):
+        pr._check_original_unchanged("x", "valid-arg", env)
 
 
 def test_probe_crash_marker_is_crash():

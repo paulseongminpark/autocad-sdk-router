@@ -59,7 +59,13 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
+import shutil
 import sys
+import tempfile
+import time
+import uuid
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -70,6 +76,8 @@ FIXTURES_DIR = ROUTER_HOME / "fixtures"
 
 if str(_THIS_DIR) not in sys.path:
     sys.path.insert(0, str(_THIS_DIR))
+
+from operation_provenance import ExecutionReceiptError, parse_execution_receipt
 
 SCHEMA_ID = "ariadne.mint_pilot_seed.v1"
 BASELINE_SCHEMA_ID = "ariadne.pilot_cleared_seed_baseline.v1"
@@ -83,6 +91,52 @@ FIXTURE_NAME = "pilot_cleared_seed.dwg"
 FIXTURE_PATH = FIXTURES_DIR / FIXTURE_NAME
 SHA_PATH = FIXTURES_DIR / (FIXTURE_NAME + ".sha256")
 BASELINE_PATH = FIXTURES_DIR / "pilot_cleared_seed.baseline.json"
+
+
+@contextmanager
+def _fixture_publication_lock():
+    """Serialize mint-once decision and publication for one canonical fixture."""
+
+    lock_key = hashlib.sha256(
+        os.path.normcase(str(FIXTURE_PATH.resolve())).encode("utf-8")
+    ).hexdigest()
+    lock_root = Path(tempfile.gettempdir()) / "ariadne-mint-locks"
+    lock_root.mkdir(parents=True, exist_ok=True)
+    lock_path = lock_root / f"{lock_key}.lock"
+    handle = lock_path.open("a+b", buffering=0)
+    handle.seek(0)
+    handle.write(b"\0")
+    handle.flush()
+    acquired = False
+    try:
+        handle.seek(0)
+        if os.name == "nt":
+            import msvcrt
+
+            while not acquired:
+                try:
+                    msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+                    acquired = True
+                except OSError:
+                    time.sleep(0.05)
+        else:  # pragma: no cover - CI and production are Windows
+            import fcntl
+
+            fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+            acquired = True
+        yield
+    finally:
+        if acquired:
+            handle.seek(0)
+            if os.name == "nt":
+                import msvcrt
+
+                msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+            else:  # pragma: no cover - CI and production are Windows
+                import fcntl
+
+                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+        handle.close()
 
 # Ground truth measured LIVE against D:\dev\.build\test.dws on 2026-07-01 (this
 # session, via cadctl.Cad().inspect(include_rich=True) during research for this
@@ -174,9 +228,10 @@ PINNED_CLEAR_PROCEDURE = [
         "action": "save_cleared_copy",
         "op_id": "transform.database.save_as",
         "method": "cadctl.Cad().run_operation('transform.database.save_as', "
-                  "args={'file_name': str(FIXTURE_PATH)}, "
-                  "write_mode='write_copy', dwg_path=staged_source, "
-                  "out_dir=...)",
+                  "args={'output_path': str(run_local_fixture)}, "
+                  "write_mode='write_copy', dwg_path=erase_result.path, "
+                  "out_dir=run_local_dir); verify; then publish bytes to "
+                  "FIXTURE_PATH",
         "note": "CAUTION (verified 2026-07-01): top-level registry status is "
                 "'implemented' (passes the run_operation allow-list) but the "
                 "op's own nested policy block says "
@@ -369,6 +424,22 @@ def mint(
     non-'ok' status and stops -- it does not write fixtures/pilot_cleared_seed.dwg
     unless every step (including verify_cleared) actually passed.
     """
+    with _fixture_publication_lock():
+        return _mint_locked(
+            source_path,
+            force=force,
+            out_dir=out_dir,
+            cad=cad,
+        )
+
+
+def _mint_locked(
+    source_path: str,
+    *,
+    force: bool,
+    out_dir: "str | None",
+    cad: Any,
+) -> dict:
     result: dict = {
         "schema": SCHEMA_ID,
         "node": "F4b",
@@ -433,21 +504,74 @@ def mint(
             f"PINNED_CLEAR_PROCEDURE step 3): {erase_env.get('reason')}"
         )
         return result
+    try:
+        erase_receipt = parse_execution_receipt(erase_env)
+        if erase_receipt is None:  # pragma: no cover - refusal handled above
+            raise ExecutionReceiptError(
+                "MISSING_EXECUTION_RECEIPT",
+                "executed erase operation has no execution receipt",
+            )
+        erase_result = erase_receipt.require_successful_result()
+    except ExecutionReceiptError as exc:
+        result["status"] = "blocked"
+        result["reason"] = (
+            f"erase step has invalid or unsuccessful execution receipt: {exc}"
+        )
+        return result
 
-    # --- step 4: save the cleared copy out to the fixture path ---
-    FIXTURES_DIR.mkdir(parents=True, exist_ok=True)
+    # --- step 4: save only inside this run; publish after verification ---
+    save_out_dir = out_root / "save_as"
+    save_out_dir.mkdir(parents=True, exist_ok=True)
+    staged_fixture_path = save_out_dir / FIXTURE_NAME
     save_env = cad.run_operation(
-        "transform.database.save_as", args={"file_name": str(FIXTURE_PATH)},
-        write_mode="write_copy", dwg_path=str(src), out_dir=str(out_root / "save_as"),
+        "transform.database.save_as",
+        args={"output_path": str(staged_fixture_path)},
+        write_mode="write_copy",
+        dwg_path=erase_result.path,
+        out_dir=str(save_out_dir),
     )
     result["save_as"] = save_env
-    if save_env.get("status") != "ok" or not FIXTURE_PATH.is_file():
+    if not save_env.get("executed"):
         result["status"] = save_env.get("status") or "unavailable"
         result["reason"] = f"save_as of cleared copy did not succeed: {save_env.get('reason')}"
         return result
+    try:
+        save_receipt = parse_execution_receipt(save_env)
+        if save_receipt is None:  # pragma: no cover - refusal handled above
+            raise ExecutionReceiptError(
+                "MISSING_EXECUTION_RECEIPT",
+                "executed save_as operation has no execution receipt",
+            )
+        save_result = save_receipt.require_successful_result()
+    except ExecutionReceiptError as exc:
+        result["status"] = "blocked"
+        result["reason"] = (
+            f"save_as has invalid or unsuccessful execution receipt: {exc}"
+        )
+        return result
+    saved_fixture_path = Path(save_result.path)
+    try:
+        resolved_saved_fixture = saved_fixture_path.resolve(strict=True)
+        resolved_saved_fixture.relative_to(save_out_dir.resolve(strict=True))
+        result_is_run_local = (
+            resolved_saved_fixture.name == staged_fixture_path.name
+            and resolved_saved_fixture.is_file()
+        )
+    except (OSError, RuntimeError, ValueError):
+        result_is_run_local = False
+    if not result_is_run_local:
+        result["status"] = "blocked"
+        result["reason"] = (
+            "save_as execution receipt did not bind a private result beneath "
+            f"{save_out_dir}: received {save_result.path}"
+        )
+        return result
 
     # --- step 5: post-clear baseline + verification ---
-    post_env = cad.inspect(str(FIXTURE_PATH), str(out_root / "post"), mode="rich", include_rich=True)
+    post_env = cad.inspect(
+        str(saved_fixture_path), str(out_root / "post"),
+        mode="rich", include_rich=True,
+    )
     result["post_inspect"] = post_env
     if post_env.get("status") != "ok":
         result["status"] = post_env.get("status") or "unavailable"
@@ -466,29 +590,62 @@ def mint(
     if not verification["ok"]:
         result["status"] = "blocked"
         result["reason"] = f"post-clear verification failed: {verification['errors']}"
-        # Do NOT leave a half-verified fixture behind as if it were canonical.
-        try:
-            FIXTURE_PATH.unlink()
-        except OSError:
-            pass
         return result
 
-    # --- step 6+7: sha256 sidecar + baseline JSON (only now, everything verified) ---
-    fixture_sha256 = _sha256_file(FIXTURE_PATH)
-    SHA_PATH.write_text(fixture_sha256 + "  " + FIXTURE_NAME + "\n", encoding="utf-8")
-
+    # Publish only the already verified run-local result. CAD never receives a
+    # durable repository path, so it cannot overwrite an existing fixture or
+    # any unrelated drawing directly.
+    FIXTURES_DIR.mkdir(parents=True, exist_ok=True)
+    publication_id = uuid.uuid4().hex
+    fixture_temp = FIXTURE_PATH.with_name(
+        f".{FIXTURE_PATH.name}.{publication_id}.tmp"
+    )
+    sha_temp = SHA_PATH.with_name(f".{SHA_PATH.name}.{publication_id}.tmp")
+    baseline_temp = BASELINE_PATH.with_name(
+        f".{BASELINE_PATH.name}.{publication_id}.tmp"
+    )
+    # --- step 6+7: assemble one complete generation before publication ---
+    shutil.copy2(saved_fixture_path, fixture_temp)
+    fixture_sha256 = _sha256_file(fixture_temp)
     source_ir_source = pre_ir.get("source") or {}
     baseline = build_baseline_document(
         source_path=str(src),
         source_sha256=source_ir_source.get("sha256"),
         source_byte_size=source_ir_source.get("byte_size"),
         fixture_sha256=fixture_sha256,
-        fixture_byte_size=FIXTURE_PATH.stat().st_size,
+        fixture_byte_size=fixture_temp.stat().st_size,
         pre=pre,
         post=post,
         verification=verification,
     )
-    BASELINE_PATH.write_text(json.dumps(baseline, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    sha_temp.write_text(
+        fixture_sha256 + "  " + FIXTURE_NAME + "\n",
+        encoding="utf-8",
+    )
+    baseline_temp.write_text(
+        json.dumps(baseline, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    try:
+        if _sha256_file(fixture_temp) != fixture_sha256:
+            raise RuntimeError("fixture publication bytes changed before commit")
+        staged_baseline = json.loads(baseline_temp.read_text(encoding="utf-8"))
+        if staged_baseline.get("fixture_sha256") != fixture_sha256:
+            raise RuntimeError("baseline publication digest does not match fixture")
+        if fixture_sha256 not in sha_temp.read_text(encoding="utf-8"):
+            raise RuntimeError("sha sidecar publication digest does not match fixture")
+        os.replace(fixture_temp, FIXTURE_PATH)
+        os.replace(sha_temp, SHA_PATH)
+        os.replace(baseline_temp, BASELINE_PATH)
+    finally:
+        for temporary_path in (fixture_temp, sha_temp, baseline_temp):
+            try:
+                temporary_path.unlink()
+            except FileNotFoundError:
+                pass
+
+    if _sha256_file(FIXTURE_PATH) != fixture_sha256:
+        raise RuntimeError("published fixture digest does not match its generation")
     result["baseline"] = str(BASELINE_PATH)
     result["fixture_sha256"] = fixture_sha256
     result["status"] = "ok"

@@ -15,11 +15,12 @@ WHY (SDK certification ledger P3b tail / RESULTS 20260714 §5):
 
 MECHANISM (original READ-ONLY, staged copies all the way down):
   each step runs `tools/probe_reachability.py --probe-one <op> --fixture-json
-  <args> --dwg <prev staged_result>`; cadctl stages a copy, the native layer
-  _QSAVEs the ROUTER's staged copy, and the envelope reports it back as
-  `staged_result`. Step N+1 stages from step N's staged_result, so the source
-  fixture is never touched (probe_reachability additionally sha-verifies the
-  original every step and hard-fails on mutation). Steps run SEQUENTIALLY --
+  <args> --dwg <previous canonical result>`; cadctl stages a copy, the native
+  layer _QSAVEs the ROUTER's staged copy, and the canonical execution receipt
+  binds the post-operation path and SHA-256. Step N+1 stages from that bound
+  result, so the source fixture is never touched (probe_reachability
+  additionally sha-verifies the original every step and hard-fails on
+  mutation). Steps run SEQUENTIALLY --
   concurrent probes are a proven false-CRASH source (ledger P3b, offset case).
 
 OUTPUT:
@@ -42,6 +43,8 @@ import os
 import shutil
 import subprocess
 import sys
+
+from operation_provenance import ExecutionReceiptError, parse_execution_receipt
 
 _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _PROBE = os.path.join(_REPO, "tools", "probe_reachability.py")
@@ -109,6 +112,16 @@ def _resolve_refs(args, handles: dict):
     return args
 
 
+def _bound_result_of(envelope: dict):
+    receipt = parse_execution_receipt(envelope)
+    if receipt is None:
+        raise ExecutionReceiptError(
+            "MISSING_EXECUTION_RECEIPT",
+            "executed operation has no execution receipt",
+        )
+    return receipt.require_successful_result()
+
+
 def run_chain(source: str) -> int:
     os.makedirs(_RUN_DIR, exist_ok=True)
     cur = source
@@ -130,9 +143,14 @@ def run_chain(source: str) -> int:
         env = json.load(open(result_path, encoding="utf-8"))
         status = env.get("status")
         result = env.get("result") if isinstance(env.get("result"), dict) else {}
-        staged = env.get("staged_result")
+        try:
+            bound_result = _bound_result_of(env)
+        except ExecutionReceiptError as exc:
+            print(f"[e{i:02d}] FAIL: invalid or unbound execution receipt: {exc}")
+            return 1
+        staged = bound_result.path
         if status != "ok" or not staged or not os.path.isfile(staged):
-            print(f"[e{i:02d}] FAIL: status={status} staged_result={staged}")
+            print(f"[e{i:02d}] FAIL: status={status} bound_result={staged}")
             print(json.dumps(env, ensure_ascii=False)[:600])
             return 1
         handle = result.get("handle") or result.get("action_handle") or ""
@@ -142,7 +160,7 @@ def run_chain(source: str) -> int:
             "step": i, "ref": step["ref"], "op": step["op"], "args": args,
             "status": status, "handle": handle or None,
             "result_keys": sorted(result.keys()),
-            "staged_result_sha256": env.get("staged_result_sha256"),
+            "staged_result_sha256": bound_result.sha256,
             "probe_result": os.path.relpath(result_path, _REPO),
         })
         print(f"[e{i:02d}] ok handle={handle or '-'}")
@@ -162,6 +180,11 @@ def run_chain(source: str) -> int:
         return 1
     henv = json.load(open(hres, encoding="utf-8"))
     ir = henv.get("result") or {}
+    try:
+        _bound_result_of(henv)
+    except ExecutionReceiptError as exc:
+        print(f"[harvest] FAIL: invalid or unbound execution receipt: {exc}")
+        return 1
     if henv.get("status") != "ok" or not isinstance(ir.get("entities"), list):
         print(f"[harvest] FAIL: status={henv.get('status')}")
         return 1

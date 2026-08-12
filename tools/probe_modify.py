@@ -66,7 +66,10 @@ if str(_THIS_DIR) not in sys.path:
     sys.path.insert(0, str(_THIS_DIR))
 
 import cadctl  # noqa: E402  (sibling; registry_explain + run_operation + inspect)
-import run_job  # noqa: E402  (sibling; envelope parsing for staged-path recovery)
+from operation_provenance import (  # noqa: E402
+    ExecutionReceiptError,
+    parse_execution_receipt,
+)
 
 DEFAULT_FIXTURE = ROUTER_HOME / "tests" / "fixtures" / "native_sample.dwg"
 
@@ -286,32 +289,6 @@ def classify_registry_repin(records: dict) -> dict:
 # below stays readable and the pure assertions above stay unit-testable.
 # --------------------------------------------------------------------------- #
 
-def _staged_input_of(stdout_path) -> "str | None":
-    """Recover the router's OWN internal staged/mutated DWG path from a
-    captured stdout.txt.
-
-    cadctl.Cad().run_operation()'s public dict exposes "staged_copy", but that
-    is the PRE-mutation copy cadctl made for its sha-safety check; in
-    write_copy mode the router (tools/autocad-router.ps1) re-stages that file
-    AGAIN into its own staging/dwg_job_<stamp>/input.dwg and _QSAVEs onto THAT
-    copy. The true mutated file's path is only visible in the router's own
-    envelope at execution.engine_output.input, which run_job already parses
-    from stdout for us.
-    """
-    try:
-        text = Path(stdout_path).read_text(encoding="utf-8", errors="replace")
-    except OSError:
-        return None
-    if not text.strip():
-        return None
-    envelope = run_job._parse_first_json_object(text)
-    if not envelope:
-        return None
-    eng = (envelope.get("execution") or {}).get("engine_output") or {}
-    staged = eng.get("input")
-    return staged if staged and Path(staged).exists() else None
-
-
 def _classify_run_status(res: dict) -> str:
     """Classify a cadctl inspect()/run_operation() result into ok / needs_runtime
     / failed for a check that could not complete as expected.
@@ -326,13 +303,13 @@ def _classify_run_status(res: dict) -> str:
     - anything else (error/blocked after execution) -> a genuine CAD-level
       failure (e.g. a real ObjectARX error code), reported as failed.
     """
-    if res.get("executed") is False:
-        return "failed"
     status = res.get("status")
     if status == "ok":
         return "ok"
     if status in ("unavailable", "partial", "not_implemented"):
         return "needs_runtime"
+    if res.get("executed") is False:
+        return "failed"
     return "failed"
 
 
@@ -358,11 +335,21 @@ def _run(cad: "cadctl.Cad", op_id: str, args: dict, dwg_path, out_dir,
     write-mode governance gate (confirmed live)."""
     res = cad.run_operation(op_id, args=args, dwg_path=str(dwg_path),
                             write_mode=write_mode, out_dir=str(out_dir))
-    staged = None
-    stdout_ref = res.get("stdout")
-    if stdout_ref and Path(stdout_ref).exists():
-        staged = _staged_input_of(stdout_ref)
-    return res, staged
+    try:
+        receipt = parse_execution_receipt(res)
+        if res.get("status") in (
+            "unavailable",
+            "partial",
+            "not_implemented",
+        ):
+            return res, None
+        result_artifact = receipt.require_successful_result()
+    except ExecutionReceiptError as exc:
+        failed = dict(res)
+        failed["status"] = "error"
+        failed["reason"] = "invalid or unbound execution receipt: %s" % (exc,)
+        return failed, None
+    return res, result_artifact.path
 
 
 def _safe(fn, *args, **kwargs) -> dict:

@@ -62,6 +62,7 @@ class _FakeRouterRunJob:
                            write_mode="read", job_path=None, timeout=600,
                            intent="dwg"):
         self.calls.append({"staged_dwg": staged_dwg, "write_mode": write_mode})
+        working_sha_before = _sha256(staged_dwg)
         os.makedirs(run_dir, exist_ok=True)
         stdout = os.path.join(run_dir, "stdout.txt")
         stderr = os.path.join(run_dir, "stderr.txt")
@@ -82,7 +83,13 @@ class _FakeRouterRunJob:
                     fh.write(b"MUTATED-BY-SIMULATED-QSAVE")
 
         result_json = os.path.join(run_dir, "result.json")
-        Path(result_json).write_text(json.dumps({"status": "ok"}), encoding="utf-8")
+        Path(result_json).write_text(json.dumps({
+            "schema": "ariadne.autocad_native_job_result.v1",
+            "engine": "native_objectarx",
+            "operation": operation,
+            "status": "ok",
+            "result": {},
+        }), encoding="utf-8")
 
         return {
             "command": ["fake"],
@@ -93,6 +100,39 @@ class _FakeRouterRunJob:
             "result_json": result_json,
             "result": {"status": "ok"},
             "staged_used": router_copy,
+            "execution": {
+                "router_schema": "ariadne.autocad_router_run.v2",
+                "router_status": "PASS",
+                "executed_route": "dwg_truth_autocad",
+                "process_exit_code": 0,
+                "engine_exit_code": 0,
+                "engine_output_exit_code": 0,
+                "timed_out": False,
+                "launch_error": None,
+                "executed": True,
+                "status": "ok",
+                "native_status": "ok",
+                "native_schema": "ariadne.autocad_native_job_result.v1",
+                "native_engine": "native_objectarx",
+                "native_operation": operation,
+                "native_result_source": "file",
+                "native_result_is_object": True,
+                "native_error_code": None,
+                "native_result_path": str(Path(result_json).resolve()),
+                "native_result_sha256": _sha256(result_json),
+                "result_kind": "router_working_copy",
+                "result_path": str(Path(router_copy).resolve()),
+                "operation": operation,
+                "write_mode": write_mode,
+                "input_kind": "staged_copy",
+                "request_input": str(Path(staged_dwg).resolve()),
+                "original_input": str(Path(staged_dwg).resolve()),
+                "input": str(Path(router_copy).resolve()),
+                "working_sha256_before": working_sha_before,
+                "working_sha256_after": _sha256(router_copy),
+                "save_command_issued": write_mode == "write_copy",
+                "limitation_codes": [],
+            },
             "timed_out": False,
             "error": None,
         }
@@ -105,6 +145,12 @@ def fixture_dwg(tmp_path):
     return p
 
 
+def _cad(tmp_path):
+    cad = cadctl.Cad()
+    cad.staging_golden = tmp_path / "staging"
+    return cad
+
+
 def test_read_op_envelope_is_truthful(monkeypatch, tmp_path, fixture_dwg):
     op = _first_implemented_op()
     assert op, "registry must contain at least one implemented op"
@@ -113,7 +159,7 @@ def test_read_op_envelope_is_truthful(monkeypatch, tmp_path, fixture_dwg):
     fake = _FakeRouterRunJob(mutate_on_write=True)
     monkeypatch.setattr(cadctl, "run_job", fake)
 
-    env = cadctl.Cad().run_operation(
+    env = _cad(tmp_path).run_operation(
         op_id, write_mode="read", dwg_path=str(fixture_dwg), out_dir=str(tmp_path / "out"))
 
     assert env["status"] == "ok"
@@ -137,7 +183,7 @@ def test_write_copy_op_envelope_is_truthful(monkeypatch, tmp_path, fixture_dwg):
     fake = _FakeRouterRunJob(mutate_on_write=True)
     monkeypatch.setattr(cadctl, "run_job", fake)
 
-    env = cadctl.Cad().run_operation(
+    env = _cad(tmp_path).run_operation(
         op_id, write_mode="write_copy", dwg_path=str(fixture_dwg),
         out_dir=str(tmp_path / "out"))
 
@@ -159,7 +205,7 @@ def test_write_copy_op_envelope_is_truthful(monkeypatch, tmp_path, fixture_dwg):
     assert env["staged_result_sha256"] != env["staged_copy_sha256"]
 
 
-def test_in_place_router_mutation_surfaces_as_safety_error(monkeypatch, tmp_path, fixture_dwg):
+def test_in_place_router_mutation_is_blocked_by_the_input_lease(monkeypatch, tmp_path, fixture_dwg):
     op = _first_implemented_op(require_write_copy=True)
     if not op:
         pytest.skip("no implemented op allows write_copy in this registry snapshot")
@@ -168,11 +214,12 @@ def test_in_place_router_mutation_surfaces_as_safety_error(monkeypatch, tmp_path
     fake = _FakeRouterRunJob(mutate_in_place=True)
     monkeypatch.setattr(cadctl, "run_job", fake)
 
-    env = cadctl.Cad().run_operation(
+    env = _cad(tmp_path).run_operation(
         op_id, write_mode="write_copy", dwg_path=str(fixture_dwg),
         out_dir=str(tmp_path / "out"))
 
-    assert env["status"] == "error"
-    assert env["staged_copy_unchanged"] is False
+    assert env["status"] == "unavailable"
+    assert env["staged_copy_unchanged"] is True
     assert env["original_unchanged"] is True
-    assert "staged_copy" in env["reason"]
+    assert len(fake.calls) == 1
+    assert "EXECUTED_OBSERVATION_INVALID" in env["execution_receipt"]["verification"]["failure_codes"]

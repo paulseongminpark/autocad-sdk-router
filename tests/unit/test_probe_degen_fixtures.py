@@ -56,6 +56,7 @@ _TOOLS = _ROOT / "tools"
 if str(_TOOLS) not in sys.path:
     sys.path.insert(0, str(_TOOLS))
 import probe_reachability as pr  # noqa: E402
+from operation_provenance import build_execution_receipt  # noqa: E402
 
 
 PROMOTABLE_FIXTURE_SOURCES = {
@@ -96,6 +97,44 @@ NON_PROMOTABLE_OPS = (
 
 
 def _ok_env(created: bool) -> dict:
+    receipt = build_execution_receipt(
+        authorized_operation="x",
+        authorized_write_mode="write_copy",
+        executed=True,
+        reported_status="ok",
+        executed_operation="x",
+        executed_write_mode="write_copy",
+        router_input_path=r"C:\stage\baseline.dwg",
+        original_path=r"C:\input\source.dwg",
+        original_sha256_before="a" * 64,
+        original_sha256_after="a" * 64,
+        baseline_path=r"C:\stage\baseline.dwg",
+        baseline_sha256="a" * 64,
+        baseline_sha256_after="a" * 64,
+        result_path=r"C:\stage\result.dwg",
+        result_sha256="b" * 64,
+        result_kind="router_working_copy",
+        process_exit_code=0,
+        engine_exit_code=0,
+        engine_output_exit_code=0,
+        native_status="ok",
+        native_schema="ariadne.autocad_native_job_result.v1",
+        native_engine="native_objectarx",
+        native_operation="x",
+        native_result_source="file",
+        native_result_is_object=True,
+        native_error_code=None,
+        native_result_path=r"C:\router\runs\result.json",
+        native_result_sha256="c" * 64,
+        router_status="PASS",
+        router_schema="ariadne.autocad_router_run.v2",
+        executed_route="dwg_truth_autocad",
+        timed_out=False,
+        input_kind="staged_copy",
+        save_command_issued=True,
+        router_working_sha256_before="a" * 64,
+        router_working_sha256_after="b" * 64,
+    )
     return {
         "schema": "ariadne.cadctl.run_operation.v1",
         "operation": "x",
@@ -104,6 +143,7 @@ def _ok_env(created: bool) -> dict:
         "write_mode": "write_copy",
         "original_unchanged": True,
         "status": "ok",
+        "execution_receipt": receipt,
         "result": {
             "created": created,
             "class": "AcDbLine",
