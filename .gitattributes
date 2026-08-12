@@ -5,6 +5,13 @@
 # Repo stores text as LF; checkout is native per platform.
 * text=auto
 
+# Deterministic registry projections are byte-compared with fresh LF output.
+reports/operation_coverage_full_matrix.json text eol=lf
+reports/operation_coverage_full_matrix.md   text eol=lf
+reports/operation_coverage_latest.json      text eol=lf
+reports/operation_coverage_latest.md        text eol=lf
+reports/v1_operation_gate_latest.json       text eol=lf
+
 # PowerShell scripts stay CRLF on checkout (Windows convention; PS also runs LF).
 *.ps1  text eol=crlf
 *.psm1 text eol=crlf

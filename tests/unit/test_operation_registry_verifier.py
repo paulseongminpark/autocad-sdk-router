@@ -906,6 +906,121 @@ def test_native_family_hasop_must_match_actual_dispatch_branches(
     assert "write.dynblock.property" in failures[0].detail
 
 
+def test_cross_family_native_operation_ownership_is_a_typed_failure(
+    tmp_path: Path,
+) -> None:
+    root = _copy_verification_fixture(tmp_path)
+    family_path = (
+        root / "src" / "Ariadne.AcadNative" / "families" / "m08e_handlers.inc"
+    )
+    source = family_path.read_text(encoding="utf-8")
+    operation_id = "infra.hostapp.get_services"
+    hasop_needle = "    return op == kM08eOpEntityXdata"
+    dispatch_needle = (
+        "static bool m08eDispatch(const std::string& op, "
+        "const AriadneJobCtx& ctx, std::ostringstream& r)\n"
+        "{\n"
+    )
+    assert hasop_needle in source
+    assert dispatch_needle in source
+    family_path.write_text(
+        source.replace(
+            hasop_needle,
+            f'    return op == "{operation_id}"\n        || op == kM08eOpEntityXdata',
+            1,
+        ).replace(
+            dispatch_needle,
+            dispatch_needle + f'    if (op == "{operation_id}")\n        return true;\n',
+            1,
+        ),
+        encoding="utf-8",
+    )
+
+    receipt = verify_operation_registry(root)
+
+    failures = [
+        failure for failure in receipt.failures
+        if failure.code == "NATIVE_FAMILY_OPERATION_DUPLICATE"
+    ]
+    assert receipt.verified is False
+    assert len(failures) == 1
+    assert operation_id in failures[0].detail
+
+
+def test_public_table_and_family_operation_overlap_is_a_typed_failure(
+    tmp_path: Path,
+) -> None:
+    root = _copy_verification_fixture(tmp_path)
+    operation_id = "inspect.probe.property_count"
+
+    family_path = (
+        root / "src" / "Ariadne.AcadNative" / "families" / "m08e_handlers.inc"
+    )
+    source = family_path.read_text(encoding="utf-8")
+    hasop_needle = "    return op == kM08eOpEntityXdata"
+    dispatch_needle = (
+        "static bool m08eDispatch(const std::string& op, "
+        "const AriadneJobCtx& ctx, std::ostringstream& r)\n"
+        "{\n"
+    )
+    assert hasop_needle in source
+    assert dispatch_needle in source
+    family_path.write_text(
+        source.replace(
+            hasop_needle,
+            f'    return op == "{operation_id}"\n        || op == kM08eOpEntityXdata',
+            1,
+        ).replace(
+            dispatch_needle,
+            dispatch_needle + f'    if (op == "{operation_id}")\n        return true;\n',
+            1,
+        ),
+        encoding="utf-8",
+    )
+
+    registry_path = root / "config" / "operations.v2.json"
+    registry = json.loads(registry_path.read_text(encoding="utf-8-sig"))
+    operation = next(
+        item for item in registry["operations"] if item["id"] == operation_id
+    )
+    operation["handler"]["dispatcher_symbol"] = "m08eDispatch"
+    registry_path.write_text(json.dumps(registry), encoding="utf-8")
+
+    receipt = verify_operation_registry(root)
+
+    failures = [
+        failure for failure in receipt.failures
+        if failure.code == "NATIVE_PUBLIC_TABLE_FAMILY_OVERLAP"
+    ]
+    assert receipt.verified is False
+    assert len(failures) == 1
+    assert operation_id in failures[0].detail
+
+
+def test_family_owned_operation_dispatcher_mismatch_is_a_typed_failure(
+    tmp_path: Path,
+) -> None:
+    root = _copy_verification_fixture(tmp_path)
+    registry_path = root / "config" / "operations.v2.json"
+    registry = json.loads(registry_path.read_text(encoding="utf-8-sig"))
+    operation_id = "infra.hostapp.get_services"
+    operation = next(
+        item for item in registry["operations"] if item["id"] == operation_id
+    )
+    assert operation["handler"]["dispatcher_symbol"] == "m08cDispatch"
+    operation["handler"]["dispatcher_symbol"] = "m08eDispatch"
+    registry_path.write_text(json.dumps(registry), encoding="utf-8")
+
+    receipt = verify_operation_registry(root)
+
+    failures = [
+        failure for failure in receipt.failures
+        if failure.code == "REGISTRY_NATIVE_DISPATCHER_MISMATCH"
+    ]
+    assert len(failures) == 1
+    assert operation_id in failures[0].detail
+
+
 def test_native_family_direct_dispatch_branch_must_handle_the_operation(
     tmp_path: Path,
 ) -> None:

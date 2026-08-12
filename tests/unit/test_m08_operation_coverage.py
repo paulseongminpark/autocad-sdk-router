@@ -19,8 +19,11 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 import sys
+import tempfile
 import unittest
+from copy import deepcopy
 
 _THIS = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.dirname(os.path.dirname(_THIS))
@@ -36,6 +39,13 @@ _M13 = ["operation", "family", "v1_target", "status", "host_support", "handler",
 
 _PROMOTED = ["inspect.layers", "inspect.blocks", "inspect.entities", "live.status"]
 _NATIVE_SRC = os.path.join(_REPO, "src", "Ariadne.AcadNative", "AriadneNativeJob.cpp")
+_DETERMINISTIC_REPORTS = (
+    "operation_coverage_full_matrix.json",
+    "operation_coverage_full_matrix.md",
+    "operation_coverage_latest.json",
+    "operation_coverage_latest.md",
+    "v1_operation_gate_latest.json",
+)
 
 
 def _matrix():
@@ -146,6 +156,84 @@ class TestM08Promotions(unittest.TestCase):
         import cadctl
         rc = cadctl.registry_coverage()
         self.assertEqual(self.matrix["totals"]["by_status"], rc["computed_by_status"])
+
+    def test_latest_coverage_consistency_is_derived_from_current_registry(self):
+        summary = ocm.build_latest_coverage(self.matrix)
+        self.assertEqual(summary["registry_source_ref"], "config/operations.v2.json")
+        self.assertNotIn("registry_coverage_ref", summary)
+        self.assertTrue(summary["consistency_checks"])
+        self.assertTrue(all(summary["consistency_checks"].values()))
+        self.assertEqual(
+            summary["consistent"],
+            all(summary["consistency_checks"].values()),
+        )
+
+    def test_latest_coverage_rejects_corrupted_totals_instead_of_using_an_identity(self):
+        corrupted = deepcopy(self.matrix)
+        corrupted["totals"]["unknown"] = corrupted["totals"]["total"] + 1
+        summary = ocm.build_latest_coverage(corrupted)
+        self.assertFalse(
+            summary["consistency_checks"][
+                "catalogue_partition_matches_operation_count"
+            ]
+        )
+        self.assertFalse(summary["consistent"])
+
+    def test_committed_coverage_reports_match_one_fresh_registry_projection(self):
+        with tempfile.TemporaryDirectory(prefix="operation-coverage-") as tmp:
+            original_reports = ocm.REPORTS
+            try:
+                ocm.REPORTS = tmp
+                ocm.write_reports()
+            finally:
+                ocm.REPORTS = original_reports
+            for name in _DETERMINISTIC_REPORTS:
+                with self.subTest(name=name):
+                    with open(os.path.join(tmp, name), "rb") as actual:
+                        actual_bytes = actual.read()
+                    with open(os.path.join(_REPO, "reports", name), "rb") as committed:
+                        committed_bytes = committed.read()
+                    self.assertEqual(committed_bytes, actual_bytes)
+
+    def test_deterministic_reports_have_stable_lf_checkout_bytes(self):
+        paths = [f"reports/{name}" for name in _DETERMINISTIC_REPORTS]
+        result = subprocess.run(
+            ["git", "-C", _REPO, "check-attr", "-z", "text", "eol", "--", *paths],
+            check=True,
+            capture_output=True,
+        )
+        fields = result.stdout.rstrip(b"\0").split(b"\0")
+        self.assertEqual(len(fields) % 3, 0, fields)
+        attributes = {}
+        for index in range(0, len(fields), 3):
+            path, attribute, value = (
+                field.decode("utf-8") for field in fields[index:index + 3]
+            )
+            attributes.setdefault(path, {})[attribute] = value
+
+        for path in paths:
+            with self.subTest(path=path, contract="attributes"):
+                self.assertEqual(
+                    attributes.get(path),
+                    {"text": "set", "eol": "lf"},
+                )
+            checkout = subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    _REPO,
+                    "-c",
+                    "core.autocrlf=true",
+                    "cat-file",
+                    "--filters",
+                    f"--path={path}",
+                    f"HEAD:{path}",
+                ],
+                check=True,
+                capture_output=True,
+            ).stdout
+            with self.subTest(path=path, contract="checkout_bytes"):
+                self.assertNotIn(b"\r\n", checkout)
 
 
 class TestM08NativeSource(unittest.TestCase):

@@ -669,6 +669,66 @@ def verify_operation_registry(router_home: str | Path) -> OperationRegistryRecei
                 source=str(root / "src" / "Ariadne.AcadNative" / "families"),
                 detail=f"HasOp/Dispatch mismatches: {family_dispatch_mismatches!r}",
             ))
+        duplicate_family_operation_owners = {
+            operation_id: owners
+            for operation_id, owners in native_facts.family_operation_owners.items()
+            if len(owners) > 1
+        }
+        if duplicate_family_operation_owners:
+            failures.append(OperationRegistryFailure(
+                code="NATIVE_FAMILY_OPERATION_DUPLICATE",
+                source=str(root / "src" / "Ariadne.AcadNative" / "families"),
+                detail=(
+                    "native operation ids owned by multiple families: "
+                    f"{duplicate_family_operation_owners!r}"
+                ),
+            ))
+        public_table_family_overlap = sorted(
+            native_facts.native_table_operations
+            & set(native_facts.family_operation_owners)
+        )
+        if public_table_family_overlap:
+            failures.append(OperationRegistryFailure(
+                code="NATIVE_PUBLIC_TABLE_FAMILY_OVERLAP",
+                source=str(root / "src" / "Ariadne.AcadNative"),
+                detail=(
+                    "native operation ids owned by both the public operation table "
+                    f"and a family dispatcher: {public_table_family_overlap!r}"
+                ),
+            ))
+        registry_operations_by_id = {
+            operation["id"]: operation
+            for operation in operations
+            if isinstance(operation, dict) and isinstance(operation.get("id"), str)
+        }
+        family_dispatcher_mismatches = {}
+        for operation_id, owners in native_facts.family_operation_owners.items():
+            if len(owners) != 1 or operation_id not in registry_operations_by_id:
+                continue
+            owner = owners[0]
+            operation = registry_operations_by_id[operation_id]
+            handler = operation.get("handler")
+            observed = (
+                handler.get("dispatcher_symbol")
+                if isinstance(handler, dict)
+                else None
+            )
+            expected = native_facts.families[owner].dispatch_fn
+            if observed != expected:
+                family_dispatcher_mismatches[operation_id] = {
+                    "expected": expected,
+                    "observed": observed,
+                    "owner": owner,
+                }
+        if family_dispatcher_mismatches:
+            failures.append(OperationRegistryFailure(
+                code="REGISTRY_NATIVE_DISPATCHER_MISMATCH",
+                source=str(root / "config" / "operations.v2.json"),
+                detail=(
+                    "single-owner native family dispatcher mismatches: "
+                    f"{family_dispatcher_mismatches!r}"
+                ),
+            ))
         legacy_table_operations = (
             native_facts.native_table_operations
             | native_facts.internal_table_operations

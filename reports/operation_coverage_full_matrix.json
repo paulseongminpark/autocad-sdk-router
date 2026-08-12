@@ -24,27 +24,27 @@
     "host_support": "host_eligibility (cheapest-first), '|'-joined"
   },
   "totals": {
-    "total": 551,
+    "total": 552,
     "by_status": {
-      "implemented": 489,
+      "implemented": 490,
       "blocked": 62
     },
-    "implemented": 489,
+    "implemented": 490,
     "wired": 0,
     "stub": 0,
     "catalogued": 0,
     "blocked": 62,
     "deprecated": 0,
     "unknown": 0,
-    "v1_target_total": 551,
-    "v1_target_implemented": 489,
+    "v1_target_total": 552,
+    "v1_target_implemented": 490,
     "v1_target_blocked": 62,
     "v1_target_deferred": 0,
     "by_family": {
       "objectdbx_database": 21,
       "symbol_tables_dictionaries": 31,
       "geometry_kernel": 25,
-      "inspect": 18,
+      "inspect": 19,
       "write": 4,
       "live": 7,
       "extend": 2,
@@ -72,7 +72,7 @@
       "verify": 1
     },
     "by_family_group": {
-      "read": 70,
+      "read": 71,
       "native_only": 434,
       "write_patch": 24,
       "live": 7,
@@ -81,12 +81,12 @@
       "validate_diff": 3
     },
     "by_risk_class": {
-      "read_safe": 366,
+      "read_safe": 367,
       "staged_write": 129,
       "live_edit": 50,
       "raw_command": 6
     },
-    "agent_exposed_count": 489
+    "agent_exposed_count": 490
   },
   "gate": {
     "all_classified": true,
@@ -458,6 +458,30 @@
       "agent_exposed": true,
       "notes": "Router capability contract reports current host support instead of invoking one catalog primitive.",
       "engine_tier": "accoreconsole_lisp_also",
+      "mapping_type": "synthetic"
+    },
+    {
+      "operation": "inspect.probe.property_count",
+      "family": "inspect",
+      "v1_target": true,
+      "status": "implemented",
+      "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
+      "handler": "ariadneProbePropertyCount",
+      "test_ref": [
+        "tests/unit/test_operation_registry_verifier.py::test_probe_property_count_native_source_and_result_shape"
+      ],
+      "evidence_ref": [
+        "docs/LIVE_JOB_ARGUMENT_CONTRACT.md#job_outjson-the-result",
+        "reports/opm_property_latest.json#headless_proof",
+        "reports/native_smoke_latest.json#headless_channel_smoke",
+        "tests/unit/test_operation_registry_verifier.py::test_probe_property_count_native_source_and_result_shape"
+      ],
+      "blocker_ref": "",
+      "risk_class": "read_safe",
+      "write_level": "read",
+      "agent_exposed": true,
+      "notes": "Headless proof reports property_count=1 for the Size property; the OPM panel itself remains attended-only.",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "synthetic"
     },
     {
@@ -5917,8 +5941,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -5944,8 +5968,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -5971,8 +5995,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -5998,8 +6022,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6025,8 +6049,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6052,8 +6076,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6079,8 +6103,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6106,8 +6130,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6138,7 +6162,7 @@
       "write_level": "live_edit",
       "agent_exposed": true,
       "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6167,8 +6191,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6197,8 +6221,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6224,8 +6248,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6251,8 +6275,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6281,8 +6305,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6308,8 +6332,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6335,8 +6359,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6365,8 +6389,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6395,8 +6419,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6422,8 +6446,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6449,8 +6473,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6476,8 +6500,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6508,7 +6532,7 @@
       "write_level": "live_edit",
       "agent_exposed": true,
       "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6539,7 +6563,7 @@
       "write_level": "live_edit",
       "agent_exposed": true,
       "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6682,8 +6706,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6711,7 +6735,7 @@
       "write_level": "live_edit",
       "agent_exposed": true,
       "notes": "M04 catalog-only classification was stale after the 2026-07-06 router fix. Lane I fixed tools/autocad-router.ps1 to route job-based ops by handler.execution_host_class instead of the old write_mode-based attended branch; the fixed-router re",
-      "engine_tier": "native_arx_only",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6737,8 +6761,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6764,8 +6788,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6851,8 +6875,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6881,8 +6905,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6908,8 +6932,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6935,8 +6959,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6962,8 +6986,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -6989,8 +7013,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -7016,8 +7040,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -7070,8 +7094,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -7097,8 +7121,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -7124,8 +7148,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -7151,8 +7175,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -7205,8 +7229,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -7421,8 +7445,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -7529,8 +7553,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -9987,8 +10011,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -10014,8 +10038,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -10041,8 +10065,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -10068,8 +10092,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -10095,8 +10119,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -10122,8 +10146,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -10149,8 +10173,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -10176,8 +10200,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -10203,8 +10227,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -10230,8 +10254,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -10257,8 +10281,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -10284,8 +10308,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -10311,8 +10335,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -10338,8 +10362,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -10365,8 +10389,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -10392,8 +10416,8 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
-      "engine_tier": "native_arx_only",
+      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS. P2c re-tier (2026-07-16): static dbx-capabi",
+      "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
     {
@@ -12190,7 +12214,7 @@
       "risk_class": "raw_command",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents.",
+      "notes": "M04 catalog-only classification for this raw-command API is closed as hard-blocked: raw AutoCAD command dispatch is forbidden in fallback policy and never exposed to agents. P5a reclassification (2026-07-16): kind=module_event, dispatchable",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12268,7 +12292,7 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: arbitrary command group removal mutates the host command stack; implemented probes only clean up their bounded ARIADNE_M08N group.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: arbitrary command group removal mutates the host command stack; implemented probes only clean up their bounded ARIADNE_M08N group. P5a reclassification (2026-07-16): kind=modu",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12319,7 +12343,7 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SDK_NOT_EXPOSED: entrypoint definition is a compile/link-time ARX macro/export contract, not a runtime SDK operation callable by the job dispatcher.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SDK_NOT_EXPOSED: entrypoint definition is a compile/link-time ARX macro/export contract, not a runtime SDK operation callable by the job dispatcher. P5a reclassification (2026-07-16): kind=modu",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12343,7 +12367,7 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: entrypoint dispatch is host-owned by the AutoCAD loader via acrxEntryPoint and cannot be synthesized safely by the integration job dispatcher.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: entrypoint dispatch is host-owned by the AutoCAD loader via acrxEntryPoint and cannot be synthesized safely by the integration job dispatcher. P5a reclassification (2026-07-16",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12367,7 +12391,7 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kInitAppMsg is delivered by the AutoCAD loader during module load; it is not a safe runtime job operation.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kInitAppMsg is delivered by the AutoCAD loader during module load; it is not a safe runtime job operation. P5a reclassification (2026-07-16): kind=module_event, dispatchabl",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12391,7 +12415,7 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kLoadDwgMsg is delivered by the host during document lifecycle events; no controlled attended lifecycle route is available.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kLoadDwgMsg is delivered by the host during document lifecycle events; no controlled attended lifecycle route is available. P5a reclassification (2026-07-16): kind=module_e",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12415,7 +12439,7 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kOleUnloadAppMsg is a host lifecycle callback and cannot be triggered safely from the CAD OS job surface.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kOleUnloadAppMsg is a host lifecycle callback and cannot be triggered safely from the CAD OS job surface. P5a reclassification (2026-07-16): kind=module_event, dispatchable",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12439,7 +12463,7 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kUnloadDwgMsg is host-owned document lifecycle dispatch and unavailable to the headless integration job route.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kUnloadDwgMsg is host-owned document lifecycle dispatch and unavailable to the headless integration job route. P5a reclassification (2026-07-16): kind=module_event, dispatc",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12463,7 +12487,7 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: arbitrary lifecycle message dispatch is host-owned and cannot be simulated safely by the agent job surface.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: arbitrary lifecycle message dispatch is host-owned and cannot be simulated safely by the agent job surface. P5a reclassification (2026-07-16): kind=module_event, dispatchable=",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12487,7 +12511,7 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kUnloadAppMsg is delivered by the loader during module unload; the job dispatcher must not invoke it directly.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. HOST_UNAVAILABLE: On_kUnloadAppMsg is delivered by the loader during module unload; the job dispatcher must not invoke it directly. P5a reclassification (2026-07-16): kind=module_event, dispatc",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12511,7 +12535,7 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: acrxLoadModule loads external code into the AutoCAD host process and is not an agent-exposed operation.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: acrxLoadModule loads external code into the AutoCAD host process and is not an agent-exposed operation. P5a reclassification (2026-07-16): kind=module_event, dispatchable=fals",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12535,7 +12559,7 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: ARX demand/load mechanics execute host modules and mutate runtime loader state.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: ARX demand/load mechanics execute host modules and mutate runtime loader state. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is a HOST-OWNE",
       "engine_tier": "accoreconsole_lisp_also",
       "mapping_type": "exact"
     },
@@ -12559,7 +12583,7 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: application-driven module loading executes external code and mutates process loader state.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: application-driven module loading executes external code and mutates process loader state. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is ",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12586,7 +12610,7 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "M08N-A3 hard-blocked by safety: no raw command/menu/tool execution or AutoCAD demand-load registry mutation is exposed from the agent surface.",
+      "notes": "M08N-A3 hard-blocked by safety: no raw command/menu/tool execution or AutoCAD demand-load registry mutation is exposed from the agent surface. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false -- this is a HOST-OWNED ",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12610,7 +12634,7 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: LISP loading executes script code in the AutoCAD host and is not exposed as a raw agent load surface.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: LISP loading executes script code in the AutoCAD host and is not exposed as a raw agent load surface. P5a reclassification (2026-07-16): kind=module_event, dispatchable=false ",
       "engine_tier": "accoreconsole_lisp_also",
       "mapping_type": "exact"
     },
@@ -12688,7 +12712,7 @@
       "risk_class": "read_safe",
       "write_level": "read",
       "agent_exposed": false,
-      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: acrxUnloadModule can unload host modules and destabilize the running process; it remains non-agent-exposed.",
+      "notes": "Wave3 post-merge re-audit accepted hard block. SAFETY_FORBIDDEN: acrxUnloadModule can unload host modules and destabilize the running process; it remains non-agent-exposed. P5a reclassification (2026-07-16): kind=module_event, dispatchable=",
       "engine_tier": "native_arx_only",
       "mapping_type": "exact"
     },
@@ -12997,26 +13021,22 @@
       "v1_target": true,
       "status": "implemented",
       "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
-      "handler": "m08eDispatch",
+      "handler": "m08cDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_m08e_handlers.py",
         "tests/unit/test_m08c_handlers.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#write.object.create_ext_dict",
-        "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
-        "reports/merge/MERGE-M08-READ.json",
-        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
-        "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch"
+        "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
+        "tests/unit/test_m08c_handlers.py::TestM08CHandlers"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "IMPLEMENTED (M08C-T02). Sole native owner = m08cDispatch, which creates the extension dictionary in the router-staged working database so write_copy can persist it without writing the original. Static source-contract coverage is tests/unit/",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -13026,26 +13046,23 @@
       "v1_target": true,
       "status": "implemented",
       "host_support": "dbx|coreconsole|arx_adapter|full_autocad",
-      "handler": "m08eDispatch",
+      "handler": "m08cDispatch",
       "test_ref": [
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
         "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_every_operation_has_m04_metadata",
-        "tests/unit/test_m08e_handlers.py",
         "tests/unit/test_m08c_handlers.py"
       ],
       "evidence_ref": [
         "config/autocad_native_arx_operation_catalog.json#write.regapp.register",
-        "src/Ariadne.AcadNative/families/m08e_handlers.inc:m08eDispatch",
-        "reports/merge/MERGE-M08-READ.json",
-        "build:native_acad exit 0 (.crx/.arx, VS2026 MSBuild x64)",
-        "runtime_native_job_smoke:deferred_attended(MERGE-M08-READ)",
-        "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch"
+        "src/Ariadne.AcadNative/families/m08c_handlers.inc:m08cDispatch",
+        "tools/patch_ops/xdata.py:build_xdata_ops",
+        "tests/unit/test_m08c_handlers.py::TestM08CHandlers"
       ],
       "blocker_ref": "",
       "risk_class": "staged_write",
       "write_level": "write_copy",
       "agent_exposed": true,
-      "notes": "M04 catalog-only classification. This operation is known from the native ObjectARX catalog but has no CAD OS router handler yet; status catalogued is not runnable and must not be reported as PASS.",
+      "notes": "IMPLEMENTED (M08C-T03). Sole native owner = m08cDispatch, which registers the application in the router-staged working database so write_copy can persist it without writing the original. Input uses canonical app, then legacy regapp, and def",
       "engine_tier": "objectdbx_capable",
       "mapping_type": "exact"
     },
@@ -14733,7 +14750,7 @@
     "schema": "ariadne.cad_os.closure_gate.v1",
     "ticket_basis": "M08A-T01",
     "totals_by_status": {
-      "implemented": 489,
+      "implemented": 490,
       "blocked": 62
     },
     "catalogued": 0,

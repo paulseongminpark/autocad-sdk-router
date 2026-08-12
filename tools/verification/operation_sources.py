@@ -40,6 +40,7 @@ class NativeFamilyFacts:
 @dataclass(frozen=True)
 class NativeSourceFacts:
     families: Mapping[str, NativeFamilyFacts]
+    family_operation_owners: Mapping[str, tuple[str, ...]]
     runtime_family_gates: tuple[str, ...]
     runtime_family_dispatchers: tuple[str, ...]
     legacy_dispatch_operations: frozenset[str]
@@ -1254,8 +1255,16 @@ def parse_native_sources(
         )
     if not families:
         raise OperationSourceParseError("no native family modules were parsed")
+    family_operation_owners: dict[str, list[str]] = {}
+    for family_key, family in families.items():
+        for operation_id in family.operations:
+            family_operation_owners.setdefault(operation_id, []).append(family_key)
     return NativeSourceFacts(
         families=families,
+        family_operation_owners={
+            operation_id: tuple(sorted(owners))
+            for operation_id, owners in sorted(family_operation_owners.items())
+        },
         runtime_family_gates=runtime_gates,
         runtime_family_dispatchers=runtime_dispatchers,
         legacy_dispatch_operations=legacy_dispatch_operations,

@@ -9068,11 +9068,8 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
-        "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08c_handlers.inc",
-        "src/Ariadne.AcadNative/families/m08e_handlers.inc",
         "tests/unit/test_m08c_handlers.py",
-        "tests/unit/test_m08e_handlers.py",
         "tests/unit/test_operation_registry_v2.py"
       ],
       "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
@@ -9144,12 +9141,10 @@
       "arg_keys": [],
       "target_files": [
         "config/autocad_native_arx_operation_catalog.json",
-        "reports/merge/MERGE-M08-READ.json",
         "src/Ariadne.AcadNative/families/m08c_handlers.inc",
-        "src/Ariadne.AcadNative/families/m08e_handlers.inc",
         "tests/unit/test_m08c_handlers.py",
-        "tests/unit/test_m08e_handlers.py",
-        "tests/unit/test_operation_registry_v2.py"
+        "tests/unit/test_operation_registry_v2.py",
+        "tools/patch_ops/xdata.py"
       ],
       "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
       "persistence_class": "D"

@@ -514,27 +514,24 @@ RECORD_TABLE_CLASSES: Tuple[Dict[str, str], ...] = (
 
 
 # app_id / RegApp is a census symbol table (25 records in 1.dwg: ACAD,
-# ACAD_PSEXT, ...) that a faithful "replay all records" WOULD reproduce -- but
-# its only native write op, write.regapp.register, is a ROLLBACK-ONLY smoke
-# probe: m08eHandleRegappRegister (src/Ariadne.AcadNative/families/
-# m08e_handlers.inc:451-462) wraps ensureRegApp in an AriadneStagedWriteTransaction
-# it NEVER commits and always reports "staged_rolled_back":true, so no APPID
-# record ever persists (the m08e header lines 20-28 list it among the 6
-# probe-only ops; only write.block.append_entity was graduated to a real
-# persisting primitive). Counting a regapp op as "applied" is FM8 (executed !=
-# success): it returns registered:true from inside a transaction that is
-# discarded. So app_id is EXCLUDED here and surfaced loudly in
+# ACAD_PSEXT, ...) that a faithful "replay all records" WOULD reproduce. The
+# native write op write.regapp.register can persist records in the router-staged
+# working database, but this records-only capstone has no app_id -> native-op
+# mapping: app_id is absent from RECORD_SPECS and build_records_patch emits no
+# write.regapp.register operation for symbol_tables.app_ids. Counting those
+# records as applied without wiring that mapping would be FM8 (planned !=
+# applied). So app_id is EXCLUDED here and surfaced loudly in
 # build_meta["excluded_table_kinds"] -- a DEFERRAL, not a silent omission and
-# not a fabricated pass. Re-include it only when the native op is graduated to
-# persist (as append_entity was).
+# not a fabricated pass. Re-include it only when the replay mapping is wired and
+# verified.
 EXCLUDED_TABLE_KINDS: Dict[str, str] = {
     "app_id": (
-        "write.regapp.register is a rollback-only smoke probe "
-        "(src/Ariadne.AcadNative/families/m08e_handlers.inc:451-462: "
-        "AriadneStagedWriteTransaction is never committed, always reports "
-        "staged_rolled_back:true) -- it cannot persist an APPID record, so "
-        "replaying app_ids would be a no-op falsely counted as applied (FM8). "
-        "Deferred until the native op is graduated to a persisting primitive."
+        "app_id replay is not wired into build_records_patch: there is no "
+        "RECORD_SPECS entry or adapter that emits write.regapp.register from "
+        "symbol_tables.app_ids. The native M08C operation can persist a RegApp "
+        "in the staged working database, but counting app_ids as applied before "
+        "the replay mapping exists would be FM8. Deferred until that mapping is "
+        "wired and verified."
     ),
 }
 
@@ -730,10 +727,9 @@ def build_records_patch(census_ir: Dict[str, Any], target_dwg: Dict[str, Any], p
                 reported in meta["skipped_unreferenced"][label]).
 
     ``meta["excluded_table_kinds"]`` names table kinds deliberately NOT replayed
-    because no native op can honestly persist them (app_id -> write.regapp.register
-    is rollback-only; see EXCLUDED_TABLE_KINDS). These are DEFERRED, never counted
-    as applied -- the alternative (emit a create op that silently no-ops and count
-    it applied) is FM8.
+    because their replay mapping is not wired (app_id -> write.regapp.register;
+    see EXCLUDED_TABLE_KINDS). These are DEFERRED, never counted as applied -- the
+    alternative (emit no operation but count the record applied) is FM8.
     """
     op_roundtrip_probe_mod = op_roundtrip_probe_mod or importlib.import_module("op_roundtrip_probe")
     operations: List[Dict[str, Any]] = []

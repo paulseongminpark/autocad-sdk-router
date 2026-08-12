@@ -346,6 +346,85 @@ def render_md(matrix):
     return "\n".join(lines)
 
 
+def build_latest_coverage(matrix):
+    """Build the compact coverage projection from one current registry snapshot."""
+    t = matrix["totals"]
+    gate = matrix["gate"]
+    rows = matrix["operations"]
+    observed_by_status = collections.Counter(row.get("status") for row in rows)
+    observed_total = len(rows)
+    observed_unknown = (
+        observed_by_status.get(None, 0)
+        + observed_by_status.get("", 0)
+        + observed_by_status.get("unknown", 0)
+    )
+    classified_total = observed_total - observed_unknown
+    observed_v1 = [row for row in rows if row.get("v1_target") is True]
+    observed_v1_implemented = sum(
+        1 for row in observed_v1 if row.get("status") == "implemented"
+    )
+    observed_v1_blocked = sum(
+        1 for row in observed_v1 if row.get("status") == "blocked"
+    )
+    observed_v1_deferred = sum(
+        1
+        for row in observed_v1
+        if row.get("status") in ("stub", "catalogued", "deprecated")
+    )
+    consistency_checks = {
+        "operation_count_matches_status_total": (
+            t["total"] == sum(t["by_status"].values()) == observed_total
+        ),
+        "status_histogram_matches_operations": (
+            t["by_status"] == dict(observed_by_status)
+        ),
+        "catalogue_partition_matches_operation_count": (
+            t["total"] == observed_total
+            and t["unknown"] == observed_unknown
+            and observed_total == classified_total + observed_unknown
+        ),
+        "v1_partition_matches_v1_target_total": (
+            t["v1_target_total"] == len(observed_v1)
+            and t["v1_target_implemented"] == observed_v1_implemented
+            and t["v1_target_blocked"] == observed_v1_blocked
+            and t["v1_target_deferred"] == observed_v1_deferred
+        ),
+        "coverage_gate_passes": gate["gate_pass"] is True,
+    }
+    inspect_database_graph = next(
+        row
+        for row in matrix["operations"]
+        if row["operation"] == "inspect.database.graph"
+    )
+    return {
+        "schema": "ariadne.cad_os.operation_coverage.v1",
+        "packet": PACKET,
+        "operation_count": t["total"],
+        "by_status": t["by_status"],
+        "implemented": t["implemented"],
+        "wired": t["wired"],
+        "stub": t["stub"],
+        "catalogued": t["catalogued"],
+        "blocked": t["blocked"],
+        "deprecated": t["deprecated"],
+        "unknown": t["unknown"],
+        "v1_target_total": t["v1_target_total"],
+        "v1_target_implemented": t["v1_target_implemented"],
+        "v1_target_blocked": t["v1_target_blocked"],
+        "v1_target_deferred": t["v1_target_deferred"],
+        "catalog_total_ops": observed_total,
+        "catalog_classified_ops": classified_total,
+        "catalog_unclassified_ops": observed_unknown,
+        "existing_29_ops_mapped": gate["existing_29_frozen"],
+        "inspect_database_graph_status": inspect_database_graph["status"],
+        "consistency_checks": consistency_checks,
+        "consistent": all(consistency_checks.values()),
+        "registry_source_ref": "config/operations.v2.json",
+        "full_matrix_ref": "reports/operation_coverage_full_matrix.json",
+        "v1_gate_ref": "reports/v1_operation_gate_latest.json",
+    }
+
+
 def write_reports():
     matrix, doc = build_matrix()
     os.makedirs(REPORTS, exist_ok=True)
@@ -376,36 +455,9 @@ def write_reports():
     }
     _dump(os.path.join(REPORTS, "v1_operation_gate_latest.json"), v1_gate)
 
-    # refresh operation_coverage_latest.json (keep its M05-era shape, new counts)
-    cov = {
-        "schema": "ariadne.cad_os.operation_coverage.v1",
-        "packet": PACKET,
-        "operation_count": t["total"],
-        "by_status": t["by_status"],
-        "implemented": t["implemented"],
-        "wired": t["wired"],
-        "stub": t["stub"],
-        "catalogued": t["catalogued"],
-        "blocked": t["blocked"],
-        "deprecated": t["deprecated"],
-        "unknown": t["unknown"],
-        "v1_target_total": t["v1_target_total"],
-        "v1_target_implemented": t["v1_target_implemented"],
-        "v1_target_blocked": t["v1_target_blocked"],
-        "v1_target_deferred": t["v1_target_deferred"],
-        # Derived from the live registry (was a stale hardcoded 480 snapshot that
-        # predated the M08 + w6/w7 waves -- FM9). catalog_total_ops == every op
-        # in operations.v2.json; classified == those with a known status.
-        "catalog_total_ops": t["total"],
-        "catalog_classified_ops": t["total"] - t["unknown"],
-        "catalog_unclassified_ops": t["unknown"],
-        "existing_29_ops_mapped": gate["existing_29_frozen"],
-        "inspect_database_graph_status": "implemented",
-        "consistent": True,
-        "full_matrix_ref": "reports/operation_coverage_full_matrix.json",
-        "v1_gate_ref": "reports/v1_operation_gate_latest.json",
-        "registry_coverage_ref": "reports/registry_coverage_latest.json",
-    }
+    # Refresh the compact projection from this same registry snapshot. Historical
+    # `registry_coverage_latest.json` is deliberately not used as current evidence.
+    cov = build_latest_coverage(matrix)
     _dump(os.path.join(REPORTS, "operation_coverage_latest.json"), cov)
 
     md = []
