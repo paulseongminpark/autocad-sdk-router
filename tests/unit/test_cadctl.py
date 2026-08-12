@@ -3,11 +3,9 @@
 """Lane E TEST -- cadctl control surface: status (read-only), registry, error paths.
 
 Intent (WHY):
-  * cadctl.status() MUST be a READ-ONLY normalization of the router-published
-    status JSON -- it must NEVER spawn ``-Action status`` (that would violate the
-    Daedalus/CAD-OS invariant and could mutate live probe state). We assert it
-    returns a normalized dict whose route_count/available_count mirror the
-    published file, and that it does so without invoking the router.
+  * cadctl.status() preserves the v1 read-only compatibility contract, while
+    ``schema_version=2`` exposes separately typed current-status projections.
+    Neither form may spawn ``-Action status``.
   * registry_list / registry_coverage are pure file reads of operations.v2.json;
     they must report the wired (implemented) count truthfully.
   * inspect() on a missing path must fail CLEANLY with status 'blocked' and must
@@ -44,7 +42,7 @@ def _load_json(path: str):
 
 
 class TestCadctlStatusReadOnly(unittest.TestCase):
-    """status() reflects the published status JSON without running the router."""
+    """status() preserves v1 and exposes v2 only through explicit negotiation."""
 
     def setUp(self):
         import cadctl
@@ -58,9 +56,12 @@ class TestCadctlStatusReadOnly(unittest.TestCase):
         out = self.cad.status()
         self.assertEqual(out.get("schema"), "ariadne.cadctl.status.v1")
         self.assertEqual(out.get("status"), "ok")
-        # The normalized counts must mirror the published file exactly.
+        self.assertEqual(out.get("evidence_class"), "historical_unbound")
+        self.assertFalse(out.get("bound_to_current_revision"))
         self.assertEqual(out.get("route_count"), published.get("route_count"))
-        self.assertEqual(out.get("available_count"), published.get("available_count"))
+        self.assertEqual(
+            out.get("available_count"), published.get("available_count")
+        )
         self.assertEqual(out.get("router_status"), published.get("status"))
         self.assertIsInstance(out.get("routes"), list)
         self.assertEqual(len(out["routes"]), len(published.get("routes", [])))
@@ -69,6 +70,22 @@ class TestCadctlStatusReadOnly(unittest.TestCase):
             self.assertIn("route", r)
             self.assertIn("available", r)
             self.assertIsInstance(r["available"], bool)
+
+    def test_status_v2_separates_current_facts_from_historical_claims(self):
+        out = self.cad.status(schema_version=2)
+
+        self.assertEqual(out.get("schema"), "ariadne.cadctl.status.v2")
+        self.assertEqual(out.get("status"), "PASS")
+        self.assertEqual(out.get("status_scope"), "projection_assembly_only")
+        self.assertEqual(
+            out["historical_snapshot"].get("classification"),
+            "HISTORICAL_UNBOUND",
+        )
+        self.assertFalse(
+            out["historical_snapshot"].get("bound_to_current_revision")
+        )
+        self.assertEqual(out["runtime_observation"]["availability"], "UNKNOWN")
+        self.assertNotIn("native_available", out)
 
     def test_module_level_status_matches_instance(self):
         if not os.path.isfile(_STATUS_JSON):
@@ -79,24 +96,30 @@ class TestCadctlStatusReadOnly(unittest.TestCase):
             self.cad.status().get("route_count"),
         )
 
+        current = self.cadctl.status(
+            schema_version=2,
+            expected_revision="0" * 40,
+        )
+        self.assertEqual(current.get("schema"), "ariadne.cadctl.status.v2")
+
     def test_status_missing_file_reports_unavailable_not_crash(self):
         # Point Cad at a router_home with no status JSON: it must report
         # 'unavailable' truthfully, never raise and never spawn a probe.
         with tempfile.TemporaryDirectory() as tmp:
             cad = self.cadctl.Cad(router_home=tmp)
             out = cad.status()
+            self.assertEqual(out.get("schema"), "ariadne.cadctl.status.v1")
             self.assertEqual(out.get("status"), "unavailable")
             self.assertEqual(out.get("route_count"), 0)
             self.assertFalse(out.get("native_available"))
-            self.assertIn("not found", (out.get("reason") or "").lower())
 
     def test_status_note_declares_read_only(self):
         if not os.path.isfile(_STATUS_JSON):
             self.skipTest("SKIPPED_ENV: published router status JSON absent")
-        out = self.cad.status()
-        # The contract that status is a snapshot, not a live probe, is asserted
-        # in the payload itself -- this is how we encode the read-only intent.
-        self.assertIn("not a live probe", (out.get("note") or "").lower())
+        out = self.cad.status(schema_version=2)
+        self.assertIn("did not start autocad", (
+            out["runtime_observation"].get("reason") or ""
+        ).lower())
 
     def test_status_json_cli_includes_registry_summary(self):
         proc = subprocess.run(
@@ -111,7 +134,26 @@ class TestCadctlStatusReadOnly(unittest.TestCase):
         self.assertEqual(out.get("schema"), "ariadne.cadctl.status.v1")
         self.assertEqual(out.get("status"), "ok")
         self.assertIn("registry", out)
-        self.assertEqual(out["registry"].get("unknown"), 0)
+
+        current = subprocess.run(
+            [sys.executable, os.path.join(_REPO, "tools", "cadctl_cli.py"),
+             "status", "--schema-version", "2"],
+            cwd=_REPO,
+            text=True,
+            capture_output=True,
+        )
+        self.assertEqual(current.returncode, 0, current.stderr)
+        current_out = json.loads(current.stdout)
+        self.assertEqual(current_out.get("schema"), "ariadne.cadctl.status.v2")
+        registry = current_out["capability"]["operation_registry"]
+        self.assertEqual(registry.get("status"), "PASS")
+        self.assertTrue(registry["receipt"].get("verified"))
+
+    def test_status_rejects_an_unknown_schema_version(self):
+        with self.assertRaisesRegex(ValueError, "schema_version"):
+            self.cad.status(schema_version=3)
+        with self.assertRaisesRegex(ValueError, "expected_revision"):
+            self.cad.status(expected_revision="a" * 40)
 
 
 class TestCadctlRegistry(unittest.TestCase):

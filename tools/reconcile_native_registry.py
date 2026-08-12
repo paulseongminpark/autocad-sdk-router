@@ -48,7 +48,26 @@ Usage:
   python tools/reconcile_native_registry.py --apply    # write the registry
   python tools/reconcile_native_registry.py --families c,d,e   # restrict
 """
-import json, os, re, sys, collections
+import json, os, sys, collections
+
+if __package__:
+    from .verification.operation_sources import (
+        NON_M08_FAMILY_SPECS,
+        check_vocab_lockstep as _check_vocab_lockstep,
+        parse_hasop_operations as _parse_hasop_operations,
+        parse_native_sources as _parse_native_sources,
+        parse_patch_vocabularies as _parse_patch_vocabularies,
+        patch_family_module_names as _patch_family_module_names,
+    )
+else:
+    from verification.operation_sources import (
+        NON_M08_FAMILY_SPECS,
+        check_vocab_lockstep as _check_vocab_lockstep,
+        parse_hasop_operations as _parse_hasop_operations,
+        parse_native_sources as _parse_native_sources,
+        parse_patch_vocabularies as _parse_patch_vocabularies,
+        patch_family_module_names as _patch_family_module_names,
+    )
 
 # native family / registry payloads may carry non-ASCII (e.g. Korean layer names);
 # the cp949 console would otherwise crash on print. Emit UTF-8, never crash.
@@ -62,33 +81,9 @@ REG = os.path.join(ROOT, "config", "operations.v2.json")
 FAMILIES_DIR = os.path.join(ROOT, "src", "Ariadne.AcadNative", "families")
 _NATIVE_JOB_CPP = os.path.join(ROOT, "src", "Ariadne.AcadNative", "AriadneNativeJob.cpp")
 
-# kAriadneNativeOperationTable: same shape tests/unit/test_m08b_dispatcher_table.py
-# already parses+pins for table<->handler parity (_table_ops there).
-_RE_NATIVE_TABLE = re.compile(r"kAriadneNativeOperationTable\[\]\s*=\s*\{(.*?)\};", re.S)
-_RE_NATIVE_TABLE_OP = re.compile(r'\{\s*"([^"]+)"\s*,\s*"[^"]+"\s*\}')
-
-# string-valued C constant:  ... NAME = "value" ;
-RE_CONST = re.compile(r'\b([A-Za-z_]\w*)\s*=\s*"([^"]+)"\s*;')
-# op == "literal"  |  op == IDENT
-RE_OPEQ = re.compile(r'op\s*==\s*(?:"([^"]+)"|([A-Za-z_]\w*))')
-RE_FAMFILE = re.compile(r'^m08([a-z]+)_handlers\.inc$')   # unit token may be multi-char (e.g. m08kc)
-
-# Family modules whose gate fn / filename do NOT fit the m08{letter}HasOp /
-# m08{letter}_handlers.inc shape RE_FAMFILE discovers, yet familyHasOp() in
-# AriadneNativeJob.cpp admits all the same (w6-layerstate/dynblk/section +
-# w7-materials/annoscale). Omitting them under-counts all_coded_ops() by their
-# op-ids and makes check_vocab_lockstep falsely report no_live_hasop for any
-# patch surface that points at one. Kept in lockstep with familyHasOp() by
-# tests/unit/test_reconcile_family_gate_parity.py.
-# (key, filename, hasop_fn, display_label)
-_NON_M08_FAMILIES = [
-    ("w6_layerstate", "w6_layerstate_handlers.inc", "w6LayerStateHasOp",  "w6-layerstate"),
-    ("w6_dynblk",     "w6_dynblk_handlers.inc",     "w6dynblkHasOp",      "w6-dynblk"),
-    ("w6_section",    "w6_section_handlers.inc",     "w6sectionHasOp",     "w6-section"),
-    ("w7_materials",  "materials_read.inc",          "materialsReadHasOp", "w7-materials"),
-    ("w7_annoscale",  "annoscale_read.inc",          "annoscaleReadHasOp", "w7-annoscale"),
-]
-
+# Compatibility view for existing callers/tests; the canonical specifications
+# live beside the pure parser that consumes them.
+_NON_M08_FAMILIES = NON_M08_FAMILY_SPECS
 
 def _load_reg():
     with open(REG, "r", encoding="utf-8-sig") as f:
@@ -101,71 +96,59 @@ def _dump_reg(obj):
         json.dump(obj, f, indent=2, ensure_ascii=False)
 
 
-def _hasop_body(text, hasop_fn):
-    """Extract the brace-balanced body of ``<hasop_fn>(...)``.
-
-    Anchor on the DEFINITION (`bool <hasop_fn>(...)`) not the doc-comment mention
-    (`//   - <hasop_fn>(op): ...`), which has no `bool` before the name."""
-    m = re.search(r'bool\s+' + re.escape(hasop_fn) + r'\s*\([^)]*\)', text)
-    if not m:
-        return ""
-    i = text.find("{", m.end())
-    if i < 0:
-        return ""
-    depth, j = 0, i
-    while j < len(text):
-        c = text[j]
-        if c == "{":
-            depth += 1
-        elif c == "}":
-            depth -= 1
-            if depth == 0:
-                return text[i + 1:j]
-        j += 1
-    return text[i + 1:]
-
-
 def parse_family(path, hasop_fn):
-    text = open(path, "r", encoding="utf-8").read()
-    consts = {name: val for name, val in RE_CONST.findall(text)}
-    body = _hasop_body(text, hasop_fn)
-    ops, unresolved = set(), []
-    for lit, ident in RE_OPEQ.findall(body):
-        if lit:
-            ops.add(lit)
-        elif ident:
-            if ident in consts:
-                ops.add(consts[ident])
-            else:
-                unresolved.append(ident)
-    return ops, unresolved
+    with open(path, "rb") as source_file:
+        operations, unresolved = _parse_hasop_operations(
+            source_file.read(), hasop_fn, os.fspath(path)
+        )
+    return set(operations), list(unresolved)
 
 
-def discover_families(restrict):
+def _native_facts(router_home=None):
+    root = os.fspath(ROOT if router_home is None else router_home)
+    native_path = os.path.join(
+        root, "src", "Ariadne.AcadNative", "AriadneNativeJob.cpp"
+    )
+    families_dir = os.path.join(root, "src", "Ariadne.AcadNative", "families")
+    with open(native_path, "rb") as native_file:
+        native_source = native_file.read()
+    family_sources = {}
+    for file_name in sorted(os.listdir(families_dir)):
+        if not file_name.endswith(".inc"):
+            continue
+        with open(os.path.join(families_dir, file_name), "rb") as family_file:
+            family_sources[file_name] = family_file.read()
+    return _parse_native_sources(native_source, family_sources)
+
+
+def discover_families(restrict, router_home=None):
+    facts = _native_facts(router_home=router_home)
     out = {}
-    for fn in sorted(os.listdir(FAMILIES_DIR)):
-        m = RE_FAMFILE.match(fn)
-        if not m:
-            continue
-        letter = m.group(1)
-        if restrict and letter not in restrict:
-            continue
-        ops, unresolved = parse_family(os.path.join(FAMILIES_DIR, fn), "m08" + letter + "HasOp")
-        out[letter] = {"file": fn, "ops": ops, "unresolved": unresolved, "label": "m08" + letter}
-    # non-m08 families (w6/w7): familyHasOp() admits these too, but RE_FAMFILE
-    # can't see them (different filename + gate-fn shape). Their ops are all
-    # status=implemented today, so they never produce a flip (evidence_for() is
-    # never reached for a non-m08 key) -- they classify as overlap, which is
-    # exactly right, and they now count toward all_coded_ops().
-    for key, fn, hasop_fn, label in _NON_M08_FAMILIES:
+    for key, family in sorted(facts.families.items()):
         if restrict and key not in restrict:
             continue
-        path = os.path.join(FAMILIES_DIR, fn)
-        if not os.path.exists(path):
-            continue
-        ops, unresolved = parse_family(path, hasop_fn)
-        out[key] = {"file": fn, "ops": ops, "unresolved": unresolved, "label": label}
+        out[key] = {
+            "file": family.file_name,
+            "ops": set(family.operations),
+            "unresolved": list(family.unresolved),
+            "label": family.label,
+            "hasop_fn": family.hasop_fn,
+        }
     return out
+
+
+def native_family_gate_functions(router_home=None):
+    """Return the HasOp functions admitted by native ``familyHasOp()``.
+
+    Missing source or an unparsable definition is an error, not an empty gate
+    universe: callers use this as a verification input.
+    """
+    return set(_native_facts(router_home=router_home).runtime_family_gates)
+
+
+def discovered_family_gate_functions(router_home=None):
+    """Return the HasOp functions scanned by ``discover_families``."""
+    return set(_native_facts(router_home=router_home).discovered_family_gates)
 
 
 def evidence_for(letter):
@@ -221,34 +204,33 @@ def _sync_totals(doc):
 # patch_engine.OP_REGISTRY_MAP + patch_ops.NATIVE_WRITE_OP_MAP)
 # --------------------------------------------------------------------------- #
 
-def _load_external_vocab():
+def _load_external_vocab(router_home=None):
     """Load the two vocab surfaces this tool does not itself own:
     tools/patch_engine.OP_REGISTRY_MAP (declared patch-op -> registry op id,
     the dry_run_plan/validate_patch_schema surface) and the patch_ops family
     aggregate NATIVE_WRITE_OP_MAP (patch-op -> registry op id with a LIVE
     native write handler, the apply_staged real-execution surface).
 
-    Returns {surface_label: {patch_op: registry_op_id}}. An import failure
-    degrades that ONE surface to {} rather than raising -- this tool never
-    fabricates another module's map."""
-    tools_dir = os.path.dirname(os.path.abspath(__file__))
-    if tools_dir not in sys.path:
-        sys.path.insert(0, tools_dir)
-    surfaces = {}
-    try:
-        import patch_engine
-        surfaces["patch_engine.OP_REGISTRY_MAP"] = dict(patch_engine.OP_REGISTRY_MAP)
-    except Exception:
-        surfaces["patch_engine.OP_REGISTRY_MAP"] = {}
-    try:
-        import patch_ops
-        surfaces["patch_ops.NATIVE_WRITE_OP_MAP"] = dict(patch_ops.NATIVE_WRITE_OP_MAP)
-    except Exception:
-        surfaces["patch_ops.NATIVE_WRITE_OP_MAP"] = {}
-    return surfaces
+    Returns {surface_label: {patch_op: registry_op_id}}. Sources are parsed as
+    inert bytes; checkout Python is never imported or executed."""
+    root = os.fspath(ROOT if router_home is None else router_home)
+    patch_engine_path = os.path.join(root, "tools", "patch_engine.py")
+    patch_ops_dir = os.path.join(root, "tools", "patch_ops")
+    patch_ops_init_path = os.path.join(patch_ops_dir, "__init__.py")
+    with open(patch_engine_path, "rb") as patch_engine_file:
+        patch_engine_source = patch_engine_file.read()
+    with open(patch_ops_init_path, "rb") as patch_ops_init_file:
+        patch_ops_init = patch_ops_init_file.read()
+    family_sources = {}
+    for module_name in _patch_family_module_names(patch_ops_init):
+        with open(os.path.join(patch_ops_dir, module_name + ".py"), "rb") as family_file:
+            family_sources[module_name] = family_file.read()
+    return _parse_patch_vocabularies(
+        patch_engine_source, patch_ops_init, family_sources
+    )
 
 
-def native_operation_table_ops():
+def native_operation_table_ops(router_home=None):
     """The op-id set ``kAriadneNativeOperationTable`` registers directly in
     AriadneNativeJob.cpp -- the pre-M08 dispatcher's OWN gate for the ops it
     implements without going through any m08X family (write.entity.line,
@@ -257,30 +239,23 @@ def native_operation_table_ops():
     (see AriadneNativeJob.cpp), so this table UNION the family HasOp sets IS
     the native dispatcher's full live-admission gate -- see all_coded_ops().
 
-    Returns an empty set (never raises) if the source is missing/unparsable.
-    Same table + regex shape tests/unit/test_m08b_dispatcher_table.py already
-    parses and pins for table<->handler parity."""
-    try:
-        with open(_NATIVE_JOB_CPP, "r", encoding="utf-8", errors="replace") as f:
-            src = f.read()
-    except OSError:
-        return set()
-    m = _RE_NATIVE_TABLE.search(src)
-    if not m:
-        return set()
-    return set(_RE_NATIVE_TABLE_OP.findall(m.group(1)))
+    Missing or unparsable source raises: an empty native gate must not be
+    mistaken for a valid reconciliation input."""
+    return set(_native_facts(router_home=router_home).native_table_operations)
 
 
-def all_coded_ops(restrict=None):
+def all_coded_ops(restrict=None, router_home=None):
     """Union of every family's live HasOp-admitted op-id set PLUS the pre-M08
     kAriadneNativeOperationTable (surface 2's full live-admission universe),
     by default over EVERY family regardless of a --families restriction (a
     restricted reconcile run must not make check_vocab_lockstep falsely report
     "no_live_hasop" for an id owned by a family this run didn't scan)."""
-    fams = discover_families(restrict)
-    coded = native_operation_table_ops()
-    for info in fams.values():
-        coded |= info["ops"]
+    facts = _native_facts(router_home=router_home)
+    coded = set(facts.native_table_operations)
+    for key, family in facts.families.items():
+        if restrict and key not in restrict:
+            continue
+        coded.update(family.operations)
     return coded
 
 
@@ -309,31 +284,8 @@ def check_vocab_lockstep(doc, coded_ops, external_vocab=None):
     Returns a list of violation dicts (empty == the four surfaces agree);
     never raises.
     """
-    by_id = {o.get("id"): o for o in doc.get("operations", [])}
     vocab = _load_external_vocab() if external_vocab is None else external_vocab
-    violations = []
-    for surface in sorted(vocab):
-        mapping = vocab[surface]
-        for patch_op in sorted(mapping):
-            reg_id = mapping[patch_op]
-            base = {"surface": surface, "patch_op": patch_op, "target": reg_id}
-            rec = by_id.get(reg_id)
-            if rec is None:
-                violations.append(dict(base, problem="dangling_target",
-                                       detail="{0!r} is not a registry op-id".format(reg_id)))
-                continue
-            if reg_id not in coded_ops:
-                violations.append(dict(base, problem="no_live_hasop",
-                                       detail="{0!r} is not admitted by any family's HasOp gate"
-                                              .format(reg_id)))
-            status = rec.get("status")
-            if status != "implemented":
-                violations.append(dict(base, problem="not_implemented",
-                                       detail="registry status={0!r}".format(status)))
-            if not rec.get("evidence_refs"):
-                violations.append(dict(base, problem="missing_evidence_ref",
-                                       detail="evidence_refs is empty/absent"))
-    return violations
+    return _check_vocab_lockstep(doc, set(coded_ops), vocab)
 
 
 def _print_vocab_violations(violations):

@@ -13,8 +13,8 @@ Invariants honored here:
     sibling module (ir_builder / sqlite_ir_store / validator) is absent, the
     method returns a truthful status (not_implemented / unavailable / partial /
     blocked) -- never a faked ok.
-  * status() READS the published router status JSON read-only; it never runs
-    `-Action status`.
+  * status() assembles typed read-only verification receipts; a legacy router
+    status JSON is exposed only as an unbound historical snapshot.
   * Every external command's stdout + stderr + exit code is captured into out_dir.
 
 Standard library only (json, sqlite3 are stdlib). Config/status JSON on this box
@@ -49,25 +49,6 @@ DISPLAY_MEMBERSHIP_GEOMETRY_SCOPES = frozenset({
     DISPLAY_MEMBERSHIP_STRICT_LAYER_ENTITIES_V1,
     DISPLAY_MEMBERSHIP_LINEAR_SEGMENTS_V1,
 })
-NATIVE_BUILD_MANIFEST_NAME = "native_build_manifest.json"
-NATIVE_BUILD_MANIFEST_SCHEMA = "ariadne.cad_os.native_build_manifest.v1"
-NATIVE_BUILD_MANIFEST_VERSION = 1
-DISPLAY_MEMBERSHIP_REQUIRED_ARTIFACTS = (
-    "Ariadne.AcadNativeDbx.dbx",
-    "Ariadne.AcadNative.crx",
-    "Ariadne.AcadNative.arx",
-)
-_NATIVE_SOURCE_ROOTS = (
-    Path("src") / "Ariadne.AcadNative",
-    Path("src") / "Ariadne.AcadNativeDbx",
-)
-_NATIVE_BUILD_OUTPUT_DIRS = frozenset({"bin", "obj", ".vs", "build"})
-_NATIVE_BUILD_RECIPE_PATH = Path("tools") / "build_native_acad.ps1"
-_NATIVE_SOURCE_GIT_PATHS = (
-    "src/Ariadne.AcadNative",
-    "src/Ariadne.AcadNativeDbx",
-)
-
 # Ensure sibling tools/*.py are importable when cadctl is imported by path.
 if str(_THIS_DIR) not in sys.path:
     sys.path.insert(0, str(_THIS_DIR))
@@ -76,6 +57,14 @@ import run_job  # noqa: E402  (sibling helper, Lane B1)
 import normalize_result  # noqa: E402  (sibling helper, Lane B1)
 import route_select  # noqa: E402  (sibling helper, Lane B1)
 import attended_lane  # noqa: E402  (dedicated full-AutoCAD one-shot lane)
+from verification import native_integrity as _native_integrity  # noqa: E402
+from verification import current_status as _current_status  # noqa: E402
+
+NATIVE_BUILD_MANIFEST_NAME = _native_integrity.NATIVE_BUILD_MANIFEST_NAME
+NATIVE_BUILD_MANIFEST_SCHEMA = _native_integrity.NATIVE_BUILD_MANIFEST_SCHEMA
+NATIVE_BUILD_MANIFEST_VERSION = _native_integrity.NATIVE_BUILD_MANIFEST_VERSION
+DISPLAY_MEMBERSHIP_REQUIRED_ARTIFACTS = _native_integrity.REQUIRED_NATIVE_ARTIFACTS
+_NATIVE_BUILD_RECIPE_PATH = _native_integrity._NATIVE_BUILD_RECIPE_PATH
 
 
 def _now_iso() -> str:
@@ -206,174 +195,12 @@ def _canonical_json_bytes(value: object) -> bytes:
     ).encode("utf-8")
 
 
-def _source_tree_digest(inputs: list[dict]) -> str:
-    digest = hashlib.sha256()
-    for entry in inputs:
-        digest.update(
-            f"{entry['path']}\0{entry['sha256']}\0{entry['bytes']}\n".encode("utf-8")
-        )
-    return digest.hexdigest()
-
-
-def _is_native_build_output_component(component: str) -> bool:
-    normalized = component.casefold()
-    return (
-        normalized in _NATIVE_BUILD_OUTPUT_DIRS
-        or normalized.startswith("obj-")
-        or normalized.startswith("obj_")
-    )
-
-
 def _is_reparse_point(path: Path) -> bool:
     """Treat symbolic links and Windows reparse points as containment escapes."""
     metadata = os.lstat(path)
     attributes = getattr(metadata, "st_file_attributes", 0)
     reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x0400)
     return stat.S_ISLNK(metadata.st_mode) or bool(attributes & reparse_flag)
-
-
-def _canonical_native_source_bytes(raw: bytes) -> bytes:
-    """Ignore checkout-only CRLF expansion while preserving binary inputs."""
-    if b"\0" in raw:
-        return raw
-    return raw.replace(b"\r\n", b"\n")
-
-
-def _native_source_inputs(router_home: Path) -> list[dict]:
-    """Enumerate the native source tree without build output or reparse inputs."""
-    inputs: list[dict] = []
-    for relative_root in _NATIVE_SOURCE_ROOTS:
-        root = router_home / relative_root
-        if not root.is_dir() or _path_reparse_error(root) is not None:
-            raise FileNotFoundError(f"native source root is missing: {root}")
-        for current_text, directory_names, file_names in os.walk(
-            root, topdown=True, followlinks=False
-        ):
-            current = Path(current_text)
-            if _is_reparse_point(current):
-                raise OSError(f"native source directory is a reparse point: {current}")
-            retained_directories = []
-            for name in directory_names:
-                child = current / name
-                if _is_reparse_point(child):
-                    raise OSError(f"native source directory is a reparse point: {child}")
-                if not _is_native_build_output_component(name):
-                    retained_directories.append(name)
-            directory_names[:] = retained_directories
-            for name in file_names:
-                path = current / name
-                if _is_reparse_point(path):
-                    raise OSError(f"native source input is a reparse point: {path}")
-                raw = _canonical_native_source_bytes(path.read_bytes())
-                inputs.append(
-                    {
-                        "path": path.relative_to(router_home).as_posix(),
-                        "sha256": hashlib.sha256(raw).hexdigest(),
-                        "bytes": len(raw),
-                    }
-                )
-    inputs.sort(key=lambda entry: entry["path"].casefold())
-    if not inputs:
-        raise FileNotFoundError("native source input inventory is empty")
-    return inputs
-
-
-def _native_status_line_tracks_source(line: str) -> bool:
-    """Keep source changes but discard generated build-output status rows."""
-    payload = line[3:] if len(line) >= 3 else line
-    for candidate in payload.split(" -> "):
-        normalized = candidate.strip().strip('"').replace("\\", "/")
-        if not any(
-            _is_native_build_output_component(part)
-            for part in Path(normalized).parts
-        ):
-            return True
-    return False
-
-
-def _native_source_git_state(router_home: Path) -> dict:
-    """Read Git state only for native source inputs, never the whole worktree."""
-    unknown = {
-        "available": False,
-        "head": "UNKNOWN",
-        "native_source_dirty": "UNKNOWN",
-        "native_source_status_sha256": "UNKNOWN",
-    }
-    try:
-        head_result = subprocess.run(
-            [
-                "git",
-                "-C",
-                str(router_home),
-                "rev-parse",
-                "HEAD",
-            ],
-            check=False,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            timeout=15,
-        )
-        if head_result.returncode != 0:
-            return unknown
-        head = head_result.stdout.decode("utf-8", errors="strict").strip()
-        if not head:
-            return unknown
-        status_result = subprocess.run(
-            [
-                "git",
-                "-C",
-                str(router_home),
-                "status",
-                "--porcelain=v1",
-                "--untracked-files=all",
-                "--",
-                *_NATIVE_SOURCE_GIT_PATHS,
-            ],
-            check=False,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            timeout=15,
-        )
-        if status_result.returncode != 0:
-            return unknown
-        status_lines = status_result.stdout.decode(
-            "utf-8", errors="strict"
-        ).splitlines()
-        status_text = "\n".join(
-            line for line in status_lines if _native_status_line_tracks_source(line)
-        )
-    except (OSError, UnicodeError, subprocess.TimeoutExpired):
-        return unknown
-    return {
-        "available": True,
-        "head": head,
-        "native_source_dirty": bool(status_text),
-        "native_source_status_sha256": hashlib.sha256(
-            status_text.encode("utf-8")
-        ).hexdigest(),
-    }
-
-
-def _build_recipe_state(router_home: Path) -> dict:
-    """Return the exact checked-out build recipe identity, or explicit unknown."""
-    recipe = router_home / _NATIVE_BUILD_RECIPE_PATH
-    try:
-        if not recipe.is_file() or _is_reparse_point(recipe):
-            raise FileNotFoundError(recipe)
-        sha256 = hashlib.sha256(
-            _canonical_native_source_bytes(recipe.read_bytes())
-        ).hexdigest()
-    except OSError:
-        return {
-            "path": _NATIVE_BUILD_RECIPE_PATH.as_posix(),
-            "sha256": "UNKNOWN",
-            "available": False,
-        }
-    return {
-        "path": _NATIVE_BUILD_RECIPE_PATH.as_posix(),
-        "sha256": sha256,
-        "available": True,
-    }
 
 
 def _same_resolved_path(left: object, right: Path) -> bool:
@@ -405,6 +232,20 @@ def _path_reparse_error(path: Path) -> str | None:
         if current != absolute and not current.is_dir():
             return f"path component is not a directory: {current}"
     return None
+
+
+_source_tree_digest = _native_integrity._source_tree_digest
+_native_source_git_state = _native_integrity._native_source_git_state
+_build_recipe_state = _native_integrity._build_recipe_state
+
+
+def _native_source_inputs(router_home: Path) -> list[dict]:
+    """Compatibility seam for callers that historically imported this helper."""
+    return _native_integrity._native_source_inputs(
+        Path(router_home),
+        is_reparse_point=_is_reparse_point,
+        path_reparse_error=_path_reparse_error,
+    )
 
 
 @contextmanager
@@ -713,273 +554,39 @@ def _atomic_write_json_no_overwrite(
                 raise
 
 
-def _pe64_image_state(path: Path) -> dict:
-    """Validate the minimum structural facts of an x64 PE32+ DLL image."""
-    state = {
-        "verified": False,
-        "machine": None,
-        "format": None,
-        "minimum_bytes": 512,
-        "pe_header_offset": None,
-        "section_count": None,
-        "optional_header_bytes": None,
-        "reason": None,
-    }
-    try:
-        raw = path.read_bytes()
-        if len(raw) < state["minimum_bytes"]:
-            raise ValueError("artifact is smaller than the minimum PE inspection size")
-        if raw[:2] != b"MZ":
-            raise ValueError("DOS MZ signature is missing")
-        pe_offset = int.from_bytes(raw[0x3C:0x40], "little")
-        state["pe_header_offset"] = pe_offset
-        if pe_offset < 0x40 or pe_offset + 24 > len(raw):
-            raise ValueError("PE header offset is outside the artifact")
-        if raw[pe_offset : pe_offset + 4] != b"PE\x00\x00":
-            raise ValueError("PE signature is missing")
-        machine = int.from_bytes(raw[pe_offset + 4 : pe_offset + 6], "little")
-        section_count = int.from_bytes(raw[pe_offset + 6 : pe_offset + 8], "little")
-        optional_bytes = int.from_bytes(
-            raw[pe_offset + 20 : pe_offset + 22], "little"
-        )
-        characteristics = int.from_bytes(
-            raw[pe_offset + 22 : pe_offset + 24], "little"
-        )
-        optional_offset = pe_offset + 24
-        if optional_offset + optional_bytes > len(raw):
-            raise ValueError("optional header extends beyond the artifact")
-        optional_magic = int.from_bytes(
-            raw[optional_offset : optional_offset + 2], "little"
-        )
-        state.update(
-            {
-                "machine": f"0x{machine:04x}",
-                "format": "PE32+" if optional_magic == 0x20B else f"0x{optional_magic:04x}",
-                "section_count": section_count,
-                "optional_header_bytes": optional_bytes,
-            }
-        )
-        if machine != 0x8664:
-            raise ValueError("PE machine is not AMD64")
-        if section_count < 1:
-            raise ValueError("PE has no sections")
-        if optional_bytes < 0xF0 or optional_magic != 0x20B:
-            raise ValueError("PE optional header is not a complete PE32+ header")
-        if not characteristics & 0x2000:
-            raise ValueError("PE image is not marked as a DLL")
-        state["verified"] = True
-        state["reason"] = "verified x64 PE32+ DLL image"
-    except (OSError, ValueError) as exc:
-        state["reason"] = f"{type(exc).__name__}: {exc}"
-    return state
+
+_pe64_image_state = _native_integrity._pe64_image_state
 
 
 def _verify_native_build_manifest(router_home: Path, native_bin: Path) -> dict:
-    """Verify that the loadable binaries bind to this exact source checkout."""
+    """Compatibility seam delegating native integrity to its owning module."""
+    native_bin = Path(native_bin)
     manifest_path = native_bin / NATIVE_BUILD_MANIFEST_NAME
-    receipt = {
-        "path": str(manifest_path),
-        "sha256": None,
-        "valid": False,
-        "checks": {},
-        "errors": [],
-        "artifact_paths": [],
-    }
     native_bin_error = _path_reparse_error(native_bin)
     if native_bin_error:
-        receipt["errors"].append(
-            "native build artifact directory is unsafe: " + native_bin_error
-        )
-        return receipt
-    if not manifest_path.is_file() or _path_reparse_error(manifest_path) is not None:
-        receipt["errors"].append("native build manifest is missing or unsafe")
-        return receipt
-    try:
-        manifest_bytes = manifest_path.read_bytes()
-        manifest = _strict_json_loads(manifest_bytes.decode("utf-8-sig"))
-    except (OSError, UnicodeError, ValueError) as exc:
-        receipt["errors"].append(
-            f"native build manifest is not parseable: {type(exc).__name__}: {exc}"
-        )
-        return receipt
-    receipt["sha256"] = hashlib.sha256(manifest_bytes).hexdigest()
-    if not isinstance(manifest, dict):
-        receipt["errors"].append("native build manifest is not an object")
-        return receipt
-
-    checks = receipt["checks"]
-    checks["schema"] = (
-        manifest.get("schema") == NATIVE_BUILD_MANIFEST_SCHEMA
-        and manifest.get("schema_version") == NATIVE_BUILD_MANIFEST_VERSION
-    )
-    if not checks["schema"]:
-        receipt["errors"].append("manifest schema/version")
-    checks["claim_scope"] = (
-        manifest.get("claim_scope") == "release_build_integrity_bundle"
-    )
-    checks["build_target"] = manifest.get("build_target") == "Rebuild"
-    if not checks["claim_scope"] or not checks["build_target"]:
-        receipt["errors"].append("manifest claim scope or build target")
-    checks["configuration"] = manifest.get("configuration") == "Release"
-    checks["platform"] = manifest.get("platform") == "x64"
-    if not checks["configuration"] or not checks["platform"]:
-        receipt["errors"].append("manifest configuration/platform")
-    checks["load_bin_dir"] = _same_resolved_path(manifest.get("load_bin_dir"), native_bin)
-    if not checks["load_bin_dir"]:
-        receipt["errors"].append("manifest load bin directory")
-
-    checkout = manifest.get("checkout")
-    git = checkout.get("git") if isinstance(checkout, dict) else None
-    checks["checkout_root"] = isinstance(checkout, dict) and _same_resolved_path(
-        checkout.get("root"), router_home
-    )
-    if not checks["checkout_root"]:
-        receipt["errors"].append("manifest checkout root")
-    current_git = _native_source_git_state(router_home)
-    checks["git_available"] = (
-        isinstance(git, dict)
-        and git.get("available") is True
-        and current_git.get("available") is True
-    )
-    if not checks["git_available"]:
-        receipt["errors"].append("checkout Git state is UNKNOWN")
-    else:
-        checks["git_head"] = (
-            isinstance(git.get("head"), str)
-            and git.get("head") == current_git.get("head")
-        )
-        checks["git_native_source_dirty"] = (
-            isinstance(git.get("native_source_dirty"), bool)
-            and git.get("native_source_dirty")
-            == current_git.get("native_source_dirty")
-        )
-        checks["git_native_source_status_sha256"] = (
-            isinstance(git.get("native_source_status_sha256"), str)
-            and git.get("native_source_status_sha256")
-            == current_git.get("native_source_status_sha256")
-        )
-        for key in (
-            "git_head",
-            "git_native_source_dirty",
-            "git_native_source_status_sha256",
-        ):
-            if not checks[key]:
-                receipt["errors"].append("manifest " + key.replace("git_", "Git "))
-
-    manifest_recipe = manifest.get("build_recipe")
-    current_recipe = _build_recipe_state(router_home)
-    checks["build_recipe"] = (
-        isinstance(manifest_recipe, dict)
-        and manifest_recipe.get("path") == _NATIVE_BUILD_RECIPE_PATH.as_posix()
-        and isinstance(manifest_recipe.get("sha256"), str)
-        and manifest_recipe.get("sha256").lower() == current_recipe.get("sha256")
-        and current_recipe.get("available") is True
-    )
-    if not checks["build_recipe"]:
-        receipt["errors"].append("manifest build recipe SHA-256")
-
-    source_tree = manifest.get("source_tree")
-    manifest_inputs = source_tree.get("inputs") if isinstance(source_tree, dict) else None
-    normalized_inputs = []
-    if isinstance(manifest_inputs, list):
-        for item in manifest_inputs:
-            if not isinstance(item, dict):
-                normalized_inputs = None
-                break
-            path = item.get("path")
-            sha256 = item.get("sha256")
-            size = item.get("bytes")
-            if (
-                not isinstance(path, str)
-                or not isinstance(sha256, str)
-                or not isinstance(size, int)
-                or isinstance(size, bool)
-            ):
-                normalized_inputs = None
-                break
-            normalized_inputs.append({"path": path, "sha256": sha256, "bytes": size})
-    else:
-        normalized_inputs = None
-    try:
-        actual_inputs = _native_source_inputs(router_home)
-    except (OSError, ValueError) as exc:
-        actual_inputs = None
-        receipt["errors"].append(
-            f"native source inventory is unavailable: {type(exc).__name__}: {exc}"
-        )
-    checks["source_tree"] = (
-        isinstance(source_tree, dict)
-        and source_tree.get("algorithm") == "sha256"
-        and normalized_inputs is not None
-        and actual_inputs is not None
-        and normalized_inputs == actual_inputs
-        and source_tree.get("digest") == _source_tree_digest(actual_inputs)
-    )
-    if not checks["source_tree"]:
-        receipt["errors"].append("native source-tree digest or input inventory")
-
-    artifacts = manifest.get("artifacts")
-    by_leaf: dict[str, dict] = {}
-    if isinstance(artifacts, list):
-        for item in artifacts:
-            if isinstance(item, dict) and isinstance(item.get("leaf"), str):
-                leaf = item["leaf"]
-                if leaf in by_leaf:
-                    receipt["errors"].append(f"duplicate manifest artifact: {leaf}")
-                by_leaf[leaf] = item
-    else:
-        receipt["errors"].append("manifest artifacts")
-    artifact_paths = []
-    artifact_checks = True
-    for leaf in DISPLAY_MEMBERSHIP_REQUIRED_ARTIFACTS:
-        item = by_leaf.get(leaf)
-        path = native_bin / leaf
-        observed_pe = _pe64_image_state(path) if path.is_file() else {"verified": False}
-        manifest_pe = item.get("pe_verification") if isinstance(item, dict) else None
-        pe_ok = (
-            isinstance(manifest_pe, dict)
-            and manifest_pe.get("verified") is True
-            and manifest_pe.get("machine") == observed_pe.get("machine") == "0x8664"
-            and manifest_pe.get("format") == observed_pe.get("format") == "PE32+"
-            and manifest_pe.get("minimum_bytes") == observed_pe.get("minimum_bytes") == 512
-            and manifest_pe.get("pe_header_offset") == observed_pe.get("pe_header_offset")
-            and manifest_pe.get("section_count") == observed_pe.get("section_count")
-            and manifest_pe.get("optional_header_bytes")
-            == observed_pe.get("optional_header_bytes")
-            and observed_pe.get("verified") is True
-        )
-        ok = (
-            isinstance(item, dict)
-            and item.get("current") is True
-            and path.is_file()
-            and not _is_reparse_point(path)
-            and isinstance(item.get("bytes"), int)
-            and not isinstance(item.get("bytes"), bool)
-            and item.get("bytes") == path.stat().st_size
-            and isinstance(item.get("sha256"), str)
-            and item.get("sha256").lower() == _sha256_file(path)
-            and pe_ok
-        )
-        checks[f"artifact_pe:{leaf}"] = pe_ok
-        checks[f"artifact:{leaf}"] = ok
-        if not ok:
-            artifact_checks = False
-            receipt["errors"].append(f"manifest artifact binding: {leaf}")
-        else:
-            artifact_paths.append(path)
-    checks["artifacts"] = artifact_checks
-    display_membership = manifest.get("display_membership")
-    checks["display_membership_ready"] = (
-        isinstance(display_membership, dict)
-        and display_membership.get("ready") is True
-        and display_membership.get("canonical_arx_current") is True
-        and by_leaf.get("Ariadne.AcadNative.arx", {}).get("current") is True
-    )
-    if not checks["display_membership_ready"]:
-        receipt["errors"].append("canonical ARX is not current for display membership")
-    receipt["artifact_paths"] = [str(path) for path in artifact_paths]
-    receipt["valid"] = not receipt["errors"]
-    return receipt
+        return {
+            "path": str(manifest_path),
+            "sha256": None,
+            "valid": False,
+            "checks": {},
+            "errors": [
+                "native build artifact directory is unsafe: " + native_bin_error
+            ],
+            "artifact_paths": [],
+        }
+    if (
+        not manifest_path.is_file()
+        or _path_reparse_error(manifest_path) is not None
+    ):
+        return {
+            "path": str(manifest_path),
+            "sha256": None,
+            "valid": False,
+            "checks": {},
+            "errors": ["native build manifest is missing or unsafe"],
+            "artifact_paths": [],
+        }
+    return _native_integrity.verify_build_manifest(Path(router_home), native_bin)
 
 
 def _attended_execution_state(attended: dict) -> dict:
@@ -1048,80 +655,59 @@ class Cad:
         self.staging_golden = self.router_home / "staging" / "golden"
 
     # ------------------------------------------------------------------ status
-    def status(self) -> dict:
-        """Read the published router status JSON read-only and normalize it.
+    def status(
+        self,
+        *,
+        schema_version: int = 1,
+        expected_revision: str | None = None,
+        mcp_definitions: object | None = None,
+        mcp_dispatch: object | None = None,
+    ) -> dict:
+        """Return v1 compatibility by default or the explicit v2 projection.
 
-        DOES NOT run `-Action status`. If the published file is missing, report
-        that truthfully (status='unavailable') rather than spawning a probe.
+        v1 preserves existing clients but labels every route/native value as an
+        unbound historical claim.  v2 separates checkout, capability, proof,
+        runtime observation, and history.  ``expected_revision`` must come from
+        an independent caller or receipt; the observed HEAD is never accepted
+        as its own anchor.  Neither version starts AutoCAD or a router probe.
         """
-        if not self.status_json.exists():
-            return {
-                "schema": "ariadne.cadctl.status.v1",
-                "status": "unavailable",
-                "reason": f"published router status JSON not found: {self.status_json}",
-                "status_json_path": str(self.status_json),
-                "route_count": 0,
-                "available_count": 0,
-                "native_available": False,
-            }
-        try:
-            raw = _load_json_bom(self.status_json)
-        except Exception as exc:
-            return {
-                "schema": "ariadne.cadctl.status.v1",
-                "status": "error",
-                "reason": f"failed to parse status JSON: {type(exc).__name__}: {exc}",
-                "status_json_path": str(self.status_json),
-            }
-        native_modules = raw.get("native_modules") or {}
-        native_status = str(native_modules.get("status", "")).upper()
-        routes = raw.get("routes") or []
-        out = {
-            "schema": "ariadne.cadctl.status.v1",
-            "status": "ok",
-            "router_status": raw.get("status"),
-            "router_status_schema": raw.get("schema"),
-            "status_json_path": str(self.status_json),
-            "router_home": raw.get("router_home"),
-            "timestamp": raw.get("timestamp"),
-            "route_count": raw.get("route_count", len(routes)),
-            "available_count": raw.get(
-                "available_count",
-                sum(1 for r in routes if r.get("available")),
-            ),
-            "unavailable": list(raw.get("unavailable", []) or []),
-            "native_available": native_status == "PASS",
-            "native_modules_status": native_modules.get("status"),
-            "routes": [
-                {"route": r.get("route"), "available": bool(r.get("available")),
-                 "engine": r.get("engine")}
-                for r in routes
-            ],
-            "note": "read-only snapshot of the router-published status; not a live probe.",
-        }
-        reg = self.registry_coverage()
-        if reg.get("status") == "ok":
-            by_status = reg.get("computed_by_status") or {}
-            out["registry"] = {
-                "schema": reg.get("registry_schema"),
-                "version": reg.get("registry_version"),
-                "operation_count": reg.get("operation_count"),
-                "implemented": by_status.get("implemented", 0),
-                "wired": by_status.get("wired", 0),
-                "stub": by_status.get("stub", 0),
-                "catalogued": by_status.get("catalogued", 0),
-                "blocked": by_status.get("blocked", 0),
-                "deprecated": by_status.get("deprecated", 0),
-                "unknown": reg.get("unknown_count", 0),
-                "consistent": reg.get("consistent"),
-            }
-        else:
-            out["registry"] = {
-                "status": reg.get("status"),
-                "reason": reg.get("reason"),
-                "unknown": None,
-            }
-        return out
+        if isinstance(schema_version, bool) or schema_version not in {1, 2}:
+            raise ValueError("schema_version must be exactly 1 or 2")
+        if schema_version == 1:
+            if expected_revision is not None:
+                raise ValueError(
+                    "expected_revision is valid only when schema_version is 2"
+                )
+            result = _current_status.build_legacy_status(self.router_home)
+            reg = self.registry_coverage()
+            if reg.get("status") == "ok":
+                by_status = reg.get("computed_by_status") or {}
+                result["registry"] = {
+                    "schema": reg.get("registry_schema"),
+                    "version": reg.get("registry_version"),
+                    "operation_count": reg.get("operation_count"),
+                    "implemented": by_status.get("implemented", 0),
+                    "wired": by_status.get("wired", 0),
+                    "stub": by_status.get("stub", 0),
+                    "catalogued": by_status.get("catalogued", 0),
+                    "blocked": by_status.get("blocked", 0),
+                    "deprecated": by_status.get("deprecated", 0),
+                    "unknown": reg.get("unknown_count", 0),
+                    "consistent": reg.get("consistent"),
+                }
+            else:
+                result["registry"] = {
+                    "status": reg.get("status"),
+                    "reason": reg.get("reason"),
+                    "unknown": None,
+                }
+            return result
+        return _current_status.build_current_status(
+            self.router_home,
+            expected_revision=expected_revision,
+            mcp_definitions=mcp_definitions,
+            mcp_dispatch=mcp_dispatch,
+        )
 
     # ----------------------------------------------------------------- inspect
     def inspect(self, dwg_path: str, out_dir: str, mode: str = "graph",
@@ -1702,6 +1288,15 @@ class Cad:
             return self._run_op_refusal(op_id, "blocked",
                 f"operation '{op_id}' has registry status '{op_status}', not 'implemented'; refused",
                 out_dir_p, registry_status=op_status, blocked_reason=rec.get("blocked_reason"))
+        if args is not None and "operation" in args:
+            return self._run_op_refusal(
+                op_id,
+                "blocked",
+                "INVALID_ARGUMENT: args contains reserved key 'operation'; "
+                "the allow-listed op_id is the only operation authority",
+                out_dir_p,
+                registry_status=op_status,
+            )
 
         # --- write-mode governance ---
         wl = rec.get("write_level") or {}
@@ -1768,8 +1363,8 @@ class Cad:
         job_path = None
         if args:
             job_path = str(out_dir_p / "job_args.json")
-            payload = {"operation": op_id}
-            payload.update(args)
+            payload = dict(args)
+            payload["operation"] = op_id
             Path(job_path).write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
 
         # --- drive the native job lane on the COPY ---
@@ -3460,8 +3055,15 @@ class Cad:
 
 
 # Module-level convenience wrappers (so callers can `from cadctl import status`).
-def status() -> dict:
-    return Cad().status()
+def status(
+    *,
+    schema_version: int = 1,
+    expected_revision: str | None = None,
+) -> dict:
+    return Cad().status(
+        schema_version=schema_version,
+        expected_revision=expected_revision,
+    )
 
 
 def inspect(dwg_path: str, out_dir: str, mode: str = "graph",

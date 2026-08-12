@@ -292,6 +292,7 @@ def _prepare_current_native_checkout(router: Path) -> Path:
                 "bytes": len(payload),
             }
         )
+    source_digest = _source_tree_digest(source_inputs)
     manifest = {
         "schema": "ariadne.cad_os.native_build_manifest.v1",
         "schema_version": 1,
@@ -312,8 +313,23 @@ def _prepare_current_native_checkout(router: Path) -> Path:
         },
         "source_tree": {
             "algorithm": "sha256",
-            "digest": _source_tree_digest(source_inputs),
+            "canonicalization": "crlf_to_lf_unless_nul",
+            "digest": source_digest,
             "inputs": source_inputs,
+        },
+        "compilation_tree": {
+            "algorithm": "sha256",
+            "byte_representation": "canonical_lf_unless_nul_mirror_bytes",
+            "digest": source_digest,
+            "inputs": source_inputs,
+        },
+        "source_provenance": {
+            "compilation_input": "immutable_starting_snapshot_mirror",
+            "mirror_ephemeral": True,
+        },
+        "build_snapshot": {
+            "input_mode": "immutable_starting_snapshot_mirror",
+            "exact_match": True,
         },
         "artifacts": [
             {

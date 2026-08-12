@@ -51,6 +51,17 @@ import sys
 import importlib.util
 from typing import Any, Dict, List, Callable
 
+if __package__:
+    from .verification.mcp_surface import (
+        REQUIRED_CAD_TOOLS,
+        verify_declared_tool_surface,
+    )
+else:
+    from verification.mcp_surface import (
+        REQUIRED_CAD_TOOLS,
+        verify_declared_tool_surface,
+    )
+
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 _ROUTER_HOME = os.path.dirname(_THIS_DIR)
 
@@ -132,7 +143,15 @@ def _tool_status(args: Dict[str, Any]) -> Dict[str, Any]:
     if cad is None:
         return _err(e, delegate="cadctl.Cad.status")
     try:
-        return {"ok": True, "result": cad.status()}
+        return {
+            "ok": True,
+            "result": cad.status(
+                schema_version=args.get("schema_version", 1),
+                expected_revision=args.get("expected_revision"),
+                mcp_definitions=_TOOLS,
+                mcp_dispatch=_DISPATCH,
+            ),
+        }
     except Exception as exc:  # noqa: BLE001
         return _err("cadctl.status failed: %r" % exc)
 
@@ -550,10 +569,38 @@ def _tool_run_command_template(args: Dict[str, Any]) -> Dict[str, Any]:
 _TOOLS: List[Dict[str, Any]] = [
     {
         "name": "cad.status",
-        "description": "Read the router-published status JSON (read-only) and "
-                       "report route_count/available/native. Delegates to cadctl.Cad.status.",
+        "description": "Read-only status. Defaults to the v1 historical compatibility "
+                       "shape; schema_version=2 reports checkout anchor, declared "
+                       "capabilities, proof with explicit binding metadata, "
+                       "live-observation state, and historical snapshots separately; "
+                       "expected_revision optionally adds an exact revision anchor. "
+                       "It does not run a live AutoCAD/router "
+                       "probe. Delegates to cadctl.Cad.status.",
         "delegates_to": "cadctl.Cad.status",
-        "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False},
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "schema_version": {
+                    "type": "integer",
+                    "enum": [1, 2],
+                    "default": 1,
+                },
+                "expected_revision": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{40}$",
+                },
+            },
+            "allOf": [
+                {
+                    "if": {"required": ["expected_revision"]},
+                    "then": {
+                        "required": ["schema_version"],
+                        "properties": {"schema_version": {"const": 2}},
+                    },
+                }
+            ],
+            "additionalProperties": False,
+        },
     },
     {
         "name": "cad.inspect_drawing",
@@ -966,15 +1013,6 @@ def serve_stdio() -> int:
 # Self-test (__main__): print the tools manifest (default) or serve (--serve)
 # --------------------------------------------------------------------------- #
 
-_EXPECTED_TOOLS = {
-    "cad.status", "cad.inspect_drawing", "cad.query_entities", "cad.get_entity",
-    "cad.validate_ir", "cad.registry_status", "cad.registry_explain",
-    "cad.patch_dry_run", "cad.patch_apply_staged", "cad.anchor_set",
-    "cad.anchor_get", "cad.anchor_list", "cad.anchor_clear", "cad.diff_before_after",
-    "cad.visual_report", "cad.live_status", "cad.run_operation",
-    "cad.run_command_template", "cad.inspect_display_membership",
-}
-
 # Trivial (often invalid/missing) args per tool. The contract: EVERY handler must
 # return a dict and NEVER crash, whether it succeeds, reports a missing arg, or
 # truthfully degrades to not_implemented. We do NOT supply a real DWG path here,
@@ -1010,7 +1048,7 @@ def _selftest() -> int:
     manifest = tools_manifest()
     print(json.dumps(manifest, ensure_ascii=False, indent=2))
 
-    manifest_names = {t["name"] for t in manifest["tools"]}
+    surface_receipt = verify_declared_tool_surface(manifest["tools"], _DISPATCH)
 
     # Dispatch EVERY retained handler with a trivial arg; confirm each returns a
     # dict.  Wire-level behavior is exercised by the persistent-stdio test.
@@ -1031,10 +1069,8 @@ def _selftest() -> int:
 
     ok = (
         manifest["transport"] == "mcp-sdk"
-        and len(manifest["tools"]) == len(_EXPECTED_TOOLS)
-        and manifest_names == _EXPECTED_TOOLS
-        # manifest and dispatch table must agree exactly (no orphan tools).
-        and set(_DISPATCH.keys()) == manifest_names
+        and surface_receipt["verification"] == "VERIFIED"
+        and surface_receipt["tool_count"] == len(REQUIRED_CAD_TOOLS)
         and all_dicts
     )
     print("SELFTEST_OK" if ok else "SELFTEST_FAIL",

@@ -125,33 +125,13 @@ class TestM08ACatalogReopen(unittest.TestCase):
         self.assertIn("closure_gate", matrix)
 
     def test_status_counts_reflect_wave3_closure(self):
-        # Wave3 closure eliminates the old catalogued/stub escape: every op is now
-        # implemented or hard-blocked. w3-dimstyle adds one new synthetic
-        # implemented op (write.dimstyle.create) on top of the wave3 baseline
-        # -- 457 -> 458. w3-ltts adds two more (write.linetype.create,
-        # write.textstyle.create) -- 458 -> 459 -> 460 (see
-        # tools/patch_ops/tables.py). P10 adds a fourth new synthetic
-        # implemented op (modify.entity.xdata) -- 460 -> 461 (see
-        # tools/patch_ops/entities.py). p4-poly2d adds a fifth
-        # (write.entity.polyline2d.deep) -- 461 -> 462. p9-tables2 adds three
-        # more (write.ucs.create / write.view.create / write.vport.create) --
-        # 462 -> 463 -> 464 -> 465.
         import collections
         by_status = collections.Counter(o.get("status") for o in self.ops)
         self.assertEqual(by_status.get("unknown", 0), 0)
         self.assertEqual(by_status.get("catalogued", 0), 0)
         self.assertEqual(by_status.get("stub", 0), 0)
-        # wave-5/6 merge adds 14 implemented (w5-anchor x4, w6-layerstate x4,
-        # w6-dynblk x3, w6-section x3) -- 465 -> 479; w6-sheetset x2 are blocked.
-        # wave-7 adds 4 implemented headless python ops (identity_contract,
-        # semantic_anchor, corpus.batch, cross_engine) -- 479 -> 483; w7-native
-        # materials x3 + annoscale x2 -- 483 -> 488; P3 assoc-relink
-        # (write.block.relink_hatch_assoc) -- 488 -> 489.
-        self.assertEqual(by_status.get("implemented", 0), 489)
-        self.assertEqual(by_status.get("blocked", 0), 62)
-        # W6-SHEETSET added two new blocked synthetic COM read records for the
-        # measured Sheet Set Manager gap; implemented count is unchanged.
-        self.assertEqual(by_status.get("implemented", 0) + by_status.get("blocked", 0), len(self.ops))
+        self.assertEqual(dict(by_status), self.doc["totals"]["by_status"])
+        self.assertEqual(sum(by_status.values()), len(self.ops))
 
 
 if __name__ == "__main__":

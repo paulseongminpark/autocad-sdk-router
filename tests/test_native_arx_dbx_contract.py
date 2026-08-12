@@ -53,11 +53,26 @@ def test_native_build_script_builds_dbx_crx_and_arx_in_order():
 def test_native_build_script_verifies_artifacts_under_requested_platform_and_configuration():
     text = BUILD_NATIVE.read_text(encoding="utf-8")
 
+    output_assignment = re.search(
+        r"(?ms)^\$nativeBuildOutputDir\s*=\s*(.*?)"
+        r"(?=^\$nativeBuildObjectRoot\s*=)",
+        text,
+    )
+    assert output_assignment is not None
+    output_expression = output_assignment.group(1)
+    assert re.search(
+        r'Join-Path\s+\$OutputRoot\s+"bin\\\$Platform\\\$Configuration"',
+        output_expression,
+    )
+    assert re.search(
+        r'Join-Path\s+\$RouterHome\s+'
+        r'"src\\Ariadne\.AcadNative\\bin\\\$Platform\\\$Configuration"',
+        output_expression,
+    )
+
     bin_assignment = re.search(r"(?m)^\$bin\s*=\s*(.+)$", text)
     assert bin_assignment is not None
-    assert "$Platform" in bin_assignment.group(1)
-    assert "$Configuration" in bin_assignment.group(1)
-    assert "bin\\x64\\Release" not in bin_assignment.group(1)
+    assert bin_assignment.group(1).strip() == "$nativeBuildOutputDir"
 
 
 def test_router_accepts_prebuilt_only_through_a_committed_exact_set_marker():

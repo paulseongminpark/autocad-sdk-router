@@ -37,6 +37,7 @@
         "inspect.layout.list",
         "inspect.xref.list",
         "inspect.runtime.capabilities",
+        "inspect.probe.property_count",
         "inspect.reactor.registry",
         "inspect.overrule.registry",
         "inspect.jig.host_support",

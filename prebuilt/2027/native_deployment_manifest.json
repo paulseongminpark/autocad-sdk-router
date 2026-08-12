@@ -9,13 +9,355 @@
     "platform":  "x64",
     "build_recipe":  {
                          "path":  "tools/build_native_acad.ps1",
-                         "sha256":  "4dd2c9598a07956db8055ffde7532198951609b117d4a6289e0274e5737d2f3c"
+                         "sha256":  "224701ce83680d3b8e851d5d4efe9a654613e9e6b0d7aceddf25234ce655003c"
                      },
-    "source_tree_digest":  "a446c0c53799586e125ba080938fd7594d7b27ee986aac62c1290a819603fc13",
+    "source_tree":  {
+                        "algorithm":  "sha256",
+                        "canonicalization":  "crlf_to_lf_unless_nul",
+                        "digest":  "d472dbc83cd1398cf07cb1bdd8f1bc22546d95c7dc97c89eed155e08e27e5b4a",
+                        "inputs":  [
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/Ariadne.AcadNative.arx.vcxproj",
+                                           "sha256":  "e51664b8fe298124bda6746df2ca8cfe82c42e4ffc894e0fde158f5a34a73512",
+                                           "bytes":  3120
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/Ariadne.AcadNative.crx.vcxproj",
+                                           "sha256":  "963dc0fae6443dfda37f27befe0ace37ec06f60e264650931e31fa1040e3ac34",
+                                           "bytes":  3134
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/AriadneNativeJob.cpp",
+                                           "sha256":  "412a787d5388ea13d6df11a68c7b1b20989a6bae22e567ae0b8e2c26e7d7d8f6",
+                                           "bytes":  393187
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/AriadnePalette.cpp",
+                                           "sha256":  "b39eac1c6122600bc0fa75b032d87c3c4fa9c3fe7441199ac42a7e66a64dda33",
+                                           "bytes":  3063
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/AriadneProbe.cpp",
+                                           "sha256":  "492520915ef1860d7b498716067ea8a124eb23a5964788b320599b8a79390c20",
+                                           "bytes":  14889
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/AriadneProbe.h",
+                                           "sha256":  "dc26448d34dc26f26d3d6f93bf69725d69584ac0d7778f02707c5b16e12693be",
+                                           "bytes":  3693
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/families/annoscale_read.inc",
+                                           "sha256":  "e306385d7b6122a0fca30d5ed0ed00b160865db516517a53df26343e1c1e0ee6",
+                                           "bytes":  8122
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/families/e2_display_oracle.inc",
+                                           "sha256":  "ed1e05092cab5edddd359f51eb221b6c70e264fb1d07c499101579cce19b5638",
+                                           "bytes":  37307
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/families/m08c_handlers.inc",
+                                           "sha256":  "015e0826bda710af1fa60b32fbc62999436095fa67f1f631d709c33148a081cc",
+                                           "bytes":  40200
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/families/m08d_handlers.inc",
+                                           "sha256":  "b1c587681c0b2f8dd3f756697778f5f1acec7d340ffe965a3592891eacd84ec9",
+                                           "bytes":  75250
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/families/m08e_handlers.inc",
+                                           "sha256":  "db2d7430712a8df010dff2477b5ffb6d5a298323367672e7a39b94319cbba2e5",
+                                           "bytes":  103579
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/families/m08f_handlers.inc",
+                                           "sha256":  "c87edd91ba30456e8583c6ff6677e023bd5842573bb5dc6838d951633efff337",
+                                           "bytes":  1026
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/families/m08g_handlers.inc",
+                                           "sha256":  "fc579a21c883f13bd5efc5a96cb5bfe5821723e8641e7b34a53a134b4ddd361e",
+                                           "bytes":  110300
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/families/m08h_handlers.inc",
+                                           "sha256":  "04ff8b0866ce6d88ae2182c60b0ff2ffcea8350ace00bb04456ce1a1c71b3450",
+                                           "bytes":  32265
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/families/m08i_bulk_from_ir.inc.draft",
+                                           "sha256":  "481010cbd863a9514aeb6197e21de0e4bcc7411d54cb0cb75625d6da7ccaa8f2",
+                                           "bytes":  2359
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/families/m08k_handlers.inc",
+                                           "sha256":  "999ffbea074082e54c66bcbb84fe7b133e0a1c4d9816670f3dfb9334daa07bc5",
+                                           "bytes":  125412
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/families/m08kc_handlers.inc",
+                                           "sha256":  "7a1c61c9d912b447e4957e738598d9c26b7d044a8a529c34d5476a2ba078cd64",
+                                           "bytes":  70392
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/families/m08l_handlers.inc",
+                                           "sha256":  "22f388f1e91e3fada87fed5d72e0639f1c41fa7f4bf2eb84517ea7d3b3eb5a34",
+                                           "bytes":  59511
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/families/m08m_handlers.inc",
+                                           "sha256":  "69fe8b0a92e3695ba7245704b4990cfa33f3f735cb626d6e1f225c22a1a15248",
+                                           "bytes":  108127
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/families/m08n_handlers.inc",
+                                           "sha256":  "cf3fa3941a181c30c4bc51b74bddd704fef9f38e496cbe8ce1716e95ac0ad0e4",
+                                           "bytes":  43616
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/families/materials_read.inc",
+                                           "sha256":  "85330edc844ad34182a2a2dc6e85ff6f718118347829bc486b1d52703c2c97c6",
+                                           "bytes":  9121
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc",
+                                           "sha256":  "365391c1ce612b45870b1bc0a62e5f4634d12f59c1798d78675a513cb375bb89",
+                                           "bytes":  28127
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc",
+                                           "sha256":  "27323cc50e2185e35cbf3e6eb3a73641403973d193782fda2a6070600d933c0d",
+                                           "bytes":  15247
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNative/families/w6_section_handlers.inc",
+                                           "sha256":  "bf3c26f7e7d3d643667a58739b1f09d5b377c31d222d41ddd7342583aa51e03f",
+                                           "bytes":  18771
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNativeDbx/Ariadne.AcadNativeDbx.dbx.vcxproj",
+                                           "sha256":  "300b98d1507cce08b4c17cc75292a262d464ec6332b3fc7bc832ba8547ba8a51",
+                                           "bytes":  3342
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNativeDbx/AriadneDbxApi.h",
+                                           "sha256":  "e45dd97fca67ac03e2e44880b74dbccc4a7752fcb7c923bcf9ed0533917cbad0",
+                                           "bytes":  1156
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNativeDbx/AriadneDbxEntry.cpp",
+                                           "sha256":  "ddbf4a8a20de98247cf6d303e505f66f6a44729ffef7f26183d260093aef2595",
+                                           "bytes":  4030
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNativeDbx/AriadneProtocol.cpp",
+                                           "sha256":  "991900119b688627d71bd454c7854aac015e5d71e795e7e46c26fb69f1e1d162",
+                                           "bytes":  1218
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNativeDbx/AriadneProtocol.h",
+                                           "sha256":  "431c23f69b3d70571d296c1dbb74b2970c52d575da8b2a464840aeaf53abd42a",
+                                           "bytes":  299
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNativeDbx/AriadneRecord.cpp",
+                                           "sha256":  "5aa1433b4b3b441efd13e3089cc68328cc8c55186b9b839dbb07f0e5aa993c9b",
+                                           "bytes":  3948
+                                       },
+                                       {
+                                           "path":  "src/Ariadne.AcadNativeDbx/AriadneRecord.h",
+                                           "sha256":  "87df7576dadbce6da50ea93481e2a803742a15ed38a50eda259e5d0757b82423",
+                                           "bytes":  759
+                                       }
+                                   ]
+                    },
+    "source_tree_digest":  "d472dbc83cd1398cf07cb1bdd8f1bc22546d95c7dc97c89eed155e08e27e5b4a",
+    "source_authority":  {
+                             "source_inventory_authoritative":  true,
+                             "captured_inputs_match_head":  true,
+                             "tracked_source_path_count":  31,
+                             "tracked_source_inventory_sha256":  "2e4cde842377d1d21b6541eb34ef07eb06b13d1e456702b41bb0ac4d7a318e69",
+                             "reason":  "Captured canonical source and build-recipe bytes match exact HEAD blobs."
+                         },
+    "compilation_tree":  {
+                             "algorithm":  "sha256",
+                             "byte_representation":  "canonical_lf_unless_nul_mirror_bytes",
+                             "digest":  "d472dbc83cd1398cf07cb1bdd8f1bc22546d95c7dc97c89eed155e08e27e5b4a",
+                             "inputs":  [
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/Ariadne.AcadNative.arx.vcxproj",
+                                                "sha256":  "e51664b8fe298124bda6746df2ca8cfe82c42e4ffc894e0fde158f5a34a73512",
+                                                "bytes":  3120
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/Ariadne.AcadNative.crx.vcxproj",
+                                                "sha256":  "963dc0fae6443dfda37f27befe0ace37ec06f60e264650931e31fa1040e3ac34",
+                                                "bytes":  3134
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/AriadneNativeJob.cpp",
+                                                "sha256":  "412a787d5388ea13d6df11a68c7b1b20989a6bae22e567ae0b8e2c26e7d7d8f6",
+                                                "bytes":  393187
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/AriadnePalette.cpp",
+                                                "sha256":  "b39eac1c6122600bc0fa75b032d87c3c4fa9c3fe7441199ac42a7e66a64dda33",
+                                                "bytes":  3063
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/AriadneProbe.cpp",
+                                                "sha256":  "492520915ef1860d7b498716067ea8a124eb23a5964788b320599b8a79390c20",
+                                                "bytes":  14889
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/AriadneProbe.h",
+                                                "sha256":  "dc26448d34dc26f26d3d6f93bf69725d69584ac0d7778f02707c5b16e12693be",
+                                                "bytes":  3693
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/families/annoscale_read.inc",
+                                                "sha256":  "e306385d7b6122a0fca30d5ed0ed00b160865db516517a53df26343e1c1e0ee6",
+                                                "bytes":  8122
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/families/e2_display_oracle.inc",
+                                                "sha256":  "ed1e05092cab5edddd359f51eb221b6c70e264fb1d07c499101579cce19b5638",
+                                                "bytes":  37307
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/families/m08c_handlers.inc",
+                                                "sha256":  "015e0826bda710af1fa60b32fbc62999436095fa67f1f631d709c33148a081cc",
+                                                "bytes":  40200
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/families/m08d_handlers.inc",
+                                                "sha256":  "b1c587681c0b2f8dd3f756697778f5f1acec7d340ffe965a3592891eacd84ec9",
+                                                "bytes":  75250
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/families/m08e_handlers.inc",
+                                                "sha256":  "db2d7430712a8df010dff2477b5ffb6d5a298323367672e7a39b94319cbba2e5",
+                                                "bytes":  103579
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/families/m08f_handlers.inc",
+                                                "sha256":  "c87edd91ba30456e8583c6ff6677e023bd5842573bb5dc6838d951633efff337",
+                                                "bytes":  1026
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/families/m08g_handlers.inc",
+                                                "sha256":  "fc579a21c883f13bd5efc5a96cb5bfe5821723e8641e7b34a53a134b4ddd361e",
+                                                "bytes":  110300
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/families/m08h_handlers.inc",
+                                                "sha256":  "04ff8b0866ce6d88ae2182c60b0ff2ffcea8350ace00bb04456ce1a1c71b3450",
+                                                "bytes":  32265
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/families/m08i_bulk_from_ir.inc.draft",
+                                                "sha256":  "481010cbd863a9514aeb6197e21de0e4bcc7411d54cb0cb75625d6da7ccaa8f2",
+                                                "bytes":  2359
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/families/m08k_handlers.inc",
+                                                "sha256":  "999ffbea074082e54c66bcbb84fe7b133e0a1c4d9816670f3dfb9334daa07bc5",
+                                                "bytes":  125412
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/families/m08kc_handlers.inc",
+                                                "sha256":  "7a1c61c9d912b447e4957e738598d9c26b7d044a8a529c34d5476a2ba078cd64",
+                                                "bytes":  70392
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/families/m08l_handlers.inc",
+                                                "sha256":  "22f388f1e91e3fada87fed5d72e0639f1c41fa7f4bf2eb84517ea7d3b3eb5a34",
+                                                "bytes":  59511
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/families/m08m_handlers.inc",
+                                                "sha256":  "69fe8b0a92e3695ba7245704b4990cfa33f3f735cb626d6e1f225c22a1a15248",
+                                                "bytes":  108127
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/families/m08n_handlers.inc",
+                                                "sha256":  "cf3fa3941a181c30c4bc51b74bddd704fef9f38e496cbe8ce1716e95ac0ad0e4",
+                                                "bytes":  43616
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/families/materials_read.inc",
+                                                "sha256":  "85330edc844ad34182a2a2dc6e85ff6f718118347829bc486b1d52703c2c97c6",
+                                                "bytes":  9121
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/families/w6_dynblk_handlers.inc",
+                                                "sha256":  "365391c1ce612b45870b1bc0a62e5f4634d12f59c1798d78675a513cb375bb89",
+                                                "bytes":  28127
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/families/w6_layerstate_handlers.inc",
+                                                "sha256":  "27323cc50e2185e35cbf3e6eb3a73641403973d193782fda2a6070600d933c0d",
+                                                "bytes":  15247
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNative/families/w6_section_handlers.inc",
+                                                "sha256":  "bf3c26f7e7d3d643667a58739b1f09d5b377c31d222d41ddd7342583aa51e03f",
+                                                "bytes":  18771
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNativeDbx/Ariadne.AcadNativeDbx.dbx.vcxproj",
+                                                "sha256":  "300b98d1507cce08b4c17cc75292a262d464ec6332b3fc7bc832ba8547ba8a51",
+                                                "bytes":  3342
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNativeDbx/AriadneDbxApi.h",
+                                                "sha256":  "e45dd97fca67ac03e2e44880b74dbccc4a7752fcb7c923bcf9ed0533917cbad0",
+                                                "bytes":  1156
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNativeDbx/AriadneDbxEntry.cpp",
+                                                "sha256":  "ddbf4a8a20de98247cf6d303e505f66f6a44729ffef7f26183d260093aef2595",
+                                                "bytes":  4030
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNativeDbx/AriadneProtocol.cpp",
+                                                "sha256":  "991900119b688627d71bd454c7854aac015e5d71e795e7e46c26fb69f1e1d162",
+                                                "bytes":  1218
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNativeDbx/AriadneProtocol.h",
+                                                "sha256":  "431c23f69b3d70571d296c1dbb74b2970c52d575da8b2a464840aeaf53abd42a",
+                                                "bytes":  299
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNativeDbx/AriadneRecord.cpp",
+                                                "sha256":  "5aa1433b4b3b441efd13e3089cc68328cc8c55186b9b839dbb07f0e5aa993c9b",
+                                                "bytes":  3948
+                                            },
+                                            {
+                                                "path":  "src/Ariadne.AcadNativeDbx/AriadneRecord.h",
+                                                "sha256":  "87df7576dadbce6da50ea93481e2a803742a15ed38a50eda259e5d0757b82423",
+                                                "bytes":  759
+                                            }
+                                        ]
+                         },
+    "compilation_tree_digest":  "d472dbc83cd1398cf07cb1bdd8f1bc22546d95c7dc97c89eed155e08e27e5b4a",
+    "source_provenance":  {
+                              "compilation_input":  "immutable_starting_snapshot_mirror",
+                              "mirror_ephemeral":  true,
+                              "limitations":  [
+                                                  {
+                                                      "code":  "EXTERNAL_TOOLCHAIN_INPUTS_UNSEALED",
+                                                      "scope":  "ObjectARX SDK headers/properties, Visual Studio targets, compiler, linker, and system libraries are external toolchain inputs and are not part of source_tree."
+                                                  }
+                                              ]
+                          },
     "artifacts":  [
                       {
                           "leaf":  "Ariadne.AcadNativeDbx.dbx",
-                          "sha256":  "e9d7b866295b89902f6f982e84383a3b385eef8ddd33a2c8a3203a79d7d99283",
+                          "sha256":  "330157e9e0c41ff16205678ca556a5122f1548dc20292f1d525573cdae4d4db6",
                           "bytes":  54272,
                           "current":  true,
                           "exists":  true,
@@ -27,13 +369,13 @@
                                                   "pe_header_offset":  288,
                                                   "section_count":  6,
                                                   "optional_header_bytes":  240,
-                                                  "reason":  "MZ, PE, x64 machine, section table, and PE32+ optional header checks passed."
+                                                  "reason":  "MZ, PE, x64 machine, DLL characteristic, section table, and PE32+ optional header checks passed."
                                               }
                       },
                       {
                           "leaf":  "Ariadne.AcadNative.crx",
-                          "sha256":  "4c65e63fb522b1c73aaf9fe91bc8b40e31aae1c9ac22516bfda9e3627ec2f39d",
-                          "bytes":  1175552,
+                          "sha256":  "3aae1f442e0642c1bcc8aa3548e6214243bad9ffdc4c7453846399186f294a71",
+                          "bytes":  1177600,
                           "current":  true,
                           "exists":  true,
                           "pe_verification":  {
@@ -44,13 +386,13 @@
                                                   "pe_header_offset":  288,
                                                   "section_count":  6,
                                                   "optional_header_bytes":  240,
-                                                  "reason":  "MZ, PE, x64 machine, section table, and PE32+ optional header checks passed."
+                                                  "reason":  "MZ, PE, x64 machine, DLL characteristic, section table, and PE32+ optional header checks passed."
                                               }
                       },
                       {
                           "leaf":  "Ariadne.AcadNative.arx",
-                          "sha256":  "0b498dd165d61a50e0f9facf640695b88477b0f31c663e1c2a5e1c66d0f14271",
-                          "bytes":  1184256,
+                          "sha256":  "a9c3ed5cd047da9057630216518e3c988f308792b690353797f1fb0536349515",
+                          "bytes":  1186304,
                           "current":  true,
                           "exists":  true,
                           "pe_verification":  {
@@ -61,7 +403,7 @@
                                                   "pe_header_offset":  280,
                                                   "section_count":  6,
                                                   "optional_header_bytes":  240,
-                                                  "reason":  "MZ, PE, x64 machine, section table, and PE32+ optional header checks passed."
+                                                  "reason":  "MZ, PE, x64 machine, DLL characteristic, section table, and PE32+ optional header checks passed."
                                               }
                       }
                   ]

@@ -59,7 +59,16 @@ class TestM08C0FamilySeam(unittest.TestCase):
     def test_gate_admits_family_ops(self):
         # gate must consult familyHasOp, else family ops -> OPERATION_NOT_IMPLEMENTED
         self.assertIn("familyHasOp(op)", self.src)
-        self.assertRegex(self.src, r"findAriadneNativeOp\(op\) == nullptr && !familyHasOp\(op\)")
+        self.assertRegex(
+            self.src,
+            r"const bool publicOperation\s*=\s*findAriadneNativeOp\(op\) != nullptr\s*"
+            r"\|\|\s*familyHasOp\(op\);",
+        )
+        self.assertRegex(
+            self.src,
+            r"case AriadneOperationAdmissionScope::PublicOnly:\s*"
+            r"return publicOperation;",
+        )
 
     def test_dispatcher_routes_to_families(self):
         self.assertIn("tryFamilyDispatch(op, ctx, r)", self.src)

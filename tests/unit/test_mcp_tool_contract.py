@@ -37,14 +37,7 @@ for _p in (_REPO, os.path.join(_REPO, "tools")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-_EXPECTED_TOOLS = {
-    "cad.status", "cad.inspect_drawing", "cad.query_entities", "cad.get_entity",
-    "cad.validate_ir", "cad.registry_status", "cad.registry_explain",
-    "cad.patch_dry_run", "cad.patch_apply_staged", "cad.anchor_set",
-    "cad.anchor_get", "cad.anchor_list", "cad.anchor_clear", "cad.diff_before_after",
-    "cad.visual_report", "cad.live_status", "cad.run_operation",
-    "cad.run_command_template", "cad.inspect_display_membership",
-}
+from verification.mcp_surface import REQUIRED_CAD_TOOLS  # noqa: E402
 
 # Trivial args per tool: deliberately minimal/invalid so handlers report a
 # missing-arg or degrade -- never mutate/extract. Each MUST still return a dict.
@@ -85,7 +78,7 @@ class TestToolsManifest(unittest.TestCase):
 
     def test_manifest_lists_exactly_the_cad_tools(self):
         names = {t["name"] for t in self.manifest["tools"]}
-        self.assertEqual(names, _EXPECTED_TOOLS,
+        self.assertEqual(names, REQUIRED_CAD_TOOLS,
                          "manifest tool set drifted from the cad.* contract")
         # every advertised tool is a cad.* tool.
         for n in names:
@@ -153,6 +146,27 @@ class TestToolsManifest(unittest.TestCase):
 
         self.assertTrue(forwarded["ok"])
         self.assertEqual(calls[0][1]["geometry_scope"], "linear_segments_v1")
+
+    def test_status_binds_the_running_mcp_surface(self):
+        status_tool = next(
+            item for item in self.manifest["tools"] if item["name"] == "cad.status"
+        )
+        version_schema = status_tool["inputSchema"]["properties"]["schema_version"]
+        self.assertEqual(version_schema["enum"], [1, 2])
+        self.assertEqual(version_schema["default"], 1)
+
+        legacy = self.mcp._dispatch_tool("cad.status", {})
+        payload = self.mcp._dispatch_tool("cad.status", {"schema_version": 2})
+
+        self.assertTrue(legacy["ok"])
+        self.assertEqual(legacy["result"]["schema"], "ariadne.cadctl.status.v1")
+        self.assertTrue(payload["ok"])
+        result = payload["result"]
+        self.assertEqual(result["schema"], "ariadne.cadctl.status.v2")
+        mcp_surface = result["capability"]["mcp_surface"]
+        self.assertEqual(mcp_surface["status"], "PASS")
+        self.assertEqual(mcp_surface["verification"], "VERIFIED")
+        self.assertEqual(mcp_surface["receipt"]["tool_count"], 19)
 
 
 class TestHandlerDispatchReturnsDict(unittest.TestCase):

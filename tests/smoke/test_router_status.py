@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Lane E SMOKE -- the router-published status JSON exists and cadctl reflects it.
+"""Lane E SMOKE -- cadctl classifies the router-published JSON as historical.
 
 Intent (WHY):
-  * The published reports/autocad_router_status_latest.json is the read-only
-    source cadctl.status() normalizes. This smoke test proves the live artifact
-    is present and that cadctl's normalized view agrees with it on the headline
-    facts (route_count / available_count). If they ever disagree, cadctl is
-    misreading the router and every status-dependent decision is wrong.
+  * The published reports/autocad_router_status_latest.json is an unbound legacy
+    observation, not current runtime truth. This smoke test proves cadctl keeps
+    its route claims available under the historical compatibility section while
+    refusing to elevate them into live availability.
   * Read-only: this test only READS the status file (allowed) and calls
     cadctl.status() (which is itself read-only). It never runs ``-Action status``
     and never spawns AutoCAD.
@@ -43,7 +42,7 @@ class TestRouterStatusSmoke(unittest.TestCase):
             self.published = json.load(fh)
         import cadctl
         self.cad = cadctl.Cad()
-        self.normalized = self.cad.status()
+        self.normalized = self.cad.status(schema_version=2)
 
     def test_published_status_is_well_formed(self):
         self.assertIn("routes", self.published)
@@ -54,29 +53,36 @@ class TestRouterStatusSmoke(unittest.TestCase):
         self.assertEqual(self.published["route_count"], len(self.published["routes"]))
 
     def test_cadctl_status_reflects_route_count(self):
-        self.assertEqual(self.normalized["status"], "ok")
+        self.assertEqual(self.normalized["status"], "PASS")
         self.assertEqual(
-            self.normalized["route_count"], self.published["route_count"],
+            self.normalized["status_scope"], "projection_assembly_only"
+        )
+        self.assertEqual(
+            self.normalized["compatibility"]["route_count"],
+            self.published["route_count"],
             "cadctl route_count disagrees with the published status",
         )
 
     def test_cadctl_status_reflects_available_count(self):
         self.assertEqual(
-            self.normalized["available_count"], self.published["available_count"],
+            self.normalized["compatibility"]["available_count"],
+            self.published["available_count"],
             "cadctl available_count disagrees with the published status",
         )
         # available_count must never exceed route_count (basic sanity).
+        compatibility = self.normalized["compatibility"]
         self.assertLessEqual(
-            self.normalized["available_count"], self.normalized["route_count"]
+            compatibility["available_count"], compatibility["route_count"]
         )
 
-    def test_native_available_matches_pass_semantics(self):
-        # cadctl reports native_available True ONLY when native_modules.status
-        # is exactly 'PASS' -- assert it tracks the published value truthfully
-        # (no fake native availability).
-        native_status = (self.published.get("native_modules") or {}).get("status")
-        expected = str(native_status).upper() == "PASS"
-        self.assertEqual(self.normalized.get("native_available"), expected)
+    def test_historical_native_claim_never_becomes_runtime_availability(self):
+        historical = self.normalized["historical_snapshot"]
+        self.assertEqual(historical["classification"], "HISTORICAL_UNBOUND")
+        self.assertFalse(historical["bound_to_current_revision"])
+        self.assertEqual(
+            self.normalized["runtime_observation"]["availability"], "UNKNOWN"
+        )
+        self.assertNotIn("native_available", self.normalized)
 
 
 if __name__ == "__main__":

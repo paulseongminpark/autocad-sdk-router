@@ -122,6 +122,21 @@ async def _exercise_persistent_stdio() -> None:
                 assert "ok" in payload, name
                 assert _field(result, "isError", "is_error") is (payload["ok"] is False), name
 
+            # The documented direct-script server runs as ``__main__``.  Its
+            # v2 status projection must still bind handlers to this exact
+            # cadagent_mcp.py module rather than trusting handler metadata.
+            status_v2 = await session.call_tool(
+                "cad.status", {"schema_version": 2}
+            )
+            status_v2_payload = _field(
+                status_v2, "structuredContent", "structured_content"
+            )
+            assert _field(status_v2, "isError", "is_error") is False
+            assert status_v2_payload["ok"] is True
+            assert status_v2_payload["result"]["capability"]["mcp_surface"][
+                "verification"
+            ] == "VERIFIED"
+
             # Exercise the adapter through a real ClientSession rather than
             # its private callable.  The legacy names must reach the existing
             # handler and return its structured blocked envelope, not an SDK

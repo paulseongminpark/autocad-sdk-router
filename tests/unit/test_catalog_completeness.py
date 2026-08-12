@@ -135,28 +135,14 @@ class TestCatalogDenominatorLiveSmoke(unittest.TestCase):
     figure is asserted only within a wide, documented neighborhood of PLAN.md's
     "~446" estimate, never pinned exactly (that number is explicitly provisional)."""
 
-    def test_live_registry_is_517_ops(self):
-        # w3-dimstyle adds one new synthetic op (write.dimstyle.create,
-        # DIMSTYLE table D-class TABLES tier) on top of the F0 517-op
-        # anchor -- 517 -> 518. w3-ltts adds two more (write.linetype.create,
-        # write.textstyle.create -- LINETYPE/TEXTSTYLE table D-class TABLES
-        # tier) -- 518 -> 519 -> 520. P10 adds a fourth (modify.entity.xdata,
-        # entity-handle-targeted xdata write) -- 520 -> 521. p4-poly2d adds a
-        # fifth (write.entity.polyline2d.deep, the true legacy AcDb2dPolyline
-        # write path) -- 521 -> 522. p9-tables2 adds three more
-        # (write.ucs.create / write.view.create / write.vport.create, TABLES
-        # tier-2) -- 522 -> 523 -> 524 -> 525. W6-SHEETSET adds two blocked
-        # sheet-set COM read records -- 525 -> 526 -> 527. See
-        # tools/patch_ops/tables.py + entities.py + tools/sheetset_read.py.
+    def test_live_registry_matches_its_declared_denominator(self):
         ops = cc.load_operations_catalog()
-        self.assertEqual(len(ops), 551,
-                         "the F0 task's own '517-op catalogue' anchor (+8 wave0-3, "
-                         "+16 wave5/6: w5-anchor x4/w6-layerstate x4/w6-dynblk x3/"
-                         "w6-section x3/w6-sheetset x2; +4 wave-7: identity_contract/"
-                         "semantic_anchor/corpus.batch/cross_engine python ops; "
-                         "+1 P3 assoc-relink: write.block.relink_hatch_assoc); "
-                         "if this moves again, "
-                         "the whole WAVE-0 accounting must be recomputed")
+        registry = json.loads(cc.CATALOG_PATH.read_text(encoding="utf-8-sig"))
+        self.assertEqual(
+            len(ops),
+            registry["totals"]["operations"],
+            "the measured denominator must follow the canonical registry total",
+        )
 
     def test_live_denominator_lands_near_plan_446_estimate(self):
         ops = cc.load_operations_catalog()

@@ -1,10 +1,8 @@
 # MCP_TOOL_CONTRACT — `tools/cadagent_mcp.py`
 
-This document is the public contract for the CADAgent MCP endpoint on the PR #67
-integration branch. The endpoint is the official Python MCP SDK over persistent
-stdio; it is not the retired private JSON-RPC compatibility shim. The branch is
-still Draft, so this document does not claim that the SDK integration is merged
-into `main`.
+This document is the public contract for the CADAgent MCP endpoint. The endpoint
+uses the official Python MCP SDK over persistent stdio; it is not the retired
+private JSON-RPC compatibility shim.
 
 ## Purpose and safety boundary
 
@@ -70,15 +68,19 @@ The exact names are:
 18. `cad.inspect_display_membership`
 19. `cad.run_command_template`
 
-The public schema is the source of truth for required fields, defaults, enum
-values, and descriptions. The implementation and the integration test must
-keep the 19-name set and each `inputSchema` equal.
+The versioned compatibility contract in `tools/verification/mcp_surface.py`
+independently binds every tool name to its complete `inputSchema` and exact
+dispatch wrapper. `_TOOLS` and `_DISPATCH` are the live implementation and must
+match that contract. The verifier compares schemas without calling handlers;
+the stdio integration test then proves the same surface through the official
+SDK.
 
 ## Tool surface and mutation rules
 
 | tool family | public behavior |
 |---|---|
-| `cad.status`, `cad.registry_status`, `cad.registry_explain` | Read router status or registry records through `cadctl`. |
+| `cad.status` | Defaults to the historical v1 compatibility shape. `schema_version=2` separates checkout anchor, declared capability, byte-bound proof, runtime observation, and historical evidence; it does not run a live AutoCAD/router probe. |
+| `cad.registry_status`, `cad.registry_explain` | Read current operation-registry facts through `cadctl`. |
 | `cad.inspect_drawing`, `cad.query_entities`, `cad.get_entity`, `cad.validate_ir` | Read/extract/query/validate through the CAD shells; drawing input is staged and the original is not modified. |
 | `cad.patch_dry_run`, `cad.patch_apply_staged` | Plan or apply a patch only on a staged copy; a missing peer implementation is reported as `not_implemented`. |
 | `cad.anchor_set`, `cad.anchor_clear` | Write semantic-anchor data to a staged copy; `anchor_get` and `anchor_list` read an extracted IR. |
@@ -157,6 +159,10 @@ python -m pip install -r requirements.txt
 
 # Real stdio contract; uses nonexistent DWG paths and temporary directories only.
 python -m pytest -q tests/integration/test_cadagent_mcp_sdk_stdio.py
+
+# Static public contract; proves exact schemas and dispatch identities without
+# executing a handler.
+python -m pytest -q tests/unit/test_mcp_surface_verifier.py
 
 # v1 + isolated v2 matrix (v2 is installed only under the target directory).
 powershell -ExecutionPolicy Bypass -File .\tools\test_cadagent_mcp_sdk_matrix.ps1 -InstallV2
