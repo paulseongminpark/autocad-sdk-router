@@ -15,6 +15,9 @@
        paths instead of assuming a shared/relative one.
 
   This script only ADDS a worktree; it never deletes or force-resets one.
+  Retirement is a separate lifecycle: classify stale/preserved content, merge
+  or remotely preserve the retained HEAD, then require PASS from
+  tools\fleet\retirement_gate.py before `git worktree remove`.
   Re-running it for a node that already exists is a safe no-op (idempotent):
   the existing worktree/branch is reused and only the staging dir + env file
   are (re)materialized.
