@@ -1,0 +1,15 @@
+[   0.2s] === attended job run: attended ===
+[   0.2s] pre-existing acad PIDs: 
+[   0.2s] operation: e2.inspect.xclip_membership
+[   0.2s] launch args: /nologo /b "D:\runs\autocad-sdk-router\pr66-live-readonly-bootstrap-final\attended\attended_job.scr"
+[   0.3s] launched dedicated acad PID: 37376
+[   7.9s] job_out.json appeared
+[   7.9s] wrote compact completion receipt before cleanup
+[   7.9s] job done; waiting up to 30s for the process to quit on its own
+[  38.1s] post-poll: jobDone=True hasExited=False timedOut=False
+[  38.1s] cleanup: launchedExited=False
+[  38.1s] closing launched PID 37376 through its exact process handle
+[  38.1s] Stop-Process handle close ok
+[  39.1s] cleanup: collecting process-safety evidence
+[  39.1s] cleanup: collecting security restoration evidence
+[  39.1s] cleanup: writing final receipt

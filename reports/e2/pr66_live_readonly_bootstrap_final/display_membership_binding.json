@@ -1,0 +1,169 @@
+{
+  "schema": "ariadne.e2.native_display_binding.v1",
+  "source_path": "D:\\runs\\e2_program\\l0_gold_1dwg\\l0_gold.dwg",
+  "source_sha256": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+  "staged_path": "D:\\runs\\autocad-sdk-router\\pr66-live-readonly-bootstrap-final\\staged\\input.dwg",
+  "staged_sha256_before": "14eb65eb292d8a07f38ab5662dcafe9761c6185bc5ff0c8a9a008be15b598961",
+  "staged_read_only_evidence": {
+    "required": true,
+    "after_copy": {
+      "path": "D:\\runs\\autocad-sdk-router\\pr66-live-readonly-bootstrap-final\\staged\\input.dwg",
+      "read_only": true,
+      "mode": "0o444",
+      "writable_mode_bits": false,
+      "windows_file_attributes": 33,
+      "windows_read_only_attribute": true,
+      "reason": "OS read-only attribute and mode are enforced"
+    },
+    "before_launch": {
+      "path": "D:\\runs\\autocad-sdk-router\\pr66-live-readonly-bootstrap-final\\staged\\input.dwg",
+      "read_only": true,
+      "mode": "0o444",
+      "writable_mode_bits": false,
+      "windows_file_attributes": 33,
+      "windows_read_only_attribute": true,
+      "reason": "OS read-only attribute and mode are enforced"
+    },
+    "after_execution": {
+      "path": "D:\\runs\\autocad-sdk-router\\pr66-live-readonly-bootstrap-final\\staged\\input.dwg",
+      "read_only": true,
+      "mode": "0o444",
+      "writable_mode_bits": false,
+      "windows_file_attributes": 33,
+      "windows_read_only_attribute": true,
+      "reason": "OS read-only attribute and mode are enforced"
+    }
+  },
+  "native_document_access": {
+    "mode": "read_only",
+    "required": true,
+    "application_context": true,
+    "open_errorstatus": 0,
+    "read_lock_errorstatus": 0,
+    "read_unlock_errorstatus": 0,
+    "restore_errorstatus": 0,
+    "close_errorstatus": 0,
+    "path_verified_before": true,
+    "path_verified_after": true,
+    "read_only_verified_before": true,
+    "read_only_verified_after": true,
+    "working_database_matches_before": true,
+    "working_database_matches_after": true,
+    "operation_executed": true,
+    "opened_path": "D:\\runs\\autocad-sdk-router\\pr66-live-readonly-bootstrap-final\\staged\\input.dwg"
+  },
+  "geometry_scope": "linear_segments_v1",
+  "native_job_out_path": "D:\\runs\\autocad-sdk-router\\pr66-live-readonly-bootstrap-final\\attended\\job_out.json",
+  "native_job_out_sha256": "7c2d8e94b0d85d687eaa74111c21f982d04a70a58098f677feefe74c77410865",
+  "attended_final_receipt": {
+    "path": "D:\\runs\\autocad-sdk-router\\pr66-live-readonly-bootstrap-final\\attended\\attended_job_final_receipt.json",
+    "sha256": "75a03f80df659c8e7692d5def08d7f966813f787f2f463bb32e52dcd10b892d1",
+    "bytes": 1514
+  },
+  "native_artifacts": [
+    {
+      "leaf": "Ariadne.AcadNativeDbx.dbx",
+      "path": "D:\\runs\\wt\\autocad-sdk-router__cadagent-display-pr\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNativeDbx.dbx",
+      "sha256": "5b5dd4080a76c4f09aa2ba167dd0ac8e34d09de06e3cec69cea115884aeabeb2",
+      "bytes": 54272
+    },
+    {
+      "leaf": "Ariadne.AcadNative.crx",
+      "path": "D:\\runs\\wt\\autocad-sdk-router__cadagent-display-pr\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.crx",
+      "sha256": "71184abddb6a27fadad7d8e722b4467079fe34c8d9527fb64ceb127f29c41a5b",
+      "bytes": 1174528
+    },
+    {
+      "leaf": "Ariadne.AcadNative.arx",
+      "path": "D:\\runs\\wt\\autocad-sdk-router__cadagent-display-pr\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\Ariadne.AcadNative.arx",
+      "sha256": "a399c673910234877053b1734e7d269e4547e93d5e4f9801b8e39ca663811321",
+      "bytes": 1183744
+    }
+  ],
+  "native_build_manifest": {
+    "path": "D:\\runs\\wt\\autocad-sdk-router__cadagent-display-pr\\src\\Ariadne.AcadNative\\bin\\x64\\Release\\native_build_manifest.json",
+    "sha256": "f9c6970ad639c46363eeca141b8d70b633210b3d60670a3aed975c74655dd3c8",
+    "validation": {
+      "before": {
+        "valid": true,
+        "checks": {
+          "schema": true,
+          "claim_scope": true,
+          "build_target": true,
+          "configuration": true,
+          "platform": true,
+          "load_bin_dir": true,
+          "checkout_root": true,
+          "git_available": true,
+          "git_head": true,
+          "git_native_source_dirty": true,
+          "git_native_source_status_sha256": true,
+          "build_recipe": true,
+          "source_tree": true,
+          "artifact_pe:Ariadne.AcadNativeDbx.dbx": true,
+          "artifact:Ariadne.AcadNativeDbx.dbx": true,
+          "artifact_pe:Ariadne.AcadNative.crx": true,
+          "artifact:Ariadne.AcadNative.crx": true,
+          "artifact_pe:Ariadne.AcadNative.arx": true,
+          "artifact:Ariadne.AcadNative.arx": true,
+          "artifacts": true,
+          "display_membership_ready": true
+        }
+      },
+      "after_execution": {
+        "valid": true,
+        "checks": {
+          "schema": true,
+          "claim_scope": true,
+          "build_target": true,
+          "configuration": true,
+          "platform": true,
+          "load_bin_dir": true,
+          "checkout_root": true,
+          "git_available": true,
+          "git_head": true,
+          "git_native_source_dirty": true,
+          "git_native_source_status_sha256": true,
+          "build_recipe": true,
+          "source_tree": true,
+          "artifact_pe:Ariadne.AcadNativeDbx.dbx": true,
+          "artifact:Ariadne.AcadNativeDbx.dbx": true,
+          "artifact_pe:Ariadne.AcadNative.crx": true,
+          "artifact:Ariadne.AcadNative.crx": true,
+          "artifact_pe:Ariadne.AcadNative.arx": true,
+          "artifact:Ariadne.AcadNative.arx": true,
+          "artifacts": true,
+          "display_membership_ready": true
+        }
+      },
+      "before_evidence": {
+        "valid": true,
+        "checks": {
+          "schema": true,
+          "claim_scope": true,
+          "build_target": true,
+          "configuration": true,
+          "platform": true,
+          "load_bin_dir": true,
+          "checkout_root": true,
+          "git_available": true,
+          "git_head": true,
+          "git_native_source_dirty": true,
+          "git_native_source_status_sha256": true,
+          "build_recipe": true,
+          "source_tree": true,
+          "artifact_pe:Ariadne.AcadNativeDbx.dbx": true,
+          "artifact:Ariadne.AcadNativeDbx.dbx": true,
+          "artifact_pe:Ariadne.AcadNative.crx": true,
+          "artifact:Ariadne.AcadNative.crx": true,
+          "artifact_pe:Ariadne.AcadNative.arx": true,
+          "artifact:Ariadne.AcadNative.arx": true,
+          "artifacts": true,
+          "display_membership_ready": true
+        }
+      }
+    }
+  },
+  "execution_context": "dedicated_full_autocad",
+  "headless_fallback": false
+}

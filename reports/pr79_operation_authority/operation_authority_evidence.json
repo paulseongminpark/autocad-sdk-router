@@ -1,0 +1,148 @@
+{
+  "schema": "ariadne.cad_os.operation_authority_evidence.v1",
+  "status": "PASS",
+  "generated_at": "2026-08-12T03:48:06.4216135+09:00",
+  "repository": "D:\\runs\\wt\\autocad-sdk-router__architecture-operation-authority",
+  "source_commit": "303285d1284b1d433cbabc3b83b8dfa433ed5526",
+  "artifact_commit": "f3aacb0b25f6b217eb707eedc2d29be2ab7695d0",
+  "ci_fix_commit": "5ec11d25339826a1095fda9cbdf98987dde956bd",
+  "branch_head": "5ec11d25339826a1095fda9cbdf98987dde956bd",
+  "artifact_parent_is_source_commit": true,
+  "static_verification": {
+    "operation_count": 552,
+    "implemented": 490,
+    "blocked": 62,
+    "verification_scope": "static_operation_vocabulary_parity",
+    "related_tests": {
+      "passed": 221,
+      "skipped": 5
+    },
+    "limitations": [
+      "property_count_runtime_evidence_host_subset",
+      "dispatch_target_identity_not_proven",
+      "handler_execution_not_proven",
+      "source_not_compiled_or_executed"
+    ]
+  },
+  "native_build": {
+    "status": "PASS",
+    "log": "D:\\tmp\\operation-authority-native-build-20260812.log",
+    "build_head": "303285d1284b1d433cbabc3b83b8dfa433ed5526",
+    "source_path_count": 31,
+    "source_inputs_match_head": true,
+    "source_dirty": false,
+    "snapshot_exact_match": true,
+    "display_membership_ready": true,
+    "canonical_arx_current": true,
+    "artifacts": {
+      "Ariadne.AcadNativeDbx.dbx": {
+        "bytes": 54272,
+        "sha256": "ab6d59ea05b22f6619203898fbac7387b85e09d8463afa7db87c888660bb91fe"
+      },
+      "Ariadne.AcadNative.crx": {
+        "bytes": 1176576,
+        "sha256": "e968c8bdc7e13ca780da53c76df767d939ac8464561478ea25296f6648646e05"
+      },
+      "Ariadne.AcadNative.arx": {
+        "bytes": 1184256,
+        "sha256": "d78e0373c2c441990da58800fc0e08ce114968723673ffc7e514796de19d1cc1"
+      }
+    },
+    "post_build_tests": {
+      "passed": 347,
+      "skipped": 1
+    },
+    "committed_bundle_tests": {
+      "passed": 3,
+      "skipped": 0
+    },
+    "verification_scope": "committed_artifact_identity_and_canonical_compilation_input_binding",
+    "limitations": [
+      "external_toolchain_inputs_unsealed",
+      "binary_rebuild_equivalence_not_proven"
+    ]
+  },
+  "ci": {
+    "status": "PASS",
+    "local_full_suite": {
+      "passed": 2629,
+      "skipped": 49,
+      "duration_seconds": 411.1
+    },
+    "mcp_sdk_matrix": {
+      "mcp_1_27_1_passed": 3,
+      "mcp_2_0_0_passed": 3
+    },
+    "powershell_parse": {
+      "tracked_scripts": 11,
+      "errors": 0
+    },
+    "github": {
+      "pull_request": 75,
+      "run_id": 31523484976,
+      "head": "5ec11d25339826a1095fda9cbdf98987dde956bd",
+      "checks_passed": 4,
+      "checks_total": 4,
+      "python_tests": {
+        "passed": 2628,
+        "skipped": 50,
+        "subtests_passed": 255,
+        "duration_seconds": 660.83
+      }
+    },
+    "windows_checkout_contract": {
+      "core_autocrlf": true,
+      "focused_tests_passed": 2,
+      "report_paths": 5,
+      "crlf_paths": 0
+    },
+    "router_status_observation": {
+      "path": "D:\\runs\\autocad-sdk-router\\operation-authority-f3aacb0\\autocad_router_status_ci_after_eol_fix.json",
+      "bytes": 26903,
+      "sha256": "08cdd24703e25f45e7bedcd3b173136100c7eb43a6fe837a75e87ecbba9989eb"
+    }
+  },
+  "runtime": {
+    "status": "PASS",
+    "source_fixture": "D:\\runs\\wt\\autocad-sdk-router__architecture-operation-authority\\tests\\fixtures\\enriched_seed_20260716.dwg",
+    "source_sha256_before_and_after": "f8eba385204d1273ac3005890ba9134cff6dc5fffbde8fcdc79daeb5b9493376",
+    "source_mtime_ticks_before_and_after": 639220638071896197,
+    "selected_entity": {
+      "handle": "11935",
+      "class": "AcDbLine"
+    },
+    "write_regapp": {
+      "operation": "write.regapp.register",
+      "app": "ARIADNE_OPAUTH_F3AACB0",
+      "registered": true,
+      "original_unchanged": true,
+      "output": "D:\\runs\\autocad-sdk-router\\operation-authority-f3aacb0\\01_regapp"
+    },
+    "write_extension_dictionary": {
+      "operation": "write.object.create_ext_dict",
+      "created": true,
+      "extension_dictionary_handle": "1925F",
+      "original_unchanged": true,
+      "output": "D:\\runs\\autocad-sdk-router\\operation-authority-f3aacb0\\02_extdict"
+    },
+    "fresh_reopen": {
+      "operation": "inspect.database.graph",
+      "app_present_before": false,
+      "app_present_after": true,
+      "app_count_before": 11,
+      "app_count_after": 12,
+      "extension_dictionary_before": null,
+      "extension_dictionary_after": "1925F",
+      "output": "D:\\runs\\autocad-sdk-router\\operation-authority-f3aacb0\\03_reopen"
+    },
+    "router_status_observation": {
+      "path": "D:\\runs\\autocad-sdk-router\\operation-authority-f3aacb0\\autocad_router_status_runtime.json",
+      "sha256": "08b0032ebdc45c4afe8f6b56287020bf65e85627ed426ab96b7b5f6fc233a5ff"
+    },
+    "final_staged_result": {
+      "path": "D:\\runs\\autocad-sdk-router\\operation-authority-f3aacb0\\final_staged_result.dwg",
+      "bytes": 2962373,
+      "sha256": "fa9e819cd040882af0ea1f78fbd5bb710aae5a239880fad25becdbad42431241"
+    }
+  }
+}

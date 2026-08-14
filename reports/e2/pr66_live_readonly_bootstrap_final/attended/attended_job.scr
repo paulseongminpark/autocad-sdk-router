@@ -1,0 +1,23 @@
+(setq _ariadneOsl (getvar "SECURELOAD"))
+(setq _ariadneOtp (getvar "TRUSTEDPATHS"))
+(setq _f (open "D:/runs/autocad-sdk-router/pr66-live-readonly-bootstrap-final/attended/security_before.txt" "w"))
+(write-line (itoa _ariadneOsl) _f)
+(write-line _ariadneOtp _f)
+(close _f)
+(setvar "FILEDIA" 0)
+(setvar "CMDECHO" 0)
+(setvar "SECURELOAD" 0)
+(setvar "TRUSTEDPATHS" (strcat _ariadneOtp ";D:\\runs\\wt\\autocad-sdk-router__cadagent-display-pr\\src\\Ariadne.AcadNative\\bin\\x64\\Release"))
+(arxload "D:/runs/wt/autocad-sdk-router__cadagent-display-pr/src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNativeDbx.dbx")
+(arxload "D:/runs/wt/autocad-sdk-router__cadagent-display-pr/src/Ariadne.AcadNative/bin/x64/Release/Ariadne.AcadNative.arx")
+ARIADNE_NATIVE_JOB_ARGS_READONLY
+(setvar "SECURELOAD" _ariadneOsl)
+(setvar "TRUSTEDPATHS" _ariadneOtp)
+(setq _f2 (open "D:/runs/autocad-sdk-router/pr66-live-readonly-bootstrap-final/attended/security_after.txt" "w"))
+(write-line (itoa (getvar "SECURELOAD")) _f2)
+(write-line (getvar "TRUSTEDPATHS") _f2)
+(close _f2)
+(princ)
+_QUIT
+_N
+

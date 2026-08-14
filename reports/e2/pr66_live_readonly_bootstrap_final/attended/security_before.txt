@@ -1,0 +1,2 @@
+0
+D:\runs\wt\autocad-sdk-router__issue63-text\.native-build-issue63\bin\x64\Release
