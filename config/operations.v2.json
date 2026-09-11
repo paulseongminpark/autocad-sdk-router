@@ -54,10 +54,10 @@
     }
   },
   "totals": {
-    "operations": 552,
+    "operations": 563,
     "by_status": {
-      "blocked": 62,
-      "implemented": 490
+      "implemented": 501,
+      "blocked": 62
     },
     "by_family": {
       "objectdbx_database": 21,
@@ -88,15 +88,16 @@
       "runtime_commands": 26,
       "ui_customization": 39,
       "corpus": 1,
-      "verify": 1
+      "verify": 1,
+      "pq_label": 11
     },
     "by_engine_tier": {
-      "managed_also": 48,
+      "managed_also": 59,
       "objectdbx_capable": 307,
       "accoreconsole_lisp_also": 20,
       "native_arx_only": 177
     },
-    "total": 552
+    "total": 563
   },
   "coverage": {
     "wired_ops": 29,
@@ -39887,6 +39888,776 @@
       "evidence_required": "existing_tests_and_evidence_refs",
       "notes": "IMPLEMENTED (w7-materials). Handler = materialsReadDispatch in families/materials_read.inc (ACDB_VISUALSTYLE_DICT iterate, kForRead only). Compiled 2026-07-07.",
       "implementation_notes": "IMPLEMENTED (w7-materials). Handler = materialsReadDispatch in families/materials_read.inc (ACDB_VISUALSTYLE_DICT iterate, kForRead only). Compiled 2026-07-07."
+    },
+    {
+      "id": "pq_label.inspect",
+      "operation": "pq_label.inspect",
+      "family": "pq_label",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "host_eligibility": [
+        "coreconsole"
+      ],
+      "execution_context": "managed_in_coreconsole",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "PQ_LABEL_JOB",
+        "dispatcher_symbol": "PqCommands.RunLabelJob",
+        "execution_host_class": "coreconsole",
+        "composed_of": []
+      },
+      "input_schema": "schemas/pq_label.args.schema.json#/$defs/inspect",
+      "output_schema": "schemas/pq_label.result.schema.json",
+      "schema_refs": {
+        "input": "schemas/pq_label.args.schema.json#/$defs/inspect",
+        "output": "schemas/pq_label.result.schema.json"
+      },
+      "summary": "Read stored and effective PQ labels for handles from cad.query_entities.",
+      "args_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "handles": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9A-Fa-f]+$"
+            }
+          }
+        },
+        "required": [
+          "handles"
+        ]
+      },
+      "evidence_refs": [
+        "src/PqLabel/PqJob.cs",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "notes": "Use existing cad.query_entities for target discovery. Handles must belong to the input DWG. GUI selection/visibility is not persistent across one-shot jobs.",
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "read",
+        "no_original_write_default": true
+      },
+      "hosts": [
+        "coreconsole"
+      ],
+      "engines": [
+        "managed_also"
+      ],
+      "tests": [
+        "tests/unit/test_pq_label_contract.py",
+        "tests/integration/pq_label_runtime.py"
+      ]
+    },
+    {
+      "id": "pq_label.inventory",
+      "operation": "pq_label.inventory",
+      "family": "pq_label",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "host_eligibility": [
+        "coreconsole"
+      ],
+      "execution_context": "managed_in_coreconsole",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "PQ_LABEL_JOB",
+        "dispatcher_symbol": "PqCommands.RunLabelJob",
+        "execution_host_class": "coreconsole",
+        "composed_of": []
+      },
+      "input_schema": "schemas/pq_label.args.schema.json#/$defs/inventory",
+      "output_schema": "schemas/pq_label.result.schema.json",
+      "schema_refs": {
+        "input": "schemas/pq_label.args.schema.json#/$defs/inventory",
+        "output": "schemas/pq_label.result.schema.json"
+      },
+      "summary": "Count PQ classes and instances in the current space.",
+      "args_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "evidence_refs": [
+        "src/PqLabel/PqJob.cs",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "notes": "Use existing cad.query_entities for target discovery. Handles must belong to the input DWG. GUI selection/visibility is not persistent across one-shot jobs.",
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "read",
+        "no_original_write_default": true
+      },
+      "hosts": [
+        "coreconsole"
+      ],
+      "engines": [
+        "managed_also"
+      ],
+      "tests": [
+        "tests/unit/test_pq_label_contract.py",
+        "tests/integration/pq_label_runtime.py"
+      ]
+    },
+    {
+      "id": "pq_label.validate",
+      "operation": "pq_label.validate",
+      "family": "pq_label",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "host_eligibility": [
+        "coreconsole"
+      ],
+      "execution_context": "managed_in_coreconsole",
+      "write_level": {
+        "default_write_mode": "read",
+        "allowed_write_modes": [
+          "read"
+        ],
+        "dwg_persisted": false,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "PQ_LABEL_JOB",
+        "dispatcher_symbol": "PqCommands.RunLabelJob",
+        "execution_host_class": "coreconsole",
+        "composed_of": []
+      },
+      "input_schema": "schemas/pq_label.args.schema.json#/$defs/validate",
+      "output_schema": "schemas/pq_label.result.schema.json",
+      "schema_refs": {
+        "input": "schemas/pq_label.args.schema.json#/$defs/validate",
+        "output": "schemas/pq_label.result.schema.json"
+      },
+      "summary": "Validate all physical host XData and current-space semantic occurrences.",
+      "args_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "evidence_refs": [
+        "src/PqLabel/PqJob.cs",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "notes": "Use existing cad.query_entities for target discovery. Handles must belong to the input DWG. GUI selection/visibility is not persistent across one-shot jobs.",
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "read",
+        "no_original_write_default": true
+      },
+      "hosts": [
+        "coreconsole"
+      ],
+      "engines": [
+        "managed_also"
+      ],
+      "tests": [
+        "tests/unit/test_pq_label_contract.py",
+        "tests/integration/pq_label_runtime.py"
+      ]
+    },
+    {
+      "id": "pq_label.class.set",
+      "operation": "pq_label.class.set",
+      "family": "pq_label",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "host_eligibility": [
+        "coreconsole"
+      ],
+      "execution_context": "managed_in_coreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "PQ_LABEL_JOB",
+        "dispatcher_symbol": "PqCommands.RunLabelJob",
+        "execution_host_class": "coreconsole",
+        "composed_of": []
+      },
+      "input_schema": "schemas/pq_label.args.schema.json#/$defs/class.set",
+      "output_schema": "schemas/pq_label.result.schema.json",
+      "schema_refs": {
+        "input": "schemas/pq_label.args.schema.json#/$defs/class.set",
+        "output": "schemas/pq_label.result.schema.json"
+      },
+      "summary": "Assign class/kind using PQ recursive block semantics; refresh derived caches.",
+      "args_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "handles": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9A-Fa-f]+$"
+            }
+          },
+          "class_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          },
+          "class_kind": {
+            "enum": [
+              "THING",
+              "STUFF"
+            ]
+          },
+          "allow_shared_definitions": {
+            "type": "boolean",
+            "default": false
+          },
+          "overwrite": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "handles",
+          "class_id",
+          "class_kind"
+        ]
+      },
+      "evidence_refs": [
+        "src/PqLabel/PqJob.cs",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "notes": "Use existing cad.query_entities for target discovery. Handles must belong to the input DWG. GUI selection/visibility is not persistent across one-shot jobs.",
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "hosts": [
+        "coreconsole"
+      ],
+      "engines": [
+        "managed_also"
+      ],
+      "tests": [
+        "tests/unit/test_pq_label_contract.py",
+        "tests/integration/pq_label_runtime.py"
+      ]
+    },
+    {
+      "id": "pq_label.class.clear",
+      "operation": "pq_label.class.clear",
+      "family": "pq_label",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "host_eligibility": [
+        "coreconsole"
+      ],
+      "execution_context": "managed_in_coreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "PQ_LABEL_JOB",
+        "dispatcher_symbol": "PqCommands.RunLabelJob",
+        "execution_host_class": "coreconsole",
+        "composed_of": []
+      },
+      "input_schema": "schemas/pq_label.args.schema.json#/$defs/class.clear",
+      "output_schema": "schemas/pq_label.result.schema.json",
+      "schema_refs": {
+        "input": "schemas/pq_label.args.schema.json#/$defs/class.clear",
+        "output": "schemas/pq_label.result.schema.json"
+      },
+      "summary": "Remove class labels recursively and refresh derived caches.",
+      "args_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "handles": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9A-Fa-f]+$"
+            }
+          },
+          "allow_shared_definitions": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "handles"
+        ]
+      },
+      "evidence_refs": [
+        "src/PqLabel/PqJob.cs",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "notes": "Use existing cad.query_entities for target discovery. Handles must belong to the input DWG. GUI selection/visibility is not persistent across one-shot jobs.",
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "hosts": [
+        "coreconsole"
+      ],
+      "engines": [
+        "managed_also"
+      ],
+      "tests": [
+        "tests/unit/test_pq_label_contract.py",
+        "tests/integration/pq_label_runtime.py"
+      ]
+    },
+    {
+      "id": "pq_label.class.set_kind",
+      "operation": "pq_label.class.set_kind",
+      "family": "pq_label",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "host_eligibility": [
+        "coreconsole"
+      ],
+      "execution_context": "managed_in_coreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "PQ_LABEL_JOB",
+        "dispatcher_symbol": "PqCommands.RunLabelJob",
+        "execution_host_class": "coreconsole",
+        "composed_of": []
+      },
+      "input_schema": "schemas/pq_label.args.schema.json#/$defs/class.set_kind",
+      "output_schema": "schemas/pq_label.result.schema.json",
+      "schema_refs": {
+        "input": "schemas/pq_label.args.schema.json#/$defs/class.set_kind",
+        "output": "schemas/pq_label.result.schema.json"
+      },
+      "summary": "Change kind on all authored records of a class in host-owned definitions.",
+      "args_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "class_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          },
+          "class_kind": {
+            "enum": [
+              "THING",
+              "STUFF"
+            ]
+          }
+        },
+        "required": [
+          "class_id",
+          "class_kind"
+        ]
+      },
+      "evidence_refs": [
+        "src/PqLabel/PqJob.cs",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "notes": "Use existing cad.query_entities for target discovery. Handles must belong to the input DWG. GUI selection/visibility is not persistent across one-shot jobs.",
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "hosts": [
+        "coreconsole"
+      ],
+      "engines": [
+        "managed_also"
+      ],
+      "tests": [
+        "tests/unit/test_pq_label_contract.py",
+        "tests/integration/pq_label_runtime.py"
+      ]
+    },
+    {
+      "id": "pq_label.instance.set",
+      "operation": "pq_label.instance.set",
+      "family": "pq_label",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "host_eligibility": [
+        "coreconsole"
+      ],
+      "execution_context": "managed_in_coreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "PQ_LABEL_JOB",
+        "dispatcher_symbol": "PqCommands.RunLabelJob",
+        "execution_host_class": "coreconsole",
+        "composed_of": []
+      },
+      "input_schema": "schemas/pq_label.args.schema.json#/$defs/instance.set",
+      "output_schema": "schemas/pq_label.result.schema.json",
+      "schema_refs": {
+        "input": "schemas/pq_label.args.schema.json#/$defs/instance.set",
+        "output": "schemas/pq_label.result.schema.json"
+      },
+      "summary": "Assign one instance ID to all supplied handles; no definition recursion.",
+      "args_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "handles": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9A-Fa-f]+$"
+            }
+          },
+          "instance_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "pattern": "\\S"
+          }
+        },
+        "required": [
+          "handles",
+          "instance_id"
+        ]
+      },
+      "evidence_refs": [
+        "src/PqLabel/PqJob.cs",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "notes": "Use existing cad.query_entities for target discovery. Handles must belong to the input DWG. GUI selection/visibility is not persistent across one-shot jobs.",
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "hosts": [
+        "coreconsole"
+      ],
+      "engines": [
+        "managed_also"
+      ],
+      "tests": [
+        "tests/unit/test_pq_label_contract.py",
+        "tests/integration/pq_label_runtime.py"
+      ]
+    },
+    {
+      "id": "pq_label.instance.new",
+      "operation": "pq_label.instance.new",
+      "family": "pq_label",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "host_eligibility": [
+        "coreconsole"
+      ],
+      "execution_context": "managed_in_coreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "PQ_LABEL_JOB",
+        "dispatcher_symbol": "PqCommands.RunLabelJob",
+        "execution_host_class": "coreconsole",
+        "composed_of": []
+      },
+      "input_schema": "schemas/pq_label.args.schema.json#/$defs/instance.new",
+      "output_schema": "schemas/pq_label.result.schema.json",
+      "schema_refs": {
+        "input": "schemas/pq_label.args.schema.json#/$defs/instance.new",
+        "output": "schemas/pq_label.result.schema.json"
+      },
+      "summary": "Generate one UUID shared by all supplied handles, not one per handle.",
+      "args_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "handles": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9A-Fa-f]+$"
+            }
+          }
+        },
+        "required": [
+          "handles"
+        ]
+      },
+      "evidence_refs": [
+        "src/PqLabel/PqJob.cs",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "notes": "Use existing cad.query_entities for target discovery. Handles must belong to the input DWG. GUI selection/visibility is not persistent across one-shot jobs.",
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "hosts": [
+        "coreconsole"
+      ],
+      "engines": [
+        "managed_also"
+      ],
+      "tests": [
+        "tests/unit/test_pq_label_contract.py",
+        "tests/integration/pq_label_runtime.py"
+      ]
+    },
+    {
+      "id": "pq_label.instance.clear",
+      "operation": "pq_label.instance.clear",
+      "family": "pq_label",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "host_eligibility": [
+        "coreconsole"
+      ],
+      "execution_context": "managed_in_coreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "PQ_LABEL_JOB",
+        "dispatcher_symbol": "PqCommands.RunLabelJob",
+        "execution_host_class": "coreconsole",
+        "composed_of": []
+      },
+      "input_schema": "schemas/pq_label.args.schema.json#/$defs/instance.clear",
+      "output_schema": "schemas/pq_label.result.schema.json",
+      "schema_refs": {
+        "input": "schemas/pq_label.args.schema.json#/$defs/instance.clear",
+        "output": "schemas/pq_label.result.schema.json"
+      },
+      "summary": "Remove instance ID from supplied handles; no definition recursion.",
+      "args_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "handles": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9A-Fa-f]+$"
+            }
+          }
+        },
+        "required": [
+          "handles"
+        ]
+      },
+      "evidence_refs": [
+        "src/PqLabel/PqJob.cs",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "notes": "Use existing cad.query_entities for target discovery. Handles must belong to the input DWG. GUI selection/visibility is not persistent across one-shot jobs.",
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "hosts": [
+        "coreconsole"
+      ],
+      "engines": [
+        "managed_also"
+      ],
+      "tests": [
+        "tests/unit/test_pq_label_contract.py",
+        "tests/integration/pq_label_runtime.py"
+      ]
+    },
+    {
+      "id": "pq_label.sync",
+      "operation": "pq_label.sync",
+      "family": "pq_label",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "host_eligibility": [
+        "coreconsole"
+      ],
+      "execution_context": "managed_in_coreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "PQ_LABEL_JOB",
+        "dispatcher_symbol": "PqCommands.RunLabelJob",
+        "execution_host_class": "coreconsole",
+        "composed_of": []
+      },
+      "input_schema": "schemas/pq_label.args.schema.json#/$defs/sync",
+      "output_schema": "schemas/pq_label.result.schema.json",
+      "schema_refs": {
+        "input": "schemas/pq_label.args.schema.json#/$defs/sync",
+        "output": "schemas/pq_label.result.schema.json"
+      },
+      "summary": "Synchronize derived class caches on host block references.",
+      "args_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "evidence_refs": [
+        "src/PqLabel/PqJob.cs",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "notes": "Use existing cad.query_entities for target discovery. Handles must belong to the input DWG. GUI selection/visibility is not persistent across one-shot jobs.",
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "hosts": [
+        "coreconsole"
+      ],
+      "engines": [
+        "managed_also"
+      ],
+      "tests": [
+        "tests/unit/test_pq_label_contract.py",
+        "tests/integration/pq_label_runtime.py"
+      ]
+    },
+    {
+      "id": "pq_label.migrate",
+      "operation": "pq_label.migrate",
+      "family": "pq_label",
+      "status": "implemented",
+      "engine_tier": "managed_also",
+      "host_eligibility": [
+        "coreconsole"
+      ],
+      "execution_context": "managed_in_coreconsole",
+      "write_level": {
+        "default_write_mode": "write_copy",
+        "allowed_write_modes": [
+          "write_copy"
+        ],
+        "dwg_persisted": true,
+        "original_write_default": false
+      },
+      "handler": {
+        "router_lane": "PQ_LABEL_JOB",
+        "dispatcher_symbol": "PqCommands.RunLabelJob",
+        "execution_host_class": "coreconsole",
+        "composed_of": []
+      },
+      "input_schema": "schemas/pq_label.args.schema.json#/$defs/migrate",
+      "output_schema": "schemas/pq_label.result.schema.json",
+      "schema_refs": {
+        "input": "schemas/pq_label.args.schema.json#/$defs/migrate",
+        "output": "schemas/pq_label.result.schema.json"
+      },
+      "summary": "Migrate legacy COMPANY_PQ data, preserving other Rhino fields.",
+      "args_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {},
+        "required": []
+      },
+      "evidence_refs": [
+        "src/PqLabel/PqJob.cs",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "notes": "Use existing cad.query_entities for target discovery. Handles must belong to the input DWG. GUI selection/visibility is not persistent across one-shot jobs.",
+      "policy": {
+        "source": "config/policy.v2.json",
+        "status_policy": "implemented",
+        "default_write_mode": "write_copy",
+        "no_original_write_default": true
+      },
+      "hosts": [
+        "coreconsole"
+      ],
+      "engines": [
+        "managed_also"
+      ],
+      "tests": [
+        "tests/unit/test_pq_label_contract.py",
+        "tests/integration/pq_label_runtime.py"
+      ]
     }
   ],
   "catalog_families": [

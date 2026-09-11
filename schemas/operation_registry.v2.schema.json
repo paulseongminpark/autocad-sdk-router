@@ -135,7 +135,7 @@
           "properties": {
             "router_lane": {
               "type": ["string", "null"],
-              "enum": ["ARIADNE_CAD_JOB", "ARIADNE_NATIVE_JOB", "geometry_native", "full_autocad", "libredwg_sidecar", null],
+              "enum": ["ARIADNE_CAD_JOB", "ARIADNE_NATIVE_JOB", "PQ_LABEL_JOB", "geometry_native", "full_autocad", "libredwg_sidecar", null],
               "description": "Router entrypoint/lane that handles this op. null for catalogued ops with no lane yet."
             },
             "dispatcher_symbol": {

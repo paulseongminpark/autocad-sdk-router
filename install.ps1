@@ -21,6 +21,7 @@
 [CmdletBinding()]
 param(
   [switch]$Full,
+  [switch]$PqLabel,
   [string]$PythonExe = ''
 )
 $ErrorActionPreference = 'Stop'
@@ -68,6 +69,12 @@ if (-not $acad) { throw "AutoCAD (accoreconsole.exe) not found under <ProgramFil
 $acadVer = 'unknown'
 if ($acad -match 'AutoCAD\s+(\d{4})') { $acadVer = $Matches[1] }
 Ok "AutoCAD $acadVer  ($acad)"
+if ($PqLabel) {
+  if ($acadVer -ne '2027') { throw 'PQ Label 1.9.1 requires AutoCAD 2027.' }
+  if (Get-Process -Name 'acad','accoreconsole' -ErrorAction SilentlyContinue) {
+    throw 'Close AutoCAD and Core Console before installing PQ Label.'
+  }
+}
 
 # 2) prebuilt native modules for this version -----------------------------------
 $prebuilt = Join-Path $Root "prebuilt\$acadVer"
@@ -117,6 +124,13 @@ Say "Router status smoke (live tool probe)..."
 Invoke-CheckedNative -Label 'router status smoke' `
   -FilePath (Join-Path $Root 'tools\autocad-router.ps1') -ArgumentList @('-Action', 'status') | Out-Null
 Ok "router status ran (see reports\autocad_router_status_latest.json)"
+
+if ($PqLabel) {
+  Invoke-CheckedNative -Label 'PQ Label installation' -FilePath 'powershell.exe' `
+    -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File',
+      (Join-Path $Root 'prebuilt\2027\pq-label\PQ-Label-1.9.1\Install-PqLabel.ps1'))
+  Ok 'PQ Label installed. Open a staging drawing in AutoCAD and run PQPALETTE.'
+}
 
 # 5) MCP registration block to paste -------------------------------------------
 # Resolve the CONCRETE interpreter (sys.executable) so the MCP command is

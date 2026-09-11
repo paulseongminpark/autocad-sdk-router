@@ -849,8 +849,9 @@ _TOOLS: List[Dict[str, Any]] = [
     },
     {
         "name": "cad.run_operation",
-        "description": "Drive ANY implemented registry operation (the native ObjectARX op surface) "
-                       "through the headless native job lane. Allow-list gated: only status=='implemented' "
+        "description": "Drive implemented registry operations, including pq_label.* managed labeling, "
+                       "through the registered job lane. Discover arguments with cad.registry_explain; "
+                       "reuse cad.query_entities to find target handles. Allow-list gated: only status=='implemented' "
                        "ops run; blocked/unknown are refused (executed=false), never faked. Write-mode "
                        "governance: defaults to the op's registry default_write_mode; an explicit write_mode "
                        "must be in the op's allowed_write_modes; 'write_original' is NEVER permitted (the "

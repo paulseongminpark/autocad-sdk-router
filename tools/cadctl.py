@@ -1535,6 +1535,16 @@ class Cad:
                 f"write_mode '{wm}' is not in allowed_write_modes {sorted(allowed)} for '{op_id}'",
                 out_dir_p, registry_status=op_status)
 
+        # Operation-specific schemas are additive; existing operations keep their contract.
+        if rec.get("args_schema") is not None:
+            try:
+                import jsonschema
+                jsonschema.Draft7Validator(rec["args_schema"]).validate(args if args is not None else {})
+            except Exception as exc:
+                return self._run_op_refusal(op_id, "blocked",
+                    f"INVALID_OPERATION_ARGUMENTS: {exc}", out_dir_p,
+                    registry_status=op_status, write_mode=wm)
+
         # --- stage the input DWG (original READ-ONLY) ---
         if not dwg_path:
             return self._run_op_refusal(op_id, "blocked",

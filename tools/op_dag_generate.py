@@ -61,12 +61,9 @@ describes):
     close a cycle. `topo_check` re-verifies this at generation time regardless
     and FAILS LOUD rather than silently emitting a cyclic graph.
 
-  arg_keys[] -- 15 of 517 op_ids carry a real per-op args schema
-    (``schemas/cad_job.v2.schema.json`` allOf if/then blocks) -- the only
-    ground-truth arg-key source in this tree today (F2's promotion manifest,
-    which would carry arg_keys for every promoted op, does not exist yet).
-    Those 15 use their exact ``args.properties`` key set; every other op_id
-    gets ``[]`` -- honestly empty, not a guessed field name.
+  arg_keys[] -- operation-local args_schema.properties takes precedence;
+    otherwise use schemas/cad_job.v2.schema.json allOf if/then blocks.
+    Operations without an authored schema get [] rather than guessed fields.
 
   target_files[] -- path-like tokens parsed out of the op's own
     citation / evidence_refs / tests registry fields, KEPT ONLY if the token
@@ -332,9 +329,8 @@ _DERIVATION_RULES = {
                     "coarse same-family P|D -> R read-before-write gate (SS2.4 tier-barrier "
                     "projection); acyclic by construction + defensively re-checked "
                     "(tests/unit/test_op_dag_generate.py)",
-    "arg_keys": "schemas/cad_job.v2.schema.json allOf if/then args.properties keys for the 15 "
-                "op_ids that carry one; [] elsewhere (no per-op arg schema authored yet -- "
-                "honest, not guessed)",
+    "arg_keys": "operation args_schema.properties, otherwise schemas/cad_job.v2.schema.json "
+                "allOf if/then args.properties; [] when no schema is authored",
     "target_files": "citation / evidence_refs / tests path-like tokens, kept ONLY if NOT "
                      "under a gitignored worktree-local evidence root (runs/, staging/, "
                      "ErrorReports/) and os.path.isfile resolves on this worktree at "
@@ -361,7 +357,7 @@ def build_dag() -> Dict[str, Any]:
         nodes.append({
             "op_id": oid,
             "predecessors": predecessors[oid],
-            "arg_keys": arg_schema.get(oid, []),
+            "arg_keys": sorted(op["args_schema"].get("properties", {})) if "args_schema" in op else arg_schema.get(oid, []),
             "target_files": derive_target_files(op, python_wired_ids),
             "acceptance_test_id": derive_acceptance_test_id(op),
             "persistence_class": pclass[oid],

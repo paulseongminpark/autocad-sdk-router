@@ -702,6 +702,14 @@ function Test-NativeP1CadJobOperation {
   return [bool]$set.ContainsKey($OperationName)
 }
 
+function Test-PqLabelJobOperation {
+  param([string]$OperationName)
+  $registry = Get-Content -LiteralPath (Join-Path $RouterHome 'config\operations.v2.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+  return [bool](@($registry.operations | Where-Object {
+    $_.id -eq $OperationName -and $_.status -eq 'implemented' -and $_.handler.router_lane -eq 'PQ_LABEL_JOB'
+  }).Count -eq 1)
+}
+
 $script:_ExecutionHostClassMap = $null
 $script:_ExecutionHostClassMapCacheKey = $null
 
@@ -1777,8 +1785,12 @@ function Invoke-CadJobRoute {
   }
   $jobOperation = Get-CadJobOperation -Path $jobIn
 
+  $isPqLabelJob = Test-PqLabelJobOperation -OperationName $jobOperation
+  if ($isPqLabelJob -and $effectiveWriteMode -notin @('read', 'write_copy')) {
+    throw 'PQ Label jobs require read or write_copy.'
+  }
   if (@('write_copy', 'live_edit') -contains $effectiveWriteMode -and
-      -not (Test-NativeP1CadJobOperation -OperationName $jobOperation)) {
+      -not (Test-NativeP1CadJobOperation -OperationName $jobOperation) -and -not $isPqLabelJob) {
     $engineExitCode = -17
     return [ordered]@{
       engine_exit_code = $engineExitCode
@@ -1884,11 +1896,29 @@ function Invoke-CadJobRoute {
     }
   }
 
-  $dll = Resolve-NativeExtractorDll
+  $dll = if ($isPqLabelJob) {
+    $pqRoot = Join-Path $RouterHome 'prebuilt\2027\pq-label\router'
+    $pqDll = Join-Path $pqRoot 'PqLabel.dll'
+    $pqManifest = Get-Content -LiteralPath (Join-Path $pqRoot 'manifest.json') -Raw | ConvertFrom-Json
+    if ((Get-Sha256File -Path $pqDll) -ne $pqManifest.sha256) {
+      throw 'PQ Label router DLL failed integrity verification.'
+    }
+    foreach ($source in $pqManifest.sources.PSObject.Properties) {
+      if ((Get-Sha256File -Path (Join-Path $RouterHome $source.Name)) -ne $source.Value) {
+        throw "PQ Label source/build mismatch: $($source.Name)"
+      }
+    }
+    $pqDll
+  } else { Resolve-NativeExtractorDll }
   $dllFwd = $dll.Replace('\', '/')
   $scrPath = Join-Path $runOut 'cad_job.scr'
-  $scrLines = @('SECURELOAD', '0', 'FILEDIA', '0', 'CMDECHO', '0', 'NETLOAD', "`"$dllFwd`"", 'ARIADNE_CAD_JOB')
-  if ($effectiveWriteMode -eq 'write_original') {
+  $jobCommand = if ($isPqLabelJob) { 'PQ_LABEL_JOB' } else { 'ARIADNE_CAD_JOB' }
+  if ($isPqLabelJob -and $effectiveWriteMode -eq 'read') {
+    Set-ItemProperty -LiteralPath $inputDwg -Name IsReadOnly -Value $true
+  }
+  $scrLines = @('SECURELOAD', '0', 'FILEDIA', '0', 'CMDECHO', '0', 'NETLOAD', "`"$dllFwd`"", $jobCommand)
+  $managedSave = $effectiveWriteMode -eq 'write_original' -or ($isPqLabelJob -and $effectiveWriteMode -eq 'write_copy')
+  if ($managedSave) {
     $scrLines += 'QSAVE'
   }
   $scrLines += @('QUIT', '')
@@ -1925,7 +1955,7 @@ function Invoke-CadJobRoute {
       -WorkingInput $inputDwg `
       -WorkingSha256Before $workingSha256Before `
       -WorkingSha256After $workingSha256After `
-      -SaveCommandIssued ($effectiveWriteMode -eq 'write_original') `
+      -SaveCommandIssued $managedSave `
       -Additional ([ordered]@{
         mode = 'cad_job'
         job = $jobIn
