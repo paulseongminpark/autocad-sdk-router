@@ -1,0 +1,59 @@
+name: Mirror to SUNAPSE-BOOTCAMP
+
+# One-way mirror. This repository (paulseongminpark/autocad-sdk-router) is canonical;
+# SUNAPSE-BOOTCAMP/autocad-sdk-router is a read-only copy for the bootcamp org.
+# Issues and PRs live here only. The mirror receives main and tags, fast-forward only:
+# if the mirror's main ever gains commits that are not on canonical main, the job fails
+# instead of overwriting them. Fix by bringing those commits upstream via PR, then re-run.
+
+on:
+  push:
+    branches: [main]
+    tags: ["*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mirror-to-sunapse-bootcamp
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # The MIRROR_TOKEN secret is bound to this environment, which only main may use.
+    environment: sunapse-mirror
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Push main and tags to the mirror (fast-forward only)
+        env:
+          MIRROR_TOKEN: ${{ secrets.MIRROR_TOKEN }}
+          MIRROR_REPO: SUNAPSE-BOOTCAMP/autocad-sdk-router
+        run: |
+          set -euo pipefail
+          # Credentials go in a header, not the remote URL, so they never appear in git output.
+          auth="$(printf 'x-access-token:%s' "$MIRROR_TOKEN" | base64 -w0)"
+          git config --local "http.https://github.com/.extraheader" "AUTHORIZATION: basic $auth"
+          git remote add mirror "https://github.com/$MIRROR_REPO.git"
+          git fetch --quiet mirror main
+
+          ahead="$(git rev-list --count mirror/main..origin/main)"
+          stray="$(git rev-list --count origin/main..mirror/main)"
+          echo "canonical main: $(git rev-parse --short origin/main)  mirror main: $(git rev-parse --short mirror/main)"
+          echo "commits to send: $ahead   stray commits on mirror: $stray"
+
+          if [ "$stray" != "0" ]; then
+            echo "::error::mirror main has $stray commit(s) not on canonical main; refusing to overwrite."
+            git log --oneline origin/main..mirror/main
+            exit 1
+          fi
+
+          git push mirror origin/main:refs/heads/main
+          git push mirror --tags
+          echo "mirror main now: $(git ls-remote --heads mirror main | cut -c1-7)"
