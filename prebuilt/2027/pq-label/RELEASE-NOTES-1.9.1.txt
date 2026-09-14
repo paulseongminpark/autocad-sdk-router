@@ -1,0 +1,28 @@
+PQ Label 1.9.1 Distribution
+===========================
+
+Primary package
+- PQ-Label-Setup-v1.9.1.zip
+- SHA-256: F6ECDF189303C2E6D30BB7327F7D9B267555DA31FB43A2D81878A89C4391A94F
+- Extract the ZIP and double-click Install.cmd.
+
+Single-file installer
+- PQ-Label-Setup-v1.9.1.exe
+- SHA-256: 65800E06766FD2C6B96600247D15F8275073B41D58C970BA40FC577528C2A8E2
+- Built with Windows IExpress.
+- This executable is not digitally signed and Windows SmartScreen may display a warning.
+
+Target
+- AutoCAD 2027 64-bit
+- Per-user installation; administrator rights are not required.
+- Install location: %APPDATA%\Autodesk\ApplicationPlugins\PqLabel.bundle
+
+Verification performed
+- Release DLL compiled successfully.
+- Runtime bundle excludes source and test files.
+- DLL SHA-256 is verified before and after installation.
+- Install, update backup, installed uninstaller, and recoverable uninstall were tested in an isolated directory.
+- IExpress payload extraction and file inventory were verified.
+
+Operational note
+- The installer refuses to modify the live ApplicationPlugins folder while AutoCAD or AutoCAD Core Console is running.

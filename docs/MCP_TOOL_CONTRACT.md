@@ -92,6 +92,13 @@ SDK.
 
 ## Hidden legacy aliases and argument binding
 
+PQ Label operations use the existing `cad.run_operation` surface with `pq_label.*`
+operation IDs. `cad.registry_explain` exposes their closed `args_schema`; entity
+discovery remains in `cad.query_entities`. The PQ managed job lane permits only
+read or staged write_copy, verifies the router DLL/source manifest, and returns
+the existing execution receipt. No additional MCP tool or server is registered.
+See [PQ Label integration](pq-label/INTEGRATION.md) for scopes and examples.
+
 The adapter accepts **hidden legacy aliases** for compatibility with existing
 callers, but aliases are not present in `tools/list` and must not be added to a
 published `inputSchema`. The accepted aliases are:

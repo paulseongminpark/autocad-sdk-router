@@ -26,6 +26,17 @@ prebuilt 파일이 존재하거나 라우트 탐지가 성공했다는 사실만
 
 ## 사용 인터페이스
 
+### PQ Label (선택 설치)
+
+AutoCAD 2027용 PQ Label 1.9.1의 소스, 설명서와 배포 패키지를 함께 제공합니다.
+LLM은 기존 `cad.query_entities`로 대상을 찾고 `cad.run_operation`의 `pq_label.*`
+연산으로 조회·class/instance 편집·동기화·검증·마이그레이션을 실행할 수 있습니다.
+MCP 실행에는 팔레트 설치가 필요 없으며 라우터가 staging 사본에서 전용 DLL을 로드합니다.
+AutoCAD를 종료한 뒤 `powershell -ExecutionPolicy Bypass -File .\install.ps1 -PqLabel`로
+설치하고, **staging 도면 사본**을 열어 `PQPALETTE`를 실행합니다.
+대화형 명령은 현재 도면을 수정하므로 원본 도면에서 실행하지 않습니다.
+통합 범위와 개별 설치·빌드는 [PQ Label 통합 안내](docs/pq-label/INTEGRATION.md)를 참고하세요.
+
 | 목적 | 진입점 |
 |---|---|
 | AI 에이전트 | `python tools\cadagent_mcp.py --serve` |

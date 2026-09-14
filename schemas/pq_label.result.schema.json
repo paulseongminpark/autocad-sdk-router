@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": [
+    "schema",
+    "engine",
+    "operation",
+    "write_mode",
+    "status"
+  ],
+  "properties": {
+    "schema": {
+      "const": "ariadne.autocad_sdk_job_result.v1"
+    },
+    "engine": {
+      "const": "managed_objectarx_active_document"
+    },
+    "operation": {
+      "enum": [
+        "pq_label.inspect",
+        "pq_label.inventory",
+        "pq_label.validate",
+        "pq_label.class.set",
+        "pq_label.class.clear",
+        "pq_label.class.set_kind",
+        "pq_label.instance.set",
+        "pq_label.instance.new",
+        "pq_label.instance.clear",
+        "pq_label.sync",
+        "pq_label.migrate"
+      ]
+    },
+    "write_mode": {
+      "enum": [
+        "read",
+        "write_copy"
+      ]
+    },
+    "status": {
+      "enum": [
+        "ok",
+        "error"
+      ]
+    },
+    "result": {
+      "type": "object"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

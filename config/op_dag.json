@@ -7,20 +7,20 @@
     "catalogue": "config/operations.v2.json operations[].id -- the same id set operation_coverage_matrix.py / reconcile_native_registry.py key off",
     "persistence_class": "status=='blocked' -> NON_GOAL; family=='live' or write_level.default_write_mode=='live_edit' -> L; default_write_mode=='read' -> R; default_write_mode in (write_copy, write_original): family in {entities, brep_solids, geometry_kernel} -> P else D",
     "predecessors": "handler.composed_of (authored, validated against the catalogue) UNION coarse same-family P|D -> R read-before-write gate (SS2.4 tier-barrier projection); acyclic by construction + defensively re-checked (tests/unit/test_op_dag_generate.py)",
-    "arg_keys": "schemas/cad_job.v2.schema.json allOf if/then args.properties keys for the 15 op_ids that carry one; [] elsewhere (no per-op arg schema authored yet -- honest, not guessed)",
+    "arg_keys": "operation args_schema.properties, otherwise schemas/cad_job.v2.schema.json allOf if/then args.properties; [] when no schema is authored",
     "target_files": "citation / evidence_refs / tests path-like tokens, kept ONLY if NOT under a gitignored worktree-local evidence root (runs/, staging/, ErrorReports/) and os.path.isfile resolves on this worktree at generation time, plus tools/patch_engine.py for op_ids NATIVE_WRITE_OP_MAP already wires (no invented paths, no worktree-variable paths)",
     "acceptance_test_id": "registry tests[0] (current best-evidence test ref; F3's future per-op W+D roundtrip gate is not built in this tree yet)"
   },
   "totals": {
-    "catalogue_count": 552,
-    "node_count": 552,
-    "edge_count": 1410,
+    "catalogue_count": 563,
+    "node_count": 563,
+    "edge_count": 1434,
     "by_persistence_class": {
-      "D": 61,
+      "D": 69,
       "L": 35,
       "NON_GOAL": 62,
       "P": 59,
-      "R": 335
+      "R": 338
     }
   },
   "audit": {
@@ -6133,6 +6133,191 @@
       ],
       "acceptance_test_id": "tests/unit/test_operation_registry_v2.py::TestTotalsMatchRecords::test_catalog_union_is_classified",
       "persistence_class": "NON_GOAL"
+    },
+    {
+      "op_id": "pq_label.class.clear",
+      "predecessors": [
+        "pq_label.inspect",
+        "pq_label.inventory",
+        "pq_label.validate"
+      ],
+      "arg_keys": [
+        "allow_shared_definitions",
+        "handles"
+      ],
+      "target_files": [
+        "src/PqLabel/PqJob.cs",
+        "tests/integration/pq_label_runtime.py",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_pq_label_contract.py",
+      "persistence_class": "D"
+    },
+    {
+      "op_id": "pq_label.class.set",
+      "predecessors": [
+        "pq_label.inspect",
+        "pq_label.inventory",
+        "pq_label.validate"
+      ],
+      "arg_keys": [
+        "allow_shared_definitions",
+        "class_id",
+        "class_kind",
+        "handles",
+        "overwrite"
+      ],
+      "target_files": [
+        "src/PqLabel/PqJob.cs",
+        "tests/integration/pq_label_runtime.py",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_pq_label_contract.py",
+      "persistence_class": "D"
+    },
+    {
+      "op_id": "pq_label.class.set_kind",
+      "predecessors": [
+        "pq_label.inspect",
+        "pq_label.inventory",
+        "pq_label.validate"
+      ],
+      "arg_keys": [
+        "class_id",
+        "class_kind"
+      ],
+      "target_files": [
+        "src/PqLabel/PqJob.cs",
+        "tests/integration/pq_label_runtime.py",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_pq_label_contract.py",
+      "persistence_class": "D"
+    },
+    {
+      "op_id": "pq_label.inspect",
+      "predecessors": [],
+      "arg_keys": [
+        "handles"
+      ],
+      "target_files": [
+        "src/PqLabel/PqJob.cs",
+        "tests/integration/pq_label_runtime.py",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_pq_label_contract.py",
+      "persistence_class": "R"
+    },
+    {
+      "op_id": "pq_label.instance.clear",
+      "predecessors": [
+        "pq_label.inspect",
+        "pq_label.inventory",
+        "pq_label.validate"
+      ],
+      "arg_keys": [
+        "handles"
+      ],
+      "target_files": [
+        "src/PqLabel/PqJob.cs",
+        "tests/integration/pq_label_runtime.py",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_pq_label_contract.py",
+      "persistence_class": "D"
+    },
+    {
+      "op_id": "pq_label.instance.new",
+      "predecessors": [
+        "pq_label.inspect",
+        "pq_label.inventory",
+        "pq_label.validate"
+      ],
+      "arg_keys": [
+        "handles"
+      ],
+      "target_files": [
+        "src/PqLabel/PqJob.cs",
+        "tests/integration/pq_label_runtime.py",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_pq_label_contract.py",
+      "persistence_class": "D"
+    },
+    {
+      "op_id": "pq_label.instance.set",
+      "predecessors": [
+        "pq_label.inspect",
+        "pq_label.inventory",
+        "pq_label.validate"
+      ],
+      "arg_keys": [
+        "handles",
+        "instance_id"
+      ],
+      "target_files": [
+        "src/PqLabel/PqJob.cs",
+        "tests/integration/pq_label_runtime.py",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_pq_label_contract.py",
+      "persistence_class": "D"
+    },
+    {
+      "op_id": "pq_label.inventory",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "src/PqLabel/PqJob.cs",
+        "tests/integration/pq_label_runtime.py",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_pq_label_contract.py",
+      "persistence_class": "R"
+    },
+    {
+      "op_id": "pq_label.migrate",
+      "predecessors": [
+        "pq_label.inspect",
+        "pq_label.inventory",
+        "pq_label.validate"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "src/PqLabel/PqJob.cs",
+        "tests/integration/pq_label_runtime.py",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_pq_label_contract.py",
+      "persistence_class": "D"
+    },
+    {
+      "op_id": "pq_label.sync",
+      "predecessors": [
+        "pq_label.inspect",
+        "pq_label.inventory",
+        "pq_label.validate"
+      ],
+      "arg_keys": [],
+      "target_files": [
+        "src/PqLabel/PqJob.cs",
+        "tests/integration/pq_label_runtime.py",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_pq_label_contract.py",
+      "persistence_class": "D"
+    },
+    {
+      "op_id": "pq_label.validate",
+      "predecessors": [],
+      "arg_keys": [],
+      "target_files": [
+        "src/PqLabel/PqJob.cs",
+        "tests/integration/pq_label_runtime.py",
+        "tests/unit/test_pq_label_contract.py"
+      ],
+      "acceptance_test_id": "tests/unit/test_pq_label_contract.py",
+      "persistence_class": "R"
     },
     {
       "op_id": "prompt.alert",

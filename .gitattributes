@@ -33,3 +33,6 @@ reports/v1_operation_gate_latest.json       text eol=lf
 *.ico  binary
 *.pdf  binary
 *.zip  binary
+# Preserve the upstream release bytes, including files covered by SHA256SUMS.txt.
+prebuilt/2027/pq-label/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+src/PqLabel/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

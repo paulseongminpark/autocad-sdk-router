@@ -342,8 +342,8 @@ def test_live_registry_receipt_exposes_consistent_schema_and_status_histogram() 
     assert isinstance(receipt, OperationRegistryReceipt)
     assert receipt.verified is True
     assert receipt.registry_schema == "ariadne.operations_registry.v2"
-    assert receipt.operation_count == sum(receipt.status_histogram.values()) == 552
-    assert receipt.status_histogram == {"blocked": 62, "implemented": 490}
+    assert receipt.operation_count == sum(receipt.status_histogram.values()) == 563
+    assert receipt.status_histogram == {"blocked": 62, "implemented": 501}
     assert receipt.status_vocabulary == frozenset(
         {"implemented", "wired", "stub", "catalogued", "deprecated", "blocked"}
     )
