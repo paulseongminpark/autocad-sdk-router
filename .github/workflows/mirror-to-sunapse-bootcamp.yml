@@ -23,6 +23,9 @@ jobs:
   mirror:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Only the canonical repo mirrors. The mirror receives this file too, and must not
+    # try to run it against itself (no token there; it would just fail and page).
+    if: github.repository == 'paulseongminpark/autocad-sdk-router'
     # The MIRROR_TOKEN secret is bound to this environment, which only main may use.
     environment: sunapse-mirror
     steps:
